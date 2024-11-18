@@ -1,6 +1,8 @@
 # Contributing to the Project
 
-Thank you for your interest in contributing to this project! This guide outlines the standards and best practices to follow for contributing effectively and maintaining code quality.
+Thank you for your interest in contributing to this project! This guide outlines
+the standards and best practices to follow for contributing effectively and
+maintaining code quality.
 
 ---
 
@@ -29,14 +31,17 @@ Thank you for your interest in contributing to this project! This guide outlines
 ## Pull Request (PR) Standards
 
 1. **PR Title**:
+
 - Follow the commit message format.
 - Example: `MERGE: {{TICKET-REF}} {{TICKET-NAME}}`.
 
 2. **PR Description**:
+
 - **Context**: Why is this change important?
 - **Major Changes**: List the key changes made.
 - **Tests Performed**: Indicate if you’ve added or executed tests.
-- **Link to Issues**: Use `Closes #<issue number>` to associate the PR with an issue.
+- **Link to Issues**: Use `Closes #<issue number>` to associate the PR with an
+  issue.
 - Example:
   ```
   ### Context
@@ -49,3 +54,5 @@ Thank you for your interest in contributing to this project! This guide outlines
   ### Tests
   - Verified multiple client acceptation.
   ```
+
+**Don't miss to add labels**
