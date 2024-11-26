@@ -10,11 +10,12 @@ FAILED=false
 
 while IFS= read -r COMMIT; do
   if [[ ! $COMMIT =~ $STANDARD ]]; then
-    echo "Error : $COMMIT don't respect the standard"
+    echo "::error title=This commit does not respect the standard::$COMMIT"
     FAILED=true
   fi
 done <<< "$LAST_COMMITS"
 
-if [ "$FAILED" = true]; then
+if [ "$FAILED" = true ]; then
   exit 1
 fi
+echo "::notice title=Standard check::is ok"

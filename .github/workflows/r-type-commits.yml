@@ -17,4 +17,4 @@ jobs:
         uses: actions/checkout@v4
       - name: lint
         run: |
-          ./commit_lint.sh
+          ./ci_scripts/commit_lint.sh
