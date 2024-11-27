@@ -50,3 +50,6 @@ build/*
 
 tools/conan-venv/*
 CMakeUserPresets.json
+
+#MacOS
+.DS_STORE
