@@ -5,15 +5,16 @@
 
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
+PROCS=$(nproc)
 
 cd $SCRIPTPATH/..
 printf "### Pulling dependent submodules\n"
-git pull --recurse-submodules
+git submodule update
 
 printf "\n### Generating build files\n"
 set -e
 cmake -B build .
 cd build
 printf "\n### Building R-Type\n"
-make
+make -j $PROCS
 printf "\n### Build done\n"

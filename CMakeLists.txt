@@ -11,5 +11,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(${PROJECT_SOURCE_DIR}/dependencies/SFML)
 
 add_subdirectory(libs/ecs)
-# add_subdirectory(client)
-# add_subdirectory(tests)
+add_subdirectory(libs/system)
+add_subdirectory(server)
+add_subdirectory(client)
