@@ -8,7 +8,6 @@ project(ecs
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
 
 file(GLOB_RECURSE SRC "./src/*.cpp")
 file(GLOB_RECURSE APP "./include/*.hpp")
@@ -18,6 +17,7 @@ add_library(${PROJECT_NAME} SHARED ${SRC} ${APP})
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
+include_directories(${PROJECT_SOURCE_DIR}/../../dependencies/SFML)
 find_package(SFML COMPONENTS system window graphics REQUIRED)
 target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics)
 
