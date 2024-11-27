@@ -19,6 +19,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 if (WIN32)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -WX
     )
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 else ()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror
     -Wswitch-default -Wcast-align -Wpointer-arith -Wundef -Wcast-qual

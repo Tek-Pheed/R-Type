@@ -21,6 +21,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics)
 
 if (WIN32)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -WX
     )
 else ()
