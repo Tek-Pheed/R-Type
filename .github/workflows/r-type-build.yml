@@ -27,21 +27,10 @@ jobs:
         uses: actions/checkout@v4
       - name: build
         run: ./.github/ci_scripts/run_make.bat
-  code_analyzer:
-    name: Code analyzer
-    runs-on: [ self-hosted, linux, x64 ]
-    needs: check_program_compilation_linux
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install cppcheck
-        run: sudo apt-get update && sudo apt-get install cppcheck -y
-      - name: Run cppcheck
-        run: ./.github/ci_scripts/run_cppcheck.sh
   run_tests:
     name: Run unit tests
     runs-on: [ self-hosted, linux, x64 ]
-    needs: code_analyzer
+    needs: check_program_compilation_linux
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -1,19 +1,19 @@
 cmake .
-if ($?) {
-    cmake -B build -S .
-} else {
-    Write-Output "::error title=Build Checker windows::CMake Configuration Failed"
+if %errorlevel% neq 0 (
+    echo "::error title=Build Checker windows::CMake Configuration Failed"
     exit 1
-}
+)
 
-if ($?) {
-    make -C build > temp.txt 2>&1
-} else {
-    Write-Output "::error title=Build Checker windows::CMake Configuration Failed"
-    exit 1
-}
+cmake -B build -S .
 
-if (-not $?) {
-    Write-Output "::error title=Build Checker windows::CMake Configuration Failed"
+if %errorlevel% neq 0 (
+    echo "::error title=Build Checker windows::CMake Configuration Failed"
     exit 1
-}
+)
+
+make -C build > temp.txt 2>&1
+
+if %errorlevel% neq 0 (
+    echo "::error title=Build Checker windows::CMake Configuration Failed"
+    exit 1
+)
