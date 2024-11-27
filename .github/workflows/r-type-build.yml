@@ -1,0 +1,30 @@
+name: R-Type - Build and tests
+
+on:
+  push:
+    branches-ignore:
+      - "ga-ignore-*"
+  pull_request:
+    branches-ignore:
+      - "ga-ignore-*"
+
+jobs:
+  check_program_compilation_linux:
+    name: Build on linux
+    runs-on: [ self-hosted, linux, x64 ]
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: build
+        run: ./.github/ci_scripts/run_make.sh
+  check_program_compilation_windows:
+    name: Build on windows
+    runs-on: [ self-hosted, windows, x64 ]
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: build
+        run: ./.github/ci_scripts/run_make.bat
+
