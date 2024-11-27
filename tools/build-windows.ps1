@@ -4,4 +4,4 @@ cd $SCRIPTPATH/..
 git pull --recurse-submodules
 cmake -B build .
 cd build
-cmake --build .
+cmake --build . -j %NUMBER_OF_PROCESSORS%

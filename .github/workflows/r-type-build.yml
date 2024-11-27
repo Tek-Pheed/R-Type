@@ -12,7 +12,7 @@ jobs:
   check_program_compilation_linux:
     name: Build on linux
     runs-on: [ self-hosted, linux, x64 ]
-    timeout-minutes: 2
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
   check_program_compilation_windows:
     name: Build on windows
     runs-on: [ self-hosted, windows, x64 ]
-    timeout-minutes: 2
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
