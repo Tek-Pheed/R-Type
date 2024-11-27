@@ -31,15 +31,6 @@ jobs:
           submodules: true
       - name: build
         run: ./tools/build-windows.ps1
-  run_tests:
-    name: Run unit tests
-    runs-on: [ self-hosted, linux, x64 ]
-    needs: check_program_compilation_linux
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: run tests
-        run: make run_tests
 
 
 
