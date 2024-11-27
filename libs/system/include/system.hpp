@@ -8,4 +8,6 @@
 #ifndef SYSTEM_HPP
 #define SYSTEM_HPP
 
+void empty(void);
+
 #endif /* SYSTEM_HPP */

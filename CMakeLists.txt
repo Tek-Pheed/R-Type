@@ -7,6 +7,7 @@ project(R-Type
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/dependencies/SFML)
 

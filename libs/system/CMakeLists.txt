@@ -8,6 +8,7 @@ project(system
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 file(GLOB_RECURSE SRC "./src/*.cpp")
 file(GLOB_RECURSE APP "./include/*.hpp")
@@ -19,7 +20,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 if (WIN32)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -WX
     )
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 else ()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror
     -Wswitch-default -Wcast-align -Wpointer-arith -Wundef -Wcast-qual

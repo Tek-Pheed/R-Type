@@ -6,3 +6,8 @@
 */
 
 #include "system.hpp"
+
+void empty(void)
+{
+    return;
+}

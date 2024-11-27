@@ -8,4 +8,6 @@
 #ifndef ECS_HPP
 #define ECS_HPP
 
+void empty(void);
+
 #endif /* ECS_HPP */

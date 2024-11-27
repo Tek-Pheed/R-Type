@@ -6,3 +6,8 @@
 */
 
 #include "ecs.hpp"
+
+void empty(void)
+{
+    return;
+}
