@@ -1,0 +1,23 @@
+name: R-Type - Code analyzer
+
+on:
+  push:
+    branches-ignore:
+      - "ga-ignore-*"
+  pull_request:
+    branches-ignore:
+      - "ga-ignore-*"
+
+jobs:
+  code_analyzer:
+    name: Code analyzer
+    runs-on: [ self-hosted, linux, x64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate Build Files
+        run: cmake -B build .
+
+      - name: Run cppcheck
+        run: ./.github/ci_scripts/run_cppcheck.sh

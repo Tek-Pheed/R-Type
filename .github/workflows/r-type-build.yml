@@ -1,0 +1,37 @@
+name: R-Type - Project
+
+on:
+  push:
+    branches-ignore:
+      - "ga-ignore-*"
+  pull_request:
+    branches-ignore:
+      - "ga-ignore-*"
+
+jobs:
+  check_program_compilation_linux:
+    name: Build on linux
+    runs-on: [ self-hosted, linux, x64 ]
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: build
+        run: ./tools/build-linux.sh
+  check_program_compilation_windows:
+    name: Build on windows
+    runs-on: [ self-hosted, windows, x64 ]
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: build
+        run: ./tools/build-windows.ps1
+
+
+
+

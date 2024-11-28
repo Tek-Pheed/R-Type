@@ -37,3 +37,19 @@
 
 #CMAKE
 cmake-build-debug
+
+.bootstrap
+.bootstrap/*
+
+.cache
+.chache/*
+
+build/*
+check.txt
+*.pdf
+
+tools/conan-venv/*
+CMakeUserPresets.json
+
+#MacOS
+.DS_STORE
