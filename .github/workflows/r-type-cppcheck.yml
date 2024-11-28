@@ -15,5 +15,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Generate Build Files
+        run: cmake -B build .
+
       - name: Run cppcheck
         run: ./.github/ci_scripts/run_cppcheck.sh
