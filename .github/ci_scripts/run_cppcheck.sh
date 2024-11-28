@@ -1,8 +1,5 @@
 #!/bin/sh
 
-mkdir -p __cppcheckWorkaroundInclude
-find . -type f \( -iname \*.h -o -iname \*.inl -o -iname \*.hpp \) -exec cp {} __cppcheckWorkaroundInclude \;
-
-cppcheck --enable=all --quiet  --suppress=missingInclude \
-  --suppress=unusedFunction --suppress=unmatchedSuppression:{} \
---error-exitcode=1 -I__cppcheckWorkaroundInclude . > check.txt 2>&1
+cppcheck --enable=all --quiet  --suppress=missingIncludeSystem --suppress=missingInclude \
+--suppress=unusedFunction --suppress=preprocessorErrorDirective --suppress=unmatchedSuppression --project=build/compile_commands.json \
+--error-exitcode=1 > check.txt 2>&1

@@ -45,7 +45,7 @@ cmake-build-debug
 .chache/*
 
 build/*
-
+check.txt
 *.pdf
 
 tools/conan-venv/*
