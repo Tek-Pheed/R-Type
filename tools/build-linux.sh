@@ -9,7 +9,7 @@ PROCS=$(nproc)
 
 cd $SCRIPTPATH/..
 printf "### Pulling dependent submodules\n"
-git submodule update
+git submodule update --remote --recursive
 
 printf "\n### Generating build files\n"
 set -e
