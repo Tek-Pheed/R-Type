@@ -18,9 +18,11 @@ add_library(${PROJECT_NAME} SHARED ${SRC} ${APP})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 if (WIN32)
+    add_definitions(-DWIN32)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -WX
     )
 else ()
+    add_definitions(-DLINUX)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror
     -Wswitch-default -Wcast-align -Wpointer-arith -Wundef -Wcast-qual
     -Wshadow -Wwrite-strings -Wconversion -Wunreachable-code -Wunused-macros
