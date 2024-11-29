@@ -6,6 +6,7 @@ This class is used to render a window with SFML. It manages the window's size, t
 
 ### Functions
 
+- `getWindow()`: Returns the SFML window object.
 - `getTitle()`: Returns the current title of the window.
 - `setTitle(newTitle)`: Sets a new title for the window.
 - `getFrameRate()`: Returns the current frame rate of the window.
@@ -36,6 +37,5 @@ int main() {
     } catch (const ErrorClass &e) {
         std::cerr << e.what() << std::endl;
     }
-
     return 0;
 }
