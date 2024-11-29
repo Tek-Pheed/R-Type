@@ -39,6 +39,11 @@ RenderClass::~RenderClass()
     }
 }
 
+sf::RenderWindow &RenderClass::getWindow()
+{
+    return this->window;
+}
+
 std::string RenderClass::getTitle() const
 {
     return this->title;

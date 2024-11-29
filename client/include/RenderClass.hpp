@@ -18,6 +18,7 @@ class RenderClass {
         RenderClass(int width, int height, const std::string &title, int frameRate);
         ~RenderClass();
 
+        sf::RenderWindow &getWindow();
         std::string getTitle() const;
         void setTitle(const std::string &title);
         int getFrameRate() const;
