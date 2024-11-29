@@ -15,13 +15,13 @@ class RenderClass {
 
     public:
 
-        RenderClass(unsigned int width, unsigned int height, const std::string &title, unsigned int frameRate);
+        RenderClass(int width, int height, const std::string &title, int frameRate);
         ~RenderClass();
 
         std::string getTitle() const;
         void setTitle(const std::string &title);
-        unsigned int getFrameRate() const;
-        void setFrameRate(unsigned int frameRate);
+        int getFrameRate() const;
+        void setFrameRate(int frameRate);
 
         void renderWindow();
         void playEvent();
@@ -31,7 +31,7 @@ class RenderClass {
         sf::RenderWindow window;
         std::string title;
         sf::VideoMode videoMode;
-        unsigned int frameRate;
+        int frameRate;
 };
 
 #endif /* !RENDERCLASS_HPP_ */
