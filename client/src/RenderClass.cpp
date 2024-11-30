@@ -7,11 +7,10 @@
 
 #include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include "ErrorClass.hpp"
 
 RenderClass::RenderClass(
-    int width, int height, const std::string &title, int frameRate)
+    int width, int height, const std::string &_title, int _frameRate)
 {
     if (width <= 0 || height <= 0) {
         throw ErrorClass("RTC002 : Invalid window dimensions: width and "
@@ -28,10 +27,10 @@ RenderClass::RenderClass(
             "RTC004 : Invalid title: the window title cannot be empty.");
     }
 
-    this->title = title;
+    this->title = _title;
     this->videoMode =
         sf::VideoMode(1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);
-    this->frameRate = frameRate;
+    this->frameRate = _frameRate;
 
     window.create(this->videoMode, title);
     window.setFramerateLimit(static_cast<unsigned int>(frameRate));
