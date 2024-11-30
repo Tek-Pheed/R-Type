@@ -7,6 +7,8 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
+#include <string>
+
 namespace ecs
 {
     class Component {
@@ -27,6 +29,17 @@ namespace ecs
         int _x;
         int _y;
     };
+
+	class PlayerComponent : public Component {
+      public:
+        PlayerComponent(const std::string &name);
+
+        std::string getName() const;
+        void setName(const std::string &name);
+
+      private:
+        std::string _name;
+	};
 } // namespace ecs
 
 #endif // R_TYPE_COMPONENT_HPP
