@@ -9,30 +9,28 @@
 #include <string>
 
 #ifndef RENDERCLASS_HPP_
-#define RENDERCLASS_HPP_
+    #define RENDERCLASS_HPP_
 
 class RenderClass {
+  public:
+    RenderClass(
+        int width, int height, const std::string &title, int frameRate);
+    ~RenderClass();
 
-    public:
+    sf::RenderWindow &getWindow();
+    std::string getTitle() const;
+    void setTitle(const std::string &title);
+    int getFrameRate() const;
+    void setFrameRate(int frameRate);
 
-        RenderClass(int width, int height, const std::string &title, int frameRate);
-        ~RenderClass();
+    void renderWindow();
+    void playEvent();
 
-        sf::RenderWindow &getWindow();
-        std::string getTitle() const;
-        void setTitle(const std::string &title);
-        int getFrameRate() const;
-        void setFrameRate(int frameRate);
-
-        void renderWindow();
-        void playEvent();
-
-    private:
-
-        sf::RenderWindow window;
-        std::string title;
-        sf::VideoMode videoMode;
-        int frameRate;
+  private:
+    sf::RenderWindow _window;
+    std::string _title;
+    sf::VideoMode _videoMode;
+    int _frameRate;
 };
 
 #endif /* !RENDERCLASS_HPP_ */
