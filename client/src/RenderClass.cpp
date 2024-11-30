@@ -12,9 +12,6 @@
 
 RenderClass::RenderClass(
     int width, int height, const std::string &title, int frameRate)
-    : title(title),
-      videoMode(1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel),
-      frameRate(frameRate)
 {
     if (width <= 0 || height <= 0) {
         throw ErrorClass("RTC002 : Invalid window dimensions: width and "
@@ -30,6 +27,11 @@ RenderClass::RenderClass(
         throw ErrorClass(
             "RTC004 : Invalid title: the window title cannot be empty.");
     }
+
+    this->title = title;
+    this->videoMode =
+        sf::VideoMode(1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);
+    this->frameRate = frameRate;
 
     window.create(this->videoMode, title);
     window.setFramerateLimit(static_cast<unsigned int>(frameRate));
