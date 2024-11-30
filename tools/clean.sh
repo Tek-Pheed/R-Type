@@ -6,6 +6,5 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 cd $SCRIPTPATH/..
 
 set -e
-cd build
-rm -rf .
-printf "Cleaned build directory"
+rm -r build/*
+printf "Cleaned build directory\n"
