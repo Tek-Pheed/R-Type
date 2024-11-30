@@ -10,17 +10,16 @@
 
 #include <cstdint>
 #include <exception>
+#include <optional>
 #include <string>
-#include <sys/types.h>
 #include <vector>
-
-#include "system.hpp"
 
 #if defined(LINUX)
     #include <arpa/inet.h>
     #include <sys/select.h>
     #include <sys/socket.h>
     #include <sys/time.h>
+    #include <sys/types.h>
     #include <unistd.h>
 #elif defined(WIN32)
     #include <winsock2.h>
@@ -33,6 +32,12 @@ namespace System
 
     namespace Network
     {
+
+#if defined(LINUX)
+        using osSocketType = int;
+#elif defined(WIN32)
+        using osSocketType = SOCKET;
+#endif
 
         class NetworkException : public std::exception {
           public:
@@ -48,7 +53,7 @@ namespace System
             enum TCPMode { CONNECT, SERVE };
 
             explicit TCPSocket(
-                uint16_t port, TCPMode mode, std::string address = "");
+                uint16_t port, TCPMode mode, const std::string &address = "");
 
             TCPSocket(TCPSocket &&) = default;
             TCPSocket(const TCPSocket &) = default;
@@ -56,37 +61,29 @@ namespace System
             TCPSocket &operator=(const TCPSocket &) = default;
             ~TCPSocket();
 
-            ssize_t send(std::vector<uint8_t> byteSequence);
+            ssize_t send(const std::vector<uint8_t> &byteSequence);
             std::vector<uint8_t> receive(void);
 
-#if defined(LINUX)
-            explicit TCPSocket(int sock_fd);
-#elif defined(WIN32)
-            explicit TCPSocket(SOCKET _sock);
-#endif
+            explicit TCPSocket(osSocketType _sock);
             friend TCPSocket accept(const TCPSocket &src);
-            friend ssize_t select(std::vector<TCPSocket> readfds,
-                std::vector<TCPSocket> writefds,
-                std::vector<TCPSocket> exceptfds, struct timeval timeout);
+            friend int select(std::optional<std::vector<TCPSocket>> &readfds,
+                std::optional<std::vector<TCPSocket>> &writefds,
+                std::optional<std::vector<TCPSocket>> &exceptfds,
+                std::optional<struct timeval> &timeout);
 
           private:
             TCPMode _mode;
-
+            osSocketType _sockfd;
 #if defined(LINUX)
-          private:
             struct sockaddr_in _sockSettings;
-            int _sockfd;
-
-#elif defined(WIN32)
-          private:
-            SOCKET _sock;
 #endif
         };
 
         TCPSocket accept(const TCPSocket &src);
-        ssize_t select(std::vector<TCPSocket> readfds,
-            std::vector<TCPSocket> writefds, std::vector<TCPSocket> exceptfds,
-            struct timeval timeout);
+        int select(std::optional<std::vector<TCPSocket>> &readfds,
+            std::optional<std::vector<TCPSocket>> &writefds,
+            std::optional<std::vector<TCPSocket>> &exceptfds,
+            std::optional<struct timeval> &timeout);
     } // namespace Network
 
 } // namespace System

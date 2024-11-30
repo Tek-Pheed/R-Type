@@ -8,11 +8,13 @@
 #include "system.hpp"
 #include "system_tcp.hpp"
 
-System::Network::NetworkException::NetworkException(const std::string &str) {
-    _content = str;
+System::Network::NetworkException::NetworkException(const std::string &str)
+    : _content(str)
+{
 }
 
-const char * System::Network::NetworkException::what() const noexcept {
+const char *System::Network::NetworkException::what() const noexcept
+{
     return (this->_content.c_str());
 }
 
