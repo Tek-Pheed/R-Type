@@ -4,9 +4,6 @@ on:
   push:
     branches-ignore:
       - "ga-ignore-*"
-  pull_request:
-    branches-ignore:
-      - "ga-ignore-*"
 
 jobs:
   check_program_compilation_linux:
