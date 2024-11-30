@@ -5,14 +5,13 @@
 ** ErrorClass
 */
 
-#include "../include/ErrorClass.hpp"
+#include "ErrorClass.hpp"
 
-ErrorClass::ErrorClass(const std::string &message) : std::runtime_error(message)
+ErrorClass::ErrorClass(const std::string &message)
+    : std::runtime_error(message)
 {
-
 }
 
 ErrorClass::ErrorClass(const char *message) : std::runtime_error(message)
 {
-
 }

@@ -5,27 +5,34 @@
 ** RenderClass
 */
 
-#include "../include/RenderClass.hpp"
-#include "../include/ErrorClass.hpp"
+#include "RenderClass.hpp"
+#include <SFML/Graphics.hpp>
 #include <iostream>
+#include "ErrorClass.hpp"
 
-RenderClass::RenderClass(int width, int height, const std::string &title, int frameRate)
-    : videoMode(width, height), title(title), frameRate(frameRate)
+RenderClass::RenderClass(
+    int width, int height, const std::string &title, int frameRate)
+    : title(title),
+      videoMode(1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel),
+      frameRate(frameRate)
 {
     if (width <= 0 || height <= 0) {
-        throw ErrorClass("RTC002 : Invalid window dimensions: width and height must be positive.");
+        throw ErrorClass("RTC002 : Invalid window dimensions: width and "
+                         "height must be positive.");
     }
 
     if (frameRate <= 0) {
-        throw ErrorClass("RTC003 : Invalid framerate: it must be a positive value.");
+        throw ErrorClass(
+            "RTC003 : Invalid framerate: it must be a positive value.");
     }
 
     if (title.empty()) {
-        throw ErrorClass("RTC004 : Invalid title: the window title cannot be empty.");
+        throw ErrorClass(
+            "RTC004 : Invalid title: the window title cannot be empty.");
     }
 
-    window.create(videoMode, title);
-    window.setFramerateLimit(frameRate);
+    window.create(this->videoMode, title);
+    window.setFramerateLimit(static_cast<unsigned int>(frameRate));
 
     if (!window.isOpen()) {
         throw ErrorClass("RTC001 : Failed to create the SFML window.");
@@ -57,7 +64,8 @@ int RenderClass::getFrameRate() const
 void RenderClass::setTitle(const std::string &newTitle)
 {
     if (newTitle.empty()) {
-        throw ErrorClass("RTC004 : Invalid title: the window title cannot be empty.");
+        throw ErrorClass(
+            "RTC004 : Invalid title: the window title cannot be empty.");
     }
     this->title = newTitle;
     window.setTitle(newTitle);
@@ -66,10 +74,11 @@ void RenderClass::setTitle(const std::string &newTitle)
 void RenderClass::setFrameRate(int newFrameRate)
 {
     if (newFrameRate <= 0) {
-        throw ErrorClass("RTC003 : Invalid framerate: it must be a positive value.");
+        throw ErrorClass(
+            "RTC003 : Invalid framerate: it must be a positive value.");
     }
     this->frameRate = newFrameRate;
-    window.setFramerateLimit(newFrameRate);
+    window.setFramerateLimit(static_cast<unsigned int>(newFrameRate));
 }
 
 void RenderClass::renderWindow()
