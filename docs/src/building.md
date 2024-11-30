@@ -29,7 +29,7 @@ Required system libraries (for SFML): https://www.sfml-dev.org/tutorials/2.6/sta
 On Fedora/RedHat based distributions:
 
 ```
-dnf install libglvnd-opengl xrandr freetype glew libjpeg-turbo libsndfile openal-soft libvorbis-devel flac-devel
+dnf install freetype-devel libglvnd-opengl libXrandr-devel libXcursor-devel xrandr freetype glew libjpeg-turbo libsndfile openal-soft libvorbis-devel flac-devel libX11-devel libGL-devel systemd-devel openal-soft-devel
 ```
 
 On Debian/Ubuntu based distributions:
