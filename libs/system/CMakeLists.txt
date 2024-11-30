@@ -6,6 +6,7 @@ project(system
     LANGUAGES CXX
 )
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3 -ggdb")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -26,5 +27,6 @@ else ()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror
     -Wswitch-default -Wcast-align -Wpointer-arith -Wundef -Wcast-qual
     -Wshadow -Wwrite-strings -Wconversion -Wunreachable-code -Wunused-macros
+    $<$<CONFIG:Debug>:-g3>
 )
 endif()

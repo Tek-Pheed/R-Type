@@ -9,10 +9,9 @@
 #define SYSTEM_TCP_HPP
 
 #include <cstdint>
-#include <exception>
 #include <optional>
 #include <string>
-#include <vector>
+#include "system.hpp"
 
 #if defined(LINUX)
     #include <arpa/inet.h>
@@ -22,6 +21,7 @@
     #include <sys/types.h>
     #include <unistd.h>
 #elif defined(WIN32)
+    #include <winbase.h>
     #include <winsock2.h>
 #else
     #error "This target is not supported by R-Type libSystem"
@@ -39,51 +39,47 @@ namespace System
         using osSocketType = SOCKET;
 #endif
 
-        class NetworkException : public std::exception {
-          public:
-            explicit NetworkException(const std::string &str);
-            const char *what() const noexcept override;
-
-          private:
-            std::string _content;
-        };
-
         class TCPSocket {
           public:
             enum TCPMode { CONNECT, SERVE };
 
-            explicit TCPSocket(
-                uint16_t port, TCPMode mode, const std::string &address = "");
+            explicit TCPSocket(uint16_t port, TCPMode mode,
+                const std::string &address = "0.0.0.0");
 
             TCPSocket(TCPSocket &&) = default;
             TCPSocket(const TCPSocket &) = default;
             TCPSocket &operator=(TCPSocket &&) = default;
             TCPSocket &operator=(const TCPSocket &) = default;
+            bool operator==(const TCPSocket &);
+            bool operator!=(const TCPSocket &);
             ~TCPSocket();
 
-            ssize_t send(const std::vector<uint8_t> &byteSequence);
-            std::vector<uint8_t> receive(void);
+            ssize_t send(const byteArray &byteSequence);
+            byteArray receive(void);
+            void closeSocket(void);
+            bool isOpen(void);
+            u_int64_t getUID(void) const;
 
             explicit TCPSocket(osSocketType _sock);
             friend TCPSocket accept(const TCPSocket &src);
-            friend int select(std::optional<std::vector<TCPSocket>> &readfds,
-                std::optional<std::vector<TCPSocket>> &writefds,
-                std::optional<std::vector<TCPSocket>> &exceptfds,
-                std::optional<struct timeval> &timeout);
+            friend void select(socketSetTCP *readfds, socketSetTCP *writefds,
+                socketSetTCP *exceptfds, std::optional<struct timeval> timeout);
 
           private:
+            u_int64_t _uid;
             TCPMode _mode;
             osSocketType _sockfd;
+            bool _opened;
 #if defined(LINUX)
             struct sockaddr_in _sockSettings;
 #endif
         };
 
         TCPSocket accept(const TCPSocket &src);
-        int select(std::optional<std::vector<TCPSocket>> &readfds,
-            std::optional<std::vector<TCPSocket>> &writefds,
-            std::optional<std::vector<TCPSocket>> &exceptfds,
-            std::optional<struct timeval> &timeout);
+        void select(socketSetTCP *readfds = nullptr,
+            socketSetTCP *writefds = nullptr,
+            socketSetTCP *exceptfds = nullptr,
+            timeoutStruct timeout = std::nullopt);
     } // namespace Network
 
 } // namespace System
