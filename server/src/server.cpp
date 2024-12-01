@@ -75,8 +75,8 @@ int main(void)
                               << System::Network::decodeString(sock->receive())
                               << std::endl;
                     if (sock->isOpen())
-                        sock->sendData(System::Network::byteArray({'h','e', 'l',
-                        'l', 'o'}));
+                        sock->sendData(System::Network::byteArray(
+                            {'h', 'e', 'l', 'l', 'o'}));
                     if (!sock->isOpen()) {
                         std::cout << "Removing client" << std::endl;
                         sock->closeSocket();

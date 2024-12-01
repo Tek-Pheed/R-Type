@@ -56,7 +56,8 @@ void System::Network::addSocketToSet(TCPSocket *src, socketSetTCP &dest)
     dest.emplace_back(src);
 }
 
-bool System::Network::removeSocketInVect(const System::Network::TCPSocket &toRemove,
+bool System::Network::removeSocketInVect(
+    const System::Network::TCPSocket &toRemove,
     std::vector<System::Network::TCPSocket> &vect)
 {
     const uint64_t uid = toRemove.getUID();
@@ -70,7 +71,8 @@ bool System::Network::removeSocketInVect(const System::Network::TCPSocket &toRem
     return (false);
 }
 
-bool System::Network::removeSocketInSet(const System::Network::TCPSocket &toRemove,
+bool System::Network::removeSocketInSet(
+    const System::Network::TCPSocket &toRemove,
     System::Network::socketSetTCP &set)
 {
     const uint64_t uid = toRemove.getUID();

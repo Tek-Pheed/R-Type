@@ -14,7 +14,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <iostream>
 #include "system_network.hpp"
 
 using namespace System;
@@ -23,7 +22,7 @@ using namespace Network;
 static uint64_t sockID = 0;
 
 #if defined(WIN32)
-#pragma comment(lib, "ws2_32.lib")
+    #pragma comment(lib, "ws2_32.lib")
 static WSADATA WData;
 
 void System::Network::initNetwork(void)
@@ -51,7 +50,6 @@ void System::Network::stopNetwork(void)
     return;
 }
 #endif
-
 
 TCPSocket::TCPSocket(uint16_t port, TCPMode mode, const std::string &address)
     : _mode(mode), _opened(false)
@@ -99,14 +97,16 @@ ssize_t TCPSocket::sendData(const byteArray &byteSequence)
     uint8_t *buff = new uint8_t[len];
 
     if (buff == NULL)
-        throw std::runtime_error("System::Network::TCPSocket: Failed to allocate send buffer");
+        throw std::runtime_error(
+            "System::Network::TCPSocket: Failed to allocate send buffer");
     for (size_t i = 0; i < len; i++) {
         buff[i] = byteSequence[i];
     }
 #if defined(LINUX)
     writtenBytes = write(this->_sockfd, reinterpret_cast<void *>(buff), len);
 #elif defined(WIN32)
-    writtenBytes = send(this->_sockfd, reinterpret_cast<const char*>(buff), len, 0);
+    writtenBytes =
+        send(this->_sockfd, reinterpret_cast<const char *>(buff), len, 0);
 #endif
     this->_opened = (writtenBytes > 0);
     if (writtenBytes == -1)
@@ -124,7 +124,7 @@ void TCPSocket::closeSocket(void)
             throw NetworkException("Failed to close socket");
         }
 #elif defined(WIN32)
-    if (closesocket(this->_sockfd) != 0 ) {
+    if (closesocket(this->_sockfd) != 0) {
         throw NetworkException("Failed to close socket");
     }
 #endif
@@ -181,7 +181,7 @@ byteArray TCPSocket::receive(void)
 #if defined(LINUX)
         ret = read(this->_sockfd, &dummy, len);
 #elif defined(WIN32)
-        ret = recv(this->_sockfd, reinterpret_cast <char *>(&dummy), len, 0);
+        ret = recv(this->_sockfd, reinterpret_cast<char *>(&dummy), len, 0);
 #endif
         this->_opened = (ret > 0);
         if (ret == -1)

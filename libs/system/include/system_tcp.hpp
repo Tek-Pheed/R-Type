@@ -8,15 +8,15 @@
 #ifndef SYSTEM_TCP_HPP
 #define SYSTEM_TCP_HPP
 
-#include <ctype.h>
 #include <cstdint>
+#include <ctype.h>
 #include <optional>
 #include <string>
 #include "system.hpp"
 
 #if defined(LINUX)
-    #include <sys/ioctl.h>
     #include <arpa/inet.h>
+    #include <sys/ioctl.h>
     #include <sys/select.h>
     #include <sys/socket.h>
     #include <sys/time.h>
@@ -77,7 +77,6 @@ namespace System
             bool _opened;
             SOCKADDR_IN _sockSettings;
         };
-
 
         TCPSocket accept(const TCPSocket &src);
         void select(socketSetTCP *readfds = nullptr,

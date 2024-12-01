@@ -45,8 +45,8 @@ namespace System
             System::Network::TCPSocket *src, socketSetTCP &dest);
         bool removeSocketInVect(const System::Network::TCPSocket &toRemove,
             std::vector<System::Network::TCPSocket> &vect);
-        bool removeSocketInSet(const System::Network::TCPSocket &toRemove,
-            socketSetTCP &set);
+        bool removeSocketInSet(
+            const System::Network::TCPSocket &toRemove, socketSetTCP &set);
         std::string decodeString(const byteArray &bytes);
     } // namespace Network
 } // namespace System
