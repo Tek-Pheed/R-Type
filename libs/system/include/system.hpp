@@ -13,6 +13,18 @@
 #include <string>
 #include <vector>
 
+#if defined(LINUX)
+    #define INVALID_SOCKET -1
+using osSocketType = int;
+using s_timeval = struct timeval;
+using SOCKADDR_IN = struct sockaddr_in;
+#elif defined(WIN32)
+    #include <WinSock2.h>
+using osSocketType = SOCKET;
+typedef long ssize_t;
+typedef timeval s_timeval;
+#endif
+
 namespace System
 {
     namespace Network
@@ -20,18 +32,6 @@ namespace System
         class NetworkException;
         class TCPClient;
         class TCPSocket;
-
-    #if defined(LINUX)
-        #define INVALID_SOCKET -1
-        using osSocketType = int;
-        using s_timeval = struct timeval;
-        using SOCKADDR_IN = struct sockaddr_in;
-    #elif defined(WIN32)
-        #include <WinSock2.h>
-        using osSocketType = SOCKET;
-        typedef long ssize_t;
-        typedef timeval s_timeval;
-    #endif
 
         using socketSetTCP = std::vector<TCPSocket *>;
         using timeoutStruct = std::optional<s_timeval>;
