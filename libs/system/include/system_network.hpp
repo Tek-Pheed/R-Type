@@ -16,6 +16,13 @@ namespace System
 {
     namespace Network
     {
+        /**
+         * @brief The Network Exception class.
+         *
+         *
+         * @note Node: This exception hold a string containing a network error
+         * raised by the OS or the library.
+         */
         class NetworkException : public std::exception {
           public:
             explicit NetworkException(const std::string &str);
