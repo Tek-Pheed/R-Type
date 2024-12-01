@@ -43,12 +43,12 @@ void System::Network::stopNetwork(void)
 #elif defined(LINUX)
 void System::Network::initNetwork(void)
 {
-    return (true);
+    return;
 }
 
 void System::Network::stopNetwork(void)
 {
-    return (true);
+    return;
 }
 #endif
 
