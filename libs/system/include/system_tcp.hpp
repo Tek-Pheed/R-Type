@@ -8,12 +8,14 @@
 #ifndef SYSTEM_TCP_HPP
 #define SYSTEM_TCP_HPP
 
+#include <ctype.h>
 #include <cstdint>
 #include <optional>
 #include <string>
 #include "system.hpp"
 
 #if defined(LINUX)
+    #include <sys/ioctl.h>
     #include <arpa/inet.h>
     #include <sys/select.h>
     #include <sys/socket.h>
@@ -21,7 +23,6 @@
     #include <sys/types.h>
     #include <unistd.h>
 #elif defined(WIN32)
-    #include <winbase.h>
     #include <winsock2.h>
 #else
     #error "This target is not supported by R-Type libSystem"
@@ -35,8 +36,12 @@ namespace System
 
 #if defined(LINUX)
         using osSocketType = int;
+        typedef struct timeval s_timeval;
 #elif defined(WIN32)
         using osSocketType = SOCKET;
+        typedef long ssize_t;
+        typedef timeval s_timeval;
+        typedef int socklen_t;
 #endif
 
         class TCPSocket {
@@ -54,27 +59,27 @@ namespace System
             bool operator!=(const TCPSocket &);
             ~TCPSocket();
 
-            ssize_t send(const byteArray &byteSequence);
+            ssize_t sendData(const byteArray &byteSequence);
             byteArray receive(void);
             void closeSocket(void);
             bool isOpen(void);
-            u_int64_t getUID(void) const;
+            uint64_t getUID(void) const;
 
             explicit TCPSocket(osSocketType _sock);
             friend TCPSocket accept(const TCPSocket &src);
             friend void select(socketSetTCP *readfds, socketSetTCP *writefds,
-                socketSetTCP *exceptfds, std::optional<struct timeval> timeout);
+                socketSetTCP *exceptfds, timeoutStruct timeout);
 
           private:
-            u_int64_t _uid;
+            uint64_t _uid;
             TCPMode _mode;
             osSocketType _sockfd;
             bool _opened;
-#if defined(LINUX)
-            struct sockaddr_in _sockSettings;
-#endif
+            SOCKADDR_IN _sockSettings;
         };
 
+        void initNetwork(void);
+        void stopNetwork(void);
         TCPSocket accept(const TCPSocket &src);
         void select(socketSetTCP *readfds = nullptr,
             socketSetTCP *writefds = nullptr,

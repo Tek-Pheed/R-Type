@@ -17,11 +17,11 @@
 
 static volatile std::atomic<bool> stop = false;
 
-void sighandler(int n)
-{
-    (void) n;
-    stop = true;
-}
+//void sighandler(int n)
+//{
+//    (void) n;
+//    stop = true;
+//}
 
 // Example TCP Server with libSystem
 int main(void)
@@ -33,10 +33,9 @@ int main(void)
 
     System::Network::socketSetTCP socketSetTCP;
     System::Network::timeoutStruct tv;
-    tv->tv_sec = 1;
-    tv->tv_usec = 0;
+    tv = {1, 0};
     clients.clear();
-    signal(SIGINT, &sighandler);
+    //signal(SIGINT, &sighandler);
 
     try {
         std::cout << "Started TCP Server on Port 1234" << std::endl;

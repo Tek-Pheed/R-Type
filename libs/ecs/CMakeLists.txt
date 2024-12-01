@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SFML_STATIC_LIBRARIES TRUE)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION "10.0")
 
 file(GLOB_RECURSE SRC "./src/*.cpp")
 file(GLOB_RECURSE APP "./include/*.hpp")
@@ -23,7 +24,7 @@ target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics)
 
 if(WIN32)
     add_definitions(-DWIN32)
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -WX
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall
     )
 else()
     add_definitions(-DLINUX)

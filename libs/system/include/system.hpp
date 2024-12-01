@@ -21,8 +21,20 @@ namespace System
         class TCPClient;
         class TCPSocket;
 
+    #if defined(LINUX)
+        #define INVALID_SOCKET -1
+        using osSocketType = int;
+        typedef struct timeval s_timeval;
+        typedef struct sockaddr_in SOCKADDR_IN;
+    #elif defined(WIN32)
+        #include <WinSock2.h>
+        using osSocketType = SOCKET;
+        typedef long ssize_t;
+        typedef timeval s_timeval;
+    #endif
+
         using socketSetTCP = std::vector<TCPSocket *>;
-        using timeoutStruct = std::optional<struct timeval>;
+        using timeoutStruct = std::optional<s_timeval>;
         using byteArray = std::vector<uint8_t>;
 
         void addSocketToSet(const std::vector<System::Network::TCPSocket> &src,

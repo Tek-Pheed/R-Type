@@ -24,10 +24,9 @@ System::Network::NetworkException::NetworkException(const std::string &str)
     _content += strerror(errno);
 
 #elif defined(WIN32)
-    char msgbuf[256];
-    msgbuf[0] = '\0';
+    char msgbuf[256]{'\0'};
     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         msgbuf, sizeof(msgbuf), NULL);
     _content += " : ";
     if (!*msgbuf) {
