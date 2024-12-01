@@ -11,7 +11,7 @@ namespace ecs
 {
     class Component {
       public:
-        ~Component();
+        virtual ~Component() = default;
     };
 
     class PositionComponent : public Component {
