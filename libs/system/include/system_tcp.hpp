@@ -78,8 +78,7 @@ namespace System
             SOCKADDR_IN _sockSettings;
         };
 
-        void initNetwork(void);
-        void stopNetwork(void);
+
         TCPSocket accept(const TCPSocket &src);
         void select(socketSetTCP *readfds = nullptr,
             socketSetTCP *writefds = nullptr,

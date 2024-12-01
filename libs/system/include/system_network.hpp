@@ -16,7 +16,6 @@ namespace System
 {
     namespace Network
     {
-
         class NetworkException : public std::exception {
           public:
             explicit NetworkException(const std::string &str);
