@@ -12,7 +12,7 @@ ls
 $sourceDir = "dependencies/SFML/"
 $destDir = "../release/"
 
-Get-ChildItem -Path $sourceDir -Include *.dll, *.recipe -Recurse | ForEach-Object {
+Get-ChildItem -Path $sourceDir -Include *.dll -Recurse | ForEach-Object {
     Write-Host "Copying file: $_.FullName"
     Copy-Item -Path $_.FullName -Destination $destDir
 }
