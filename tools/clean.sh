@@ -7,4 +7,5 @@ cd $SCRIPTPATH/..
 
 set -e
 rm -r build/*
+rm -r release/*
 printf "Cleaned build directory\n"
