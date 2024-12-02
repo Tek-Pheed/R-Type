@@ -181,6 +181,10 @@ byteArray TCPSocket::receive(void)
         ret = read(this->_sockfd, &dummy, len);
 #elif defined(WIN32)
         ret = recv(this->_sockfd, reinterpret_cast<char *>(&dummy), len, 0);
+        if (this->_opened && ret == SOCKET_ERROR) {
+            this->_opened = (ret > 0);
+            return (vect);
+        }
 #endif
         this->_opened = (ret > 0);
         if (ret == SOCKET_ERROR)
