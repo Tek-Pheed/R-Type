@@ -15,6 +15,7 @@
 
 #if defined(LINUX)
     #define INVALID_SOCKET -1
+    #define SOCKET_ERROR -1
 using osSocketType = int;
 using s_timeval = struct timeval;
 using SOCKADDR_IN = struct sockaddr_in;

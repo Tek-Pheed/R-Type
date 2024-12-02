@@ -69,11 +69,11 @@ TCPSocket::TCPSocket(uint16_t port, TCPMode mode, const std::string &address)
         res = bind(this->_sockfd,
             reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
             sizeof(this->_sockSettings));
-        if (res == -1)
+        if (res == SOCKET_ERROR)
             throw NetworkException(
                 "System::Network::TCPSocket: Failed to bind socket");
         res = listen(this->_sockfd, FD_SETSIZE);
-        if (res == -1)
+        if (res == SOCKET_ERROR)
             throw NetworkException(
                 "System::Network::TCPSocket: Failed to listen");
         this->_opened = true;
@@ -82,19 +82,18 @@ TCPSocket::TCPSocket(uint16_t port, TCPMode mode, const std::string &address)
         res = connect(this->_sockfd,
             reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
             sizeof(this->_sockSettings));
-        if (res == -1)
+        if (res == SOCKET_ERROR)
             throw NetworkException(
                 "System::Network::TCPSocket: Failed to connect");
         this->_opened = true;
     }
 }
 
-// TODO: Fix this mess
 ssize_t TCPSocket::sendData(const byteArray &byteSequence)
 {
     ssize_t writtenBytes = 0;
     size_t len = byteSequence.size();
-    uint8_t *buff = new uint8_t[len];
+    uint8_t *buff = new uint8_t[len]();
 
     if (buff == NULL)
         throw std::runtime_error(
@@ -109,9 +108,9 @@ ssize_t TCPSocket::sendData(const byteArray &byteSequence)
         send(this->_sockfd, reinterpret_cast<const char *>(buff), len, 0);
 #endif
     this->_opened = (writtenBytes > 0);
-    if (writtenBytes == -1)
-        throw NetworkException("System::Network::TCPSocket: Failed to send");
     delete[] buff;
+    if (writtenBytes == SOCKET_ERROR)
+        throw NetworkException("System::Network::TCPSocket: Failed to send");
     return (writtenBytes);
 }
 
@@ -124,7 +123,7 @@ void TCPSocket::closeSocket(void)
             throw NetworkException("Failed to close socket");
         }
 #elif defined(WIN32)
-    if (closesocket(this->_sockfd) != 0) {
+    if (closesocket(this->_sockfd) == SOCKET_ERROR) {
         throw NetworkException("Failed to close socket");
     }
 #endif
@@ -184,12 +183,12 @@ byteArray TCPSocket::receive(void)
         ret = recv(this->_sockfd, reinterpret_cast<char *>(&dummy), len, 0);
 #endif
         this->_opened = (ret > 0);
-        if (ret == -1)
+        if (ret == SOCKET_ERROR)
             throw NetworkException(
                 "System::Network::TCPSocket: Failed to read");
         return (vect);
     }
-    uint8_t *buff = new uint8_t[len];
+    uint8_t *buff = new uint8_t[len]();
 #if defined(LINUX)
     if (buff == nullptr)
         throw std::runtime_error("System::Network::TCPSocket::receive: Unable "
@@ -199,8 +198,10 @@ byteArray TCPSocket::receive(void)
 #elif defined(WIN32)
     ret = recv(this->_sockfd, reinterpret_cast<char *>(buff), len, 0);
 #endif
-    if (ret == -1)
+    if (ret == SOCKET_ERROR) {
+        delete [] buff;
         throw NetworkException("System::Network::TCPSocket: Failed to read");
+    }
     this->_opened = (ret > 0);
     vect.reserve(len);
     for (size_t i = 0; i < len; i++) {
@@ -219,7 +220,7 @@ TCPSocket Network::accept(const TCPSocket &src)
 
     res = accept(src._sockfd, reinterpret_cast<struct sockaddr *>(&clientAddr),
         &clientSockLen);
-    if (res == -1 || res == 0)
+    if (res == INVALID_SOCKET || res == 0)
         throw NetworkException("System::Network::accept: Failed to accept "
                                "connection to TCP socket: ");
     return (Network::TCPSocket(res));
@@ -264,7 +265,7 @@ void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
                 FD_SET(i->_sockfd, except_set_p);
         }
     }
-    if (select(FD_SETSIZE, read_set_p, write_set_p, except_set_p, tm) == -1)
+    if (select(FD_SETSIZE, read_set_p, write_set_p, except_set_p, tm) == SOCKET_ERROR)
         throw NetworkException("Network::select failed");
     if (readfds != nullptr && readfds->size() > 0) {
         for (size_t i = 0; i < readfds->size(); i++) {
