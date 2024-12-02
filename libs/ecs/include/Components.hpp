@@ -32,7 +32,7 @@ namespace ecs
 
     class PlayerComponent : public Component {
       public:
-        PlayerComponent(const std::string &name);
+        explicit PlayerComponent(const std::string &name);
 
         std::string getName() const;
         void setName(const std::string &name);
@@ -44,7 +44,7 @@ namespace ecs
     class HealthComponent : public Component {
       public:
         HealthComponent();
-        HealthComponent(int health);
+        explicit HealthComponent(int health);
 
         int getHealth();
         void setHealth(int health);

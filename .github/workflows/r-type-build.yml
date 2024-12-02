@@ -38,6 +38,9 @@ jobs:
         with:
           submodules: true
 
+      - name: add tests
+        run: echo "add_subdirectory(tests)" >> CMakeLists.txt
+
       - name: build
         run: ./tools/build-linux.sh
 
