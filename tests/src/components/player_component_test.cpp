@@ -15,7 +15,7 @@ Test(components, player_constructor)
     ecs::PlayerComponent player("samy");
 
     cr_assert_eq(player.getName(), "samy",
-        "Expected value to be 10, but got %d", player.getName());
+        "Expected value to be 'samy', but got %d", player.getName());
 }
 
 Test(components, player_getter)
@@ -23,7 +23,7 @@ Test(components, player_getter)
     ecs::PlayerComponent player("cheh");
 
     cr_assert_eq(player.getName(), "cheh",
-        "Expected value to be 10, but got %d", player.getName());
+        "Expected value to be 'cheh', but got %d", player.getName());
 }
 
 Test(components, player_setter)
@@ -32,5 +32,5 @@ Test(components, player_setter)
     player.setName("Lucas");
 
     cr_assert_eq(player.getName(), "Lucas",
-        "Expected value to be 10, but got %d", player.getName());
+        "Expected value to be 'Lucas', but got %d", player.getName());
 }
