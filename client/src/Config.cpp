@@ -32,4 +32,18 @@ void Config::saveConfig()
 
 void Config::parseConfig()
 {
+    std::ifstream infile(_filename);
+
+    if (!infile.is_open()) {
+        throw std::runtime_error("Error: file not found");
+        return;
+    }
+    std::string line;
+    int linenbr = 1;
+
+    while (std::getline(infile, line)) {
+        _configData[linenbr] = line;
+        linenbr++;
+    }
+    infile.close();
 }
