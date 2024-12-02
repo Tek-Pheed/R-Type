@@ -97,7 +97,7 @@ ssize_t TCPSocket::sendData(const byteArray &byteSequence)
 
     if (buff == NULL)
         throw std::runtime_error(
-            "System::Network::TCPSocket: Failed to allocate send buffer");
+            "System::Network::TCPSocket::sendData: Failed to allocate send buffer");
     for (size_t i = 0; i < len; i++) {
         buff[i] = byteSequence[i];
     }
@@ -110,7 +110,7 @@ ssize_t TCPSocket::sendData(const byteArray &byteSequence)
     this->_opened = (writtenBytes > 0);
     delete[] buff;
     if (writtenBytes == SOCKET_ERROR)
-        throw NetworkException("System::Network::TCPSocket: Failed to send");
+        throw NetworkException("System::Network::TCPSocket::sendData: Failed to send");
     return (writtenBytes);
 }
 
@@ -120,11 +120,11 @@ void TCPSocket::closeSocket(void)
 #if defined(LINUX)
     if (this->_sockfd != -1)
         if (close(this->_sockfd) == -1) {
-            throw NetworkException("Failed to close socket");
+            throw NetworkException("System::Network::TCPSocket::closeSocket: Failed to close socket");
         }
 #elif defined(WIN32)
     if (closesocket(this->_sockfd) == SOCKET_ERROR) {
-        throw NetworkException("Failed to close socket");
+        throw NetworkException("System::Network::TCPSocket::closeSocket: Failed to close socket");
     }
 #endif
 }
@@ -185,7 +185,7 @@ byteArray TCPSocket::receive(void)
         this->_opened = (ret > 0);
         if (ret == SOCKET_ERROR)
             throw NetworkException(
-                "System::Network::TCPSocket: Failed to read");
+                "System::Network::TCPSocket::receive: Failed to read");
         return (vect);
     }
     uint8_t *buff = new uint8_t[len]();
@@ -200,7 +200,7 @@ byteArray TCPSocket::receive(void)
 #endif
     if (ret == SOCKET_ERROR) {
         delete [] buff;
-        throw NetworkException("System::Network::TCPSocket: Failed to read");
+        throw NetworkException("System::Network::TCPSocket::receive: Failed to read");
     }
     this->_opened = (ret > 0);
     vect.reserve(len);
@@ -291,4 +291,48 @@ void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
             }
         }
     }
+}
+
+void System::Network::addSocketToSet(
+    const std::vector<System::Network::TCPSocket> &src, socketSetTCP &dest)
+{
+    for (size_t i = 0; i != src.size(); i++) {
+        TCPSocket *a = const_cast<TCPSocket *>(&(src.at(i)));
+        dest.emplace_back(a);
+    }
+}
+
+void System::Network::addSocketToSet(TCPSocket *src, socketSetTCP &dest)
+{
+    dest.emplace_back(src);
+}
+
+bool System::Network::removeSocketInVect(
+    const System::Network::TCPSocket &toRemove,
+    std::vector<System::Network::TCPSocket> &vect)
+{
+    const uint64_t uid = toRemove.getUID();
+
+    for (size_t i = 0; i != vect.size(); i++) {
+        if (vect[i].getUID() == uid) {
+            vect.erase(vect.begin() + static_cast<long>(i));
+            return (true);
+        }
+    }
+    return (false);
+}
+
+bool System::Network::removeSocketInSet(
+    const System::Network::TCPSocket &toRemove,
+    System::Network::socketSetTCP &set)
+{
+    const uint64_t uid = toRemove.getUID();
+
+    for (size_t i = 0; i != set.size(); i++) {
+        if (set[i]->getUID() == uid) {
+            set.erase(set.begin() + static_cast<long>(i));
+            return (true);
+        }
+    }
+    return (false);
 }

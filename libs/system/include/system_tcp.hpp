@@ -11,37 +11,13 @@
 #include <cstdint>
 #include <optional>
 #include <string>
-#include "system.hpp"
-
-#if defined(LINUX)
-    #include <arpa/inet.h>
-    #include <sys/ioctl.h>
-    #include <sys/select.h>
-    #include <sys/socket.h>
-    #include <sys/time.h>
-    #include <sys/types.h>
-    #include <unistd.h>
-#elif defined(WIN32)
-    #include <winsock2.h>
-#else
-    #error "This target is not supported by R-Type libSystem"
-#endif
+#include "system_network.hpp"
 
 namespace System
 {
 
     namespace Network
     {
-
-#if defined(LINUX)
-        using osSocketType = int;
-        typedef struct timeval s_timeval;
-#elif defined(WIN32)
-        using osSocketType = SOCKET;
-        typedef long ssize_t;
-        typedef timeval s_timeval;
-        typedef int socklen_t;
-#endif
 
         /**
          * @brief Implementation of TCP Socket for Windows/Linux

@@ -58,3 +58,4 @@ CMakeUserPresets.json
 out
 a.out
 vgcore.*
+*.recipe

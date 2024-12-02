@@ -25,6 +25,8 @@ static volatile std::atomic<bool> stop = false;
 // Example TCP Server with libSystem
 int main(void)
 {
+    System::Network::initNetwork();
+
     System::Network::TCPSocket serverSocket(
         1234, System::Network::TCPSocket::SERVE);
 
@@ -70,12 +72,16 @@ int main(void)
                         System::Network::accept(*socketSetTCP[0]));
                     std::cout << "New client connected" << std::endl;
                 } else {
-                    std::cout << "Reading from client: "
-                              << System::Network::decodeString(sock->receive())
-                              << std::endl;
-                    if (sock->isOpen())
-                        sock->sendData(System::Network::byteArray(
-                            {'h', 'e', 'l', 'l', 'o'}));
+                    if (sock->isOpen()) {
+                        std::cout
+                            << "Reading from client: "
+                            << System::Network::decodeString(sock->receive())
+                            << std::endl;
+                        std::cout << "Writing to client" << std::endl;
+                        if (sock->isOpen())
+                            sock->sendData(System::Network::byteArray(
+                                {'h', 'e', 'l', 'l', 'o'}));
+                    }
                     if (!sock->isOpen()) {
                         std::cout << "Removing client" << std::endl;
                         sock->closeSocket();
