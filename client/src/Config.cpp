@@ -28,6 +28,23 @@ void Config::setConfig(int line, const std::string &param)
 
 void Config::saveConfig()
 {
+     if (_filename.find(".cfg") != _filename.size() - 4) {
+        _filename += ".cfg";
+    }
+
+    std::ofstream savefile(_filename);
+
+    if (!savefile.is_open()) {
+        throw std::runtime_error("Error: file not found");
+    }
+    if (_configData.empty()) {
+        throw std::runtime_error("Error: config is empty");
+    }
+    for (auto &line : _configData) {
+        savefile << line.second << std::endl;
+    }
+
+    savefile.close();
 }
 
 void Config::parseConfig()
