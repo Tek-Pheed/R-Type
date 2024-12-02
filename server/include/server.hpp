@@ -19,4 +19,5 @@ struct server {
     struct sockaddr_in servaddr, cliaddr;
 };
 
+int handle_player(int code, std::vector<std::string> tokens);
 #endif /* SERVER_HPP */

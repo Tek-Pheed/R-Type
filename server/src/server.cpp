@@ -16,6 +16,7 @@
 #include <bits/stdc++.h>
 
 #include "protocol.hpp"
+#include "server.hpp"
 
 #define PORT    8081
 #define MAXLINE 1400
@@ -62,10 +63,11 @@ int is_code_valid(int code)
 int manage_buffer(char *buffer, ssize_t n)
 {
     std::string code = std::string(buffer).substr(0, 3);
-    int code_int = is_code_valid(atoi(code.c_str()));
+    int i_code = atoi(code.c_str());
+    int code_pro = is_code_valid(atoi(code.c_str()));
     std::vector<std::string> tokens;
 
-    if (code_int == -1) {
+    if (code_pro == -1) {
         free(buffer);
         return -1;
     }
@@ -77,23 +79,8 @@ int manage_buffer(char *buffer, ssize_t n)
         tokens.push_back(token);
     }
 
-    switch (code_int) {
-        case 0:
-            for (size_t i = 0; i < tokens.size(); i++) {
-                printf("args: %s\n", tokens[i].c_str());
-            }
-            // handle_player(tokens);
-            break;
-        case 1:
-            // handle_enemy(tokens);
-            break;
-        case 2:
-            // handle_terrain(tokens);
-            break;
-        case 3:
-            // handle_mechs(tokens);
-            break;
-
+    switch (code_pro) {
+        case 0: handle_player(i_code, tokens); break;
         default: break;
     }
     free(buffer);
