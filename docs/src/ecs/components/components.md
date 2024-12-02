@@ -8,5 +8,6 @@ This class is built with destructor only
 
 | Component          | Description                   |
 |--------------------|-------------------------------|
-| Position component | Store position of a component |
+| Position component | Store position of an entity   |
 | Player component   | Define entity as a player     |
+| Velocity component | Store velocity of an entity   |
