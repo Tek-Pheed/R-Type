@@ -19,6 +19,12 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_library(${PROJECT_NAME} SHARED ${SRC} ${APP})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    BUILD_WITH_INSTALL_RPATH TRUE
+    CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
+)
+
 if(WIN32)
     add_definitions(-DWIN32)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall

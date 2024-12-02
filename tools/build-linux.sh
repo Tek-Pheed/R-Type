@@ -2,7 +2,6 @@
 
 # TODO: Check for missing system dependencies
 
-
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 PROCS=$(nproc)
@@ -18,3 +17,10 @@ cd build
 printf "\n### Building R-Type\n"
 make -j $PROCS
 printf "\n### Build done\n"
+
+RELEASE_DIR=$SCRIPTPATH/../release/
+
+printf "\n### Copying shared libraries (.so files)\n"
+find . -type f \( -name "*.so" -o -name "*.so.*" \) -exec cp {} $RELEASE_DIR \;
+
+printf "\n### Shared libraries copied to release folder\n"
