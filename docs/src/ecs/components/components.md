@@ -11,3 +11,4 @@ This class is built with destructor only
 | Position component | Store position of an entity   |
 | Player component   | Define entity as a player     |
 | Velocity component | Store velocity of an entity   |
+| Health component   | Store health of a entity      |

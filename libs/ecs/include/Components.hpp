@@ -30,18 +30,18 @@ namespace ecs
         int _y;
     };
 
-	class PlayerComponent : public Component {
+    class PlayerComponent : public Component {
       public:
-        PlayerComponent(const std::string &name);
+        explicit PlayerComponent(const std::string &name);
 
         std::string getName() const;
         void setName(const std::string &name);
 
       private:
         std::string _name;
-	};
+  	};
 
-  class VelocityComponent : public Component {
+    class VelocityComponent : public Component {
       public:
         VelocityComponent(int vx, int vy);
 
@@ -54,7 +54,19 @@ namespace ecs
       private:
         int _vx;
         int _vy;
-	};
+	  };
+
+    class HealthComponent : public Component {
+      public:
+        HealthComponent();
+        explicit HealthComponent(int health);
+
+        int getHealth();
+        void setHealth(int health);
+
+      private:
+        int _health;
+    };
 } // namespace ecs
 
 #endif // R_TYPE_COMPONENT_HPP
