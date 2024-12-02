@@ -6,8 +6,8 @@ on:
       - dev
 
 jobs:
-  deploy:
-    name: Deploy mdbook
+  build:
+    name: Build
     runs-on: [ self-hosted, linux, x64 ]
     steps:
       - name: Checkout
@@ -19,6 +19,17 @@ jobs:
       - name: Build mdbook
         run: |
           mdbook build docs/
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs/book
+
+  deploy:
+    name: Deploy
+    needs: build
+    environment: production
+    runs-on: [ self-hosted, linux, x64 ]
+    steps:
       - name: Deploy to server
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
