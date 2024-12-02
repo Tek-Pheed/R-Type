@@ -5,6 +5,7 @@
 3. [ECS](ecs/ecs.md)
     - [Components](ecs/components/components.md)
         - [Position Component](ecs/components/position_component.md)
+		- [Player Component](ecs/components/player_component.md)
 4. [Client](client/client.md)
     - [RenderClass](client/renderclass.md)
     - [ErrorClass](client/errorclass.md)

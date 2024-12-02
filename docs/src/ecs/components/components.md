@@ -9,3 +9,4 @@ This class is built with destructor only
 | Component          | Description                   |
 |--------------------|-------------------------------|
 | Position component | Store position of a component |
+| Player component   | Define entity as a player     |
