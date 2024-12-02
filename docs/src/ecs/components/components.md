@@ -6,7 +6,8 @@ This class is built with destructor only
 
 ## Components list
 
-| Component          | Description                   |
-|--------------------|-------------------------------|
-| Position component | Store position of a component |
-| Player component   | Define entity as a player     |
+| Component          | Description                |
+|--------------------|----------------------------|
+| Position component | Store position of a entity |
+| Player component   | Define entity as a player  |
+| Health component   | Store health of a entity   |
