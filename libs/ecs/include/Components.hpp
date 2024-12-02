@@ -39,7 +39,22 @@ namespace ecs
 
       private:
         std::string _name;
-    };
+  	};
+
+    class VelocityComponent : public Component {
+      public:
+        VelocityComponent(int vx, int vy);
+
+        int getVx();
+        int getVy();
+
+        void setVx(int vx);
+        void setVy(int vy);
+
+      private:
+        int _vx;
+        int _vy;
+	  };
 
     class HealthComponent : public Component {
       public:
