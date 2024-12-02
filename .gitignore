@@ -59,3 +59,4 @@ out
 a.out
 vgcore.*
 *.recipe
+.vs/
