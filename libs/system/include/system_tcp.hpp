@@ -24,16 +24,8 @@ namespace System
          * @details This class absatracts the low level details about sockets,
          * while still providing a similar API to Linux sockets.
          */
-        class TCPSocket {
+        class TCPSocket : public ASocket {
           public:
-            /**
-             * @brief Mode for creating the TCP socket
-             * @li - Choose mode CONNECT to connect to another TCP socket.
-             * @li - Choose mode SERVE, if this socket
-             * needs to receive connections from clients
-             */
-            enum TCPMode { CONNECT, SERVE };
-
             /**
              * @brief Construct a new TCPSocket object
              *
@@ -41,7 +33,7 @@ namespace System
              * @param mode: CONNECT or SERVE
              * @param address: The IP address of the socket (default 0.0.0.0)
              */
-            explicit TCPSocket(uint16_t port, TCPMode mode,
+            explicit TCPSocket(uint16_t port, Mode mode,
                 const std::string &address = "0.0.0.0");
 
             TCPSocket(TCPSocket &&) = default;
@@ -50,62 +42,14 @@ namespace System
             TCPSocket &operator=(const TCPSocket &) = default;
             bool operator==(const TCPSocket &);
             bool operator!=(const TCPSocket &);
-            ~TCPSocket();
-
-            /**
-             * @brief Send data through the socket
-             *
-             * @param byteSequence: A byte sequence object (type byteArray)
-             * @return: ssize_t The number of bytes written in the socket. This
-             * might be less than the size of the byte array, in which case you
-             * should call this function later with the rest of the data to
-             * send.
-             */
-            ssize_t sendData(const byteArray &byteSequence);
-
-            /**
-             * @brief Receive data through the socket
-             * @note Note: This call could block if the socket is invalid or if
-             * there is no data available at the moment. You probably should
-             * use select before this function.
-             * @return byteArray: A byte sequence object representing all bytes
-             * read from the socket
-             */
-            byteArray receive(void);
-
-            /**
-             * @brief Close the socket.
-             * @note Note: the socket should not be used after this call
-             */
-            void closeSocket(void);
-
-            /**
-             * @brief Return true if the socket is connected and opened
-             *
-             * @return true: The socket is connected and available
-             * @return false: The socket is disconnected and should not be used
-             * (or it will throw)
-             */
-            bool isOpen(void);
-
-            /**
-             * @brief Get the unique identitifer of this socket
-             *
-             * @return uint64_t: Unique identifier of the socket
-             */
-            uint64_t getUID(void) const;
+            ~TCPSocket() override;
+            ssize_t sendData(const byteArray &byteSequence) override;
+            byteArray receive(void) override;
 
             explicit TCPSocket(osSocketType _sock);
             friend TCPSocket accept(const TCPSocket &src);
             friend void select(socketSetTCP *readfds, socketSetTCP *writefds,
                 socketSetTCP *exceptfds, timeoutStruct timeout);
-
-          private:
-            uint64_t _uid;
-            TCPMode _mode;
-            osSocketType _sockfd;
-            bool _opened;
-            SOCKADDR_IN _sockSettings;
         };
 
         /**
@@ -135,10 +79,44 @@ namespace System
             socketSetTCP *writefds = nullptr,
             socketSetTCP *exceptfds = nullptr,
             timeoutStruct timeout = std::nullopt);
+
+        /**
+         * @brief Adds a vector of sockets to a socketSetTCP object.
+         *
+         * @param src: A vector containing sockets
+         * @param dest: The destination socketSetTCP object
+         */
+        void addSocketToSet(const std::vector<System::Network::TCPSocket> &src,
+            socketSetTCP &dest);
+
+        /**
+         * @brief Adds a socket pointer to a socketSetTCP object.
+         *
+         * @param src: A TCPSocket pointer
+         * @param dest: The destination socketSetTCP object
+         */
+        void addSocketToSet(
+            System::Network::TCPSocket *src, socketSetTCP &dest);
+
+        /**
+         * @brief Remove a socket from a vector of socket.
+         * @note Note: This functions remove a socket based on its ID.
+         * @param src: A TCPSocket pointer
+         * @param dest: The vector of TCPSocket containing the socket
+         */
+        bool removeSocketInVect(const System::Network::TCPSocket &toRemove,
+            std::vector<System::Network::TCPSocket> &vect);
+
+        /**
+         * @brief Remove a socket from a socketSetTCP.
+         * @note Note: This functions remove a socket based on its ID.
+         * @param src: A const reference to a TCPSocket object
+         * @param dest: The destination socketSetTCP object
+         */
+        bool removeSocketInSet(
+            const System::Network::TCPSocket &toRemove, socketSetTCP &set);
     } // namespace Network
 
 } // namespace System
-
-void empty(void);
 
 #endif /* SYSTEM_TCP_HPP */

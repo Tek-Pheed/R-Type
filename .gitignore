@@ -60,3 +60,4 @@ a.out
 vgcore.*
 *.recipe
 .vs/
+release/*

@@ -15,6 +15,36 @@
     #include <winsock2.h>
 #endif
 
+#if defined(WIN32)
+    #pragma comment(lib, "ws2_32.lib")
+static WSADATA WData;
+
+void System::Network::initNetwork(void)
+{
+    if (WSAStartup(MAKEWORD(2, 0), &WData) != 0) {
+        throw std::runtime_error("Failed to initialize winsock2");
+    }
+}
+
+void System::Network::stopNetwork(void)
+{
+    if (WSACleanup() != 0) {
+        throw std::runtime_error("Failed to cleanup winsock2");
+    }
+}
+
+#elif defined(LINUX)
+void System::Network::initNetwork(void)
+{
+    return;
+}
+
+void System::Network::stopNetwork(void)
+{
+    return;
+}
+#endif
+
 System::Network::NetworkException::NetworkException(const std::string &str)
     : _content(str)
 {
@@ -51,4 +81,45 @@ std::string System::Network::decodeString(
         s += static_cast<char>(b);
     }
     return (s);
+}
+
+void System::Network::ASocket::closeSocket()
+{
+    this->_opened = false;
+#if defined(LINUX)
+    if (this->_sockfd != -1)
+        if (close(this->_sockfd) == -1) {
+            throw NetworkException("System::Network::ASocket::closeSocket: "
+                                   "Failed to close socket");
+        }
+#elif defined(WIN32)
+    if (closesocket(this->_sockfd) == SOCKET_ERROR) {
+        throw NetworkException(
+            "System::Network::ASocket::closeSocket: Failed to close socket");
+    }
+#endif
+}
+
+bool System::Network::ASocket::isOpen() const
+{
+    return (_opened);
+}
+
+uint64_t System::Network::ASocket::getUID() const
+{
+    return (_uid);
+}
+
+bool System::Network::ASocket::operator==(const System::Network::ASocket &target)
+{
+    return (target._uid == this->_uid);
+}
+
+bool System::Network::ASocket::operator!=(const System::Network::ASocket &target)
+{
+    return (target._uid != this->_uid);
+}
+
+osSocketType System::Network::ASocket::getHandle(void) const {
+    return (this->_sockfd);
 }

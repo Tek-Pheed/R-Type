@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include "system.hpp"
+#include "system_network.hpp"
 #include "system_tcp.hpp"
 
 static volatile std::atomic<bool> stop = false;
@@ -30,10 +31,17 @@ int main(void)
     System::Network::TCPSocket serverSocket(
         1234, System::Network::TCPSocket::SERVE);
 
+    System::Network::TCPSocket serverSocketUDP(
+        1236, System::Network::TCPSocket::SERVE);
+
     std::vector<System::Network::TCPSocket> clients;
 
     System::Network::socketSetTCP socketSetTCP;
     System::Network::timeoutStruct tv;
+
+    System::Network::TCPSocket clientSocketUDP(
+        1236, System::Network::TCPSocket::CONNECT, "127.0.0.1");
+
     tv = {1, 0};
     clients.clear();
     // signal(SIGINT, &sighandler);

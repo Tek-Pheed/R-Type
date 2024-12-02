@@ -19,52 +19,23 @@
 using namespace System;
 using namespace Network;
 
-static uint64_t sockID = 0;
+static uint64_t tcpSockID = 0;
 
-#if defined(WIN32)
-    #pragma comment(lib, "ws2_32.lib")
-static WSADATA WData;
-
-void System::Network::initNetwork(void)
+TCPSocket::TCPSocket(uint16_t port, Mode mode, const std::string &address)
 {
-    if (WSAStartup(MAKEWORD(2, 0), &WData) != 0) {
-        throw std::runtime_error("Failed to initialize winsock2");
-    }
-}
-
-void System::Network::stopNetwork(void)
-{
-    if (WSACleanup() != 0) {
-        throw std::runtime_error("Failed to cleanup winsock2");
-    }
-}
-
-#elif defined(LINUX)
-void System::Network::initNetwork(void)
-{
-    return;
-}
-
-void System::Network::stopNetwork(void)
-{
-    return;
-}
-#endif
-
-TCPSocket::TCPSocket(uint16_t port, TCPMode mode, const std::string &address)
-    : _mode(mode), _opened(false)
-{
-    sockID++;
+    tcpSockID++;
     int res;
+    this->_mode = mode;
+    this->_opened = false;
     this->_sockSettings.sin_family = AF_INET;
     this->_sockSettings.sin_port = htons(port);
     this->_sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    this->_uid = sockID;
+    this->_uid = tcpSockID;
     if (this->_sockfd == INVALID_SOCKET)
         throw NetworkException(
             "System::Network::TCPSocket: Failed to create socket");
 
-    if (mode == TCPMode::SERVE) {
+    if (mode == SERVE) {
         _sockSettings.sin_addr.s_addr = htonl(INADDR_ANY);
         res = bind(this->_sockfd,
             reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
@@ -77,7 +48,7 @@ TCPSocket::TCPSocket(uint16_t port, TCPMode mode, const std::string &address)
             throw NetworkException(
                 "System::Network::TCPSocket: Failed to listen");
         this->_opened = true;
-    } else if (mode == TCPMode::CONNECT) {
+    } else if (mode == CONNECT) {
         this->_sockSettings.sin_addr.s_addr = inet_addr(address.c_str());
         res = connect(this->_sockfd,
             reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
@@ -114,52 +85,17 @@ ssize_t TCPSocket::sendData(const byteArray &byteSequence)
     return (writtenBytes);
 }
 
-void TCPSocket::closeSocket(void)
-{
-    this->_opened = false;
-#if defined(LINUX)
-    if (this->_sockfd != -1)
-        if (close(this->_sockfd) == -1) {
-            throw NetworkException("System::Network::TCPSocket::closeSocket: Failed to close socket");
-        }
-#elif defined(WIN32)
-    if (closesocket(this->_sockfd) == SOCKET_ERROR) {
-        throw NetworkException("System::Network::TCPSocket::closeSocket: Failed to close socket");
-    }
-#endif
-}
-
 TCPSocket::TCPSocket(osSocketType sock_fd)
 {
-    sockID++;
+    tcpSockID++;
     this->_opened = true;
     this->_sockfd = sock_fd;
-    this->_uid = sockID;
+    this->_uid = tcpSockID;
     this->_mode = CONNECT;
 }
 
 TCPSocket::~TCPSocket()
 {
-}
-
-uint64_t TCPSocket::getUID() const
-{
-    return (_uid);
-}
-
-bool TCPSocket::operator==(const TCPSocket &target)
-{
-    return (target._sockfd == this->_sockfd);
-}
-
-bool TCPSocket::operator!=(const TCPSocket &target)
-{
-    return (target._sockfd != this->_sockfd);
-}
-
-bool TCPSocket::isOpen(void)
-{
-    return this->_opened;
 }
 
 byteArray TCPSocket::receive(void)
@@ -250,23 +186,23 @@ void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
 
     if (readfds != nullptr && readfds->size() > 0) {
         read_set_p = &read_set;
-        for (const TCPSocket *i : *readfds) {
+        for (const auto *i : *readfds) {
             if (i != nullptr)
-                FD_SET(i->_sockfd, read_set_p);
+                FD_SET(i->getHandle(), read_set_p);
         }
     }
     if (writefds != nullptr && writefds->size() > 0) {
         write_set_p = &write_set;
-        for (const TCPSocket *i : *writefds) {
+        for (const auto *i : *writefds) {
             if (i != nullptr)
-                FD_SET(i->_sockfd, write_set_p);
+                FD_SET(i->getHandle(), write_set_p);
         }
     }
     if (exceptfds != nullptr && exceptfds->size() > 0) {
         except_set_p = &except_set;
-        for (const TCPSocket *i : *exceptfds) {
+        for (const auto *i : *exceptfds) {
             if (i != nullptr)
-                FD_SET(i->_sockfd, except_set_p);
+                FD_SET(i->getHandle(), except_set_p);
         }
     }
     if (select(FD_SETSIZE, read_set_p, write_set_p, except_set_p, tm) == SOCKET_ERROR)
@@ -274,7 +210,7 @@ void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
     if (readfds != nullptr && readfds->size() > 0) {
         for (size_t i = 0; i < readfds->size(); i++) {
             if ((*readfds)[i] != nullptr
-                && !FD_ISSET((*readfds)[i]->_sockfd, read_set_p)) {
+                && !FD_ISSET((*readfds)[i]->getHandle(), read_set_p)) {
                 readfds->erase((readfds->begin()) + (long) i);
             }
         }
@@ -282,7 +218,7 @@ void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
     if (writefds != nullptr && writefds->size() > 0) {
         for (size_t i = 0; i < writefds->size(); i++) {
             if ((*writefds)[i] != nullptr
-                && !FD_ISSET((*writefds)[i]->_sockfd, write_set_p)) {
+                && !FD_ISSET((*writefds)[i]->getHandle(), write_set_p)) {
                 writefds->erase((writefds->begin()) + (long) i);
             }
         }
@@ -290,7 +226,7 @@ void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
     if (exceptfds != nullptr && exceptfds->size() > 0) {
         for (size_t i = 0; i < exceptfds->size(); i++) {
             if ((*exceptfds)[i] != nullptr
-                && !FD_ISSET((*exceptfds)[i]->_sockfd, except_set_p)) {
+                && !FD_ISSET((*exceptfds)[i]->getHandle(), except_set_p)) {
                 exceptfds->erase((exceptfds->begin()) + (long) i);
             }
         }
@@ -298,10 +234,10 @@ void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
 }
 
 void System::Network::addSocketToSet(
-    const std::vector<System::Network::TCPSocket> &src, socketSetTCP &dest)
+    const std::vector<TCPSocket> &src, socketSetTCP &dest)
 {
     for (size_t i = 0; i != src.size(); i++) {
-        TCPSocket *a = const_cast<TCPSocket *>(&(src.at(i)));
+        auto *a = const_cast<TCPSocket *>(&(src.at(i)));
         dest.emplace_back(a);
     }
 }

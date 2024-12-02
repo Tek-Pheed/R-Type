@@ -24,18 +24,18 @@
 
     #define INVALID_SOCKET -1
     #define SOCKET_ERROR   -1
-    using osSocketType = int;
-    typedef struct timeval s_timeval;
-    using osSocketType = int;
-    using s_timeval = struct timeval;
-    using SOCKADDR_IN = struct sockaddr_in;
+using osSocketType = int;
+typedef struct timeval s_timeval;
+using osSocketType = int;
+using s_timeval = struct timeval;
+using SOCKADDR_IN = struct sockaddr_in;
 
 #elif defined(WIN32)
     #include <WinSock2.h>
-    using osSocketType = SOCKET;
-    typedef long ssize_t;
-    typedef timeval s_timeval;
-    typedef int socklen_t;
+using osSocketType = SOCKET;
+typedef long ssize_t;
+typedef timeval s_timeval;
+typedef int socklen_t;
 
 #else
     #error "This target is not supported by R-Type libSystem"
@@ -61,12 +61,102 @@ namespace System
             std::string _content;
         };
 
-        class TCPClient;
-        class TCPSocket;
-
-        using socketSetTCP = std::vector<TCPSocket *>;
         using timeoutStruct = std::optional<s_timeval>;
         using byteArray = std::vector<uint8_t>;
+
+        /**
+         * @brief Socket Interface
+         */
+        class ISocket {
+          public:
+            /**
+             * @brief Mode for creating the socket
+             * @li - Choose mode CONNECT to connect to a socket.
+             * @li - Choose mode SERVE, if this socket
+             * needs to receive connections from clients
+             */
+            enum Mode { CONNECT, SERVE };
+
+            /**
+             * @brief Send data through the socket
+             *
+             * @param byteSequence: A byte sequence object (type byteArray)
+             * @return: ssize_t The number of bytes written in the socket. This
+             * might be less than the size of the byte array, in which case you
+             * should call this function later with the rest of the data to
+             * send.
+             */
+            virtual ssize_t sendData(const byteArray &byteSequence) = 0;
+
+            /**
+             * @brief Receive data through the socket
+             * @note Note: This call could block if the socket is invalid or if
+             * there is no data available at the moment. You probably should
+             * use select before this function.
+             * @return byteArray: A byte sequence object representing all bytes
+             * read from the socket
+             */
+            virtual byteArray receive(void) = 0;
+
+            /**
+             * @brief Close the socket.
+             * @note Note: the socket should not be used after this call
+             */
+            virtual void closeSocket(void) = 0;
+
+            /**
+             * @brief Get the OS-native socket handle
+             * @note Note: this call should probably not be use directly
+             */
+            virtual osSocketType getHandle(void) const = 0;
+
+            /**
+             * @brief Return true if the socket is connected and opened
+             *
+             * @return true: The socket is connected and available
+             * @return false: The socket is disconnected and should not be used
+             * (or it will throw)
+             */
+            virtual bool isOpen(void) const = 0;
+
+            /**
+             * @brief Get the unique identitifer of this socket
+             *
+             * @return uint64_t: Unique identifier of the socket
+             */
+            virtual uint64_t getUID(void) const = 0;
+
+        };
+
+        class ASocket : public ISocket {
+          public:
+            virtual ~ASocket() {};
+            bool operator==(const ASocket &);
+            bool operator!=(const ASocket &);
+
+            virtual ssize_t sendData(
+                const byteArray &byteSequence) override = 0;
+            virtual byteArray receive(void) override = 0;
+
+            void closeSocket(void) override;
+            bool isOpen(void) const override;
+            uint64_t getUID(void) const override;
+            osSocketType getHandle(void) const override;
+
+          protected:
+            uint64_t _uid;
+            Mode _mode;
+            osSocketType _sockfd;
+            bool _opened;
+            SOCKADDR_IN _sockSettings;
+        };
+
+        class TCPClient;
+        class TCPSocket;
+        class UDPSocket;
+
+        using socketSetTCP = std::vector<TCPSocket *>;
+        using socketSetUDP = std::vector<UDPSocket *>;
 
         /**
          * @brief Intitialize the Network library (Windows specific).
@@ -81,42 +171,6 @@ namespace System
          * an empty function.
          */
         void stopNetwork(void);
-
-        /**
-         * @brief Adds a vector of sockets to a socketSetTCP object.
-         *
-         * @param src: A vector containing sockets
-         * @param dest: The destination socketSetTCP object
-         */
-        void addSocketToSet(const std::vector<System::Network::TCPSocket> &src,
-            socketSetTCP &dest);
-
-        /**
-         * @brief Adds a socket pointer to a socketSetTCP object.
-         *
-         * @param src: A TCPSocket pointer
-         * @param dest: The destination socketSetTCP object
-         */
-        void addSocketToSet(
-            System::Network::TCPSocket *src, socketSetTCP &dest);
-
-        /**
-         * @brief Remove a socket from a vector of socket.
-         * @note Note: This functions remove a socket based on its ID.
-         * @param src: A TCPSocket pointer
-         * @param dest: The vector of TCPSocket containing the socket
-         */
-        bool removeSocketInVect(const System::Network::TCPSocket &toRemove,
-            std::vector<System::Network::TCPSocket> &vect);
-
-        /**
-         * @brief Remove a socket from a socketSetTCP.
-         * @note Note: This functions remove a socket based on its ID.
-         * @param src: A const reference to a TCPSocket object
-         * @param dest: The destination socketSetTCP object
-         */
-        bool removeSocketInSet(
-            const System::Network::TCPSocket &toRemove, socketSetTCP &set);
 
         /**
          * @brief Decode a std::string from a byteArray object
