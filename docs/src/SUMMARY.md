@@ -4,13 +4,6 @@
 2. [Building](./building.md)
 3. [ECS](ecs/ecs.md)
     - [Components](ecs/components/components.md)
-        - [Position Component](ecs/components/position_component.md)
-        - [Velocity Component](ecs/components/velocity_component.md)
-        - [Player Component](ecs/components/player_component.md)
-        - [Health Component](ecs/components/health_component.md)
-        - [Boss Component](ecs/components/boss_component.md)
-        - [Enemy Component](ecs/components/enemy_component.md)
-        - [Render Component](ecs/components/render_component.md)
 
 4. [Client](client/client.md)
     - [RenderClass](client/renderclass.md)

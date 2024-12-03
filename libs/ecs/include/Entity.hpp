@@ -40,8 +40,7 @@ namespace ecs
             return nullptr;
         }
 
-        template <typename componentType>
-        std::unique_ptr<componentType> deleteComponent()
+        template <typename componentType> void deleteComponent()
         {
             this->_components.erase(typeid(componentType));
         }

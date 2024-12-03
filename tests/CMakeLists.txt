@@ -19,3 +19,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} ecs)
 include_directories(../libs/ecs/include)
 target_link_libraries(${PROJECT_NAME} criterion)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>:$ENV{LD_LIBRARY_PATH}
+        BUILD_WITH_INSTALL_RPATH TRUE
+        CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>:$ENV{LD_LIBRARY_PATH}
+)
