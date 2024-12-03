@@ -78,6 +78,19 @@ namespace ecs
       private:
         std::string _name;
     };
-} // namespace ecs
+
+    enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };
+
+    class RenderComponent : public Component {
+      public:
+        explicit RenderComponent(ObjectType type);
+
+        ObjectType getType() const;
+        void setType(ObjectType type);
+
+      private:
+        ObjectType _type;
+    };
+}
 
 #endif // R_TYPE_COMPONENT_HPP
