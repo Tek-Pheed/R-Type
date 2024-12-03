@@ -7,7 +7,7 @@
 
 class Config {
     public:
-        Config(const std::string &filename);
+        explicit Config(const std::string &filename);
         ~Config();
         const std::map<int, std::string>& getConfig();
         void setConfig(int line, const std::string &param);
