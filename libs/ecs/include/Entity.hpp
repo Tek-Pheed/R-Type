@@ -19,7 +19,7 @@ namespace ecs
 {
     class Entity {
       public:
-        Entity(std::size_t id);
+        explicit Entity(std::size_t id);
         ~Entity();
 
         template <typename componentType>
