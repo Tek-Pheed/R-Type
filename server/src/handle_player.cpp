@@ -8,18 +8,28 @@
 #include <string>
 #include <vector>
 #include "protocol.hpp"
+#include "server.hpp"
 
-int handle_player(int code, std::vector<std::string> tokens)
+int server::handle_player(int code, std::vector<std::string> tokens)
 {
+    int id, x, y;
     switch (code) {
         case P_POS:
+            id = std::stoi(tokens[0]);
+            x = std::stoi(tokens[1]);
+            y = std::stoi(tokens[2]);
+            playerPosition(id, x, y);
             // handle_p_pos(tokens);
             break;
         case P_SHOOT:
-            // handle_p_shoot(tokens);
+            id = std::stoi(tokens[0]);
+            x = std::stoi(tokens[1]);
+            y = std::stoi(tokens[2]);
+            playerShooting(id, x, y);
             break;
         case P_DISCONN:
-            // handle_p_disconn(tokens);
+            id = std::stoi(tokens[0]);
+            playerDisconnection(id);
             break;
         default: break;
     }

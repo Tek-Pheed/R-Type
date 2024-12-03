@@ -20,7 +20,6 @@ int server::playerPosition(int id, int x, int y)
         if (_players[i].id == id)
             player = &_players[i];
     }
-    // Update player position
     player->x = x;
     player->y = y;
     // send to all

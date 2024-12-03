@@ -14,10 +14,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <bits/stdc++.h>
-/*struct server {
-    int scokfd;
-    struct sockaddr_in servaddr, cliaddr;
-};*/
 
 struct Player_s {
     int id;
@@ -55,6 +51,7 @@ class server {
     int playerShooting(int id, int x, int y);
     int playerDamaged(int id, int amount);
     int playerDisconnection(int id);
+    int handle_player(int code, std::vector<std::string> tokens);
 
   private:
     int _sockfd;
