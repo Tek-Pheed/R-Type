@@ -46,6 +46,7 @@ void UDPSocket::initSocket(uint16_t port, const std::string &address)
     if (res == SOCKET_ERROR)
         throw NetworkException(
             "System::Network::UDPSocket: Failed to bind socket");
+    this->_opened = true;
 }
 
 UDPSocket::UDPSocket()
@@ -103,7 +104,6 @@ byteArray UDPSocket::receive(void)
 {
     ssize_t ret = 0;
     byteArray vect;
-    uint8_t dummy = 0;
 
 #if defined(WIN32)
     u_long len = 0;
@@ -114,23 +114,6 @@ byteArray UDPSocket::receive(void)
 #endif
 
     if (len == 0) {
-#if defined(LINUX)
-        socklen_t slen = sizeof(this->_sockSettings);
-        ret = recvfrom(this->_sockfd, &dummy, len, 0,
-            reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
-#elif defined(WIN32)
-        int slen = sizeof(this->_sockSettings);
-        ret = recvfrom(this->_sockfd, reinterpret_cast<char *>(&dummy), len, 0,
-            reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
-        if (this->_opened && ret == SOCKET_ERROR) {
-            this->_opened = (ret > 0);
-            return (vect);
-        }
-#endif
-        this->_opened = (ret > 0);
-        if (ret == SOCKET_ERROR)
-            throw NetworkException(
-                "System::Network::UDPSocket::receive: Failed to read");
         return (vect);
     }
     uint8_t *buff = new uint8_t[len]();

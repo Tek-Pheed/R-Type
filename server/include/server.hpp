@@ -15,6 +15,10 @@
 #include <unistd.h>
 #include <bits/stdc++.h>
 
+#include "system_network.hpp"
+#include "system_tcp.hpp"
+#include "system_udp.hpp"
+
 struct Player_s {
     int id;
     int x;
@@ -54,8 +58,7 @@ class server {
     int handle_player(int code, std::vector<std::string> tokens);
 
   private:
-    int _sockfd;
-    struct sockaddr_in _servaddr, _cliaddr;
+    System::Network::UDPSocket _sockupd;
     std::vector<Player_t> _players;
     std::vector<Enemy_t> _enemies;
     std::vector<Terrain_t> _terrains;

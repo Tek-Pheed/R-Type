@@ -15,13 +15,17 @@
 #include <unistd.h>
 #include <bits/stdc++.h>
 
+#include "system_network.hpp"
+#include "system_tcp.hpp"
+#include "system_udp.hpp"
+
 #include "protocol.hpp"
 #include "server.hpp"
 
 #define PORT    8081
 #define MAXLINE 1400
 
-server::server()
+server::server() : _sockupd()
 {
 }
 
@@ -31,23 +35,7 @@ server::~server()
 
 void server::create_server()
 {
-    if ((_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        perror("socket creation failed");
-        exit(EXIT_FAILURE);
-    }
-
-    memset(&_servaddr, 0, sizeof(_servaddr));
-    memset(&_cliaddr, 0, sizeof(_cliaddr));
-
-    _servaddr.sin_family = AF_INET;
-    _servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    _servaddr.sin_port = htons(PORT);
-
-    if (bind(_sockfd, (const struct sockaddr *) &_servaddr, sizeof(_servaddr))
-        < 0) {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
-    }
+    _sockupd.initSocket(PORT);
 }
 
 int is_code_valid(int code)
@@ -63,7 +51,7 @@ int is_code_valid(int code)
     return -1;
 }
 
-int manage_buffer(char *buffer, ssize_t n)
+int manage_buffer(std::string buffer, ssize_t n)
 {
     std::string code = std::string(buffer).substr(0, 3);
     int i_code = atoi(code.c_str());
@@ -71,41 +59,47 @@ int manage_buffer(char *buffer, ssize_t n)
     std::vector<std::string> tokens;
 
     if (code_pro == -1) {
-        free(buffer);
         return -1;
     }
-    std::string str =
-        std::string(buffer).substr(4, static_cast<size_t>(n) - 4);
+    std::string str = buffer.substr(4, static_cast<size_t>(n) - 4);
     std::istringstream ss(str);
     std::string token;
     while (std::getline(ss, token, ' ')) {
         tokens.push_back(token);
     }
 
-    switch (code_pro) {
+    /*switch (code_pro) {
         case 0: handle_player(i_code, tokens); break;
         default: break;
-    }
-    free(buffer);
+    }*/
     return 0;
 }
 
 void server::receive_message()
 {
-    socklen_t len;
-    ssize_t n;
-    char *buffer = (char *) malloc(MAXLINE * sizeof(char));
+    System::Network::byteArray arr;
 
-    len = sizeof(_cliaddr);
-    n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_WAITALL,
-        (struct sockaddr *) &_cliaddr, &len);
+    if (!_sockupd.isOpen())
+        return;
+    sleep(1);
+    arr = _sockupd.receive();
 
-    while (buffer[n - 1] != '\n' || buffer[n - 2] != '\t') {
+    /*n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_WAITALL,
+        (struct sockaddr *) &_cliaddr, &len);*/
+    if (arr.size() == 0)
+        return;
+    while (arr[arr.size() - 1] != '\n' || arr[arr.size() - 2] != '\t') {
+        auto vect2 = _sockupd.receive();
+        arr.insert(arr.end(), vect2.begin(), vect2.end());
+    }
+
+    /*while (buffer[n - 1] != '\n' || buffer[n - 2] != '\t') {
         n += recvfrom(_sockfd, (char *) buffer + n, MAXLINE, MSG_WAITALL,
             (struct sockaddr *) &_cliaddr, &len);
-    }
-    buffer[n] = '\0';
-    manage_buffer(buffer, n);
+    }*/
+    std::string buffer = System::Network::decodeString(arr);
+    printf("Message received: %s\n", buffer.c_str());
+    manage_buffer(buffer, static_cast<ssize_t>(buffer.size()));
     return;
 }
 
@@ -113,8 +107,10 @@ int main()
 {
     server s;
     s.create_server();
+    System::Network::initNetwork();
 
     while (true) {
         s.receive_message();
     }
+    // System::Network::stopNetwork();
 }
