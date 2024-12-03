@@ -102,6 +102,17 @@ namespace ecs
       private:
         ObjectType _type;
     };
+
+    class TextComponent : public Component {
+      public:
+        TextComponent();
+        ~TextComponent();
+        void setText(const std::string &text);
+        std::string getText() const;
+
+        private:
+          std::string _text;
+    };
 }
 
 #endif // R_TYPE_COMPONENT_HPP
