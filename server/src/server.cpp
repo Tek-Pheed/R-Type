@@ -78,27 +78,29 @@ int manage_buffer(std::string buffer, ssize_t n)
 void server::receive_message()
 {
     System::Network::byteArray arr;
+    std::string buffer;
 
     if (!_sockupd.isOpen())
         return;
-    sleep(1);
-    arr = _sockupd.receive();
+    System::Network::socketSetGeneric readfds;
+    System::Network::socketSetGeneric writefds;
 
-    /*n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_WAITALL,
-        (struct sockaddr *) &_cliaddr, &len);*/
-    if (arr.size() == 0)
-        return;
-    while (arr[arr.size() - 1] != '\n' || arr[arr.size() - 2] != '\t') {
-        auto vect2 = _sockupd.receive();
-        arr.insert(arr.end(), vect2.begin(), vect2.end());
+    readfds.emplace_back(&_sockupd);
+    // writefds.emplace_back(&_sockupd);
+    System::Network::select(&readfds, &writefds, nullptr);
+
+    for (auto &sock : readfds) {
+        auto vect = sock->receive();
+        buffer = System::Network::decodeString(vect);
+        if (buffer[buffer.size() - 1] == '\n'
+            && buffer[buffer.size() - 2] == '\t') {
+            arr.insert(arr.end(), vect.begin(), vect.end());
+            break;
+        }
     }
 
-    /*while (buffer[n - 1] != '\n' || buffer[n - 2] != '\t') {
-        n += recvfrom(_sockfd, (char *) buffer + n, MAXLINE, MSG_WAITALL,
-            (struct sockaddr *) &_cliaddr, &len);
-    }*/
-    std::string buffer = System::Network::decodeString(arr);
-    printf("Message received: %s\n", buffer.c_str());
+    printf(
+        "Message received: %s\n", System::Network::decodeString(arr).c_str());
     manage_buffer(buffer, static_cast<ssize_t>(buffer.size()));
     return;
 }
