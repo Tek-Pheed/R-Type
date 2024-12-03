@@ -21,10 +21,6 @@ jobs:
       - name: Run cppcheck
         run: ./.github/ci_scripts/run_cppcheck.sh
 
-      - name: Cat Output
-        if: always()
-        run: cat ./check.txt
-
       - name: Publish cppcheck
         if: always()
         run: ./.github/ci_scripts/cppcheck_publisher.sh
