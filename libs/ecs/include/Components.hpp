@@ -102,6 +102,18 @@ namespace ecs
       private:
         ObjectType _type;
     };
+
+    class BulletComponent : public Component {
+      public:
+        BulletComponent();
+        explicit BulletComponent(bool isFromPlayer);
+
+        std::string getIsFromPlayer() const;
+        void setIsFromPlayer(bool isFromPlayer);
+
+      private:
+        std::string _isFromPlayer;
+    };
 }
 
 #endif // R_TYPE_COMPONENT_HPP
