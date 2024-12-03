@@ -39,7 +39,7 @@ namespace ecs
 
       private:
         std::string _name;
-  	};
+    };
 
     class VelocityComponent : public Component {
       public:
@@ -54,7 +54,7 @@ namespace ecs
       private:
         int _vx;
         int _vy;
-	  };
+    };
 
     class HealthComponent : public Component {
       public:
@@ -109,8 +109,9 @@ namespace ecs
         void setText(const std::string &text);
         std::string getText() const;
 
-        private:
-          std::string _text;
+      private:
+        std::string _text;
+    };
 
     class BulletComponent : public Component {
       public:
@@ -123,6 +124,6 @@ namespace ecs
       private:
         bool _isFromPlayer;
     };
-}
+} // namespace ecs
 
 #endif // R_TYPE_COMPONENT_HPP
