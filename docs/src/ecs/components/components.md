@@ -15,3 +15,4 @@ This class is built with destructor only
 | Boss component     | Define entity as a boss       |
 | Enemy component    | Define entity as an enemy     |
 | Render component   | Renders an entity             |
+| Bullet component   | Defines an entity as a bullet |
