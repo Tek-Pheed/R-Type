@@ -18,16 +18,16 @@ namespace ecs
 
     class PositionComponent : public Component {
       public:
-        PositionComponent(int x, int y);
+        PositionComponent(float x, float y);
 
-        int getX();
-        int getY();
-        void setX(int x);
-        void setY(int y);
+        float getX();
+        float getY();
+        void setX(float x);
+        void setY(float y);
 
       private:
-        int _x;
-        int _y;
+        float _x;
+        float _y;
     };
 
     class PlayerComponent : public Component {
