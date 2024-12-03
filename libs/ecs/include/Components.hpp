@@ -68,6 +68,17 @@ namespace ecs
         int _health;
     };
 
+    class BossComponent : public Component {
+      public:
+        explicit BossComponent(const std::string &name);
+
+        std::string getName() const;
+        void setName(const std::string &name);
+
+      private:
+        std::string _name;
+    };
+
     enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };
 
     class RenderComponent : public Component {

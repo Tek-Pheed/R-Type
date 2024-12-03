@@ -4,10 +4,3 @@
 ** File description:
 ** system
 */
-
-#include "system.hpp"
-
-void empty(void)
-{
-    return;
-}
