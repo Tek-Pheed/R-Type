@@ -11,7 +11,7 @@ ecs::VelocitySystem::VelocitySystem()
 {
 }
 
-ecs::VelocitySystem::update(sf::Window *window, float deltaTime)
+void ecs::VelocitySystem::update(sf::Window *window, float deltaTime)
 {
     (void)window;
     for (auto &entity : entities) {
