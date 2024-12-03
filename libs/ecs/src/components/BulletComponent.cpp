@@ -17,7 +17,7 @@ ecs::BulletComponent::BulletComponent(bool isFromPlayer)
     this->_isFromPlayer = isFromPlayer;
 }
 
-std::string ecs::BulletComponent::getIsFromPlayer() const
+std::string ecs::BulletComponent::getIsFromPlayer()
 {
     return this->_isFromPlayer;
 }
