@@ -8,6 +8,7 @@
         - [Velocity Component](ecs/components/velocity_component.md)
         - [Player Component](ecs/components/player_component.md)
         - [Health Component](ecs/components/health_component.md)
+    - [Systems](ecs/system/system.md)
 4. [Client](client/client.md)
     - [RenderClass](client/renderclass.md)
     - [ErrorClass](client/errorclass.md)
