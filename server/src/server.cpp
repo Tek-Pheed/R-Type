@@ -21,30 +21,33 @@
 #define PORT    8081
 #define MAXLINE 1400
 
-server *create_server()
+server::server()
 {
-    server *s = (server *) malloc(sizeof(server));
+}
 
-    if ((s->scokfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+server::~server()
+{
+}
+
+void server::create_server()
+{
+    if ((_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         perror("socket creation failed");
         exit(EXIT_FAILURE);
     }
 
-    memset(&s->servaddr, 0, sizeof(s->servaddr));
-    memset(&s->cliaddr, 0, sizeof(s->cliaddr));
+    memset(&_servaddr, 0, sizeof(_servaddr));
+    memset(&_cliaddr, 0, sizeof(_cliaddr));
 
-    s->servaddr.sin_family = AF_INET;
-    s->servaddr.sin_addr.s_addr = INADDR_ANY;
-    s->servaddr.sin_port = htons(PORT);
+    _servaddr.sin_family = AF_INET;
+    _servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    _servaddr.sin_port = htons(PORT);
 
-    if (bind(s->scokfd, (const struct sockaddr *) &s->servaddr,
-            sizeof(s->servaddr))
+    if (bind(_sockfd, (const struct sockaddr *) &_servaddr, sizeof(_servaddr))
         < 0) {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
-
-    return s;
 }
 
 int is_code_valid(int code)
@@ -87,29 +90,31 @@ int manage_buffer(char *buffer, ssize_t n)
     return 0;
 }
 
-int receive_message(server *s)
+void server::receive_message()
 {
     socklen_t len;
     ssize_t n;
     char *buffer = (char *) malloc(MAXLINE * sizeof(char));
 
-    len = sizeof(s->cliaddr);
-    n = recvfrom(s->scokfd, (char *) buffer, MAXLINE, MSG_WAITALL,
-        (struct sockaddr *) &s->cliaddr, &len);
+    len = sizeof(_cliaddr);
+    n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_WAITALL,
+        (struct sockaddr *) &_cliaddr, &len);
 
     while (buffer[n - 1] != '\n' || buffer[n - 2] != '\t') {
-        n += recvfrom(s->scokfd, (char *) buffer + n, MAXLINE, MSG_WAITALL,
-            (struct sockaddr *) &s->cliaddr, &len);
+        n += recvfrom(_sockfd, (char *) buffer + n, MAXLINE, MSG_WAITALL,
+            (struct sockaddr *) &_cliaddr, &len);
     }
     buffer[n] = '\0';
-    return manage_buffer(buffer, n);
+    manage_buffer(buffer, n);
+    return;
 }
 
 int main()
 {
-    server *s = create_server();
+    server s;
+    s.create_server();
 
     while (true) {
-        receive_message(s);
+        s.receive_message();
     }
 }

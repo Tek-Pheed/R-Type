@@ -10,7 +10,7 @@ format : CODE SP <?ARGS> HTLF
 
 -   Player (100)
 
-    -   Player connection (id, x, y) - 101 ➡️
+    -   Player connection (id, x, y) - 101 🔄
     -   Player change position (id, x, y) - 102 🔄
     -   Player killed (id) - 103 ➡️
     -   Player shooting (id, x, y) - 104 🔄
