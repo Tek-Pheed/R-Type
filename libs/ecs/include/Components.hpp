@@ -67,6 +67,24 @@ namespace ecs
       private:
         int _health;
     };
-} // namespace ecs
+
+    enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };
+
+    class RenderComponent : public Component {
+      public:
+        RenderComponent(ObjectType type);
+
+        ObjectType getType() const {
+          return _type;
+        }
+
+        void setType(ObjectType type) {
+          _type = type;
+        }
+
+      private:
+        ObjectType _type;
+    };
+}
 
 #endif // R_TYPE_COMPONENT_HPP
