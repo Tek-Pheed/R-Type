@@ -154,7 +154,7 @@ byteArray TCPSocket::receive(void)
 
 TCPSocket Network::accept(const TCPSocket &src)
 {
-    int res = 0;
+    osSocketType res = 0;
     struct sockaddr clientAddr;
     socklen_t clientSockLen = sizeof(clientAddr);
 

@@ -69,6 +69,8 @@ namespace System
          */
         class ISocket {
           public:
+            virtual ~ISocket() = default;
+
             /**
              * @brief Mode for creating the socket
              * @li - Choose mode CONNECT to connect to a socket.
@@ -130,7 +132,6 @@ namespace System
 
         class ASocket : public ISocket {
           public:
-            virtual ~ASocket() {};
             bool operator==(const ASocket &);
             bool operator!=(const ASocket &);
 

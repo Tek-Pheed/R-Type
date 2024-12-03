@@ -7,6 +7,8 @@
 
 #include "system_network.hpp"
 #include <cstddef>
+#include <stdexcept>
+#include <exception>
 
 #if defined(LINUX)
     #include "string.h"

@@ -6,9 +6,6 @@ cmake -B build .
 cd build
 cmake --build . -j $env:NUMBER_OF_PROCESSORS
 
-Write-Host "Listing contents of build directory:"
-ls
-
 $sourceDir = "dependencies/SFML/"
 $destDir = "../release/"
 

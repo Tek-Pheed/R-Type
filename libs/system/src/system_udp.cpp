@@ -11,10 +11,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <netinet/in.h>
 #include <stdexcept>
 #include <string>
-#include <sys/socket.h>
 #include "system_network.hpp"
 
 using namespace System;
@@ -105,7 +103,7 @@ byteArray UDPSocket::receive(void)
             reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
 #elif defined(WIN32)
         int slen = sizeof(this->_sockSettings);
-        ret = recvfrom(this->_sockfd, &dummy, len, 0,
+        ret = recvfrom(this->_sockfd, reinterpret_cast<char *>(&dummy), len, 0,
             reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
         if (this->_opened && ret == SOCKET_ERROR) {
             this->_opened = (ret > 0);
@@ -128,7 +126,7 @@ byteArray UDPSocket::receive(void)
 
 #elif defined(WIN32)
     int slen = sizeof(this->_sockSettings);
-    ret = recvfrom(this->_sockfd, buff, len, 0, reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
+    ret = recvfrom(this->_sockfd,  reinterpret_cast<char *>(buff), len, 0, reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
 #endif
     if (ret == SOCKET_ERROR) {
         delete[] buff;
