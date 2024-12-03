@@ -11,6 +11,7 @@
         - [Boss Component](ecs/components/boss_component.md)
         - [Enemy Component](ecs/components/enemy_component.md)
         - [Render Component](ecs/components/render_component.md)
+        - [Bullet Component](ecs/components/bullet_component.md)
 
 4. [Client](client/client.md)
     - [RenderClass](client/renderclass.md)
