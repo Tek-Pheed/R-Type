@@ -77,22 +77,22 @@ namespace System
         };
 
         /**
-         * @brief Adds a vector of sockets to a socketSetTCP object.
+         * @brief Adds a vector of sockets to a socketSetGeneric object.
          *
          * @param src: A vector containing sockets
-         * @param dest: The destination socketSetTCP object
+         * @param dest: The destination socketSetGeneric object
          */
         void addSocketToSet(const std::vector<System::Network::UDPSocket> &src,
-            socketSetUDP &dest);
+            socketSetGeneric &dest);
 
         /**
-         * @brief Adds a socket pointer to a socketSetTCP object.
+         * @brief Adds a socket pointer to a socketSetGeneric object.
          *
          * @param src: A TCPSocket pointer
-         * @param dest: The destination socketSetTCP object
+         * @param dest: The destination socketSetGeneric object
          */
         void addSocketToSet(
-            System::Network::UDPSocket *src, socketSetUDP &dest);
+            System::Network::UDPSocket *src, socketSetGeneric &dest);
 
         /**
          * @brief Remove a socket from a vector of socket.
@@ -104,13 +104,13 @@ namespace System
             std::vector<System::Network::UDPSocket> &vect);
 
         /**
-         * @brief Remove a socket from a socketSetTCP.
+         * @brief Remove a socket from a socketSetGeneric.
          * @note Note: This functions remove a socket based on its ID.
          * @param src: A const reference to a TCPSocket object
-         * @param dest: The destination socketSetTCP object
+         * @param dest: The destination socketSetGeneric object
          */
         bool removeSocketInSet(
-            const System::Network::UDPSocket &toRemove, socketSetUDP &set);
+            const System::Network::UDPSocket &toRemove, socketSetGeneric &set);
     } // namespace Network
 
 } // namespace System

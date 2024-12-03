@@ -146,7 +146,7 @@ byteArray UDPSocket::receive(void)
 }
 
 void System::Network::addSocketToSet(
-    const std::vector<UDPSocket> &src, socketSetUDP &dest)
+    const std::vector<UDPSocket> &src, socketSetGeneric &dest)
 {
     for (size_t i = 0; i != src.size(); i++) {
         auto *a = const_cast<UDPSocket *>(&(src.at(i)));
@@ -154,7 +154,7 @@ void System::Network::addSocketToSet(
     }
 }
 
-void System::Network::addSocketToSet(UDPSocket *src, socketSetUDP &dest)
+void System::Network::addSocketToSet(UDPSocket *src, socketSetGeneric &dest)
 {
     dest.emplace_back(src);
 }
@@ -176,7 +176,7 @@ bool System::Network::removeSocketInVect(
 
 bool System::Network::removeSocketInSet(
     const System::Network::UDPSocket &toRemove,
-    System::Network::socketSetUDP &set)
+    System::Network::socketSetGeneric &set)
 {
     const uint64_t uid = toRemove.getUID();
 

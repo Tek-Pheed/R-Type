@@ -48,7 +48,7 @@ The mode can be either:
 - `uint64_t getUID(void) const`: Get the unique identitifer of this socket
 
 Additionnal syscall encapsulation are also provided:
-- `void select(socketSetTCP *readfds = nullptr, socketSetTCP *writefds = nullptr, socketSetTCP *exceptfds = nullptr, timeoutStruct timeout = std::nullopt)`: The Linux select function applied to TCPSocket objects. This function modifies the sets passed as argument.
+- `void select(socketSetGeneric *readfds = nullptr, socketSetGeneric *writefds = nullptr, socketSetGeneric *exceptfds = nullptr, timeoutStruct timeout = std::nullopt)`: The Linux select function applied to TCPSocket objects. This function modifies the sets passed as argument.
 
 - `TCPSocket accept(const TCPSocket &src)`: The Linux accept function applied to TCPSocket objects.
 

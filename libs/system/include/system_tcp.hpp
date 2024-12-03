@@ -52,8 +52,8 @@ namespace System
 
             explicit TCPSocket(osSocketType _sock);
             friend TCPSocket accept(const TCPSocket &src);
-            friend void select(socketSetTCP *readfds, socketSetTCP *writefds,
-                socketSetTCP *exceptfds, timeoutStruct timeout);
+            friend void select(socketSetGeneric *readfds, socketSetGeneric *writefds,
+                socketSetGeneric *exceptfds, timeoutStruct timeout);
         };
 
         /**
@@ -66,41 +66,22 @@ namespace System
         TCPSocket accept(const TCPSocket &src);
 
         /**
-         * @brief select applied to TCPSocket objects.
-         * @note Note: This function modifies the sets passed as argument.
-         * @param readfds: A socketSetTCP object which conatains all sockets
-         * that should be watch to see if they are ready for reading.
-         * @param writefds: A socketSetTCP object which conatains all sockets
-         * that should be watch to see if they are ready for writing.
-         * @param exceptfds: A socketSetTCP object which conatains all sockets
-         * that should be watch for exceptionnal events.
-         * @param timeout The timeout argument is a timeoutStruct that
-         * specifies the interval that select() should block waiting for a file
-         * descriptor to become ready. If the argument is unsepcified, select
-         * will block indefinitely waiting for a socket to become ready.
-         */
-        void select(socketSetTCP *readfds = nullptr,
-            socketSetTCP *writefds = nullptr,
-            socketSetTCP *exceptfds = nullptr,
-            timeoutStruct timeout = std::nullopt);
-
-        /**
-         * @brief Adds a vector of sockets to a socketSetTCP object.
+         * @brief Adds a vector of sockets to a socketSetGeneric object.
          *
          * @param src: A vector containing sockets
-         * @param dest: The destination socketSetTCP object
+         * @param dest: The destination socketSetGeneric object
          */
         void addSocketToSet(const std::vector<System::Network::TCPSocket> &src,
-            socketSetTCP &dest);
+            socketSetGeneric &dest);
 
         /**
-         * @brief Adds a socket pointer to a socketSetTCP object.
+         * @brief Adds a socket pointer to a socketSetGeneric object.
          *
          * @param src: A TCPSocket pointer
-         * @param dest: The destination socketSetTCP object
+         * @param dest: The destination socketSetGeneric object
          */
         void addSocketToSet(
-            System::Network::TCPSocket *src, socketSetTCP &dest);
+            System::Network::TCPSocket *src, socketSetGeneric &dest);
 
         /**
          * @brief Remove a socket from a vector of socket.
@@ -112,13 +93,13 @@ namespace System
             std::vector<System::Network::TCPSocket> &vect);
 
         /**
-         * @brief Remove a socket from a socketSetTCP.
+         * @brief Remove a socket from a socketSetGeneric.
          * @note Note: This functions remove a socket based on its ID.
          * @param src: A const reference to a TCPSocket object
-         * @param dest: The destination socketSetTCP object
+         * @param dest: The destination socketSetGeneric object
          */
         bool removeSocketInSet(
-            const System::Network::TCPSocket &toRemove, socketSetTCP &set);
+            const System::Network::TCPSocket &toRemove, socketSetGeneric &set);
     } // namespace Network
 
 } // namespace System

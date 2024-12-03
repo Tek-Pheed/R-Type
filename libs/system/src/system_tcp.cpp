@@ -181,76 +181,8 @@ TCPSocket Network::accept(const TCPSocket &src)
     return (Network::TCPSocket(res));
 }
 
-void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
-    socketSetTCP *exceptfds, timeoutStruct timeout)
-{
-    fd_set read_set;
-    fd_set write_set;
-    fd_set except_set;
-    fd_set *read_set_p = NULL;
-    fd_set *write_set_p = NULL;
-    fd_set *except_set_p = NULL;
-    s_timeval *tm = NULL;
-
-    if (timeout.has_value()) {
-        tm = &timeout.value();
-    }
-    FD_ZERO(&read_set);
-    FD_ZERO(&write_set);
-    FD_ZERO(&except_set);
-
-    if (readfds != nullptr && readfds->size() > 0) {
-        read_set_p = &read_set;
-        for (const auto *i : *readfds) {
-            if (i != nullptr)
-                FD_SET(i->getHandle(), read_set_p);
-        }
-    }
-    if (writefds != nullptr && writefds->size() > 0) {
-        write_set_p = &write_set;
-        for (const auto *i : *writefds) {
-            if (i != nullptr)
-                FD_SET(i->getHandle(), write_set_p);
-        }
-    }
-    if (exceptfds != nullptr && exceptfds->size() > 0) {
-        except_set_p = &except_set;
-        for (const auto *i : *exceptfds) {
-            if (i != nullptr)
-                FD_SET(i->getHandle(), except_set_p);
-        }
-    }
-    if (select(FD_SETSIZE, read_set_p, write_set_p, except_set_p, tm)
-        == SOCKET_ERROR)
-        throw NetworkException("Network::select failed");
-    if (readfds != nullptr && readfds->size() > 0) {
-        for (size_t i = 0; i < readfds->size(); i++) {
-            if ((*readfds)[i] != nullptr
-                && !FD_ISSET((*readfds)[i]->getHandle(), read_set_p)) {
-                readfds->erase((readfds->begin()) + (long) i);
-            }
-        }
-    }
-    if (writefds != nullptr && writefds->size() > 0) {
-        for (size_t i = 0; i < writefds->size(); i++) {
-            if ((*writefds)[i] != nullptr
-                && !FD_ISSET((*writefds)[i]->getHandle(), write_set_p)) {
-                writefds->erase((writefds->begin()) + (long) i);
-            }
-        }
-    }
-    if (exceptfds != nullptr && exceptfds->size() > 0) {
-        for (size_t i = 0; i < exceptfds->size(); i++) {
-            if ((*exceptfds)[i] != nullptr
-                && !FD_ISSET((*exceptfds)[i]->getHandle(), except_set_p)) {
-                exceptfds->erase((exceptfds->begin()) + (long) i);
-            }
-        }
-    }
-}
-
 void System::Network::addSocketToSet(
-    const std::vector<TCPSocket> &src, socketSetTCP &dest)
+    const std::vector<TCPSocket> &src, socketSetGeneric &dest)
 {
     for (size_t i = 0; i != src.size(); i++) {
         auto *a = const_cast<TCPSocket *>(&(src.at(i)));
@@ -258,7 +190,7 @@ void System::Network::addSocketToSet(
     }
 }
 
-void System::Network::addSocketToSet(TCPSocket *src, socketSetTCP &dest)
+void System::Network::addSocketToSet(TCPSocket *src, socketSetGeneric &dest)
 {
     dest.emplace_back(src);
 }
@@ -280,7 +212,7 @@ bool System::Network::removeSocketInVect(
 
 bool System::Network::removeSocketInSet(
     const System::Network::TCPSocket &toRemove,
-    System::Network::socketSetTCP &set)
+    System::Network::socketSetGeneric &set)
 {
     const uint64_t uid = toRemove.getUID();
 
