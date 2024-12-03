@@ -103,6 +103,15 @@ namespace ecs
         ObjectType _type;
     };
 
+    class TextComponent : public Component {
+      public:
+        TextComponent();
+        void setText(const std::string &text);
+        std::string getText() const;
+
+        private:
+          std::string _text;
+
     class BulletComponent : public Component {
       public:
         BulletComponent();
