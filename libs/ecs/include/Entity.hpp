@@ -9,9 +9,11 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <typeindex>
 #include <vector>
 #include "Components.hpp"
+#include <unordered_map>
 
 namespace ecs
 {
@@ -21,10 +23,22 @@ namespace ecs
         ~Entity();
 
         template <typename componentType>
-        void addComponent(std::unique_ptr<componentType> component);
+        void addComponent(std::unique_ptr<componentType> component)
+        {
+            this->_components[typeid(componentType)] = std::move(component);
+        }
 
         template <typename componentType>
-        std::unique_ptr<componentType> getComponent();
+        std::unique_ptr<componentType> getComponent()
+        {
+            auto index = this->_components.find(typeid(componentType));
+            if (index != this->_components.end()) {
+                std::unique_ptr<componentType> ptr(
+                    static_cast<componentType *>(index->second.release()));
+                return ptr;
+            }
+            return nullptr;
+        }
 
       private:
         std::size_t _id;

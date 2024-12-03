@@ -5,18 +5,19 @@
 ** client
 */
 
+#include "Components.hpp"
 #include "Entity.hpp"
 
 int main(void)
 {
-    ecs::Entity entity(0);
+    auto player = std::make_unique<ecs::Entity>(0);
+    player->addComponent(std::make_unique<ecs::PositionComponent>(0, 0));
+    player->addComponent(std::make_unique<ecs::PlayerComponent>("client"));
 
-    entity.addComponent(std::make_unique<ecs::PlayerComponent>("Samy"));
-    entity.addComponent(std::make_unique<ecs::PositionComponent>(0, 0));
-    entity.addComponent(std::make_unique<ecs::HealthComponent>());
+    /*std::cout << player->getComponent<ecs::PositionComponent>()->getX()
+              << std::endl;*/
 
-    std::cout << entity.getComponent<ecs::PositionComponent>()->getX()
-              << std::endl;
+    auto pX = player->getComponent<ecs::PositionComponent>();
 
     return (0);
 }
