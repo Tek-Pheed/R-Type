@@ -53,3 +53,11 @@ CMakeUserPresets.json
 
 #MacOS
 .DS_STORE
+
+*.out
+out
+a.out
+vgcore.*
+*.recipe
+.vs/
+release/*

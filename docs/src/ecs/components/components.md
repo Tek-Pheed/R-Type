@@ -14,3 +14,4 @@ This class is built with destructor only
 | Health component   | Store health of a entity      |
 | Boss component     | Define entity as a boss       |
 | Enemy component    | Define entity as an enemy     |
+| Render component   | Renders an entity             |
