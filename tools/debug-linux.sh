@@ -65,7 +65,10 @@ printf "\n### Build done\n"
 RELEASE_DIR=$SCRIPTPATH/../release/
 
 printf "\n### Copying shared libraries (.so files)\n"
-find . -type f \( -name "*.so" -o -name "*.so.*" \) -exec cp {} $RELEASE_DIR \;
-find . -type f \( -name "*.dylib" -o -name "*.dylib" \) -exec cp {} $RELEASE_DIR \;
+find . -type f \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} $RELEASE_DIR \;
+find . -type f \( -name "*.dylib" -o -name "*.dylib" \) -exec cp -P {} $RELEASE_DIR \;
+
+find . -type l \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} $RELEASE_DIR \;
+find . -type l \( -name "*.dylib" -o -name "*.dylib" \) -exec cp -P {} $RELEASE_DIR \;
 
 printf "\n### Shared libraries copied to release folder\n"

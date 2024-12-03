@@ -39,8 +39,8 @@ void TCPSocket::initSocket(
             reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
             sizeof(this->_sockSettings));
         if (res == SOCKET_ERROR)
-            throw NetworkException(
-                "System::Network::TCPSocket::initSocket: Failed to bind socket");
+            throw NetworkException("System::Network::TCPSocket::initSocket: "
+                                   "Failed to bind socket");
         res = listen(this->_sockfd, FD_SETSIZE);
         if (res == SOCKET_ERROR)
             throw NetworkException(
@@ -106,6 +106,7 @@ TCPSocket::TCPSocket(osSocketType sock_fd)
     this->_sockfd = sock_fd;
     this->_uid = tcpSockID;
     this->_mode = CONNECT;
+    this->_sockSettings = {};
 }
 
 TCPSocket::~TCPSocket()
@@ -173,8 +174,7 @@ TCPSocket Network::accept(const TCPSocket &src)
     struct sockaddr clientAddr;
     socklen_t clientSockLen = sizeof(clientAddr);
 
-    res = accept(src._sockfd, reinterpret_cast<struct sockaddr *>(&clientAddr),
-        &clientSockLen);
+    res = accept(src._sockfd, &clientAddr, &clientSockLen);
     if (res == INVALID_SOCKET || res == 0)
         throw NetworkException("System::Network::accept: Failed to accept "
                                "connection to TCP socket: ");

@@ -35,6 +35,7 @@ namespace System
              */
             explicit TCPSocket(uint16_t port, Mode mode,
                 const std::string &address = "0.0.0.0");
+            explicit TCPSocket(osSocketType sock_fd);
             explicit TCPSocket();
 
             void initSocket(uint16_t port, Mode mode,
@@ -50,7 +51,6 @@ namespace System
             ssize_t sendData(const byteArray &byteSequence) override;
             byteArray receive(void) override;
 
-            explicit TCPSocket(osSocketType _sock);
             friend TCPSocket accept(const TCPSocket &src);
             friend void select(socketSetGeneric *readfds, socketSetGeneric *writefds,
                 socketSetGeneric *exceptfds, timeoutStruct timeout);
