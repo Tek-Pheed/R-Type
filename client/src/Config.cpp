@@ -5,7 +5,7 @@
 ** Config
 */
 
-#include "Config.hpp"
+#include "../include/Config.hpp"
 
 Config::Config(const std::string &filename) : _filename(filename)
 {
@@ -53,7 +53,6 @@ void Config::parseConfig()
 
     if (!infile.is_open()) {
         throw std::runtime_error("Error: file not found");
-        return;
     }
     std::string line;
     int linenbr = 1;
