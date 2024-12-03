@@ -67,6 +67,17 @@ namespace ecs
       private:
         int _health;
     };
+
+    class BossComponent : public Component {
+      public:
+        explicit BossComponent(const std::string &name);
+
+        std::string getName() const;
+        void setName(const std::string &name);
+
+      private:
+        std::string _name;
+    };
 } // namespace ecs
 
 #endif // R_TYPE_COMPONENT_HPP
