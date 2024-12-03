@@ -20,16 +20,18 @@ Test(components, text_default_constructor)
 
 Test(components, text_constructor)
 {
-    ecs::TextComponent text("Hello World");
+    ecs::TextComponent text;
+    text.setText("Hello World");
 
     cr_assert_eq(text.getText(), "Hello World",
-        "Expected value to be 'Hello World', but got %d", text.getText());
+        "Expected value to be 'Hello World', but got '%s'", text.getText().c_str());
 }
 
 Test(components, text_getter)
 {
-    ecs::TextComponent text("Hello World");
+    ecs::TextComponent text;
+    text.setText("Hello World");
 
     cr_assert_eq(text.getText(), "Hello World",
-        "Expected value to be 'Hello World', but got %d", text.getText());
+        "Expected value to be 'Hello World', but got '%s'", text.getText().c_str());
 }
