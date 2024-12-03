@@ -7,3 +7,4 @@
 4. [Client](client/client.md)
     - [RenderClass](client/renderclass.md)
     - [ErrorClass](client/errorclass.md)
+    - [ErrorClass](client/configclass.md)
