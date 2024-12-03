@@ -40,6 +40,12 @@ namespace ecs
             return nullptr;
         }
 
+        template <typename componentType>
+        std::unique_ptr<componentType> deleteComponent()
+        {
+            this->_components.erase(typeid(componentType));
+        }
+
       private:
         std::size_t _id;
         std::unordered_map<std::type_index, std::unique_ptr<Component>>
