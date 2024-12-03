@@ -7,28 +7,28 @@
 
 #include "Components.hpp"
 
-ecs::PositionComponent::PositionComponent(int x, int y)
+ecs::PositionComponent::PositionComponent(float x, float y)
 {
     this->_x = x;
     this->_y = y;
 }
 
-int ecs::PositionComponent::getX()
+float ecs::PositionComponent::getX()
 {
     return this->_x;
 }
 
-int ecs::PositionComponent::getY()
+float ecs::PositionComponent::getY()
 {
     return this->_y;
 }
 
-void ecs::PositionComponent::setX(int x)
+void ecs::PositionComponent::setX(float x)
 {
     this->_x = x;
 }
 
-void ecs::PositionComponent::setY(int y)
+void ecs::PositionComponent::setY(float y)
 {
     this->_y = y;
 }
