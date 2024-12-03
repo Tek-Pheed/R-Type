@@ -83,15 +83,10 @@ namespace ecs
 
     class RenderComponent : public Component {
       public:
-        RenderComponent(ObjectType type);
+        explicit RenderComponent(ObjectType type);
 
-        ObjectType getType() const {
-          return _type;
-        }
-
-        void setType(ObjectType type) {
-          _type = type;
-        }
+        ObjectType getType() const;
+        void setType(ObjectType type);
 
       private:
         ObjectType _type;
