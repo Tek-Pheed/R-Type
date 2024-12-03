@@ -106,7 +106,6 @@ namespace ecs
     class TextComponent : public Component {
       public:
         TextComponent();
-        ~TextComponent();
         void setText(const std::string &text);
         std::string getText() const;
 

@@ -11,10 +11,6 @@ ecs::TextComponent::TextComponent()
 {
 }
 
-ecs::TextComponent::~TextComponent()
-{
-}
-
 void ecs::TextComponent::setText(const std::string &text)
 {
     this->_text = text;
