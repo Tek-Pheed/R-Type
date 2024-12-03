@@ -29,5 +29,5 @@ Test(components, bullet_setter)
     ecs::BulletComponent bullet(false);
     bullet.setIsFromPlayer(true);
     cr_assert_eq(bullet.getIsFromPlayer(), true,
-        "Expected value to be true, but got %d", bullet.getName());
+        "Expected value to be true, but got %d", bullet.getIsFromPlayer());
 }
