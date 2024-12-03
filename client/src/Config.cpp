@@ -43,7 +43,7 @@ void Config::saveConfig()
         throw ErrorClass(
             "RTC005 : Invalid config: the config file is empty.");
     }
-    for (auto &line : _configData) {
+    for (const auto &line : _configData) {
         savefile << line.second << std::endl;
     }
 
