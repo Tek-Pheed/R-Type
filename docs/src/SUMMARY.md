@@ -9,6 +9,7 @@
         - [Player Component](ecs/components/player_component.md)
         - [Health Component](ecs/components/health_component.md)
         - [Boss Component](ecs/components/boss_component.md)
+        - [Enemy Component](ecs/components/enemy_component.md)
 4. [Client](client/client.md)
     - [RenderClass](client/renderclass.md)
     - [ErrorClass](client/errorclass.md)
