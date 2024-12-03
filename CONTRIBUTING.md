@@ -1,8 +1,7 @@
 # Contributing to the Project
 
-Thank you for your interest in contributing to this project! This guide outlines
-the standards and best practices to follow for contributing effectively and
-maintaining code quality.
+This guide outlines the standards and best practices to follow for contributing
+effectively and maintaining code quality.
 
 ---
 

@@ -1,0 +1,17 @@
+name: R-Type - Commit lint
+
+on:
+  push:
+    branches-ignore:
+      - "ga-ignore-*"
+
+jobs:
+  lint_commit:
+    name: Check commit standard
+    runs-on: [ self-hosted, linux, x64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: lint
+        run: |
+          ./.github/ci_scripts/commit_lint.sh

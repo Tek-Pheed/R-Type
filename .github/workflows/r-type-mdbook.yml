@@ -1,0 +1,48 @@
+name: R-Type - mdBook
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    name: Build
+    runs-on: [ self-hosted, linux, x64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: 'latest'
+      - name: Build mdbook
+        run: |
+          mdbook build docs/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdbook
+          path: ./docs/book
+
+  deploy:
+    name: Deploy
+    needs: build
+    environment: production
+    runs-on: [ self-hosted, linux, x64 ]
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mdbook
+          path: ./docs/book
+      - name: Deploy to server
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          username: ${{ secrets.SSH_USERNAME }}
+          server: ${{ secrets.SSH_HOST }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          local_path: "./docs/book/*"
+          remote_path: "./r-type/"
+          sftpArgs: "-o ConnectTimeout=5"
