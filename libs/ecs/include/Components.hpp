@@ -108,11 +108,11 @@ namespace ecs
         BulletComponent();
         explicit BulletComponent(bool isFromPlayer);
 
-        std::string getIsFromPlayer();
+        bool getIsFromPlayer();
         void setIsFromPlayer(bool isFromPlayer);
 
       private:
-        std::string _isFromPlayer;
+        bool _isFromPlayer;
     };
 }
 

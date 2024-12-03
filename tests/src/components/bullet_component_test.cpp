@@ -12,7 +12,7 @@
 
 Test(components, bullet_constructor)
 {
-    ecs::BulletComponent bullet();
+    ecs::BulletComponent bullet(false);
     cr_assert_eq(bullet.getIsFromPlayer(), false,
         "Expected value to be false, but got %d", bullet.getIsFromPlayer());
 }
