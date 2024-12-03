@@ -35,6 +35,10 @@ namespace System
              */
             explicit TCPSocket(uint16_t port, Mode mode,
                 const std::string &address = "0.0.0.0");
+            explicit TCPSocket();
+
+            void initSocket(uint16_t port, Mode mode,
+                const std::string &address = "0.0.0.0");
 
             TCPSocket(TCPSocket &&) = default;
             TCPSocket(const TCPSocket &) = default;

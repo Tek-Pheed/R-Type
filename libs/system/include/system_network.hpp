@@ -128,7 +128,6 @@ namespace System
              * @return uint64_t: Unique identifier of the socket
              */
             virtual uint64_t getUID(void) const = 0;
-
         };
 
         class ASocket : public ISocket {

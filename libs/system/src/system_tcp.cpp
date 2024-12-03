@@ -21,19 +21,17 @@ using namespace Network;
 
 static uint64_t tcpSockID = 0;
 
-TCPSocket::TCPSocket(uint16_t port, Mode mode, const std::string &address)
+void TCPSocket::initSocket(
+    uint16_t port, Mode mode, const std::string &address)
 {
-    tcpSockID++;
     int res;
     this->_mode = mode;
-    this->_opened = false;
     this->_sockSettings.sin_family = AF_INET;
     this->_sockSettings.sin_port = htons(port);
     this->_sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    this->_uid = tcpSockID;
     if (this->_sockfd == INVALID_SOCKET)
         throw NetworkException(
-            "System::Network::TCPSocket: Failed to create socket");
+            "System::Network::TCPSocket::initSocket: Failed to create socket");
 
     if (mode == SERVE) {
         _sockSettings.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -42,11 +40,11 @@ TCPSocket::TCPSocket(uint16_t port, Mode mode, const std::string &address)
             sizeof(this->_sockSettings));
         if (res == SOCKET_ERROR)
             throw NetworkException(
-                "System::Network::TCPSocket: Failed to bind socket");
+                "System::Network::TCPSocket::initSocket: Failed to bind socket");
         res = listen(this->_sockfd, FD_SETSIZE);
         if (res == SOCKET_ERROR)
             throw NetworkException(
-                "System::Network::TCPSocket: Failed to listen");
+                "System::Network::TCPSocket::initSocket: Failed to listen");
         this->_opened = true;
     } else if (mode == CONNECT) {
         this->_sockSettings.sin_addr.s_addr = inet_addr(address.c_str());
@@ -55,9 +53,24 @@ TCPSocket::TCPSocket(uint16_t port, Mode mode, const std::string &address)
             sizeof(this->_sockSettings));
         if (res == SOCKET_ERROR)
             throw NetworkException(
-                "System::Network::TCPSocket: Failed to connect");
+                "System::Network::TCPSocket::initSocket: Failed to connect");
         this->_opened = true;
     }
+}
+
+TCPSocket::TCPSocket()
+{
+    tcpSockID++;
+    this->_uid = tcpSockID;
+    this->_opened = false;
+}
+
+TCPSocket::TCPSocket(uint16_t port, Mode mode, const std::string &address)
+{
+    tcpSockID++;
+    this->_uid = tcpSockID;
+    this->_opened = false;
+    this->initSocket(port, mode, address);
 }
 
 ssize_t TCPSocket::sendData(const byteArray &byteSequence)
@@ -67,8 +80,8 @@ ssize_t TCPSocket::sendData(const byteArray &byteSequence)
     uint8_t *buff = new uint8_t[len]();
 
     if (buff == NULL)
-        throw std::runtime_error(
-            "System::Network::TCPSocket::sendData: Failed to allocate send buffer");
+        throw std::runtime_error("System::Network::TCPSocket::sendData: "
+                                 "Failed to allocate send buffer");
     for (size_t i = 0; i < len; i++) {
         buff[i] = byteSequence[i];
     }
@@ -81,7 +94,8 @@ ssize_t TCPSocket::sendData(const byteArray &byteSequence)
     this->_opened = (writtenBytes > 0);
     delete[] buff;
     if (writtenBytes == SOCKET_ERROR)
-        throw NetworkException("System::Network::TCPSocket::sendData: Failed to send");
+        throw NetworkException(
+            "System::Network::TCPSocket::sendData: Failed to send");
     return (writtenBytes);
 }
 
@@ -139,8 +153,9 @@ byteArray TCPSocket::receive(void)
     ret = recv(this->_sockfd, reinterpret_cast<char *>(buff), len, 0);
 #endif
     if (ret == SOCKET_ERROR) {
-        delete [] buff;
-        throw NetworkException("System::Network::TCPSocket::receive: Failed to read");
+        delete[] buff;
+        throw NetworkException(
+            "System::Network::TCPSocket::receive: Failed to read");
     }
     this->_opened = (ret > 0);
     vect.reserve(len);
@@ -205,7 +220,8 @@ void Network::select(socketSetTCP *readfds, socketSetTCP *writefds,
                 FD_SET(i->getHandle(), except_set_p);
         }
     }
-    if (select(FD_SETSIZE, read_set_p, write_set_p, except_set_p, tm) == SOCKET_ERROR)
+    if (select(FD_SETSIZE, read_set_p, write_set_p, except_set_p, tm)
+        == SOCKET_ERROR)
         throw NetworkException("Network::select failed");
     if (readfds != nullptr && readfds->size() > 0) {
         for (size_t i = 0; i < readfds->size(); i++) {

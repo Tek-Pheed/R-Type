@@ -36,6 +36,11 @@ namespace System
             explicit UDPSocket(
                 uint16_t port, const std::string &address = "0.0.0.0");
 
+            explicit UDPSocket();
+
+            void initSocket(uint16_t port,
+                const std::string &address = "0.0.0.0");
+
             UDPSocket(UDPSocket &&) = default;
             UDPSocket(const UDPSocket &) = default;
             UDPSocket &operator=(UDPSocket &&) = default;

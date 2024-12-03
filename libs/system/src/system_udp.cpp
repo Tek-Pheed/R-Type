@@ -20,11 +20,9 @@ using namespace Network;
 
 static uint64_t udpSockID = 0;
 
-UDPSocket::UDPSocket(uint16_t port, const std::string &address)
+void UDPSocket::initSocket(uint16_t port, const std::string &address)
 {
-    udpSockID++;
     int res;
-    this->_opened = false;
     this->_sockSettings.sin_family = AF_INET;
     this->_sockSettings.sin_port = htons(port);
     this->_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -48,6 +46,21 @@ UDPSocket::UDPSocket(uint16_t port, const std::string &address)
     if (res == SOCKET_ERROR)
         throw NetworkException(
             "System::Network::UDPSocket: Failed to bind socket");
+}
+
+UDPSocket::UDPSocket()
+{
+    udpSockID++;
+    this->_uid = udpSockID;
+    this->_opened = false;
+}
+
+UDPSocket::UDPSocket(uint16_t port, const std::string &address)
+{
+    udpSockID++;
+    this->_uid = udpSockID;
+    this->_opened = false;
+    this->initSocket(port, address);
 }
 
 ssize_t UDPSocket::sendData(const byteArray &byteSequence)
