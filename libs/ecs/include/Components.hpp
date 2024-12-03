@@ -78,6 +78,17 @@ namespace ecs
       private:
         std::string _name;
     };
+
+    class EnemyComponent : public Component {
+      public:
+        explicit EnemyComponent(const std::string &name);
+
+        std::string getName() const;
+        void setName(const std::string &name);
+
+      private:
+        std::string _name;
+    };
 } // namespace ecs
 
 #endif // R_TYPE_COMPONENT_HPP
