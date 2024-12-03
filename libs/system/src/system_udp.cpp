@@ -36,7 +36,11 @@ UDPSocket::UDPSocket(uint16_t port, const std::string &address)
     if (address == "0.0.0.0") {
         _sockSettings.sin_addr.s_addr = htonl(INADDR_ANY);
     } else {
-        this->_sockSettings.sin_addr.s_addr = inet_addr(address.c_str());
+        if (inet_pton(AF_INET, address.c_str(), &this->_sockSettings.sin_addr)
+            <= 0) {
+            throw NetworkException("System::Network::UDPSocket: Invalid "
+                                   "address/ Address not supported");
+        }
     }
     res = bind(this->_sockfd,
         reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
@@ -122,11 +126,13 @@ byteArray UDPSocket::receive(void)
         throw std::runtime_error("System::Network::UDPSocket::receive: Unable "
                                  "to allocate receive buffer");
     socklen_t slen = sizeof(this->_sockSettings);
-    ret = recvfrom(this->_sockfd, buff, len, 0, reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
+    ret = recvfrom(this->_sockfd, buff, len, 0,
+        reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
 
 #elif defined(WIN32)
     int slen = sizeof(this->_sockSettings);
-    ret = recvfrom(this->_sockfd,  reinterpret_cast<char *>(buff), len, 0, reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
+    ret = recvfrom(this->_sockfd, reinterpret_cast<char *>(buff), len, 0,
+        reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
 #endif
     if (ret == SOCKET_ERROR) {
         delete[] buff;

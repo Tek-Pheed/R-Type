@@ -32,6 +32,7 @@ using SOCKADDR_IN = struct sockaddr_in;
 
 #elif defined(WIN32)
     #include <WinSock2.h>
+    #include <Ws2tcpip.h>
 using osSocketType = SOCKET;
 typedef long ssize_t;
 typedef timeval s_timeval;
