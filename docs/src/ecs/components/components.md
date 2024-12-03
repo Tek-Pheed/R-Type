@@ -12,3 +12,4 @@ This class is built with destructor only
 | Player component   | Define entity as a player     |
 | Velocity component | Store velocity of an entity   |
 | Health component   | Store health of a entity      |
+| Render component   | Renders an entity             |
