@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Generate Build Files
         run: cmake -B build .
@@ -24,4 +26,5 @@ jobs:
         run: cat ./check.txt
 
       - name: Publish cppcheck
+        if: always()
         run: ./.github/ci_scripts/cppcheck_publisher.sh

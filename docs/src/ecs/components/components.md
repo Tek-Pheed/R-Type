@@ -16,3 +16,4 @@ This class is built with destructor only
 | Enemy component    | Define entity as an enemy     |
 | Render component   | Renders an entity             |
 | Text component     | Store text of an entity       |
+| Bullet component   | Defines an entity as a bullet |

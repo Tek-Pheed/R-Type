@@ -15,7 +15,6 @@ cat "$cppcheck_output_file" | while IFS= read -r line; do
       level="warning"
     elif [[ "$level" == "error" ]]; then
       level="error"
-      ERROR=1
     else
       level="notice"
     fi
@@ -23,5 +22,3 @@ cat "$cppcheck_output_file" | while IFS= read -r line; do
     echo "::${level} file=${filepath},line=${line},col=${col}::${message}"
   fi
 done
-
-exit $ERROR

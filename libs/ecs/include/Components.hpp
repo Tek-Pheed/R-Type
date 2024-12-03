@@ -111,6 +111,17 @@ namespace ecs
 
         private:
           std::string _text;
+
+    class BulletComponent : public Component {
+      public:
+        BulletComponent();
+        explicit BulletComponent(bool isFromPlayer);
+
+        bool getIsFromPlayer();
+        void setIsFromPlayer(bool isFromPlayer);
+
+      private:
+        bool _isFromPlayer;
     };
 }
 
