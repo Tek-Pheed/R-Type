@@ -91,10 +91,10 @@ void server::threadedClient(size_t id)
                 arr.clear();
                 vect = sock->receive();
                 buffer = System::Network::decodeString(vect);
-                if (buffer[buffer.size() - 1] == '\n'
-                    && buffer[buffer.size() - 2] == '\t') {
-                    arr.insert(arr.end(), vect.begin(), vect.end());
-                    break;
+                while (buffer[buffer.size() - 1] != '\n'
+                    && buffer[buffer.size() - 2] != '\t') {
+                    vect = sock->receive();
+                    buffer += System::Network::decodeString(vect);
                 }
                 if (dynamic_cast<System::Network::TCPSocket *>(sock)
                     != nullptr) {
