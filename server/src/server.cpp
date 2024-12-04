@@ -6,6 +6,7 @@
 */
 
 #include "server.hpp"
+#include <cstdint>
 #include <exception>
 #include <iostream>
 #include <mutex>
@@ -32,23 +33,42 @@ server::~server()
 {
 }
 
+void server::addClient(Client_t &client)
+{
+    std::unique_lock lock(_mutex);
+
+    _clientCounter++;
+    _clients[_clientCounter] = client;
+    std::cout << "Created a new client (" << std::to_string(_clientCounter)
+              << ") on the server." << std::endl;
+}
+
 Client_t &server::getClient(size_t id)
 {
     std::unique_lock lock(_mutex);
     return (_clients[id]);
 }
 
-void server::handle_client(size_t id)
+void server::removeClient(size_t id)
+{
+    std::unique_lock lock(_mutex);
+
+    _clients.erase(id);
+    std::cout << "Removed a client (" << std::to_string(_clientCounter)
+              << ") from the server." << std::endl;
+}
+
+void server::threadedClient(size_t id)
 {
     Client_t &ref = this->getClient(id);
-    std::cout << "[Thread " << std::to_string(id)
-              << "] Created a new client on the server." << std::endl;
-    System::Network::UDPSocket udpSocket = System::Network::UDPSocket(UDP_PORT, "0.0.0.0");
+    std::cout << "[Thread " << std::to_string(id) << "] Created" << std::endl;
+    System::Network::UDPSocket udpSocket = System::Network::UDPSocket(
+        UDP_PORT + (uint16_t) _clientCounter, "0.0.0.0");
     try {
         std::cout << "[Thread " << std::to_string(id)
                   << "] Created a UDP socket ("
                   << std::to_string(udpSocket.getUID()) << ") on port "
-                  << std::to_string(UDP_PORT) << std::endl;
+                  << std::to_string(UDP_PORT + _clientCounter) << std::endl;
 
         System::Network::byteArray arr;
         System::Network::byteArray vect;
@@ -57,7 +77,6 @@ void server::handle_client(size_t id)
         System::Network::socketSetGeneric readfds;
 
         while (true) {
-            std::cout << "Qqsq" << std::endl;
             readfds.clear();
             readfds.emplace_back(&udpSocket);
             readfds.emplace_back(&ref.tcpSocket);
@@ -80,6 +99,14 @@ void server::handle_client(size_t id)
                 if (dynamic_cast<System::Network::TCPSocket *>(sock)
                     != nullptr) {
                     // TCP
+                    if (!sock->isOpen()) {
+                        std::cout << "[Thread " << std::to_string(id)
+                                  << "] TCP Connexion ("
+                                  << std::to_string(sock->getUID())
+                                  << ") was closed, aborting." << std::endl;
+                        removeClient(id);
+                        return;
+                    }
                     std::cout << "[Thread " << std::to_string(id)
                               << "] Message received on TCP ("
                               << std::to_string(sock->getUID())
@@ -117,15 +144,12 @@ void server::handle_connection()
         }
         if (readfds.size() == 0)
             continue;
-        _mutex.lock();
-        _clientCounter++;
         auto h = System::Network::accept(_serverSocketTCP);
         Client_t c;
         c.server = this;
         c.tcpSocket = h;
-        _clients[_clientCounter] = c;
-        _mutex.unlock();
-        std::thread d(&server::handle_client, this, _clientCounter);
+        addClient(c);
+        std::thread d(&server::threadedClient, this, _clientCounter);
         d.detach();
     }
 }

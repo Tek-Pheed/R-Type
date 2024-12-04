@@ -64,10 +64,12 @@ class server {
     void create_server();
     void createClient();
 
+    void addClient(Client_t &client);
     Client_t &getClient(size_t id);
+    void removeClient(size_t id);
 
     void receive_message();
-    void handle_client(size_t id);
+    void threadedClient(size_t id);
     void handle_connection();
 
     int playerConnection(int id, int x, int y);
