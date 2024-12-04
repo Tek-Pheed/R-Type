@@ -22,7 +22,6 @@ namespace ecs
 
     class PositionSystem : public ISystem {
       public:
-        PositionSystem();
 
         void update(std::vector<std::unique_ptr<ecs::Entity>> &entities, sf::RenderWindow *window, float deltaTime) override;
 

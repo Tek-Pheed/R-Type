@@ -7,10 +7,6 @@
 
 #include "Systems.hpp"
 
-ecs::PositionSystem::PositionSystem()
-{
-}
-
 void ecs::PositionSystem::update(std::vector<std::unique_ptr<ecs::Entity>> &entities, sf::RenderWindow *window, float deltaTime)
 {
     for (auto &entity : entities) {
