@@ -124,7 +124,7 @@ void server::threadedClient(size_t id)
                               << "): " << buffer << std::endl;
                 }
             }
-            // manage_buffer(buffer, static_cast<ssize_t>(buffer.size()));
+            manage_buffer(buffer);
         }
     } catch (const std::exception &e) {
         std::cerr << "[Thread " << std::to_string(id)
