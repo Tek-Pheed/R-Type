@@ -22,6 +22,7 @@
     #include <sys/types.h>
     #include <unistd.h>
     #include <netdb.h>
+    #include <netinet/in.h>
 
     #define INVALID_SOCKET -1
     #define SOCKET_ERROR   -1

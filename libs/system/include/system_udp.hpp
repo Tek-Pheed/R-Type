@@ -65,12 +65,13 @@ namespace System
              *
              * @param byteSequence: A byte sequence object (type byteArray)
              * @param address: The address of the client to send the data to
+             * @param port: The port of the client to send the data to
              * @return: ssize_t The number of bytes written in the socket. This
              * might be less than the size of the byte array, in which case you
              * should call this function later with the rest of the data to
              * send.
              */
-            ssize_t sendDataTo(const byteArray &byteSequence, const std::string &address);
+            ssize_t sendDataTo(const byteArray &byteSequence, const std::string &address, uint16_t);
 
             /**
              * @brief Receive data through the socket
@@ -93,7 +94,7 @@ namespace System
              * @return byteArray: A byte sequence object representing all bytes
              * read from the socket
              */
-            byteArray receiveFrom(std::string &address);
+            byteArray receiveFrom(std::string &address, uint16_t &port);
 
             explicit UDPSocket(osSocketType _sock);
             // friend UDPSocket accept(const UDPSocket &src);

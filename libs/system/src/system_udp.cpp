@@ -90,7 +90,7 @@ ssize_t UDPSocket::sendData(const byteArray &byteSequence)
 }
 
 ssize_t UDPSocket::sendDataTo(
-    const byteArray &byteSequence, const std::string &address)
+    const byteArray &byteSequence, const std::string &address, uint16_t port)
 {
     SOCKADDR_IN sockin;
     ssize_t writtenBytes = 0;
@@ -101,7 +101,7 @@ ssize_t UDPSocket::sendDataTo(
         throw std::runtime_error("System::Network::UDPSocket::sendDataTo: "
                                  "Failed to allocate send buffer");
     sockin.sin_family = AF_INET;
-    sockin.sin_port = this->_sockSettings.sin_port;
+    sockin.sin_port = htons(port);
     if (inet_pton(AF_INET, address.c_str(), &sockin.sin_addr) != 1) {
         delete[] buff;
         throw std::runtime_error("System::Network::UDPSocket: Invalid "
@@ -179,7 +179,7 @@ byteArray UDPSocket::receive(void)
     return (vect);
 }
 
-byteArray UDPSocket::receiveFrom(std::string &address)
+byteArray UDPSocket::receiveFrom(std::string &address, uint16_t &port)
 {
     ssize_t ret = 0;
     byteArray vect;
@@ -225,6 +225,7 @@ byteArray UDPSocket::receiveFrom(std::string &address)
                                "Failed to get sender address");
     }
     const char *addr = inet_ntoa(client_addr.sin_addr);
+    port = ntohs(client_addr.sin_port);
     if (addr == NULL) {
         delete[] buff;
         throw NetworkException("System::Network::UDPSocket::receiveFrom: "
