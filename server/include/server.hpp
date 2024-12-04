@@ -87,6 +87,9 @@ class server {
     int handle_player(int code, std::vector<std::string> tokens);
     int manage_buffer(std::string buffer);
 
+    size_t identifyClient(System::Network::TCPSocket socket);
+    size_t identifyClient(std::string ip, std::string port);
+
   private:
     size_t _clientCounter;
     System::Network::TCPSocket _serverSocketTCP;

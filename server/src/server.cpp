@@ -34,36 +34,6 @@ server::~server()
 {
 }
 
-void server::addClient(Client_t &client)
-{
-    std::unique_lock lock(_mutex);
-
-    _clientCounter++;
-    _clients[_clientCounter] = client;
-    std::cout << "Created a new client (" << std::to_string(_clientCounter)
-              << ") on the server." << std::endl;
-}
-
-Client_t &server::getClient(size_t id)
-{
-    std::unique_lock lock(_mutex);
-    return (_clients[id]);
-}
-
-void server::removeClient(size_t id)
-{
-    std::unique_lock lock(_mutex);
-
-    _clients.erase(id);
-    std::cout << "Removed a client (" << std::to_string(_clientCounter)
-              << ") from the server." << std::endl;
-}
-
-void identifyClient(std::unordered_map<size_t, Client_t> &clients,
-    System::Network::TCPSocket socket);
-void identifyClient(std::unordered_map<size_t, Client_t> &clients,
-    std::string ip, std::string port);
-
 void server::threadedServerWrite()
 {
     try {
