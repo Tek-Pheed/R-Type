@@ -9,7 +9,6 @@
 #define SERVER_HPP
 
 // #include <arpa/inet.h>
-// #include <netinet/in.h>
 // #include <stdlib.h>
 // #include <sys/socket.h>
 // #include <sys/types.h>
@@ -18,7 +17,6 @@
 
 #include <cstddef>
 #include <mutex>
-#include <thread>
 #include <vector>
 #include "system_network.hpp"
 #include "system_tcp.hpp"
@@ -53,14 +51,14 @@ struct Client_t {
   public:
     System::Network::TCPSocket tcpSocket;
     std::string ip;
-    std::string port;
+    uint16_t port;
     std::string readBuffer;
     std::string writeBuffer;
 
     Client_t()
         : tcpSocket(System::Network::TCPSocket()), ip(std::string()),
-          port(std::string()), readBuffer(std::string()),
-          writeBuffer(std::string()) {};
+          port(uint16_t()), readBuffer(std::string()),
+          writeBuffer(std::string()){};
 };
 
 class server {
@@ -76,6 +74,7 @@ class server {
 
     void receive_message();
     void handle_connection();
+    void send_to_all(std::string message);
 
     void threadedServerRead();
     void threadedServerWrite();

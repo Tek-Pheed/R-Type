@@ -10,6 +10,14 @@
 #include "protocol.hpp"
 #include "server.hpp"
 
+void server::send_to_all(std::string message)
+{
+    for (auto &client : _clients) {
+        _serverSocketUDP.sendDataTo(System::Network::encodeString(message),
+            client.second.ip, client.second.port);
+    }
+}
+
 int server::handle_player(int code, std::vector<std::string> tokens)
 {
     int id, x, y;
