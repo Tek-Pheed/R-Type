@@ -21,6 +21,7 @@
     #include <sys/time.h>
     #include <sys/types.h>
     #include <unistd.h>
+    #include <netdb.h>
 
     #define INVALID_SOCKET -1
     #define SOCKET_ERROR   -1

@@ -115,6 +115,8 @@ void server::threadedClient(size_t id)
                 if (dynamic_cast<System::Network::UDPSocket *>(sock)
                     != nullptr) {
                     // UDP
+                    sock->sendData(
+                        System::Network::byteArray({'h', 'l', 'l', 'o'}));
                     std::cout << "[Thread " << std::to_string(id)
                               << "] Message received on UDP ("
                               << std::to_string(sock->getUID())

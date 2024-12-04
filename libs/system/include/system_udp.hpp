@@ -38,8 +38,8 @@ namespace System
 
             explicit UDPSocket();
 
-            void initSocket(uint16_t port,
-                const std::string &address = "0.0.0.0");
+            void initSocket(
+                uint16_t port, const std::string &address = "0.0.0.0");
 
             UDPSocket(UDPSocket &&) = default;
             UDPSocket(const UDPSocket &) = default;
@@ -61,6 +61,18 @@ namespace System
             ssize_t sendData(const byteArray &byteSequence) override;
 
             /**
+             * @brief Send data through the socket, to a specific client
+             *
+             * @param byteSequence: A byte sequence object (type byteArray)
+             * @param address: The address of the client to send the data to
+             * @return: ssize_t The number of bytes written in the socket. This
+             * might be less than the size of the byte array, in which case you
+             * should call this function later with the rest of the data to
+             * send.
+             */
+            ssize_t sendDataTo(const byteArray &byteSequence, const std::string &address);
+
+            /**
              * @brief Receive data through the socket
              * @note Note: This call could block if the socket is invalid or if
              * there is no data available at the moment. You probably should
@@ -69,6 +81,19 @@ namespace System
              * read from the socket
              */
             byteArray receive(void) override;
+
+            /**
+             * @brief Receive data through the socket, set the address argument
+             * to the address of the client who sent the packet
+             *
+             * @param address: The address of the sender will be placed in this string
+             * @note Note: This call could block if the socket is invalid or if
+             * there is no data available at the moment. You probably should
+             * use select before this function.
+             * @return byteArray: A byte sequence object representing all bytes
+             * read from the socket
+             */
+            byteArray receiveFrom(std::string &address);
 
             explicit UDPSocket(osSocketType _sock);
             // friend UDPSocket accept(const UDPSocket &src);

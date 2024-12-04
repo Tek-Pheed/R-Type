@@ -35,7 +35,7 @@ void UDPSocket::initSocket(uint16_t port, const std::string &address)
         _sockSettings.sin_addr.s_addr = htonl(INADDR_ANY);
     } else {
         if (inet_pton(AF_INET, address.c_str(), &this->_sockSettings.sin_addr)
-            <= 0) {
+            != 1) {
             throw NetworkException("System::Network::UDPSocket: Invalid "
                                    "address/ Address not supported");
         }
@@ -87,6 +87,37 @@ ssize_t UDPSocket::sendData(const byteArray &byteSequence)
     return (writtenBytes);
 }
 
+ssize_t UDPSocket::sendDataTo(
+    const byteArray &byteSequence, const std::string &address)
+{
+    SOCKADDR_IN sockin;
+    ssize_t writtenBytes = 0;
+    size_t len = byteSequence.size();
+    uint8_t *buff = new uint8_t[len]();
+
+    if (buff == NULL)
+        throw std::runtime_error("System::Network::UDPSocket::sendDataTo: "
+                                 "Failed to allocate send buffer");
+    sockin.sin_family = AF_INET;
+    sockin.sin_port = this->_sockSettings.sin_port;
+    if (inet_pton(AF_INET, address.c_str(), &sockin.sin_addr) != 1) {
+        delete[] buff;
+        throw std::runtime_error("System::Network::UDPSocket: Invalid "
+                                 "address/ Address not supported");
+    }
+    for (size_t i = 0; i < len; i++) {
+        buff[i] = byteSequence[i];
+    }
+    writtenBytes = sendto(this->_sockfd, reinterpret_cast<const char *>(buff),
+        len, 0, reinterpret_cast<const sockaddr *>(&sockin), sizeof(sockin));
+    this->_opened = (writtenBytes > 0);
+    delete[] buff;
+    if (writtenBytes == SOCKET_ERROR)
+        throw NetworkException(
+            "System::Network::UDPSocket::sendDataTo: Failed to send");
+    return (writtenBytes);
+}
+
 UDPSocket::UDPSocket(osSocketType sock_fd)
 {
     udpSockID++;
@@ -135,6 +166,68 @@ byteArray UDPSocket::receive(void)
         throw NetworkException(
             "System::Network::UDPSocket::receive: Failed to read");
     }
+    this->_opened = (ret > 0);
+    vect.reserve(len);
+    for (size_t i = 0; i < len; i++) {
+        uint8_t val = buff[i];
+        vect.emplace_back(val);
+    }
+    delete[] buff;
+    return (vect);
+}
+
+byteArray UDPSocket::receiveFrom(std::string &address)
+{
+    ssize_t ret = 0;
+    byteArray vect;
+    SOCKADDR_IN client_addr;
+    struct hostent *hostp;
+
+#if defined(WIN32)
+    u_long len = 0;
+    ioctlsocket(this->_sockfd, FIONREAD, &len);
+#elif defined(LINUX)
+    size_t len = 0;
+    ioctl(this->_sockfd, FIONREAD, &len);
+#endif
+
+    if (len == 0) {
+        return (vect);
+    }
+    uint8_t *buff = new uint8_t[len]();
+#if defined(LINUX)
+    if (buff == nullptr)
+        throw std::runtime_error(
+            "System::Network::UDPSocket::receiveFrom: Unable "
+            "to allocate receive buffer");
+    socklen_t slen = sizeof(client_addr);
+    ret = recvfrom(this->_sockfd, buff, len, 0,
+        reinterpret_cast<sockaddr *>(&client_addr), &slen);
+
+#elif defined(WIN32)
+    int slen = sizeof(client_addr);
+    ret = recvfrom(this->_sockfd, reinterpret_cast<char *>(buff), len, 0,
+        reinterpret_cast<sockaddr *>(&client_addr), &slen);
+#endif
+    if (ret == SOCKET_ERROR) {
+        delete[] buff;
+        throw NetworkException(
+            "System::Network::UDPSocket::receiveFrom: Failed to read");
+    }
+    hostp = gethostbyaddr((const char *) &client_addr.sin_addr.s_addr,
+        sizeof(client_addr.sin_addr.s_addr), AF_INET);
+    if (hostp == NULL) {
+        delete[] buff;
+        throw NetworkException("System::Network::UDPSocket::receiveFrom: "
+                               "Failed to get sender address");
+    }
+    const char *addr = inet_ntoa(client_addr.sin_addr);
+    if (addr == NULL) {
+        delete[] buff;
+        throw NetworkException("System::Network::UDPSocket::receiveFrom: "
+                               "Failed to get sender address");
+    }
+    address = addr;
     this->_opened = (ret > 0);
     vect.reserve(len);
     for (size_t i = 0; i < len; i++) {
