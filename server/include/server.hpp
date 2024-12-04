@@ -54,7 +54,7 @@ struct Client_t {
     System::Network::TCPSocket tcpSocket;
     class server *server;
 
-    Client_t() : tcpSocket(System::Network::TCPSocket()), server(nullptr) {};
+    Client_t() : tcpSocket(System::Network::TCPSocket()), server(nullptr){};
 };
 
 class server {
@@ -79,6 +79,7 @@ class server {
     int playerDamaged(int id, int amount);
     int playerDisconnection(int id);
     int handle_player(int code, std::vector<std::string> tokens);
+    int manage_buffer(std::string buffer);
 
   private:
     size_t _clientCounter;

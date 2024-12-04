@@ -10,6 +10,7 @@
 #include <exception>
 #include <iostream>
 #include <mutex>
+#include <sstream>
 #include <string>
 #include <thread>
 
@@ -174,6 +175,43 @@ int is_code_valid(int code)
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
     return -1;
+}
+
+int server::manage_buffer(std::string buffer)
+{
+    std::string code = std::string(buffer).substr(0, 3);
+    int code_int = is_code_valid(atoi(code.c_str()));
+    std::vector<std::string> tokens;
+
+    if (code_int == -1)
+        return -1;
+    std::string str = buffer.substr(4, buffer.size() - 4);
+    std::istringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, ' ')) {
+        tokens.push_back(token);
+    }
+
+    switch (code_int) {
+        case 0:
+            for (size_t i = 0; i < tokens.size(); i++) {
+                printf("args: %s\n", tokens[i].c_str());
+            }
+            handle_player(atoi(code.c_str()), tokens);
+            break;
+        case 1:
+            // handle_enemy(tokens);
+            break;
+        case 2:
+            // handle_terrain(tokens);
+            break;
+        case 3:
+            // handle_mechs(tokens);
+            break;
+
+        default: break;
+    }
+    return 0;
 }
 
 int main()
