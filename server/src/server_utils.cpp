@@ -11,6 +11,8 @@
 
 size_t server::identifyClient(System::Network::TCPSocket socket)
 {
+    std::unique_lock lock(_mutex);
+
     for (auto &pair : _clients) {
         if (pair.second.tcpSocket.getUID() == socket.getUID())
             return pair.first;
@@ -20,6 +22,8 @@ size_t server::identifyClient(System::Network::TCPSocket socket)
 
 size_t server::identifyClient(std::string ip, std::string port)
 {
+    std::unique_lock lock(_mutex);
+
     for (auto &pair : _clients) {
         if (pair.second.ip == ip && std::to_string(pair.second.port) == port)
             return pair.first;
