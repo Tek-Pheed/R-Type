@@ -80,6 +80,7 @@ namespace System
              * needs to receive connections from clients
              */
             enum Mode { CONNECT, SERVE };
+            enum Type { TCP, UDP };
 
             /**
              * @brief Send data through the socket
@@ -129,6 +130,14 @@ namespace System
              * @return uint64_t: Unique identifier of the socket
              */
             virtual uint64_t getUID(void) const = 0;
+
+
+            /**
+             * @brief Return the type of the socket
+             *
+             * @return Type: Type of the socket
+             */
+            virtual Type getType() const = 0;
         };
 
         class ASocket : public ISocket {
@@ -144,6 +153,7 @@ namespace System
             bool isOpen(void) const override;
             uint64_t getUID(void) const override;
             osSocketType getHandle(void) const override;
+            Type getType() const override;
 
           protected:
             uint64_t _uid;
@@ -151,6 +161,7 @@ namespace System
             osSocketType _sockfd;
             bool _opened;
             SOCKADDR_IN _sockSettings;
+            Type _type;
         };
 
         class TCPClient;

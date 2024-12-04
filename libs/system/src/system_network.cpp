@@ -129,6 +129,10 @@ osSocketType System::Network::ASocket::getHandle(void) const
     return (this->_sockfd);
 }
 
+System::Network::ISocket::Type System::Network::ASocket::getType() const {
+    return (_type);
+}
+
 System::Network::byteArray System::Network::encodeString(const std::string &str)
 {
     byteArray br;

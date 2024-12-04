@@ -61,6 +61,7 @@ void TCPSocket::initSocket(
 TCPSocket::TCPSocket()
 {
     tcpSockID++;
+    this->_type = System::Network::ISocket::TCP;
     this->_uid = tcpSockID;
     this->_opened = false;
 }
@@ -68,6 +69,7 @@ TCPSocket::TCPSocket()
 TCPSocket::TCPSocket(uint16_t port, Mode mode, const std::string &address)
 {
     tcpSockID++;
+    this->_type = System::Network::ISocket::TCP;
     this->_uid = tcpSockID;
     this->_opened = false;
     this->initSocket(port, mode, address);
@@ -102,6 +104,7 @@ ssize_t TCPSocket::sendData(const byteArray &byteSequence)
 TCPSocket::TCPSocket(osSocketType sock_fd)
 {
     tcpSockID++;
+    this->_type = System::Network::ISocket::TCP;
     this->_opened = true;
     this->_sockfd = sock_fd;
     this->_uid = tcpSockID;

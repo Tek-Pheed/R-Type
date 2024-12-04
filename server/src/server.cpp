@@ -6,7 +6,7 @@
 */
 
 #include "server.hpp"
-#include <cstdint>
+#include <cstddef>
 #include <exception>
 #include <iostream>
 #include <mutex>
@@ -59,76 +59,152 @@ void server::removeClient(size_t id)
               << ") from the server." << std::endl;
 }
 
-void server::threadedClient(size_t id)
-{
-    Client_t &ref = this->getClient(id);
-    std::cout << "[Thread " << std::to_string(id) << "] Created" << std::endl;
-    System::Network::UDPSocket udpSocket = System::Network::UDPSocket(
-        UDP_PORT + (uint16_t) _clientCounter, "0.0.0.0");
-    try {
-        std::cout << "[Thread " << std::to_string(id)
-                  << "] Created a UDP socket ("
-                  << std::to_string(udpSocket.getUID()) << ") on port "
-                  << std::to_string(UDP_PORT + _clientCounter) << std::endl;
+void identifyClient(std::unordered_map<size_t, Client_t> &clients,
+    System::Network::TCPSocket socket);
+void identifyClient(std::unordered_map<size_t, Client_t> &clients,
+    std::string ip, std::string port);
 
+void server::threadedServerWrite()
+{
+    try {
         System::Network::byteArray arr;
         System::Network::byteArray vect;
+        std::string buffer;
+        System::Network::socketSetGeneric writefds;
+        System::Network::timeoutStruct tv;
+        tv->tv_sec = 0;
+        tv->tv_usec = 250000;
 
+        while (true) {
+            writefds.clear();
+            for (auto &pair : _clients) {
+                Client_t &ref = pair.second;
+                writefds.emplace_back(&_serverSocketUDP);
+                writefds.emplace_back(&ref.tcpSocket);
+            }
+
+            System::Network::select(nullptr, &writefds, nullptr, tv);
+            if (writefds.size() == 0)
+                continue;
+        }
+    } catch (const std::exception &e) {
+        std::cerr << "[Read Thread] failed with exception: " << e.what()
+                  << std::endl;
+    }
+}
+
+void server::threadedServerRead()
+{
+    try {
+        System::Network::byteArray arr;
+        System::Network::byteArray vect;
         std::string buffer;
         System::Network::socketSetGeneric readfds;
+        System::Network::timeoutStruct tv;
+        tv->tv_sec = 0;
+        tv->tv_usec = 250000;
 
         while (true) {
             readfds.clear();
-            readfds.emplace_back(&udpSocket);
-            readfds.emplace_back(&ref.tcpSocket);
-            System::Network::select(&readfds);
+            for (auto &pair : _clients) {
+                Client_t &ref = pair.second;
+                readfds.emplace_back(&_serverSocketUDP);
+                readfds.emplace_back(&ref.tcpSocket);
+            }
+
+            System::Network::select(&readfds, nullptr, nullptr, tv);
             if (readfds.size() == 0)
                 continue;
-            std::cout << "[Thread " << std::to_string(id)
-                      << "] Event on socket" << std::endl;
-
+            std::cout << "[Read Thread] Event on socket" << std::endl;
             for (auto sock : readfds) {
                 vect.clear();
                 arr.clear();
-                vect = sock->receive();
-                buffer = System::Network::decodeString(vect);
-                while (buffer[buffer.size() - 1] != '\n'
-                    && buffer[buffer.size() - 2] != '\t') {
-                    vect = sock->receive();
-                    buffer += System::Network::decodeString(vect);
-                }
-                if (dynamic_cast<System::Network::TCPSocket *>(sock)
-                    != nullptr) {
-                    // TCP
-                    if (!sock->isOpen()) {
-                        std::cout << "[Thread " << std::to_string(id)
-                                  << "] TCP Connexion ("
-                                  << std::to_string(sock->getUID())
-                                  << ") was closed, aborting." << std::endl;
-                        removeClient(id);
-                        return;
+                switch (sock->getType()) {
+                    case System::Network::ISocket::TCP: {
+                        if (!sock->isOpen()) {
+                            std::cout << "[Read Thread] TCP Connexion ("
+                                      << std::to_string(sock->getUID())
+                                      << ") was closed." << std::endl;
+                            // identifyClient()
+                            // removeClient(id);
+                            // return;
+                        } else {
+                            // Read TCP Socket
+                            vect = sock->receive();
+                            buffer = System::Network::decodeString(vect);
+                            while (buffer[buffer.size() - 1] != '\n'
+                                && buffer[buffer.size() - 2] != '\t') {
+                                vect = sock->receive();
+                                buffer += System::Network::decodeString(vect);
+                            }
+                            std::cout
+                                << "[Read Thread] Message received on TCP ("
+                                << std::to_string(sock->getUID())
+                                << "): " << buffer << std::endl;
+                        }
+                        break;
                     }
-                    std::cout << "[Thread " << std::to_string(id)
-                              << "] Message received on TCP ("
-                              << std::to_string(sock->getUID())
-                              << "): " << buffer << std::endl;
-                }
-                if (dynamic_cast<System::Network::UDPSocket *>(sock)
-                    != nullptr) {
-                    // UDP
-                    sock->sendData(
-                        System::Network::byteArray({'h', 'l', 'l', 'o'}));
-                    std::cout << "[Thread " << std::to_string(id)
-                              << "] Message received on UDP ("
-                              << std::to_string(sock->getUID())
-                              << "): " << buffer << std::endl;
+                    case System::Network::ISocket::UDP: {
+                        // Read UDP
+
+                        // identifyClient()
+                        System::Network::UDPSocket *s =
+                            static_cast<System::Network::UDPSocket *>(sock);
+                        if (s == nullptr)
+                            break;
+                        // s->receiveFrom(std::string &address)
+
+                        // std::cout << "[Read Thread] Message received on UDP
+                        // ("
+                        //           << std::to_string(sock->getUID())
+                        //           << "): " << buffer << std::endl;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
             }
-            manage_buffer(buffer);
         }
+
+        // vect = sock->receive();
+        // buffer = System::Network::decodeString(vect);
+        // while (buffer[buffer.size() - 1] != '\n'
+        //     && buffer[buffer.size() - 2] != '\t') {
+        //     vect = sock->receive();
+        //     buffer += System::Network::decodeString(vect);
+        // }
+
+        // if (dynamic_cast<System::Network::TCPSocket *>(sock)
+        //     != nullptr) {
+        //     // TCP
+        //     if (!sock->isOpen()) {
+        //         std::cout << "[Thread " << std::to_string(id)
+        //                   << "] TCP Connexion ("
+        //                   << std::to_string(sock->getUID())
+        //                   << ") was closed, aborting." << std::endl;
+        //         removeClient(id);
+        //         return;
+        //     }
+        //     std::cout << "[Thread " << std::to_string(id)
+        //               << "] Message received on TCP ("
+        //               << std::to_string(sock->getUID())
+        //               << "): " << buffer << std::endl;
+        // }
+        // if (dynamic_cast<System::Network::UDPSocket *>(sock)
+        //     != nullptr) {
+        //     // UDP
+        //     sock->sendData(
+        //         System::Network::byteArray({'h', 'l', 'l', 'o'}));
+        //     std::cout << "[Thread " << std::to_string(id)
+        //               << "] Message received on UDP ("
+        //               << std::to_string(sock->getUID())
+        //               << "): " << buffer << std::endl;
+        // }
+        // manage_buffer(buffer);
     } catch (const std::exception &e) {
-        std::cerr << "[Thread " << std::to_string(id)
-                  << "] failed with exception: " << e.what() << std::endl;
+        std::cerr << "[Read Thread] failed with exception: " << e.what()
+                  << std::endl;
     }
 }
 
@@ -147,21 +223,20 @@ void server::handle_connection()
         }
         if (readfds.size() == 0)
             continue;
-        auto h = System::Network::accept(_serverSocketTCP);
-        Client_t c;
-        c.server = this;
-        c.tcpSocket = h;
-        addClient(c);
-        std::thread d(&server::threadedClient, this, _clientCounter);
-        d.detach();
+        Client_t client;
+        System::Network::TCPSocket clientSock =
+            System::Network::accept(_serverSocketTCP);
+        client.tcpSocket = clientSock;
+        addClient(client);
     }
 }
 
 void server::create_server()
 {
-    std::cout << "Running server on port " << std::to_string(TCP_PORT)
-              << std::endl;
+    std::cout << "Running server on port TCP:" << std::to_string(TCP_PORT)
+              << ", UDP: " << std::to_string(UDP_PORT) << std::endl;
     _serverSocketTCP.initSocket(TCP_PORT, System::Network::ISocket::SERVE);
+    _serverSocketUDP.initSocket(UDP_PORT);
 }
 
 int is_code_valid(int code)
@@ -220,7 +295,8 @@ int main()
     System::Network::initNetwork();
 
     s.create_server();
-
+    std::thread(&server::threadedServerRead, &s).detach();
+    std::thread(&server::threadedServerWrite, &s).detach();
     s.handle_connection();
 
     /// while (true) {

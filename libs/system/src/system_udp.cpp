@@ -52,6 +52,7 @@ void UDPSocket::initSocket(uint16_t port, const std::string &address)
 UDPSocket::UDPSocket()
 {
     udpSockID++;
+    this->_type = System::Network::ISocket::UDP;
     this->_uid = udpSockID;
     this->_opened = false;
 }
@@ -59,6 +60,7 @@ UDPSocket::UDPSocket()
 UDPSocket::UDPSocket(uint16_t port, const std::string &address)
 {
     udpSockID++;
+    this->_type = System::Network::ISocket::UDP;
     this->_uid = udpSockID;
     this->_opened = false;
     this->initSocket(port, address);
@@ -121,6 +123,7 @@ ssize_t UDPSocket::sendDataTo(
 UDPSocket::UDPSocket(osSocketType sock_fd)
 {
     udpSockID++;
+    this->_type = System::Network::ISocket::UDP;
     this->_opened = true;
     this->_sockfd = sock_fd;
     this->_uid = udpSockID;

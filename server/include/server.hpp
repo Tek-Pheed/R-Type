@@ -52,9 +52,15 @@ typedef struct Terrain_s Terrain_t;
 struct Client_t {
   public:
     System::Network::TCPSocket tcpSocket;
-    class server *server;
+    std::string ip;
+    std::string port;
+    std::string readBuffer;
+    std::string writeBuffer;
 
-    Client_t() : tcpSocket(System::Network::TCPSocket()), server(nullptr){};
+    Client_t()
+        : tcpSocket(System::Network::TCPSocket()), ip(std::string()),
+          port(std::string()), readBuffer(std::string()),
+          writeBuffer(std::string()) {};
 };
 
 class server {
@@ -69,9 +75,10 @@ class server {
     void removeClient(size_t id);
 
     void receive_message();
-    void threadedClient(size_t id);
     void handle_connection();
 
+    void threadedServerRead();
+    void threadedServerWrite();
     int playerConnection(int id, int x, int y);
     int playerPosition(int id, int x, int y);
     int playerKilled(int id);
@@ -84,6 +91,7 @@ class server {
   private:
     size_t _clientCounter;
     System::Network::TCPSocket _serverSocketTCP;
+    System::Network::UDPSocket _serverSocketUDP;
     std::mutex _mutex;
     std::unordered_map<size_t, Client_t> _clients;
 

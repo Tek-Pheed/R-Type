@@ -9,7 +9,6 @@
 #define SYSTEM_TCP_HPP
 
 #include <cstdint>
-#include <optional>
 #include <string>
 #include "system_network.hpp"
 
