@@ -34,8 +34,13 @@ void TCPSocket::initSocket(
             "System::Network::TCPSocket::initSocket: Failed to create socket");
 
     if (mode == SERVE) {
+#if defined(LINUX)
         const int enable = 1;
         setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+#elif defined(WIN32)
+        const char enable = 1;
+        setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(char));
+#endif
         _sockSettings.sin_addr.s_addr = htonl(INADDR_ANY);
         res = bind(this->_sockfd,
             reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
