@@ -13,7 +13,6 @@
 #include <cstring>
 #include <stdexcept>
 #include <string>
-#include <sys/socket.h>
 #include <vector>
 #include "system_network.hpp"
 
