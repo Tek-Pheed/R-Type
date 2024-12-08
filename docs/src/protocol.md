@@ -1,6 +1,6 @@
 # Protocol R-Type
 
-format : SP CODE SP <?ARGS> HTLF
+format : CODE SP <?ARGS> HTLF
 
 ➡️ : From Server to Client
 ⬅️ : From Client to Server

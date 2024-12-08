@@ -137,8 +137,9 @@ void server::threadedServerRead()
                                   << std::to_string(sock->getUID())
                                   << ") for client (" << std::to_string(id)
                                   << "): " << buff << std::endl;
-                        std::unique_lock lock(_globalMutex);
+                        _globalMutex.lock();
                         client.readBufferUDP += buff;
+                        _globalMutex.unlock();
                         if (client.readBufferUDP.size() > 2
                             && client.readBufferUDP[client.readBufferUDP.size()
                                    - 1]
@@ -149,35 +150,6 @@ void server::threadedServerRead()
                             this->handle_packet(
                                 (size_t) id, System::Network::ISocket::UDP);
                         }
-
-                        // ssize_t id = identifyClient(addr,
-                        // std::to_string(port)); if (id == -1) {
-                        //     //if (authenticateUDPClient(Client &client))
-                        //     std::cerr << "Unable to idendify client (UDP -
-                        //     read thread)" << std::endl;
-                        // }
-                        // Client &client = getClient((size_t) id); // Garbage
-                        // created here and returned because unidentified
-                        // client std::string buff =
-                        // System::Network::decodeString(vect); std::cout <<
-                        // "[Read Thread] Message received on UDP ("
-                        //           << std::to_string(sock->getUID())
-                        //           << ") for client (" << std::to_string(id)
-                        //           << "): " << buff << std::endl;
-                        // std::unique_lock lock(_globalMutex);
-                        // client.readBufferUDP += buff;
-                        // if (client.readBufferUDP.size() > 2
-                        //     &&
-                        //     client.readBufferUDP[client.readBufferUDP.size()
-                        //            - 1]
-                        //         == '\n'
-                        //     &&
-                        //     client.readBufferUDP[client.readBufferUDP.size()
-                        //            - 2]
-                        //         == '\t') {
-                        //     this->handle_packet(
-                        //         (size_t) id, System::Network::ISocket::UDP);
-                        // }
                         break;
                     }
                     default: {
