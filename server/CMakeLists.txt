@@ -18,7 +18,6 @@ add_executable(${PROJECT_NAME} ${SRC} ${APP})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} ecs)
 target_link_libraries(${PROJECT_NAME} ossystem)
-target_link_libraries(${PROJECT_NAME} pthread)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>:$ENV{LD_LIBRARY_PATH}
@@ -35,6 +34,7 @@ if(WIN32)
     )
 else()
     add_definitions(-DLINUX)
+    target_link_libraries(${PROJECT_NAME} pthread)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra
         -Wswitch-default -Wcast-align -Wpointer-arith -Wundef -Wcast-qual
         -Wshadow -Wwrite-strings -Wconversion -Wunreachable-code -Wunused-macros
