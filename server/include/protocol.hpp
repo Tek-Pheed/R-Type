@@ -11,8 +11,8 @@
 #define PACKET_END "\t\n"
 
 enum connect {
-    C_INIT_UDP = 900,
-    C_INIT_UDP_OK = 901,
+    C_INIT_UDP = 901,
+    C_START_UDP = 902,
 };
 
 enum player {

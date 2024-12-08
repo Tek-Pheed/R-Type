@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <mutex>
+#include <sys/types.h>
 #include <vector>
 #include "system_network.hpp"
 #include "system_tcp.hpp"
@@ -101,6 +102,8 @@ class server {
 
     ssize_t identifyClient(const System::Network::ISocket &socket);
     ssize_t identifyClient(std::string ip, std::string port);
+
+    ssize_t authenticateUDPClient(System::Network::byteArray packet);
 
   private:
     std::mutex _globalMutex;

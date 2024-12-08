@@ -5,12 +5,15 @@
 ** thread_read
 */
 
+#include <climits>
 #include <cstddef>
+#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <string>
 #include <sys/types.h>
+#include "protocol.hpp"
 #include "server.hpp"
 
 #include "system_network.hpp"
@@ -18,6 +21,20 @@
 #include "system_udp.hpp"
 
 #include "server.hpp"
+
+// This will need to be more robust
+ssize_t server::authenticateUDPClient(System::Network::byteArray packet)
+{
+    std::string decoded = System::Network::decodeString(packet);
+    if (decoded.starts_with(std::to_string(C_START_UDP))) {
+        std::string::size_type p = decoded.find(' ');
+        auto id = std::strtol(&decoded[p], nullptr, 10);
+        if (id == LLONG_MAX || id == LLONG_MIN)
+            return (-1);
+        return (id);
+    }
+    return (-1);
+}
 
 void server::threadedServerRead()
 {
@@ -46,7 +63,9 @@ void server::threadedServerRead()
                     case System::Network::ISocket::TCP: {
                         ssize_t id = identifyClient(*sock);
                         if (id == -1)
-                            std::cerr << "Unable to idendify client (TCP - read thread)" << std::endl;
+                            std::cerr << "Unable to idendify client (TCP - "
+                                         "read thread)"
+                                      << std::endl;
                         if (!sock->isOpen()) {
                             std::cout << "[Read Thread] client ("
                                       << std::to_string(id)
@@ -73,27 +92,46 @@ void server::threadedServerRead()
                                 && client.readBufferTCP
                                         [client.readBufferTCP.size() - 2]
                                     == '\t') {
-                                this->handle_packet(
-                                    (size_t) id, System::Network::ISocket::TCP);
+                                this->handle_packet((size_t) id,
+                                    System::Network::ISocket::TCP);
                             }
                         }
                         break;
                     }
                     case System::Network::ISocket::UDP: {
-                        // Read UDP
-
                         std::string addr;
                         uint16_t port;
-
                         System::Network::UDPSocket *s =
                             static_cast<System::Network::UDPSocket *>(sock);
                         if (s == nullptr)
                             break;
                         vect = s->receiveFrom(addr, port);
-                        ssize_t id = identifyClient(addr, std::to_string(port));
-                        if (id == -1)
-                            std::cerr << "Unable to idendify client (UDP - read thread)" << std::endl;
-                        Client &client = getClient((size_t) id); // Garbage created here and returned because unidentified client
+                        ssize_t id =
+                            identifyClient(addr, std::to_string(port));
+                        if (id == -1) {
+                            id = authenticateUDPClient(vect);
+                            if (id == -1) {
+                                std::cerr
+                                    << "[Read Thread] Failed to identify "
+                                       "client on UDP ("
+                                    << std::to_string(sock->getUID())
+                                    << ") with packet: "
+                                    << System::Network::decodeString(vect)
+                                    << std::endl;
+                                continue;
+                            } else {
+                                std::cout << "[Read Thread] Successfully "
+                                             "authenticated client ("
+                                          << std::to_string(id)
+                                          << ") on UDP Socket ("
+                                          << std::to_string(sock->getUID())
+                                          << ")" << std::endl;
+                                Client &client = getClient((size_t) id);
+                                client.ip = addr;
+                                client.port = port;
+                            }
+                        }
+                        Client &client = getClient((size_t) id);
                         std::string buff = System::Network::decodeString(vect);
                         std::cout << "[Read Thread] Message received on UDP ("
                                   << std::to_string(sock->getUID())
@@ -111,6 +149,35 @@ void server::threadedServerRead()
                             this->handle_packet(
                                 (size_t) id, System::Network::ISocket::UDP);
                         }
+
+                        // ssize_t id = identifyClient(addr,
+                        // std::to_string(port)); if (id == -1) {
+                        //     //if (authenticateUDPClient(Client &client))
+                        //     std::cerr << "Unable to idendify client (UDP -
+                        //     read thread)" << std::endl;
+                        // }
+                        // Client &client = getClient((size_t) id); // Garbage
+                        // created here and returned because unidentified
+                        // client std::string buff =
+                        // System::Network::decodeString(vect); std::cout <<
+                        // "[Read Thread] Message received on UDP ("
+                        //           << std::to_string(sock->getUID())
+                        //           << ") for client (" << std::to_string(id)
+                        //           << "): " << buff << std::endl;
+                        // std::unique_lock lock(_globalMutex);
+                        // client.readBufferUDP += buff;
+                        // if (client.readBufferUDP.size() > 2
+                        //     &&
+                        //     client.readBufferUDP[client.readBufferUDP.size()
+                        //            - 1]
+                        //         == '\n'
+                        //     &&
+                        //     client.readBufferUDP[client.readBufferUDP.size()
+                        //            - 2]
+                        //         == '\t') {
+                        //     this->handle_packet(
+                        //         (size_t) id, System::Network::ISocket::UDP);
+                        // }
                         break;
                     }
                     default: {

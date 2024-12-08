@@ -13,6 +13,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include <sys/socket.h>
 #include <vector>
 #include "system_network.hpp"
 
@@ -34,6 +35,8 @@ void TCPSocket::initSocket(
             "System::Network::TCPSocket::initSocket: Failed to create socket");
 
     if (mode == SERVE) {
+        const int enable = 1;
+        setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
         _sockSettings.sin_addr.s_addr = htonl(INADDR_ANY);
         res = bind(this->_sockfd,
             reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
