@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME} ${SRC} ${APP})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} ecs)
 target_link_libraries(${PROJECT_NAME} ossystem)
+target_link_libraries(${PROJECT_NAME} pthread)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>:$ENV{LD_LIBRARY_PATH}
