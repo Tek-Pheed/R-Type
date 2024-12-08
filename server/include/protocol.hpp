@@ -8,7 +8,15 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
+#define PACKET_END "\t\n"
+
+enum connect {
+    C_INIT_UDP = 900,
+    C_INIT_UDP_OK = 901,
+};
+
 enum player {
+    P_SETUP = 100,
     P_CONN = 101,
     P_POS = 102,
     P_DEAD = 103,

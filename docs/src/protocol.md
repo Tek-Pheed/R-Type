@@ -36,3 +36,9 @@ format : CODE SP <?ARGS> HTLF
     -   Win - 133 ➡️
     -   Lose - 134 ➡️
     -   Game Over - 135 ➡️
+
+
+Client Connect using TCP:
+SERVER                  CLIENT
+client_id [TCP] ->
+                    <- client_id [UDP]

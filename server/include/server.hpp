@@ -21,6 +21,7 @@
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
+#include <condition_variable>
 #include <unordered_map>
 
 struct Player_s {
@@ -47,18 +48,23 @@ struct Terrain_s {
 };
 typedef struct Terrain_s Terrain_t;
 
-struct Client_t {
+class Client {
   public:
     System::Network::TCPSocket tcpSocket;
     std::string ip;
     uint16_t port;
-    std::string readBuffer;
-    std::string writeBuffer;
+    std::string readBufferTCP;
+    std::string writeBufferTCP;
+    std::string readBufferUDP;
+    std::string writeBufferUDP;
 
-    Client_t()
+    Client()
         : tcpSocket(System::Network::TCPSocket()), ip(std::string()),
-          port(uint16_t()), readBuffer(std::string()),
-          writeBuffer(std::string()){};
+          port(uint16_t()), readBufferTCP(std::string()),
+          writeBufferTCP(std::string()), readBufferUDP(std::string()),
+          writeBufferUDP(std::string()) {};
+
+    //Client &operator=(Client &client);
 };
 
 class server {
@@ -68,13 +74,19 @@ class server {
     void create_server();
     void createClient();
 
-    void addClient(Client_t &client);
-    Client_t &getClient(size_t id);
+    Client &addClient(Client &client);
+    Client &getClient(size_t id);
     void removeClient(size_t id);
 
     void receive_message();
     void handle_connection();
     void send_to_all(std::string message);
+
+    void handle_packet(
+        size_t clientID, System::Network::ISocket::Type socketType);
+
+    void writeToClient(Client &client, std::string &data,
+        System::Network::ISocket::Type socketType);
 
     void threadedServerRead();
     void threadedServerWrite();
@@ -87,15 +99,18 @@ class server {
     int handle_player(int code, std::vector<std::string> tokens);
     int manage_buffer(std::string buffer);
 
-    size_t identifyClient(System::Network::TCPSocket socket);
-    size_t identifyClient(std::string ip, std::string port);
+    ssize_t identifyClient(const System::Network::ISocket &socket);
+    ssize_t identifyClient(std::string ip, std::string port);
 
   private:
+    std::mutex _globalMutex;
+    std::condition_variable _writeCondition;
+    std::mutex _writeMutex;
+
     size_t _clientCounter;
     System::Network::TCPSocket _serverSocketTCP;
     System::Network::UDPSocket _serverSocketUDP;
-    std::mutex _mutex;
-    std::unordered_map<size_t, Client_t> _clients;
+    std::unordered_map<size_t, Client> _clients;
 
     std::vector<Player_t> _players;
     std::vector<Enemy_t> _enemies;

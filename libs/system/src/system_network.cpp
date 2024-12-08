@@ -129,11 +129,13 @@ osSocketType System::Network::ASocket::getHandle(void) const
     return (this->_sockfd);
 }
 
-System::Network::ISocket::Type System::Network::ASocket::getType() const {
+System::Network::ISocket::Type System::Network::ASocket::getType() const
+{
     return (_type);
 }
 
-System::Network::byteArray System::Network::encodeString(const std::string &str)
+System::Network::byteArray System::Network::encodeString(
+    const std::string &str)
 {
     byteArray br;
     size_t len = str.length();
@@ -155,15 +157,17 @@ void System::Network::select(socketSetGeneric *readfds,
     fd_set *read_set_p = NULL;
     fd_set *write_set_p = NULL;
     fd_set *except_set_p = NULL;
+    s_timeval t = {0, 0};
     s_timeval *tm = NULL;
 
     if (timeout.has_value()) {
-        tm = &timeout.value();
+        t.tv_sec = timeout->tv_sec;
+        t.tv_usec = timeout->tv_usec;
+        tm = &t;
     }
     FD_ZERO(&read_set);
     FD_ZERO(&write_set);
     FD_ZERO(&except_set);
-
     if (readfds != nullptr && readfds->size() > 0) {
         read_set_p = &read_set;
         for (const auto *i : *readfds) {
@@ -188,27 +192,33 @@ void System::Network::select(socketSetGeneric *readfds,
     if (select(FD_SETSIZE, read_set_p, write_set_p, except_set_p, tm)
         == SOCKET_ERROR)
         throw NetworkException("Network::select failed");
-    if (readfds != nullptr && readfds->size() > 0) {
-        for (size_t i = 0; i < readfds->size(); i++) {
-            if ((*readfds)[i] != nullptr
-                && !FD_ISSET((*readfds)[i]->getHandle(), read_set_p)) {
-                readfds->erase((readfds->begin()) + (long) i);
+    if (readfds != nullptr) {
+        socketSetGeneric readCopy = *readfds;
+        readfds->clear();
+        for (size_t i = 0; i < readCopy.size(); i++) {
+            if (readCopy[i] != nullptr
+                && FD_ISSET(readCopy[i]->getHandle(), read_set_p)) {
+                readfds->emplace_back(readCopy[i]);
             }
         }
     }
-    if (writefds != nullptr && writefds->size() > 0) {
-        for (size_t i = 0; i < writefds->size(); i++) {
-            if ((*writefds)[i] != nullptr
-                && !FD_ISSET((*writefds)[i]->getHandle(), write_set_p)) {
-                writefds->erase((writefds->begin()) + (long) i);
+    if (writefds != nullptr) {
+        socketSetGeneric writeCopy = *writefds;
+        writefds->clear();
+        for (size_t i = 0; i < writeCopy.size(); i++) {
+            if (writeCopy[i] != nullptr
+                && FD_ISSET(writeCopy[i]->getHandle(), write_set_p)) {
+                writefds->emplace_back(writeCopy[i]);
             }
         }
     }
-    if (exceptfds != nullptr && exceptfds->size() > 0) {
-        for (size_t i = 0; i < exceptfds->size(); i++) {
-            if ((*exceptfds)[i] != nullptr
-                && !FD_ISSET((*exceptfds)[i]->getHandle(), except_set_p)) {
-                exceptfds->erase((exceptfds->begin()) + (long) i);
+    if (exceptfds != nullptr) {
+        socketSetGeneric exceptCopy = *exceptfds;
+        exceptfds->clear();
+        for (size_t i = 0; i < exceptCopy.size(); i++) {
+            if (exceptCopy[i] != nullptr
+                && FD_ISSET(exceptCopy[i]->getHandle(), except_set_p)) {
+                exceptfds->emplace_back(exceptCopy[i]);
             }
         }
     }
