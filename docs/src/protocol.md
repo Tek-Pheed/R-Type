@@ -1,12 +1,16 @@
 # Protocol R-Type
 
-format : CODE SP <?ARGS> HTLF
+format : SP CODE SP <?ARGS> HTLF
 
 ➡️ : From Server to Client
-
+⬅️ : From Client to Server
 🔄 : From Both
 
 ## List of actions needed
+
+-   Connection Management (900)
+    -   Init UDP Connection (client_id) - 901 ➡️ [TCP]
+    -   Start UDP (client_id) - 902 ⬅️ [UDP]
 
 -   Player (100)
 
@@ -36,9 +40,3 @@ format : CODE SP <?ARGS> HTLF
     -   Win - 133 ➡️
     -   Lose - 134 ➡️
     -   Game Over - 135 ➡️
-
-
-Client Connect using TCP:
-SERVER                  CLIENT
-client_id [TCP] ->
-                    <- client_id [UDP]
