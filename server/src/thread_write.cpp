@@ -82,7 +82,7 @@ void server::threadedServerWrite()
                             for (auto &cl : _clients) {
                                 size_t index = cl.first;
                                 auto &cli = cl.second;
-                                if (cli.port == 0 || cli.ip.empty())
+                                if (cli.port == 0 || cli.ip.empty() || cli.writeBufferUDP.length() == 0)
                                     continue;
                                 len = _serverSocketUDP.sendDataTo(
                                     System::Network::encodeString(
