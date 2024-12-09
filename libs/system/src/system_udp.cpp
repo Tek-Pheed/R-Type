@@ -20,13 +20,15 @@ using namespace Network;
 
 static uint64_t udpSockID = 0;
 
-void UDPSocket::initSocket(uint16_t port, const std::string &address)
+void UDPSocket::initSocket(
+    uint16_t port, Mode mode, const std::string &address)
 {
     int res;
     this->_sockSettings.sin_family = AF_INET;
     this->_sockSettings.sin_port = htons(port);
     this->_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     this->_uid = udpSockID;
+    this->_mode = mode;
     if (this->_sockfd == INVALID_SOCKET)
         throw NetworkException(
             "System::Network::UDPSocket: Failed to create socket");
@@ -40,12 +42,14 @@ void UDPSocket::initSocket(uint16_t port, const std::string &address)
                                    "address/ Address not supported");
         }
     }
-    res = bind(this->_sockfd,
-        reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
-        sizeof(this->_sockSettings));
-    if (res == SOCKET_ERROR)
-        throw NetworkException(
-            "System::Network::UDPSocket: Failed to bind socket");
+    if (_mode == SERVE) {
+        res = bind(this->_sockfd,
+            reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
+            sizeof(this->_sockSettings));
+        if (res == SOCKET_ERROR)
+            throw NetworkException(
+                "System::Network::UDPSocket: Failed to bind socket");
+    }
     this->_opened = true;
 }
 
@@ -57,13 +61,14 @@ UDPSocket::UDPSocket()
     this->_opened = false;
 }
 
-UDPSocket::UDPSocket(uint16_t port, const std::string &address)
+UDPSocket::UDPSocket(uint16_t port, Mode mode, const std::string &address)
 {
     udpSockID++;
     this->_type = System::Network::ISocket::UDP;
     this->_uid = udpSockID;
     this->_opened = false;
-    this->initSocket(port, address);
+    this->_mode = mode;
+    this->initSocket(port, mode, address);
 }
 
 ssize_t UDPSocket::sendData(const byteArray &byteSequence)
