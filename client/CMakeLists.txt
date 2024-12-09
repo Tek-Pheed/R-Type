@@ -30,7 +30,7 @@ include_directories(../libs/ecs/include)
 
 if(WIN32)
     add_definitions(-DWIN32)
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall
+    target_compile_options(${PROJECT_NAME} PRIVATE
     )
 else()
     add_definitions(-DLINUX)
