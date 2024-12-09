@@ -5,6 +5,7 @@
 ** networking
 */
 
+#include <iostream>
 #include <sstream>
 #include <string>
 #include "system_network.hpp"
@@ -45,8 +46,9 @@ int is_code_valid(int code)
 
 int client::manage_buffer(std::string buffer)
 {
-    std::string code = std::string(buffer).substr(0, 3);
-    int code_int = is_code_valid(atoi(code.c_str()));
+    std::string codeStr = std::string(buffer).substr(0, 3);
+    int code = atoi(codeStr.c_str());
+    int code_int = is_code_valid(code);
     std::vector<std::string> tokens;
 
     if (code_int == -1)
@@ -59,11 +61,11 @@ int client::manage_buffer(std::string buffer)
     }
 
     switch (code_int) {
-        case 0: handle_player(code_int, tokens); break;
-        case 1: handle_enemy(code_int, tokens); break;
-        case 2: handle_terrain(code_int, tokens); break;
-        case 3: handle_mechs(code_int, tokens); break;
-        case 9: handle_connection(code_int, tokens); break;
+        case 0: handle_player(code, tokens); break;
+        case 1: handle_enemy(code, tokens); break;
+        case 2: handle_terrain(code, tokens); break;
+        case 3: handle_mechs(code, tokens); break;
+        case 9: handle_connection(code, tokens); break;
         default: break;
     }
     return 0;
@@ -73,8 +75,10 @@ void client::writeToServer(
     std::string &data, System::Network::ISocket::Type socketType)
 {
     if (socketType == System::Network::ISocket::TCP) {
+        std::cout << "Sending TCP: " << data << std::endl;
         _clientSocketTCP.sendData(System::Network::encodeString(data.c_str()));
     } else {
+        std::cout << "Sending UDP: " << data << std::endl;
         _clientSocketUDP.sendData(System::Network::encodeString(data.c_str()));
     }
 }
@@ -107,6 +111,7 @@ void client::receive_message()
                             buffer += System::Network::decodeString(
                                 _clientSocketTCP.receive());
                         }
+                        std::cout << "Received TCP: " << buffer << std::endl;
                         manage_buffer(buffer);
                     }
                     break;
@@ -122,6 +127,7 @@ void client::receive_message()
                             buffer += System::Network::decodeString(
                                 _clientSocketUDP.receive());
                         }
+                        std::cout << "Received UDP: " << buffer << std::endl;
                         manage_buffer(buffer);
                     }
                     break;
@@ -134,8 +140,13 @@ void client::receive_message()
 
 int client::create_connection(const char *ip, int portTCP, int portUDP)
 {
-    _clientSocketTCP.initSocket(
-        static_cast<uint16_t>(portTCP), System::Network::ISocket::CONNECT, ip);
-    _clientSocketUDP.initSocket(static_cast<uint16_t>(portUDP), ip);
+    try {
+        _clientSocketTCP.initSocket(static_cast<uint16_t>(portTCP),
+            System::Network::ISocket::CONNECT, ip);
+        _clientSocketUDP.initSocket(static_cast<uint16_t>(portUDP), "0.0.0.0");
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << '\n';
+        return -1;
+    }
     return 0;
 }

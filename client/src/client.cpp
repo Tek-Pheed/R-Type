@@ -15,6 +15,6 @@ int main(void)
 
     // To be set to user input later
     c.create_connection("127.0.0.1", 8081, 8082);
-
+    c.receive_message();
     return (0);
 }
