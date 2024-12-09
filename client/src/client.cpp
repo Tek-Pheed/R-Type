@@ -18,12 +18,6 @@ int main(void)
 {
     RenderClass render(1280, 720, "R-Type", 120);
     std::vector<std::shared_ptr<ecs::Entity>> entities;
-    client c;
-
-    // To be set to user input later
-    c.create_connection("127.0.0.1", 8081, 8082);
-    std::thread(&client::receive_message, &c).detach();
-    std::cout << "Client connected" << std::endl;
 
     sf::Texture player1texture;
     srand(static_cast<unsigned int>(time(0)));
