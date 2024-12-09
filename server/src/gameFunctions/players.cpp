@@ -15,11 +15,13 @@ int server::playerConnection(int id, int x, int y)
 
 int server::playerPosition(int id, int x, int y)
 {
-    Player_t *player;
+    Player_t *player = nullptr;
     for (size_t i = 0; i != _players.size(); i++) {
         if (_players[i].id == id)
             player = &_players[i];
     }
+    if (player == nullptr)
+        return (-1);
     player->x = x;
     player->y = y;
     // send to all
@@ -41,12 +43,13 @@ int server::playerShooting(int id, int x, int y)
 
 int server::playerDamaged(int id, int amount)
 {
-    Player_t *player;
+    Player_t *player = nullptr;
     for (size_t i = 0; i != _players.size(); i++) {
         if (_players[i].id == id)
             player = &_players[i];
     }
-
+    if (player == nullptr)
+        return (-1);
     player->hp -= amount;
     if (player->hp <= 0)
         playerKilled(id);

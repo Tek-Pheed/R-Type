@@ -67,7 +67,7 @@ class server {
     void create_server();
     void createClient();
 
-    Client &addClient(Client &client);
+    Client &addClient(const Client &client);
     Client &getClient(size_t id);
     void removeClient(size_t id);
 
@@ -93,9 +93,9 @@ class server {
     int manage_buffer(std::string buffer);
 
     ssize_t identifyClient(const System::Network::ISocket &socket);
-    ssize_t identifyClient(const std::string ip, const std::string port);
+    ssize_t identifyClient(const std::string &ip, const std::string &port);
 
-    ssize_t authenticateUDPClient(System::Network::byteArray packet);
+    ssize_t authenticateUDPClient(const System::Network::byteArray &packet);
 
   private:
     std::mutex _globalMutex;
