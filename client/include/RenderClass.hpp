@@ -5,6 +5,7 @@
 ** RenderClass
 */
 
+#include "Entity.hpp"
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>

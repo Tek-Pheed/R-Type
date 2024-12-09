@@ -5,6 +5,7 @@
 ** client
 */
 
+#include "system_network.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -20,6 +21,7 @@
 
 int main(void)
 {
+    System::Network::initNetwork();
     RenderClass render(1280, 720, "R-Type", 120);
     std::vector<std::shared_ptr<ecs::Entity>> entities;
 
