@@ -79,7 +79,7 @@ int client::manage_buffers()
 }
 
 void client::writeToServer(
-    std::string &data, System::Network::ISocket::Type socketType)
+    const std::string &data, System::Network::ISocket::Type socketType)
 {
     if (socketType == System::Network::ISocket::TCP) {
         std::cout << "Sending TCP: " << data << std::endl;
