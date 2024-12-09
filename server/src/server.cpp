@@ -5,6 +5,10 @@
 ** server
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "server.hpp"
 #include <cstddef>
 #include <exception>
@@ -24,7 +28,8 @@
 #define TCP_PORT 8081
 #define UDP_PORT 8082
 
-server::server(): _clientCounter(0), _serverSocketTCP(System::Network::TCPSocket())
+server::server()
+    : _clientCounter(0), _serverSocketTCP(System::Network::TCPSocket())
 {
     return;
 }

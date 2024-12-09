@@ -30,8 +30,6 @@ include_directories(../libs/ecs/include)
 
 if(WIN32)
     add_definitions(-DWIN32)
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall
-    )
 else()
     add_definitions(-DLINUX)
     target_link_libraries(${PROJECT_NAME} pthread)

@@ -8,6 +8,8 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include <mutex>
+
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
@@ -18,7 +20,7 @@ class client {
     client();
     ~client();
     int create_connection(const char *ip, int portTCP, int portUDP);
-    int manage_buffer(std::string buffer);
+    int manage_buffers();
     void writeToServer(
         std::string &data, System::Network::ISocket::Type socketType);
     void receive_message();
@@ -33,6 +35,8 @@ class client {
     System::Network::UDPSocket _clientSocketUDP;
 
     int _id;
+    std::vector<std::string> _buffers;
+    std::mutex _mutex;
 };
 
 #endif /*CLIENT_HPP*/

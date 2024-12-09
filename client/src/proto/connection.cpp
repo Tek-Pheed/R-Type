@@ -12,7 +12,6 @@
 
 void client::handle_connection(int code, std::vector<std::string> &tokens)
 {
-    (void) tokens;
     if (code == 901) {
         _id = atoi(tokens[0].c_str());
         std::stringstream ss;
