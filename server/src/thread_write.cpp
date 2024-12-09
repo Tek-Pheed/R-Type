@@ -51,7 +51,7 @@ void server::threadedServerWrite()
                             std::cerr << "Unable to idendify client (TCP - "
                                          "write thread)"
                                       << std::endl;
-                        Client client = this->getClient((size_t) id);
+                        Client &client = this->getClient((size_t) id);
                         if (!sock->isOpen()) {
                             std::cout << "[Write Thread] client ("
                                       << std::to_string(id)
