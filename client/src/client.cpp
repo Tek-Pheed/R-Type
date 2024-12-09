@@ -5,6 +5,7 @@
 ** client
 */
 
+#include "client.hpp"
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -18,9 +19,11 @@ int main(void)
     ecs::RenderSystem renderSystem;
     std::vector<std::shared_ptr<ecs::Entity>> entities;
     sf::Texture texture;
-  
+    client c;
+
     // To be set to user input later
     c.create_connection("127.0.0.1", 8081, 8082);
+    // Set to non-blocking
     c.receive_message();
 
     texture.loadFromFile("../assets/sprites/r-typesheet1.gif");
