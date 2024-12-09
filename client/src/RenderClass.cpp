@@ -5,6 +5,7 @@
 ** RenderClass
 */
 
+#include <thread>
 #include <SFML/Graphics.hpp>
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
@@ -95,6 +96,11 @@ void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entitie
     sf::Sprite background_s;
     float deltaTime = 0.00;
 
+    // To be set to user input later
+    client.create_connection("127.0.0.1", 8081, 8082);
+    std::thread(&client::receive_message, &client).detach();
+    std::cout << "Client connected" << std::endl;
+
     _window.setMouseCursorVisible(false);
     background_t.loadFromFile("./assets/background/starry_night.png");
     background_s.setTextureRect(sf::Rect (0, 0, 1280, 720));
@@ -109,7 +115,7 @@ void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entitie
         renderSystem.update(entities, &this->_window, deltaTime);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
-        //client.manage_buffer();
+        client.manage_buffers();
     }
 }
 
