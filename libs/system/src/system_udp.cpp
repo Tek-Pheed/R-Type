@@ -20,11 +20,9 @@ using namespace Network;
 
 static uint64_t udpSockID = 0;
 
-UDPSocket::UDPSocket(uint16_t port, const std::string &address)
+void UDPSocket::initSocket(uint16_t port, const std::string &address)
 {
-    udpSockID++;
     int res;
-    this->_opened = false;
     this->_sockSettings.sin_family = AF_INET;
     this->_sockSettings.sin_port = htons(port);
     this->_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -37,7 +35,7 @@ UDPSocket::UDPSocket(uint16_t port, const std::string &address)
         _sockSettings.sin_addr.s_addr = htonl(INADDR_ANY);
     } else {
         if (inet_pton(AF_INET, address.c_str(), &this->_sockSettings.sin_addr)
-            <= 0) {
+            != 1) {
             throw NetworkException("System::Network::UDPSocket: Invalid "
                                    "address/ Address not supported");
         }
@@ -48,6 +46,24 @@ UDPSocket::UDPSocket(uint16_t port, const std::string &address)
     if (res == SOCKET_ERROR)
         throw NetworkException(
             "System::Network::UDPSocket: Failed to bind socket");
+    this->_opened = true;
+}
+
+UDPSocket::UDPSocket()
+{
+    udpSockID++;
+    this->_type = System::Network::ISocket::UDP;
+    this->_uid = udpSockID;
+    this->_opened = false;
+}
+
+UDPSocket::UDPSocket(uint16_t port, const std::string &address)
+{
+    udpSockID++;
+    this->_type = System::Network::ISocket::UDP;
+    this->_uid = udpSockID;
+    this->_opened = false;
+    this->initSocket(port, address);
 }
 
 ssize_t UDPSocket::sendData(const byteArray &byteSequence)
@@ -73,9 +89,41 @@ ssize_t UDPSocket::sendData(const byteArray &byteSequence)
     return (writtenBytes);
 }
 
+ssize_t UDPSocket::sendDataTo(
+    const byteArray &byteSequence, const std::string &address, uint16_t port)
+{
+    SOCKADDR_IN sockin;
+    ssize_t writtenBytes = 0;
+    size_t len = byteSequence.size();
+    uint8_t *buff = new uint8_t[len]();
+
+    if (buff == NULL)
+        throw std::runtime_error("System::Network::UDPSocket::sendDataTo: "
+                                 "Failed to allocate send buffer");
+    sockin.sin_family = AF_INET;
+    sockin.sin_port = htons(port);
+    if (inet_pton(AF_INET, address.c_str(), &sockin.sin_addr) != 1) {
+        delete[] buff;
+        throw std::runtime_error("System::Network::UDPSocket: Invalid "
+                                 "address/ Address not supported");
+    }
+    for (size_t i = 0; i < len; i++) {
+        buff[i] = byteSequence[i];
+    }
+    writtenBytes = sendto(this->_sockfd, reinterpret_cast<const char *>(buff),
+        len, 0, reinterpret_cast<const sockaddr *>(&sockin), sizeof(sockin));
+    this->_opened = (writtenBytes > 0);
+    delete[] buff;
+    if (writtenBytes == SOCKET_ERROR)
+        throw NetworkException(
+            "System::Network::UDPSocket::sendDataTo: Failed to send");
+    return (writtenBytes);
+}
+
 UDPSocket::UDPSocket(osSocketType sock_fd)
 {
     udpSockID++;
+    this->_type = System::Network::ISocket::UDP;
     this->_opened = true;
     this->_sockfd = sock_fd;
     this->_uid = udpSockID;
@@ -90,7 +138,6 @@ byteArray UDPSocket::receive(void)
 {
     ssize_t ret = 0;
     byteArray vect;
-    uint8_t dummy = 0;
 
 #if defined(WIN32)
     u_long len = 0;
@@ -101,23 +148,6 @@ byteArray UDPSocket::receive(void)
 #endif
 
     if (len == 0) {
-#if defined(LINUX)
-        socklen_t slen = sizeof(this->_sockSettings);
-        ret = recvfrom(this->_sockfd, &dummy, len, 0,
-            reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
-#elif defined(WIN32)
-        int slen = sizeof(this->_sockSettings);
-        ret = recvfrom(this->_sockfd, reinterpret_cast<char *>(&dummy), len, 0,
-            reinterpret_cast<sockaddr *>(&this->_sockSettings), &slen);
-        if (this->_opened && ret == SOCKET_ERROR) {
-            this->_opened = (ret > 0);
-            return (vect);
-        }
-#endif
-        this->_opened = (ret > 0);
-        if (ret == SOCKET_ERROR)
-            throw NetworkException(
-                "System::Network::UDPSocket::receive: Failed to read");
         return (vect);
     }
     uint8_t *buff = new uint8_t[len]();
@@ -149,8 +179,71 @@ byteArray UDPSocket::receive(void)
     return (vect);
 }
 
+byteArray UDPSocket::receiveFrom(std::string &address, uint16_t &port)
+{
+    ssize_t ret = 0;
+    byteArray vect;
+    SOCKADDR_IN client_addr;
+    struct hostent *hostp;
+
+#if defined(WIN32)
+    u_long len = 0;
+    ioctlsocket(this->_sockfd, FIONREAD, &len);
+#elif defined(LINUX)
+    size_t len = 0;
+    ioctl(this->_sockfd, FIONREAD, &len);
+#endif
+
+    if (len == 0) {
+        return (vect);
+    }
+    uint8_t *buff = new uint8_t[len]();
+#if defined(LINUX)
+    if (buff == nullptr)
+        throw std::runtime_error(
+            "System::Network::UDPSocket::receiveFrom: Unable "
+            "to allocate receive buffer");
+    socklen_t slen = sizeof(client_addr);
+    ret = recvfrom(this->_sockfd, buff, len, 0,
+        reinterpret_cast<sockaddr *>(&client_addr), &slen);
+
+#elif defined(WIN32)
+    int slen = sizeof(client_addr);
+    ret = recvfrom(this->_sockfd, reinterpret_cast<char *>(buff), len, 0,
+        reinterpret_cast<sockaddr *>(&client_addr), &slen);
+#endif
+    if (ret == SOCKET_ERROR) {
+        delete[] buff;
+        throw NetworkException(
+            "System::Network::UDPSocket::receiveFrom: Failed to read");
+    }
+    hostp = gethostbyaddr((const char *) &client_addr.sin_addr.s_addr,
+        sizeof(client_addr.sin_addr.s_addr), AF_INET);
+    if (hostp == NULL) {
+        delete[] buff;
+        throw NetworkException("System::Network::UDPSocket::receiveFrom: "
+                               "Failed to get sender address");
+    }
+    const char *addr = inet_ntoa(client_addr.sin_addr);
+    port = ntohs(client_addr.sin_port);
+    if (addr == NULL) {
+        delete[] buff;
+        throw NetworkException("System::Network::UDPSocket::receiveFrom: "
+                               "Failed to get sender address");
+    }
+    address = addr;
+    this->_opened = (ret > 0);
+    vect.reserve(len);
+    for (size_t i = 0; i < len; i++) {
+        uint8_t val = buff[i];
+        vect.emplace_back(val);
+    }
+    delete[] buff;
+    return (vect);
+}
+
 void System::Network::addSocketToSet(
-    const std::vector<UDPSocket> &src, socketSetUDP &dest)
+    const std::vector<UDPSocket> &src, socketSetGeneric &dest)
 {
     for (size_t i = 0; i != src.size(); i++) {
         auto *a = const_cast<UDPSocket *>(&(src.at(i)));
@@ -158,7 +251,7 @@ void System::Network::addSocketToSet(
     }
 }
 
-void System::Network::addSocketToSet(UDPSocket *src, socketSetUDP &dest)
+void System::Network::addSocketToSet(UDPSocket *src, socketSetGeneric &dest)
 {
     dest.emplace_back(src);
 }
@@ -180,7 +273,7 @@ bool System::Network::removeSocketInVect(
 
 bool System::Network::removeSocketInSet(
     const System::Network::UDPSocket &toRemove,
-    System::Network::socketSetUDP &set)
+    System::Network::socketSetGeneric &set)
 {
     const uint64_t uid = toRemove.getUID();
 
