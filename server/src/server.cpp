@@ -29,13 +29,34 @@
 #define UDP_PORT 8082
 
 server::server()
-    : _clientCounter(0), _serverSocketTCP(System::Network::TCPSocket())
+    : _clientCounter(0), _serverSocketTCP(System::Network::TCPSocket()),
+      _currentPlayers(0)
 {
     return;
 }
 
 server::~server()
 {
+}
+
+template <>
+std::string getString(const char *arg) {
+    return (std::string(arg));
+}
+
+template <>
+std::string getString(const std::string &arg) {
+    return (arg);
+}
+
+template <>
+std::string getString(std::string &arg) {
+    return (arg);
+}
+
+template <>
+std::string getString(std::string arg) {
+    return (arg);
 }
 
 void server::writeToClient(Client &client, const std::string &data,
@@ -63,9 +84,20 @@ void server::handle_packet(
     }
     if (socketType == System::Network::ISocket::UDP) {
         if (!client.isReady) {
-            auto accept = std::string("903 OK\t\n");
+            std::string accept = "";
+            if (_clientCounter >= MAX_PLAYERS) {
+                accept = makePacket(C_AUTHENTICATED_UDP, "KO");
+                std::cout
+                    << "Server: Maximum number of player reached, cannot "
+                       "accept new player curently."
+                    << std::endl;
+            } else {
+                accept = makePacket(C_AUTHENTICATED_UDP, "OK");
+                client.isReady = true;
+                syncNewClientGameState(clientID);
+                playerConnection(clientID);
+            }
             this->writeToClient(client, accept, System::Network::ISocket::TCP);
-            client.isReady = true;
         }
         client.readBufferUDP.clear();
     }
@@ -89,18 +121,17 @@ void server::handle_connection()
         Client cl;
         cl.tcpSocket = System::Network::accept(_serverSocketTCP);
         Client &client = addClient(cl);
-        std::string toWrite = std::to_string(C_INIT_UDP) + " "
-            + std::to_string(_clientCounter) + PACKET_END;
+        std::string toWrite = makePacket(C_INIT_UDP, _clientCounter);
         writeToClient(client, toWrite, System::Network::ISocket::TCP);
     }
 }
 
 void server::create_server()
 {
-    std::cout << "Running server on port TCP:" << std::to_string(TCP_PORT)
-              << ", UDP: " << std::to_string(UDP_PORT) << std::endl;
     _serverSocketTCP.initSocket(TCP_PORT, System::Network::ISocket::SERVE);
     _serverSocketUDP.initSocket(UDP_PORT);
+    std::cout << "Running server on port TCP:" << std::to_string(TCP_PORT)
+              << ", UDP:" << std::to_string(UDP_PORT) << std::endl;
 }
 
 int is_code_valid(int code)
@@ -132,7 +163,6 @@ int server::manage_buffer(std::string buffer)
     while (std::getline(ss, token, ' ')) {
         tokens.push_back(token);
     }
-
     switch (code_int) {
         case 0:
             for (size_t i = 0; i < tokens.size(); i++) {
@@ -157,13 +187,37 @@ int server::manage_buffer(std::string buffer)
     return 0;
 }
 
+void server::createGameState()
+{
+    // Create Players
+    for (size_t i = 0; i < MAX_PLAYERS; i++) {
+        auto player = std::make_shared<ecs::Entity>(rand());
+        player->addComponent(std::make_shared<ecs::PlayerComponent>(
+            std::string("Player ") + std::to_string(i)));
+        player->addComponent(
+            std::make_shared<ecs::PositionComponent>(100, 100));
+        player->addComponent(
+            std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
+        _gameStates[i].emplace_back(player);
+    }
+}
+
 int main()
 {
-    server s;
     System::Network::initNetwork();
+    server s;
 
-    s.create_server();
+    try {
+        s.create_server();
+        s.createGameState();
+    } catch (const std::exception &e) {
+        std::cerr << "Failed to launch the server: " << e.what() << std::endl;
+        return (84);
+    }
     std::thread(&server::threadedServerRead, &s).detach();
     std::thread(&server::threadedServerWrite, &s).detach();
-    s.handle_connection();
+    std::thread(&server::handle_connection, &s).detach();
+
+    while (true) {}
+    return (0);
 }

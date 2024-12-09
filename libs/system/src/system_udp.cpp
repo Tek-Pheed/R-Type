@@ -38,7 +38,7 @@ void UDPSocket::initSocket(
         if (inet_pton(AF_INET, address.c_str(), &this->_sockSettings.sin_addr)
             != 1) {
             throw NetworkException("System::Network::UDPSocket: Invalid "
-                                   "address/ Address not supported");
+                                   "address / address not supported");
         }
     }
     if (_mode == SERVE) {

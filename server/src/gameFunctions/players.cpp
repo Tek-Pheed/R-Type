@@ -5,11 +5,32 @@
 ** players
 */
 
+#include <cstddef>
+#include "Components.hpp"
 #include "server.hpp"
 
-int server::playerConnection(int id, int x, int y)
+void syncNewClientGameState(size_t newClient) {
+    std::cout << "The player will receive the gameState now" << std::endl;
+    //TODO: Sync newly connected client
+}
+
+std::shared_ptr<ecs::Entity> server::getPlayer(size_t playerID)
 {
-    // Connect player to server
+    return (getEntityByComponent<ecs::PlayerComponent>(playerID));
+}
+
+int server::playerConnection(size_t id)
+{
+    auto player = getPlayer(id);
+
+    if (player == nullptr)
+        return (-1);
+    auto playerPosition = player->getComponent<ecs::PositionComponent>();
+    if (playerPosition == nullptr)
+        return (-1);
+    send_to_others(
+        makePacket(P_CONN, playerPosition->getX(), playerPosition->getY()),
+        id);
     return 0;
 }
 

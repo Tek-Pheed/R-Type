@@ -12,9 +12,17 @@
 
 void server::send_to_all(const std::string &message)
 {
-    for (const auto &client : _clients) {
-        _serverSocketUDP.sendDataTo(System::Network::encodeString(message),
-            client.second.ip, client.second.port);
+    for (auto &client : _clients) {
+        writeToClient(client.second, message, System::Network::ISocket::UDP);
+    }
+}
+
+void server::send_to_others(const std::string &message, size_t except_clientID)
+{
+    for (auto &client : _clients) {
+        if (client.first != except_clientID)
+            writeToClient(
+                client.second, message, System::Network::ISocket::UDP);
     }
 }
 
