@@ -23,7 +23,7 @@ namespace ecs
         ~Entity();
 
         template <typename componentType>
-        void addComponent(std::unique_ptr<componentType> component)
+        void addComponent(std::shared_ptr<componentType> component)
         {
             this->_components[typeid(componentType)] = std::move(component);
         }
@@ -33,9 +33,7 @@ namespace ecs
         {
             auto index = this->_components.find(typeid(componentType));
             if (index != this->_components.end()) {
-                std::unique_ptr<componentType> ptr(
-                    static_cast<componentType *>(index->second.release()));
-                return ptr;
+                return std::static_pointer_cast<componentType>(index->second)
             }
             return nullptr;
         }
@@ -47,7 +45,7 @@ namespace ecs
 
       private:
         std::size_t _id;
-        std::unordered_map<std::type_index, std::unique_ptr<Component>>
+        std::unordered_map<std::type_index, std::shared_ptr<Component>>
             _components;
     };
 } // namespace ecs
