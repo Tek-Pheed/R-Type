@@ -8,6 +8,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <ctime>
 #include "Entity.hpp"
 #include "RenderClass.hpp"
 #include "Systems.hpp"
@@ -15,30 +16,23 @@
 int main(void)
 {
     RenderClass render(1280, 720, "R-Type", 120);
-    ecs::RenderSystem renderSystem;
     std::vector<std::shared_ptr<ecs::Entity>> entities;
-    sf::Texture texture;
+    sf::Texture player1texture;
 
-    texture.loadFromFile("../assets/sprites/r-typesheet1.gif");
+    srand(static_cast<unsigned int>(time(0)));
 
-    auto player = std::make_shared<ecs::Entity>(0);
+    player1texture.loadFromFile("./assets/sprites/r-typesheet42.gif");
+
+    auto player = std::make_shared<ecs::Entity>(rand());
     player->addComponent(std::make_shared<ecs::PlayerComponent>("Samy"));
-    player->addComponent(std::make_shared<ecs::PositionComponent>(10, 10));
+    player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
+    player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
     player->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, texture));
-
-    auto enemy = std::make_shared<ecs::Entity>(1);
-    enemy->addComponent(std::make_shared<ecs::PlayerComponent>("Arnaud"));
-    enemy->addComponent(std::make_shared<ecs::PositionComponent>(100, 5));
-    enemy->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::RECTANGLE, texture));
+        ecs::ObjectType::SPRITE, player1texture));
+    player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(sf::Rect (66, 0, 33, 14));
+    player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(sf::Vector2f (3, 3));
 
     entities.push_back(player);
-    entities.push_back(enemy);
 
-    while (render.getWindow().isOpen()) {
-        render.getWindow().clear();
-        renderSystem.update(entities, &render.getWindow(), 0);
-        render.getWindow().display();
-    }
+    render.renderWindow(entities, player);
 }

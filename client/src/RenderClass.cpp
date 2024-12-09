@@ -5,9 +5,10 @@
 ** RenderClass
 */
 
-#include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
 #include "ErrorClass.hpp"
+#include "Systems.hpp"
+#include "RenderClass.hpp"
 
 RenderClass::RenderClass(
     int width, int height, const std::string &title, int frameRate)
@@ -82,22 +83,89 @@ void RenderClass::setFrameRate(int newFrameRate)
     this->_window.setFramerateLimit(static_cast<unsigned int>(newFrameRate));
 }
 
-void RenderClass::renderWindow()
+void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entities, std::shared_ptr<ecs::Entity> player)
 {
+    sf::Clock clock;
+    sf::Clock clockAnim;
+    ecs::RenderSystem renderSystem;
+    ecs::PositionSystem positionSystem;
+    sf::Texture background_t;
+    sf::Sprite background_s;
+    float deltaTime = 0.00;
+
+    _window.setMouseCursorVisible(false);
+    background_t.loadFromFile("./assets/background/starry_night.png");
+    background_s.setTextureRect(sf::Rect (0, 0, 1280, 720));
+    background_s.setTexture(background_t);
+
     while (this->_window.isOpen()) {
-        this->_window.clear(sf::Color::Black);
-        playEvent();
+        deltaTime = clock.restart().asSeconds();
+        this->_window.clear();
+        playEvent(player);
+        this->_window.draw(background_s);
+        positionSystem.update(entities, &this->_window, deltaTime);
+        renderSystem.update(entities, &this->_window, deltaTime);
         this->_window.display();
+        backgroundAnimation(&background_s, &clockAnim);
     }
 }
 
-void RenderClass::playEvent()
+void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player)
 {
     sf::Event event;
+    auto velocity = player->getComponent<ecs::VelocityComponent>();
 
     while (this->_window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             this->_window.close();
         }
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Up) {
+                velocity->setVy(-200.0f);
+                this->playerAnimations(player, "top");
+            } else if (event.key.code == sf::Keyboard::Down) {
+                velocity->setVy(200.0f);
+                this->playerAnimations(player, "down");
+            } else if (event.key.code == sf::Keyboard::Right) {
+                velocity->setVx(200.0f);
+                this->playerAnimations(player, "right");
+            } else if (event.key.code == sf::Keyboard::Left) {
+                velocity->setVx(-200.0f);
+                this->playerAnimations(player, "left");
+            }
+        }
+
+        if (event.type == sf::Event::KeyReleased) {
+            this->playerAnimations(player, "none");
+            if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down) {
+                velocity->setVy(0.0f);
+            }
+            if (event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right) {
+                velocity->setVx(0.0f);
+            }
+        }
+    }
+}
+
+void RenderClass::playerAnimations(std::shared_ptr<ecs::Entity> player, std::string direction)
+{
+    if (direction == "top") {
+        player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(sf::Rect (132, 0, 33, 14));
+    } else if (direction == "down") {
+        player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(sf::Rect (0, 0, 33, 14));
+    } else {
+        player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(sf::Rect (66, 0, 33, 14));
+    }
+}
+
+void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock) {
+    float s = clock->getElapsedTime().asSeconds();
+
+    if (s > 0.01) {
+        bg->setTextureRect(sf::Rect (bg->getTextureRect().left + 2, 0, 1280, 720));
+        if (bg->getTextureRect().left > 768) {
+            bg->setTextureRect(sf::Rect (0, 0, 1280, 720));
+        }
+        clock->restart();
     }
 }
