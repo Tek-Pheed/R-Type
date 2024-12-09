@@ -5,11 +5,11 @@
 ** client
 */
 
-#include "system_network.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "system_network.hpp"
 #include "client.hpp"
 #include <ctime>
 #include <memory>
