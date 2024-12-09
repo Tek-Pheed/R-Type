@@ -111,6 +111,8 @@ int is_code_valid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
+    if (code >= C_INIT_UDP && code <= C_START_UDP)
+        return 9;
     return -1;
 }
 
@@ -145,7 +147,9 @@ int server::manage_buffer(std::string buffer)
         case 3:
             // handle_mechs(tokens);
             break;
-
+        case 9:
+            // handle_connection(tokens);
+            break;
         default: break;
     }
     return 0;

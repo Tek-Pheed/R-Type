@@ -11,7 +11,7 @@
     - [Health Component](ecs/components/health_component.md)
     - [Boss Component](ecs/components/boss_component.md)
     - [Systems](ecs/system/system.md)
-4. [Client](client/client.md)
+5. [Client](client/client.md)
     - [RenderClass](client/renderclass.md)
     - [ErrorClass](client/errorclass.md)
     - [ConfigClass](client/configclass.md)
