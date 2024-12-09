@@ -34,16 +34,16 @@ server::~server()
 {
 }
 
-void server::writeToClient(Client &client, std::string &data,
+void server::writeToClient(Client &client, const std::string &data,
     System::Network::ISocket::Type socketType)
 {
     std::unique_lock lock(_writeMutex);
 
     if (socketType == System::Network::ISocket::TCP) {
-        client.writeBufferTCP = client.writeBufferTCP + data;
+        client.writeBufferTCP += data;
     }
     if (socketType == System::Network::ISocket::UDP) {
-        client.writeBufferUDP = client.writeBufferUDP + data;
+        client.writeBufferUDP += data;
     }
     _writeCondition.notify_one();
 }
@@ -52,12 +52,18 @@ void server::handle_packet(
     size_t clientID, System::Network::ISocket::Type socketType)
 {
     Client &client = getClient(clientID);
+    std::unique_lock lock(_globalMutex);
 
     if (socketType == System::Network::ISocket::TCP) {
         std::cout << "Client Received: " << client.readBufferTCP << std::endl;
         client.readBufferTCP.clear();
     }
     if (socketType == System::Network::ISocket::UDP) {
+        if (!client.isReady) {
+            auto accept = std::string("903 OK\t\n");
+            this->writeToClient(client, accept, System::Network::ISocket::TCP);
+            client.isReady = true;
+        }
         std::cout << "Client Received: " << client.readBufferUDP << std::endl;
         client.readBufferUDP.clear();
     }
@@ -158,9 +164,4 @@ int main()
     std::thread(&server::threadedServerRead, &s).detach();
     std::thread(&server::threadedServerWrite, &s).detach();
     s.handle_connection();
-
-    /// while (true) {
-    ///     s.receive_message();
-    /// }
-    // System::Network::stopNetwork();
 }

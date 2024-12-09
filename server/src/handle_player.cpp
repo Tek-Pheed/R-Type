@@ -12,7 +12,7 @@
 
 void server::send_to_all(std::string message)
 {
-    for (auto &client : _clients) {
+    for (const auto &client : _clients) {
         _serverSocketUDP.sendDataTo(System::Network::encodeString(message),
             client.second.ip, client.second.port);
     }

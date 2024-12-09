@@ -184,7 +184,6 @@ byteArray UDPSocket::receiveFrom(std::string &address, uint16_t &port)
     ssize_t ret = 0;
     byteArray vect;
     SOCKADDR_IN client_addr;
-    struct hostent *hostp;
 
 #if defined(WIN32)
     u_long len = 0;
@@ -216,13 +215,6 @@ byteArray UDPSocket::receiveFrom(std::string &address, uint16_t &port)
         delete[] buff;
         throw NetworkException(
             "System::Network::UDPSocket::receiveFrom: Failed to read");
-    }
-    hostp = gethostbyaddr((const char *) &client_addr.sin_addr.s_addr,
-        sizeof(client_addr.sin_addr.s_addr), AF_INET);
-    if (hostp == NULL) {
-        delete[] buff;
-        throw NetworkException("System::Network::UDPSocket::receiveFrom: "
-                               "Failed to get sender address");
     }
     const char *addr = inet_ntoa(client_addr.sin_addr);
     port = ntohs(client_addr.sin_port);

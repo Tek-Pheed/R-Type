@@ -21,13 +21,8 @@
 void server::threadedServerWrite()
 {
     try {
-        System::Network::byteArray arr;
-        System::Network::byteArray vect;
-        std::string buffer;
         System::Network::socketSetGeneric writefds;
-        System::Network::timeoutStruct tv;
-        tv->tv_sec = 0;
-        tv->tv_usec = 250000;
+        System::Network::timeoutStruct tv = {{1, 0}};
         bool shouldWait = true;
 
         while (true) {
@@ -43,7 +38,7 @@ void server::threadedServerWrite()
                     || ref.writeBufferUDP.length() > 0)
                     writefds.emplace_back(&ref.tcpSocket);
             }
-            System::Network::select(nullptr, &writefds, nullptr);
+            System::Network::select(nullptr, &writefds, nullptr, tv);
             shouldWait = true;
             if (writefds.size() == 0)
                 continue;
@@ -53,7 +48,9 @@ void server::threadedServerWrite()
                     case System::Network::ISocket::TCP: {
                         ssize_t id = this->identifyClient(*sock);
                         if (id == -1)
-                            std::cerr << "Unable to idendify client (TCP - write thread)" << std::endl;
+                            std::cerr << "Unable to idendify client (TCP - "
+                                         "write thread)"
+                                      << std::endl;
                         Client client = this->getClient((size_t) id);
                         if (!sock->isOpen()) {
                             std::cout << "[Write Thread] client ("

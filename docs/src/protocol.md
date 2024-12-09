@@ -11,6 +11,7 @@ format : CODE SP <?ARGS> HTLF
 -   Connection Management (900)
     -   Init UDP Connection (client_id) - 901 ➡️ [TCP]
     -   Start UDP (client_id) - 902 ⬅️ [UDP]
+    -   Authenticated client (OK/KO) - 903 ➡️ [TCP]
 
 -   Player (100)
 

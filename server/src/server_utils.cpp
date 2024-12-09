@@ -9,17 +9,6 @@
 
 #include "server.hpp"
 
-// Client &Client::operator=(Client &client) {
-//     tcpSocket = client.tcpSocket;
-//     ip = client.ip;
-//     port = client.port;
-//     readBufferTCP = client.readBufferTCP;
-//     writeBufferTCP = client.writeBufferTCP;
-//     readBufferUDP = client.readBufferUDP;
-//     writeBufferUDP = client.writeBufferUDP;
-//     return (*this);
-// }
-
 ssize_t server::identifyClient(const System::Network::ISocket &socket)
 {
     std::unique_lock lock(_globalMutex);
@@ -31,7 +20,7 @@ ssize_t server::identifyClient(const System::Network::ISocket &socket)
     return -1;
 }
 
-ssize_t server::identifyClient(std::string ip, std::string port)
+ssize_t server::identifyClient(const std::string ip, const std::string port)
 {
     std::unique_lock lock(_globalMutex);
 
