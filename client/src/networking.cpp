@@ -59,7 +59,7 @@ int client::manage_buffer(std::string buffer)
     }
 
     switch (code_int) {
-        case 0: handle_player(code_int, tokens);
+        case 0: handle_player(code_int, tokens); break;
         case 1: handle_enemy(code_int, tokens); break;
         case 2: handle_terrain(code_int, tokens); break;
         case 3: handle_mechs(code_int, tokens); break;
