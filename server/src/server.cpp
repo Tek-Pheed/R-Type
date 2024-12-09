@@ -24,10 +24,9 @@
 #define TCP_PORT 8081
 #define UDP_PORT 8082
 
-server::server()
+server::server(): _clientCounter(0), _serverSocketTCP(System::Network::TCPSocket())
 {
-    _clientCounter = 0;
-    _serverSocketTCP = System::Network::TCPSocket();
+    return;
 }
 
 server::~server()

@@ -10,7 +10,7 @@
 #include "protocol.hpp"
 #include "server.hpp"
 
-void server::send_to_all(std::string message)
+void server::send_to_all(const std::string &message)
 {
     for (const auto &client : _clients) {
         _serverSocketUDP.sendDataTo(System::Network::encodeString(message),
@@ -18,7 +18,7 @@ void server::send_to_all(std::string message)
     }
 }
 
-int server::handle_player(int code, std::vector<std::string> tokens)
+int server::handle_player(int code, const std::vector<std::string> &tokens)
 {
     int id, x, y;
     switch (code) {
