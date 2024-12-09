@@ -46,24 +46,25 @@ int is_code_valid(int code)
 
 int client::manage_buffers()
 {
+    std::unique_lock lock(_mutex);
+
     if (_buffers.size() == 0)
         return 0;
     for (auto buffer : _buffers) {
-        _mutex.lock();
         std::string codeStr = std::string(buffer).substr(0, 3);
         int code = atoi(codeStr.c_str());
         int code_int = is_code_valid(code);
         std::vector<std::string> tokens;
 
-        if (code_int == -1)
+        if (code_int == -1) {
             return -1;
+        }
         std::string str = buffer.substr(4, buffer.size() - 4);
         std::istringstream ss(str);
         std::string token;
         while (std::getline(ss, token, ' ')) {
             tokens.push_back(token);
         }
-        _mutex.unlock();
 
         switch (code_int) {
             case 0: handle_player(code, tokens); break;

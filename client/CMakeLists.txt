@@ -32,6 +32,7 @@ if(WIN32)
     add_definitions(-DWIN32)
 else()
     add_definitions(-DLINUX)
+    target_link_libraries(${PROJECT_NAME} pthread)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror
         -Wswitch-default -Wcast-align -Wpointer-arith -Wundef -Wcast-qual
         -Wshadow -Wwrite-strings -Wconversion -Wunreachable-code -Wunused-macros
