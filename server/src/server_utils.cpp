@@ -20,18 +20,18 @@ ssize_t server::identifyClient(const System::Network::ISocket &socket)
     return -1;
 }
 
-ssize_t server::identifyClient(const std::string ip, const std::string port)
+ssize_t server::identifyClient(const std::string &ip, const std::string &port)
 {
     std::unique_lock lock(_globalMutex);
 
-    for (auto &pair : _clients) {
+    for (const auto &pair : _clients) {
         if (pair.second.ip == ip && std::to_string(pair.second.port) == port)
             return (ssize_t) pair.first;
     }
     return -1;
 }
 
-Client &server::addClient(Client &client)
+Client &server::addClient(const Client &client)
 {
     std::unique_lock lock(_globalMutex);
 

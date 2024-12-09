@@ -7,6 +7,7 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
+#include <SFML/Graphics.hpp>
 #include <string>
 
 namespace ecs
@@ -18,16 +19,16 @@ namespace ecs
 
     class PositionComponent : public Component {
       public:
-        PositionComponent(int x, int y);
+        PositionComponent(float x = 0, float y = 0);
 
-        int getX();
-        int getY();
-        void setX(int x);
-        void setY(int y);
+        float getX();
+        float getY();
+        void setX(float x);
+        void setY(float y);
 
       private:
-        int _x;
-        int _y;
+        float _x;
+        float _y;
     };
 
     class PlayerComponent : public Component {
@@ -94,13 +95,23 @@ namespace ecs
 
     class RenderComponent : public Component {
       public:
-        explicit RenderComponent(ObjectType type);
+        RenderComponent(ObjectType type, const sf::Texture &texture,
+            sf::Vector2f position = sf::Vector2f(0, 0));
 
-        ObjectType getType() const;
-        void setType(ObjectType type);
+        ecs::ObjectType getObjectType() const;
+        void setObjectType(ecs::ObjectType type);
+
+        sf::Sprite *getSprite();
+
+        sf::CircleShape *getCircleShape();
+
+        sf::RectangleShape *getRectangleShape();
 
       private:
-        ObjectType _type;
+        ecs::ObjectType _type;
+        sf::Sprite *sprite = nullptr;
+        sf::CircleShape *circleShape = nullptr;
+        sf::RectangleShape *rectangleShape = nullptr;
     };
 
     class TextComponent : public Component {
