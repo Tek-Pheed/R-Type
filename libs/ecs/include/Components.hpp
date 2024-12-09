@@ -44,17 +44,17 @@ namespace ecs
 
     class VelocityComponent : public Component {
       public:
-        VelocityComponent(int vx, int vy);
+        VelocityComponent(float vx, float vy);
 
-        int getVx();
-        int getVy();
+        float getVx();
+        float getVy();
 
-        void setVx(int vx);
-        void setVy(int vy);
+        void setVx(float vx);
+        void setVy(float vy);
 
       private:
-        int _vx;
-        int _vy;
+        float _vx;
+        float _vy;
     };
 
     class HealthComponent : public Component {
