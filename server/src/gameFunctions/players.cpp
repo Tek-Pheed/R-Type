@@ -9,7 +9,7 @@
 #include "Components.hpp"
 #include "server.hpp"
 
-void syncNewClientGameState(size_t newClient) {
+void server::syncNewClientGameState(size_t newClient) {
     std::cout << "The player will receive the gameState now" << std::endl;
     //TODO: Sync newly connected client
 }
