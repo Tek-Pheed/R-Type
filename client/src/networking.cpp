@@ -81,30 +81,55 @@ void client::writeToServer(
 
 void client::receive_message()
 {
-    System::Network::byteArray vectTCP;
-    System::Network::byteArray vectUDP;
+    System::Network::byteArray vect;
+    System::Network::byteArray arr;
+    System::Network::socketSetGeneric readfds;
 
-    vectTCP = _clientSocketTCP.receive();
-    vectUDP = _clientSocketUDP.receive();
-    if (vectTCP.size() > 0) {
-        std::string buffer = System::Network::decodeString(vectTCP);
-        while (buffer.size() > 0 && buffer[buffer.size() - 1] != '\n'
-            && buffer[buffer.size() - 2] != '\t') {
-            buffer +=
-                System::Network::decodeString(_clientSocketTCP.receive());
+    while (true) {
+        readfds.clear();
+        readfds.emplace_back(&_clientSocketTCP);
+        readfds.emplace_back(&_clientSocketUDP);
+        System::Network::select(&readfds, nullptr, nullptr);
+        if (readfds.size() == 0)
+            continue;
+        for (auto sock : readfds) {
+            vect.clear();
+            arr.clear();
+            switch (sock->getType()) {
+                case System::Network::ISocket::TCP: {
+                    vect = _clientSocketTCP.receive();
+                    if (vect.size() > 0) {
+                        std::string buffer =
+                            System::Network::decodeString(vect);
+                        while (buffer.size() > 0
+                            && buffer[buffer.size() - 1] != '\n'
+                            && buffer[buffer.size() - 2] != '\t') {
+                            buffer += System::Network::decodeString(
+                                _clientSocketTCP.receive());
+                        }
+                        manage_buffer(buffer);
+                    }
+                    break;
+                }
+                case System::Network::ISocket::UDP: {
+                    vect = _clientSocketUDP.receive();
+                    if (vect.size() > 0) {
+                        std::string buffer =
+                            System::Network::decodeString(vect);
+                        while (buffer.size() > 0
+                            && buffer[buffer.size() - 1] != '\n'
+                            && buffer[buffer.size() - 2] != '\t') {
+                            buffer += System::Network::decodeString(
+                                _clientSocketUDP.receive());
+                        }
+                        manage_buffer(buffer);
+                    }
+                    break;
+                };
+                default: break;
+            }
         }
-        manage_buffer(buffer);
     }
-    if (vectUDP.size() > 0) {
-        std::string buffer = System::Network::decodeString(vectUDP);
-        while (buffer.size() > 0 && buffer[buffer.size() - 1] != '\n'
-            && buffer[buffer.size() - 2] != '\t') {
-            buffer +=
-                System::Network::decodeString(_clientSocketUDP.receive());
-        }
-        manage_buffer(buffer);
-    }
-    return;
 }
 
 int client::create_connection(const char *ip, int portTCP, int portUDP)
