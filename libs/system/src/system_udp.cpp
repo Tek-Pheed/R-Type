@@ -23,7 +23,6 @@ static uint64_t udpSockID = 0;
 void UDPSocket::initSocket(
     uint16_t port, Mode mode, const std::string &address)
 {
-    int res;
     this->_sockSettings.sin_family = AF_INET;
     this->_sockSettings.sin_port = htons(port);
     this->_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -43,6 +42,7 @@ void UDPSocket::initSocket(
         }
     }
     if (_mode == SERVE) {
+        int res;
         res = bind(this->_sockfd,
             reinterpret_cast<struct sockaddr *>(&this->_sockSettings),
             sizeof(this->_sockSettings));

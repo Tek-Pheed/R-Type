@@ -16,10 +16,10 @@
 #include "protocol.hpp"
 
 client::client()
+    : _clientSocketTCP(System::Network::TCPSocket()),
+      _clientSocketUDP(System::Network::UDPSocket()), _id(-1)
 {
-    _id = -1;
-    _clientSocketTCP = System::Network::TCPSocket();
-    _clientSocketUDP = System::Network::UDPSocket();
+    return;
 }
 
 client::~client()
@@ -83,10 +83,10 @@ void client::writeToServer(
 {
     if (socketType == System::Network::ISocket::TCP) {
         std::cout << "Sending TCP: " << data << std::endl;
-        _clientSocketTCP.sendData(System::Network::encodeString(data.c_str()));
+        _clientSocketTCP.sendData(System::Network::encodeString(data));
     } else {
         std::cout << "Sending UDP: " << data << std::endl;
-        _clientSocketUDP.sendData(System::Network::encodeString(data.c_str()));
+        _clientSocketUDP.sendData(System::Network::encodeString(data));
     }
 }
 
