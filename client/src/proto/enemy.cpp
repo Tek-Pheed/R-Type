@@ -8,8 +8,9 @@
 #include "client.hpp"
 #include "protocol.hpp"
 
-void client::handle_enemy(int code, std::vector<std::string> tokens)
+void client::handle_enemy(int code, std::vector<std::string> &tokens)
 {
+    (void) tokens;
     switch (code) {
         case E_SPAWN:
             /* code */

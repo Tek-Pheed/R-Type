@@ -22,11 +22,11 @@ class client {
     void writeToServer(
         std::string &data, System::Network::ISocket::Type socketType);
     void receive_message();
-    void handle_connection(int code, std::vector<std::string> tokens);
-    void handle_player(int code, std::vector<std::string> tokens);
-    void handle_enemy(int code, std::vector<std::string> tokens);
-    void handle_terrain(int code, std::vector<std::string> tokens);
-    void handle_mechs(int code, std::vector<std::string> tokens);
+    void handle_connection(int code, std::vector<std::string> &tokens);
+    void handle_player(int code, std::vector<std::string> &tokens);
+    void handle_enemy(int code, std::vector<std::string> &tokens);
+    void handle_terrain(int code, std::vector<std::string> &tokens);
+    void handle_mechs(int code, std::vector<std::string> &tokens);
 
   private:
     System::Network::TCPSocket _clientSocketTCP;
