@@ -6,7 +6,6 @@
 */
 
 #include "client.hpp"
-#include <iostream>
 #include <memory>
 #include <vector>
 #include "Entity.hpp"
