@@ -34,12 +34,12 @@ namespace System
              * @param address: The IP address of the socket (default 0.0.0.0)
              */
             explicit UDPSocket(
-                uint16_t port, const std::string &address = "0.0.0.0");
+                uint16_t port, Mode mode = SERVE, const std::string &address = "0.0.0.0");
 
             explicit UDPSocket();
 
-            void initSocket(
-                uint16_t port, const std::string &address = "0.0.0.0");
+            void initSocket(uint16_t port, Mode mode = SERVE,
+                const std::string &address = "0.0.0.0");
 
             UDPSocket(UDPSocket &&) = default;
             UDPSocket(const UDPSocket &) = default;
@@ -71,7 +71,8 @@ namespace System
              * should call this function later with the rest of the data to
              * send.
              */
-            ssize_t sendDataTo(const byteArray &byteSequence, const std::string &address, uint16_t);
+            ssize_t sendDataTo(const byteArray &byteSequence,
+                const std::string &address, uint16_t);
 
             /**
              * @brief Receive data through the socket
@@ -87,7 +88,8 @@ namespace System
              * @brief Receive data through the socket, set the address argument
              * to the address of the client who sent the packet
              *
-             * @param address: The address of the sender will be placed in this string
+             * @param address: The address of the sender will be placed in this
+             * string
              * @note Note: This call could block if the socket is invalid or if
              * there is no data available at the moment. You probably should
              * use select before this function.
