@@ -6,105 +6,158 @@
 */
 
 #include "server.hpp"
-#include <atomic>
-#include <csignal>
+#include <cstddef>
+#include <exception>
 #include <iostream>
+#include <mutex>
+#include <sstream>
 #include <string>
-#include <vector>
-#include "system.hpp"
+#include <thread>
+
 #include "system_network.hpp"
 #include "system_tcp.hpp"
+#include "system_udp.hpp"
 
-static volatile std::atomic<bool> stop = false;
+#include "protocol.hpp"
+#include "server.hpp"
 
-// void sighandler(int n)
-//{
-//     (void) n;
-//     stop = true;
-// }
+#define TCP_PORT 8081
+#define UDP_PORT 8082
 
-// Example TCP Server with libSystem
-int main(void)
+server::server()
 {
+    _clientCounter = 0;
+    _serverSocketTCP = System::Network::TCPSocket();
+}
+
+server::~server()
+{
+}
+
+void server::writeToClient(Client &client, const std::string &data,
+    System::Network::ISocket::Type socketType)
+{
+    std::unique_lock lock(_writeMutex);
+
+    if (socketType == System::Network::ISocket::TCP) {
+        client.writeBufferTCP += data;
+    }
+    if (socketType == System::Network::ISocket::UDP) {
+        client.writeBufferUDP += data;
+    }
+    _writeCondition.notify_one();
+}
+
+void server::handle_packet(
+    size_t clientID, System::Network::ISocket::Type socketType)
+{
+    Client &client = getClient(clientID);
+    std::unique_lock lock(_globalMutex);
+
+    if (socketType == System::Network::ISocket::TCP) {
+        std::cout << "Client Received: " << client.readBufferTCP << std::endl;
+        client.readBufferTCP.clear();
+    }
+    if (socketType == System::Network::ISocket::UDP) {
+        if (!client.isReady) {
+            auto accept = std::string("903 OK\t\n");
+            this->writeToClient(client, accept, System::Network::ISocket::TCP);
+            client.isReady = true;
+        }
+        std::cout << "Client Received: " << client.readBufferUDP << std::endl;
+        client.readBufferUDP.clear();
+    }
+}
+
+void server::handle_connection()
+{
+    System::Network::socketSetGeneric readfds;
+
+    while (true) {
+        readfds.clear();
+        readfds.emplace_back(&_serverSocketTCP);
+        try {
+            System::Network::select(&readfds);
+        } catch (const std::exception &s) {
+            std::cerr << "An error occured on the server: " << s.what()
+                      << std::endl;
+        }
+        if (readfds.size() == 0)
+            continue;
+        Client cl;
+        cl.tcpSocket = System::Network::accept(_serverSocketTCP);
+        Client &client = addClient(cl);
+        std::string toWrite = std::to_string(C_INIT_UDP) + " "
+            + std::to_string(_clientCounter) + PACKET_END;
+        writeToClient(client, toWrite, System::Network::ISocket::TCP);
+    }
+}
+
+void server::create_server()
+{
+    std::cout << "Running server on port TCP:" << std::to_string(TCP_PORT)
+              << ", UDP: " << std::to_string(UDP_PORT) << std::endl;
+    _serverSocketTCP.initSocket(TCP_PORT, System::Network::ISocket::SERVE);
+    _serverSocketUDP.initSocket(UDP_PORT);
+}
+
+int is_code_valid(int code)
+{
+    if (code >= P_CONN && code <= P_DISCONN)
+        return 0;
+    if (code >= E_SPAWN && code <= E_DMG)
+        return 1;
+    if (code >= T_SPAWN && code <= T_DEAD)
+        return 2;
+    if (code >= M_WAVE && code <= M_GOVER)
+        return 3;
+    return -1;
+}
+
+int server::manage_buffer(std::string buffer)
+{
+    std::string code = std::string(buffer).substr(0, 3);
+    int code_int = is_code_valid(atoi(code.c_str()));
+    std::vector<std::string> tokens;
+
+    if (code_int == -1)
+        return -1;
+    std::string str = buffer.substr(4, buffer.size() - 4);
+    std::istringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, ' ')) {
+        tokens.push_back(token);
+    }
+
+    switch (code_int) {
+        case 0:
+            for (size_t i = 0; i < tokens.size(); i++) {
+                printf("args: %s\n", tokens[i].c_str());
+            }
+            handle_player(atoi(code.c_str()), tokens);
+            break;
+        case 1:
+            // handle_enemy(tokens);
+            break;
+        case 2:
+            // handle_terrain(tokens);
+            break;
+        case 3:
+            // handle_mechs(tokens);
+            break;
+
+        default: break;
+    }
+    return 0;
+}
+
+int main()
+{
+    server s;
     System::Network::initNetwork();
 
-    System::Network::TCPSocket serverSocket(
-        1234, System::Network::TCPSocket::SERVE);
-
-    System::Network::TCPSocket serverSocketUDP(
-        1236, System::Network::TCPSocket::SERVE);
-
-    std::vector<System::Network::TCPSocket> clients;
-
-    System::Network::socketSetTCP socketSetTCP;
-    System::Network::timeoutStruct tv;
-
-    System::Network::TCPSocket clientSocketUDP(
-        1236, System::Network::TCPSocket::CONNECT, "127.0.0.1");
-
-    tv = {1, 0};
-    clients.clear();
-    // signal(SIGINT, &sighandler);
-
-    std::cout << "Connecting to self socket" << std::endl;
-    try {
-        System::Network::TCPSocket testSocket(
-            1234, System::Network::TCPSocket::CONNECT, "127.0.0.1");
-        testSocket.sendData(
-            System::Network::byteArray({'h', 'e', 'l', 'l', 'o'}));
-        testSocket.closeSocket();
-    } catch (const std::exception &ex) {
-        std::cerr << ex.what() << std::endl;
-    }
-
-    try {
-        std::cout << "Started TCP Server on Port 1234" << std::endl;
-
-        while (!stop) {
-            socketSetTCP.clear();
-            System::Network::addSocketToSet(&serverSocket, socketSetTCP);
-            System::Network::addSocketToSet(clients, socketSetTCP);
-
-            std::cout << "Set size: " + std::to_string(socketSetTCP.size())
-                      << std::endl;
-            System::Network::select(&socketSetTCP, nullptr, nullptr);
-
-            std::cout << "Select event" << std::endl;
-
-            for (auto &sock : socketSetTCP) {
-                if (sock == nullptr) {
-                    continue;
-                }
-                if (sock == &serverSocket) {
-                    clients.emplace_back(
-                        System::Network::accept(*socketSetTCP[0]));
-                    std::cout << "New client connected" << std::endl;
-                } else {
-                    if (sock->isOpen()) {
-                        std::cout
-                            << "Reading from client: "
-                            << System::Network::decodeString(sock->receive())
-                            << std::endl;
-                        std::cout << "Writing to client" << std::endl;
-                        if (sock->isOpen())
-                            sock->sendData(System::Network::byteArray(
-                                {'h', 'e', 'l', 'l', 'o'}));
-                    }
-                    if (!sock->isOpen()) {
-                        std::cout << "Removing client" << std::endl;
-                        sock->closeSocket();
-                        System::Network::removeSocketInSet(
-                            *sock, socketSetTCP);
-                        System::Network::removeSocketInVect(*sock, clients);
-                    }
-                }
-            }
-        }
-    } catch (const std::exception &ex) {
-        std::cerr << ex.what() << std::endl;
-    }
-
-    std::cout << "Stopping Server" << std::endl;
-    serverSocket.closeSocket();
-    return (0);
+    s.create_server();
+    std::thread(&server::threadedServerRead, &s).detach();
+    std::thread(&server::threadedServerWrite, &s).detach();
+    s.handle_connection();
 }

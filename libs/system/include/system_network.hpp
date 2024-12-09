@@ -21,6 +21,8 @@
     #include <sys/time.h>
     #include <sys/types.h>
     #include <unistd.h>
+    #include <netdb.h>
+    #include <netinet/in.h>
 
     #define INVALID_SOCKET -1
     #define SOCKET_ERROR   -1
@@ -79,6 +81,7 @@ namespace System
              * needs to receive connections from clients
              */
             enum Mode { CONNECT, SERVE };
+            enum Type { TCP, UDP };
 
             /**
              * @brief Send data through the socket
@@ -129,6 +132,13 @@ namespace System
              */
             virtual uint64_t getUID(void) const = 0;
 
+
+            /**
+             * @brief Return the type of the socket
+             *
+             * @return Type: Type of the socket
+             */
+            virtual Type getType() const = 0;
         };
 
         class ASocket : public ISocket {
@@ -144,6 +154,7 @@ namespace System
             bool isOpen(void) const override;
             uint64_t getUID(void) const override;
             osSocketType getHandle(void) const override;
+            Type getType() const override;
 
           protected:
             uint64_t _uid;
@@ -151,6 +162,7 @@ namespace System
             osSocketType _sockfd;
             bool _opened;
             SOCKADDR_IN _sockSettings;
+            Type _type;
         };
 
         class TCPClient;
@@ -159,6 +171,7 @@ namespace System
 
         using socketSetTCP = std::vector<TCPSocket *>;
         using socketSetUDP = std::vector<UDPSocket *>;
+        using socketSetGeneric = std::vector<ISocket *>;
 
         /**
          * @brief Intitialize the Network library (Windows specific).
@@ -181,6 +194,34 @@ namespace System
          * @return std::string The decoded text
          */
         std::string decodeString(const byteArray &bytes);
+
+        /**
+         * @brief Encode a string into a byteArray object
+         *
+         * @param str: std::string source object
+         * @return byteArray object
+         */
+        byteArray encodeString(const std::string &str);
+
+        /**
+         * @brief select applied to TCPSocket objects.
+         * @note Note: This function modifies the sets passed as argument.
+         * @param readfds: A socketSetGeneric object which conatains all sockets
+         * that should be watch to see if they are ready for reading.
+         * @param writefds: A socketSetGeneric object which conatains all sockets
+         * that should be watch to see if they are ready for writing.
+         * @param exceptfds: A socketSetGeneric object which conatains all sockets
+         * that should be watch for exceptionnal events.
+         * @param timeout The timeout argument is a timeoutStruct that
+         * specifies the interval that select() should block waiting for a file
+         * descriptor to become ready. If the argument is unsepcified, select
+         * will block indefinitely waiting for a socket to become ready.
+         */
+        void select(socketSetGeneric *readfds = nullptr,
+            socketSetGeneric *writefds = nullptr,
+            socketSetGeneric *exceptfds = nullptr,
+            timeoutStruct timeout = std::nullopt);
+
     } // namespace Network
 } // namespace System
 
