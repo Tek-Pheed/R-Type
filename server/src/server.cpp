@@ -34,7 +34,7 @@ server::~server()
 {
 }
 
-void server::writeToClient(Client &client, std::string &data,
+void server::writeToClient(Client &client, const std::string &data,
     System::Network::ISocket::Type socketType)
 {
     std::unique_lock lock(_writeMutex);
@@ -160,9 +160,4 @@ int main()
     std::thread(&server::threadedServerRead, &s).detach();
     std::thread(&server::threadedServerWrite, &s).detach();
     s.handle_connection();
-
-    /// while (true) {
-    ///     s.receive_message();
-    /// }
-    // System::Network::stopNetwork();
 }

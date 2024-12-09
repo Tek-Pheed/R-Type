@@ -8,13 +8,6 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-// #include <arpa/inet.h>
-// #include <stdlib.h>
-// #include <sys/socket.h>
-// #include <sys/types.h>
-// #include <unistd.h>
-// #include <bits/stdc++.h>
-
 #include <cstddef>
 #include <mutex>
 #include <sys/types.h>
@@ -65,8 +58,6 @@ class Client {
           port(uint16_t()), readBufferTCP(std::string()),
           writeBufferTCP(std::string()), readBufferUDP(std::string()),
           writeBufferUDP(std::string()), isReady(false) {};
-
-    //Client &operator=(Client &client);
 };
 
 class server {
@@ -87,7 +78,7 @@ class server {
     void handle_packet(
         size_t clientID, System::Network::ISocket::Type socketType);
 
-    void writeToClient(Client &client, std::string &data,
+    void writeToClient(Client &client, const std::string &data,
         System::Network::ISocket::Type socketType);
 
     void threadedServerRead();
@@ -102,7 +93,7 @@ class server {
     int manage_buffer(std::string buffer);
 
     ssize_t identifyClient(const System::Network::ISocket &socket);
-    ssize_t identifyClient(std::string ip, std::string port);
+    ssize_t identifyClient(const std::string ip, const std::string port);
 
     ssize_t authenticateUDPClient(System::Network::byteArray packet);
 
