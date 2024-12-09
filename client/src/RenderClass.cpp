@@ -9,6 +9,7 @@
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
 #include "RenderClass.hpp"
+#include "client.hpp"
 
 RenderClass::RenderClass(
     int width, int height, const std::string &title, int frameRate)
@@ -85,6 +86,7 @@ void RenderClass::setFrameRate(int newFrameRate)
 
 void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entities, std::shared_ptr<ecs::Entity> player)
 {
+    client client;
     sf::Clock clock;
     sf::Clock clockAnim;
     ecs::RenderSystem renderSystem;
@@ -107,6 +109,7 @@ void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entitie
         renderSystem.update(entities, &this->_window, deltaTime);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
+        //client.manage_buffer();
     }
 }
 
