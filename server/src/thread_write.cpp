@@ -25,9 +25,7 @@ void server::threadedServerWrite()
         System::Network::byteArray vect;
         std::string buffer;
         System::Network::socketSetGeneric writefds;
-        System::Network::timeoutStruct tv;
-        tv->tv_sec = 0;
-        tv->tv_usec = 250000;
+        System::Network::timeoutStruct tv = {{1,0}};
         bool shouldWait = true;
 
         while (true) {
