@@ -12,16 +12,14 @@ ecs::RenderComponent::RenderComponent(
 {
     this->_type = type;
     if (type == ecs::ObjectType::SPRITE) {
-        sf::Sprite sprite1(texture);
-        this->sprite = &sprite1;
+        this->sprite = new sf::Sprite(texture);
         this->sprite->setPosition(position);
     } else if (type == ecs::ObjectType::CIRCLE) {
         sf::CircleShape circleShape1;
-        this->circleShape = &circleShape1;
+        this->circleShape = new sf::CircleShape();
         this->circleShape->setPosition(position);
     } else if (type == ecs::ObjectType::RECTANGLE) {
-        sf::RectangleShape rect;
-        this->rectangleShape = &rect;
+        this->rectangleShape = new sf::RectangleShape();
         this->rectangleShape->setPosition(position);
     }
 }
