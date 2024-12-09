@@ -5,8 +5,6 @@
 ** client
 */
 
-#define NOMINMAX
-
 #include "client.hpp"
 #include <memory>
 #include <thread>
