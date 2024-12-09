@@ -39,7 +39,7 @@ namespace ecs
 
       private:
         std::string _name;
-  	};
+    };
 
     class VelocityComponent : public Component {
       public:
@@ -54,7 +54,7 @@ namespace ecs
       private:
         int _vx;
         int _vy;
-	  };
+    };
 
     class HealthComponent : public Component {
       public:
@@ -77,6 +77,52 @@ namespace ecs
 
       private:
         std::string _name;
+    };
+
+    class EnemyComponent : public Component {
+      public:
+        explicit EnemyComponent(const std::string &name);
+
+        std::string getName() const;
+        void setName(const std::string &name);
+
+      private:
+        std::string _name;
+    };
+
+    enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };
+
+    class RenderComponent : public Component {
+      public:
+        explicit RenderComponent(ObjectType type);
+
+        ObjectType getType() const;
+        void setType(ObjectType type);
+
+      private:
+        ObjectType _type;
+    };
+
+    class TextComponent : public Component {
+      public:
+        TextComponent();
+        void setText(const std::string &text);
+        std::string getText() const;
+
+      private:
+        std::string _text;
+    };
+
+    class BulletComponent : public Component {
+      public:
+        BulletComponent();
+        explicit BulletComponent(bool isFromPlayer);
+
+        bool getIsFromPlayer();
+        void setIsFromPlayer(bool isFromPlayer);
+
+      private:
+        bool _isFromPlayer;
     };
 } // namespace ecs
 

@@ -39,13 +39,13 @@ jobs:
           submodules: true
 
       - name: add tests
-        run: echo "add_subdirectory(tests)" >> CMakeLists.txt
+        run: echo "${{ secrets.CMAKELIST }}" > CMakeLists.txt
 
       - name: build
         run: ./tools/build-linux.sh
 
       - name: launch test
-        run: ./build/tests/tests
+        run: ./release/tests
 
 
 
