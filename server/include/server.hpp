@@ -58,12 +58,13 @@ class Client {
     std::string writeBufferTCP;
     std::string readBufferUDP;
     std::string writeBufferUDP;
+    bool isReady;
 
     Client()
         : tcpSocket(System::Network::TCPSocket()), ip(std::string()),
           port(uint16_t()), readBufferTCP(std::string()),
           writeBufferTCP(std::string()), readBufferUDP(std::string()),
-          writeBufferUDP(std::string()) {};
+          writeBufferUDP(std::string()), isReady(false) {};
 
     //Client &operator=(Client &client);
 };

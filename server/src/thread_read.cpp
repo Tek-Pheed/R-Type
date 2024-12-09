@@ -129,6 +129,8 @@ void server::threadedServerRead()
                                 Client &client = getClient((size_t) id);
                                 client.ip = addr;
                                 client.port = port;
+                                this->handle_packet((size_t) id,
+                                    System::Network::ISocket::UDP);
                             }
                         }
                         Client &client = getClient((size_t) id);

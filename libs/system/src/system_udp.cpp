@@ -184,7 +184,6 @@ byteArray UDPSocket::receiveFrom(std::string &address, uint16_t &port)
     ssize_t ret = 0;
     byteArray vect;
     SOCKADDR_IN client_addr;
-    struct hostent *hostp;
 
 #if defined(WIN32)
     u_long len = 0;
