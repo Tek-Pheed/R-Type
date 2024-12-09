@@ -29,11 +29,11 @@ namespace ecs
         }
 
         template <typename componentType>
-        std::unique_ptr<componentType> getComponent()
+        std::shared_ptr<componentType> getComponent()
         {
             auto index = this->_components.find(typeid(componentType));
             if (index != this->_components.end()) {
-                return std::static_pointer_cast<componentType>(index->second)
+                return std::static_pointer_cast<componentType>(index->second);
             }
             return nullptr;
         }

@@ -23,25 +23,25 @@ void ecs::RenderSystem::update(
     for (auto &entity : entities) {
         auto renderComponent = entity->getComponent<RenderComponent>();
         auto position = entity->getComponent<PositionComponent>();
-
+        
         if (renderComponent->getObjectType() == ecs::ObjectType::SPRITE) {
-            renderComponent->getSprite().setPosition(
+            renderComponent->getSprite()->setPosition(
                 position->getX(), position->getY());
-            window->draw(renderComponent->getSprite());
+            window->draw(*(renderComponent->getSprite()));
         } else if (renderComponent->getObjectType()
             == ecs::ObjectType::RECTANGLE) {
-            renderComponent->getRectangleShape().setPosition(
+            renderComponent->getRectangleShape()->setPosition(
                 position->getX(), position->getY());
-            renderComponent->getRectangleShape().setFillColor(sf::Color::Red);
-            renderComponent->getRectangleShape().setSize(sf::Vector2f(10, 10));
-            window->draw(renderComponent->getRectangleShape());
+            renderComponent->getRectangleShape()->setFillColor(sf::Color::Red);
+            renderComponent->getRectangleShape()->setSize(sf::Vector2f(100, 100));
+            window->draw(*(renderComponent->getRectangleShape()));
         } else if (renderComponent->getObjectType()
             == ecs::ObjectType::CIRCLE) {
-            renderComponent->getCircleShape().setPosition(
+            renderComponent->getCircleShape()->setPosition(
                 position->getX(), position->getY());
-            renderComponent->getCircleShape().setFillColor(sf::Color::Yellow);
-            renderComponent->getCircleShape().setRadius(10);
-            window->draw(renderComponent->getCircleShape());
+            renderComponent->getCircleShape()->setFillColor(sf::Color::Yellow);
+            renderComponent->getCircleShape()->setRadius(100);
+            window->draw(*(renderComponent->getCircleShape()));
         }
     }
 }

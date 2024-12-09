@@ -15,7 +15,6 @@ ecs::RenderComponent::RenderComponent(
         this->sprite = new sf::Sprite(texture);
         this->sprite->setPosition(position);
     } else if (type == ecs::ObjectType::CIRCLE) {
-        sf::CircleShape circleShape1;
         this->circleShape = new sf::CircleShape();
         this->circleShape->setPosition(position);
     } else if (type == ecs::ObjectType::RECTANGLE) {
@@ -34,17 +33,17 @@ void ecs::RenderComponent::setObjectType(ecs::ObjectType type)
     this->_type = type;
 }
 
-sf::Sprite ecs::RenderComponent::getSprite() const
+sf::Sprite *ecs::RenderComponent::getSprite()
 {
-    return *this->sprite;
+    return this->sprite;
 }
 
-sf::RectangleShape ecs::RenderComponent::getRectangleShape() const
+sf::RectangleShape *ecs::RenderComponent::getRectangleShape()
 {
-    return *this->rectangleShape;
+    return this->rectangleShape;
 }
 
-sf::CircleShape ecs::RenderComponent::getCircleShape() const
+sf::CircleShape *ecs::RenderComponent::getCircleShape()
 {
-    return *this->circleShape;
+    return this->circleShape;
 }

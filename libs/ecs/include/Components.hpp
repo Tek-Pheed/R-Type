@@ -101,11 +101,11 @@ namespace ecs
         ecs::ObjectType getObjectType() const;
         void setObjectType(ecs::ObjectType type);
 
-        sf::Sprite getSprite() const;
+        sf::Sprite *getSprite();
 
-        sf::CircleShape getCircleShape() const;
+        sf::CircleShape *getCircleShape();
 
-        sf::RectangleShape getRectangleShape() const;
+        sf::RectangleShape *getRectangleShape();
 
       private:
         ecs::ObjectType _type;
