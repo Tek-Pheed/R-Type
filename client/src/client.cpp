@@ -7,6 +7,7 @@
 
 #include "client.hpp"
 #include <memory>
+#include <thread>
 #include <vector>
 #include "Entity.hpp"
 #include "RenderClass.hpp"
@@ -22,9 +23,9 @@ int main(void)
 
     // To be set to user input later
     c.create_connection("127.0.0.1", 8081, 8082);
-    // Set to non-blocking
-    c.receive_message();
-
+    std::thread(&client::receive_message, &c).detach();
+    std::cout << "Client connected" << std::endl;
+    
     texture.loadFromFile("../assets/sprites/r-typesheet1.gif");
 
     auto player = std::make_shared<ecs::Entity>(0);
@@ -46,6 +47,7 @@ int main(void)
         render.getWindow().clear();
         renderSystem.update(entities, &render.getWindow(), 0);
         render.getWindow().display();
+        c.manage_buffers();
     }
     return (0);
 }

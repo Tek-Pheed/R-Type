@@ -44,29 +44,35 @@ int is_code_valid(int code)
     return -1;
 }
 
-int client::manage_buffer(std::string buffer)
+int client::manage_buffers()
 {
-    std::string codeStr = std::string(buffer).substr(0, 3);
-    int code = atoi(codeStr.c_str());
-    int code_int = is_code_valid(code);
-    std::vector<std::string> tokens;
+    if (_buffers.size() == 0)
+        return 0;
+    for (auto buffer : _buffers) {
+        _mutex.lock();
+        std::string codeStr = std::string(buffer).substr(0, 3);
+        int code = atoi(codeStr.c_str());
+        int code_int = is_code_valid(code);
+        std::vector<std::string> tokens;
 
-    if (code_int == -1)
-        return -1;
-    std::string str = buffer.substr(4, buffer.size() - 4);
-    std::istringstream ss(str);
-    std::string token;
-    while (std::getline(ss, token, ' ')) {
-        tokens.push_back(token);
-    }
+        if (code_int == -1)
+            return -1;
+        std::string str = buffer.substr(4, buffer.size() - 4);
+        std::istringstream ss(str);
+        std::string token;
+        while (std::getline(ss, token, ' ')) {
+            tokens.push_back(token);
+        }
+        _mutex.unlock();
 
-    switch (code_int) {
-        case 0: handle_player(code, tokens); break;
-        case 1: handle_enemy(code, tokens); break;
-        case 2: handle_terrain(code, tokens); break;
-        case 3: handle_mechs(code, tokens); break;
-        case 9: handle_connection(code, tokens); break;
-        default: break;
+        switch (code_int) {
+            case 0: handle_player(code, tokens); break;
+            case 1: handle_enemy(code, tokens); break;
+            case 2: handle_terrain(code, tokens); break;
+            case 3: handle_mechs(code, tokens); break;
+            case 9: handle_connection(code, tokens); break;
+            default: break;
+        }
     }
     return 0;
 }
@@ -112,7 +118,9 @@ void client::receive_message()
                                 _clientSocketTCP.receive());
                         }
                         std::cout << "Received TCP: " << buffer << std::endl;
-                        manage_buffer(buffer);
+                        _mutex.lock();
+                        _buffers.push_back(buffer);
+                        _mutex.unlock();
                     }
                     break;
                 }
@@ -128,7 +136,9 @@ void client::receive_message()
                                 _clientSocketUDP.receive());
                         }
                         std::cout << "Received UDP: " << buffer << std::endl;
-                        manage_buffer(buffer);
+                        _mutex.lock();
+                        _buffers.push_back(buffer);
+                        _mutex.unlock();
                     }
                     break;
                 };
@@ -143,7 +153,8 @@ int client::create_connection(const char *ip, int portTCP, int portUDP)
     try {
         _clientSocketTCP.initSocket(static_cast<uint16_t>(portTCP),
             System::Network::ISocket::CONNECT, ip);
-        _clientSocketUDP.initSocket(static_cast<uint16_t>(portUDP), "0.0.0.0");
+        _clientSocketUDP.initSocket(static_cast<uint16_t>(portUDP),
+            System::Network::ISocket::CONNECT, ip);
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
         return -1;
