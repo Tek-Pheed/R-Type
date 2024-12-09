@@ -23,7 +23,7 @@
 #include "server.hpp"
 
 // This will need to be more robust
-ssize_t server::authenticateUDPClient(System::Network::byteArray packet)
+ssize_t server::authenticateUDPClient(const System::Network::byteArray &packet)
 {
     std::string decoded = System::Network::decodeString(packet);
     if (decoded.starts_with(std::to_string(C_START_UDP))) {

@@ -67,13 +67,13 @@ class server {
     void create_server();
     void createClient();
 
-    Client &addClient(Client &client);
+    Client &addClient(const Client &client);
     Client &getClient(size_t id);
     void removeClient(size_t id);
 
     void receive_message();
     void handle_connection();
-    void send_to_all(std::string message);
+    void send_to_all(const std::string &message);
 
     void handle_packet(
         size_t clientID, System::Network::ISocket::Type socketType);
@@ -89,13 +89,13 @@ class server {
     int playerShooting(int id, int x, int y);
     int playerDamaged(int id, int amount);
     int playerDisconnection(int id);
-    int handle_player(int code, std::vector<std::string> tokens);
+    int handle_player(int code, const std::vector<std::string> &tokens);
     int manage_buffer(std::string buffer);
 
     ssize_t identifyClient(const System::Network::ISocket &socket);
-    ssize_t identifyClient(const std::string ip, const std::string port);
+    ssize_t identifyClient(const std::string &ip, const std::string &port);
 
-    ssize_t authenticateUDPClient(System::Network::byteArray packet);
+    ssize_t authenticateUDPClient(const System::Network::byteArray &packet);
 
   private:
     std::mutex _globalMutex;

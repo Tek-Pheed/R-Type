@@ -51,7 +51,7 @@ void server::threadedServerWrite()
                             std::cerr << "Unable to idendify client (TCP - "
                                          "write thread)"
                                       << std::endl;
-                        Client client = this->getClient((size_t) id);
+                        Client &client = this->getClient((size_t) id);
                         if (!sock->isOpen()) {
                             std::cout << "[Write Thread] client ("
                                       << std::to_string(id)
@@ -82,7 +82,7 @@ void server::threadedServerWrite()
                             for (auto &cl : _clients) {
                                 size_t index = cl.first;
                                 auto &cli = cl.second;
-                                if (cli.port == 0 || cli.ip.empty())
+                                if (cli.port == 0 || cli.ip.empty() || cli.writeBufferUDP.length() == 0)
                                     continue;
                                 len = _serverSocketUDP.sendDataTo(
                                     System::Network::encodeString(

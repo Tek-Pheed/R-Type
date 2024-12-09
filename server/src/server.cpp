@@ -24,10 +24,9 @@
 #define TCP_PORT 8081
 #define UDP_PORT 8082
 
-server::server()
+server::server(): _clientCounter(0), _serverSocketTCP(System::Network::TCPSocket())
 {
-    _clientCounter = 0;
-    _serverSocketTCP = System::Network::TCPSocket();
+    return;
 }
 
 server::~server()
@@ -55,7 +54,6 @@ void server::handle_packet(
     std::unique_lock lock(_globalMutex);
 
     if (socketType == System::Network::ISocket::TCP) {
-        std::cout << "Client Received: " << client.readBufferTCP << std::endl;
         client.readBufferTCP.clear();
     }
     if (socketType == System::Network::ISocket::UDP) {
@@ -64,7 +62,6 @@ void server::handle_packet(
             this->writeToClient(client, accept, System::Network::ISocket::TCP);
             client.isReady = true;
         }
-        std::cout << "Client Received: " << client.readBufferUDP << std::endl;
         client.readBufferUDP.clear();
     }
 }
