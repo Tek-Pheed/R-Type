@@ -7,6 +7,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <vector>
+#include <memory>
 
 #ifndef RENDERCLASS_HPP_
     #define RENDERCLASS_HPP_
@@ -23,8 +25,9 @@ class RenderClass {
     int getFrameRate() const;
     void setFrameRate(int frameRate);
 
-    void renderWindow();
-    void playEvent();
+    void renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entities, std::shared_ptr<ecs::Entity> player);
+    void playEvent(std::shared_ptr<ecs::Entity> player);
+    void playerAnimations(std::shared_ptr<ecs::Entity> player, std::string direction);
 
   private:
     sf::RenderWindow _window;
@@ -32,5 +35,7 @@ class RenderClass {
     sf::VideoMode _videoMode;
     int _frameRate;
 };
+
+void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);
 
 #endif /* !RENDERCLASS_HPP_ */
