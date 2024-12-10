@@ -26,10 +26,6 @@ void ecs::RenderSystem::update(
         auto position = entity->getComponent<PositionComponent>();
         auto player = entity->getComponent<PlayerComponent>();
 
-        if (player != nullptr)
-            std::cout << "Rendering player: " << player->getName()
-                      << std::endl;
-
         if (renderComponent->getObjectType() == ecs::ObjectType::SPRITE) {
             renderComponent->getSprite()->setPosition(
                 position->getX(), position->getY());

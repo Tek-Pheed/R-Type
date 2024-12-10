@@ -26,7 +26,7 @@ class RenderClass {
     int getFrameRate() const;
     void setFrameRate(int frameRate);
 
-    void renderWindow(std::shared_ptr<ecs::Entity> player, client &client);
+    void renderWindow(client &client);
     void playEvent(std::shared_ptr<ecs::Entity> player);
     void playerAnimations(
         std::shared_ptr<ecs::Entity> player, std::string direction);

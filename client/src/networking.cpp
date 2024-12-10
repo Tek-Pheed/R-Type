@@ -94,7 +94,6 @@ void client::writeToServer(
         std::cout << "Sending TCP: " << data << std::endl;
         _clientSocketTCP.sendData(System::Network::encodeString(data));
     } else {
-        std::cout << "Sending UDP: " << data << std::endl;
         _clientSocketUDP.sendData(System::Network::encodeString(data));
     }
 }

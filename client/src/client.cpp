@@ -33,9 +33,11 @@ int client::get_id()
     return _id;
 }
 
-auto create_player(client &client, RenderClass &render)
+void create_player(client &client, RenderClass &render)
 {
-    auto player = std::make_shared<ecs::Entity>(client.get_id());
+    auto &player = client.getLocalPlayer();
+
+    player = std::make_shared<ecs::Entity>(client.get_id());
     player->addComponent(std::make_shared<ecs::PlayerComponent>("Samy"));
     player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
@@ -46,11 +48,24 @@ auto create_player(client &client, RenderClass &render)
     player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
         sf::Vector2f(3, 3));
     client.add_entity(player);
-    return player;
 }
 
-int main(void)
+int print_help()
 {
+    std::cout << "USAGE: ./client {IP} {PORT TCP} {PORT UDP}" << std::endl;
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 4)
+        return print_help();
+    if (!atoi(argv[1]) || !atoi(argv[2]))
+        return print_help();
+    int portTCP = atoi(argv[2]);
+    int portUDP = atoi(argv[3]);
+    std::cout << "Connecting to: " << argv[1] << " on port " << portTCP << " "
+              << portUDP << std::endl;
     RenderClass render(1280, 720, "R-Type", 120);
     client client(render);
     System::Network::initNetwork();
@@ -65,7 +80,7 @@ int main(void)
     srand(static_cast<unsigned int>(time(0)));
     render.setPlayerTexture(playerTexture);
 
-    auto player = create_player(client, render);
+    create_player(client, render);
 
-    render.renderWindow(player, client);
+    render.renderWindow(client);
 }

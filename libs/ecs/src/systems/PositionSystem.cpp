@@ -16,6 +16,7 @@ void ecs::PositionSystem::update(
             entity.get()->getComponent<ecs::PositionComponent>();
         auto velocityComponent =
             entity.get()->getComponent<ecs::VelocityComponent>();
+        auto playerComp = entity->getComponent<PlayerComponent>();
         if (positionComponent && velocityComponent) {
             float newX = static_cast<float>(positionComponent->getX())
                 + static_cast<float>(velocityComponent->getVx()) * deltaTime;
@@ -25,7 +26,7 @@ void ecs::PositionSystem::update(
             auto windowSize = window->getSize();
             float windowWidth = static_cast<float>(windowSize.x);
             float windowHeight = static_cast<float>(windowSize.y);
-            
+
             if (newX >= 0 && newX <= windowWidth) {
                 positionComponent->setX(newX);
             }

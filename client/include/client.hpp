@@ -36,6 +36,9 @@ class client {
     std::vector<std::shared_ptr<ecs::Entity>> &get_entities();
     int get_id();
 
+    void update_localplayer_position();
+    std::shared_ptr<ecs::Entity> &getLocalPlayer();
+
     // Player Management
     void create_new_player(std::vector<std::string> &tokens);
     void set_new_position(std::vector<std::string> &tokens);
@@ -49,6 +52,7 @@ class client {
     System::Network::UDPSocket _clientSocketUDP;
 
     int _id;
+    std::shared_ptr<ecs::Entity> _player;
     std::vector<std::string> _buffers;
     std::mutex _mutex;
     std::vector<std::shared_ptr<ecs::Entity>> _entities;

@@ -7,6 +7,7 @@
 
 #include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
+#include "Components.hpp"
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
 #include "client.hpp"
@@ -94,8 +95,7 @@ sf::Texture &RenderClass::getPlayerTexture()
     return _playerTexture;
 }
 
-void RenderClass::renderWindow(
-    std::shared_ptr<ecs::Entity> player, client &client)
+void RenderClass::renderWindow(client &client)
 {
     sf::Clock clock;
     sf::Clock clockAnim;
@@ -103,10 +103,11 @@ void RenderClass::renderWindow(
     ecs::PositionSystem positionSystem;
     sf::Texture background_t;
     sf::Sprite background_s;
+    auto player = client.getLocalPlayer();
     float deltaTime = 0.00;
 
     _window.setMouseCursorVisible(false);
-    background_t.loadFromFile("./assets/background/starry_night.png");
+    background_t.loadFromFile("assets/background/starry_night.png");
     background_s.setTextureRect(sf::Rect(0, 0, 1280, 720));
     background_s.setTexture(background_t);
 
@@ -117,6 +118,7 @@ void RenderClass::renderWindow(
         this->_window.draw(background_s);
         positionSystem.update(
             client.get_entities(), &this->_window, deltaTime);
+        client.update_localplayer_position();
         renderSystem.update(client.get_entities(), &this->_window, deltaTime);
         client.manage_buffers();
         this->_window.display();
