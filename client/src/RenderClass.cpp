@@ -106,7 +106,8 @@ void RenderClass::renderWindow(
     std::cout << "Client connected" << std::endl;
 
     _window.setMouseCursorVisible(false);
-    background_t.loadFromFile("./assets/background/starry_night.png");
+    background_t.loadFromFile("./assets/background/background.png");
+    background_t.setRepeated(true);
     background_s.setTextureRect(sf::Rect(0, 0, 1280, 720));
     background_s.setTexture(background_t);
 
@@ -200,16 +201,13 @@ void RenderClass::playerAnimations(
     }
 }
 
-void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock)
+void RenderClass::backgroundAnimation(sf::Sprite *bg, sf::Clock *clock)
 {
     float s = clock->getElapsedTime().asSeconds();
 
     if (s > 0.01) {
         bg->setTextureRect(
-            sf::Rect(bg->getTextureRect().left + 2, 0, 1280, 720));
-        if (bg->getTextureRect().left > 768) {
-            bg->setTextureRect(sf::Rect(0, 0, 1280, 720));
-        }
+            sf::Rect(bg->getTextureRect().left + 2, 0, int(getWindow().getSize().x), int(getWindow().getSize().y)));
         clock->restart();
     }
 }
