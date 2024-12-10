@@ -5,17 +5,19 @@
 ** server
 */
 
+#include <cstdlib>
+#include <string>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
-#include "server.hpp"
 #include <cstddef>
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <sstream>
 #include <thread>
+#include "server.hpp"
 
 #include "system_network.hpp"
 #include "system_tcp.hpp"
@@ -26,6 +28,21 @@
 
 #define TCP_PORT 8081
 #define UDP_PORT 8082
+
+static int is_code_valid(int code)
+{
+    if (code >= P_CONN && code <= P_DISCONN)
+        return 0;
+    if (code >= E_SPAWN && code <= E_DMG)
+        return 1;
+    if (code >= T_SPAWN && code <= T_DEAD)
+        return 2;
+    if (code >= M_WAVE && code <= M_GOVER)
+        return 3;
+    if (code >= C_INIT_UDP && code <= C_START_UDP)
+        return 9;
+    return -1;
+}
 
 server::server()
     : _clientCounter(0), _serverSocketTCP(System::Network::TCPSocket()),
@@ -54,7 +71,7 @@ void server::writeToClient(Client &client, const std::string &data,
 
 void server::handleNewPlayer(size_t id)
 {
-    auto player = std::make_shared<ecs::Entity>(rand());
+    auto player = std::make_shared<ecs::Entity>(id);
     player->addComponent(std::make_shared<ecs::PlayerComponent>(
         std::string("Player ") + std::to_string(id)));
     player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
@@ -75,21 +92,44 @@ void server::handle_packet(
     if (socketType == System::Network::ISocket::UDP) {
         if (!client.isReady) {
             std::string accept = "";
-            if (_clientCounter >= MAX_PLAYERS) {
-                accept = makePacket(C_AUTHENTICATED_UDP, "KO");
+            if (_clients.size() >= MAX_PLAYERS) {
+                accept = makePacket(C_AUTH, "KO");
                 std::cout
                     << "Server: Maximum number of player reached, cannot "
                        "accept new player curently."
                     << std::endl;
             } else {
-                accept = makePacket(C_AUTHENTICATED_UDP, "OK");
+                accept = makePacket(C_AUTH, "OK");
                 client.isReady = true;
                 handleNewPlayer(clientID);
                 syncNewClientGameState(clientID);
             }
             this->writeToClient(client, accept, System::Network::ISocket::TCP);
+        } else {
+            if (client.readBufferUDP.length() != 0) {
+                std::string buffer = client.readBufferUDP;
+                std::string codeStr = std::string(buffer).substr(0, 3);
+                int code = atoi(codeStr.c_str());
+                int code_int = is_code_valid(code);
+                std::vector<std::string> tokens;
+                if (code_int == -1) {
+                    std::cout << "Server: Invalid Protocol Code: "
+                              << std::to_string(code_int) << std::endl;
+                    client.readBufferUDP.clear();
+                    return;
+                }
+                std::string str = buffer.substr(4, buffer.size() - 4);
+                std::istringstream ss(str);
+                std::string token;
+                while (std::getline(ss, token, ' ')) {
+                    tokens.push_back(token);
+                }
+                if (code >= P_SETUP && code <= P_DISCONN) {
+                    handle_player(code, tokens);
+                }
+            }
+            client.readBufferUDP.clear();
         }
-        client.readBufferUDP.clear();
     }
 }
 
@@ -122,21 +162,6 @@ void server::create_server()
     _serverSocketUDP.initSocket(UDP_PORT);
     std::cout << "Running server on port TCP:" << std::to_string(TCP_PORT)
               << ", UDP:" << std::to_string(UDP_PORT) << std::endl;
-}
-
-int is_code_valid(int code)
-{
-    if (code >= P_CONN && code <= P_DISCONN)
-        return 0;
-    if (code >= E_SPAWN && code <= E_DMG)
-        return 1;
-    if (code >= T_SPAWN && code <= T_DEAD)
-        return 2;
-    if (code >= M_WAVE && code <= M_GOVER)
-        return 3;
-    if (code >= C_INIT_UDP && code <= C_START_UDP)
-        return 9;
-    return -1;
 }
 
 int server::manage_buffer(std::string buffer)
