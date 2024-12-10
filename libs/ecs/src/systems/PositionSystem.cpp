@@ -25,11 +25,11 @@ void ecs::PositionSystem::update(
             auto windowSize = window->getSize();
             float windowWidth = static_cast<float>(windowSize.x);
             float windowHeight = static_cast<float>(windowSize.y);
-            
-            if (newX >= 0 && newX <= windowWidth) {
+
+            if (newX >= 0 && newX - 33 <= windowWidth) {
                 positionComponent->setX(newX);
             }
-            if (newY >= 0 && newY <= windowHeight) {
+            if (newY >= 0 && newY - 14 <= windowHeight) {
                 positionComponent->setY(newY);
             }
         }
