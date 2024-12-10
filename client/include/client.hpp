@@ -22,7 +22,7 @@ class client {
     int create_connection(const char *ip, int portTCP, int portUDP);
     int manage_buffers();
     void writeToServer(
-        std::string &data, System::Network::ISocket::Type socketType);
+        const std::string &data, System::Network::ISocket::Type socketType);
     void receive_message();
     void handle_connection(int code, std::vector<std::string> &tokens);
     void handle_player(int code, std::vector<std::string> &tokens);

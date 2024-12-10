@@ -72,7 +72,7 @@ namespace System
              * send.
              */
             ssize_t sendDataTo(const byteArray &byteSequence,
-                const std::string &address, uint16_t);
+                const std::string &address, uint16_t port);
 
             /**
              * @brief Receive data through the socket
