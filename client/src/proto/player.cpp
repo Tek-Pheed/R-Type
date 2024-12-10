@@ -13,8 +13,8 @@
 void client::create_new_player(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
-    const int x = std::stoi(tokens[1]);
-    const int y = std::stoi(tokens[2]);
+    const float x = std::stof(tokens[1]);
+    const float y = std::stof(tokens[2]);
     sf::Texture playerTexture;
 
     playerTexture.loadFromFile("../../assets/sprites/r-typesheet42.gif");
@@ -32,8 +32,8 @@ void client::create_new_player(std::vector<std::string> &tokens)
 void client::set_new_position(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
-    const int x = std::stoi(tokens[1]);
-    const int y = std::stoi(tokens[2]);
+    const float x = std::stof(tokens[1]);
+    const float y = std::stof(tokens[2]);
 
     for (auto &entity : _entities) {
         if (entity->getID() == static_cast<size_t>(id)) {
