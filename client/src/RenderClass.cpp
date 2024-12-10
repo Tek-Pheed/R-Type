@@ -11,6 +11,7 @@
 
 #include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
+#include <thread>
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
 #include "client.hpp"
@@ -96,30 +97,34 @@ void RenderClass::renderWindow(
     sf::Clock clockAnim;
     ecs::RenderSystem renderSystem;
     ecs::PositionSystem positionSystem;
+    ecs::BulletSystem bulletSystem;
     sf::Texture background_t;
     sf::Sprite background_s;
     float deltaTime = 0.00;
 
     _window.setMouseCursorVisible(false);
-    background_t.loadFromFile("./assets/background/starry_night.png");
+    background_t.loadFromFile("assets/background/background.png");
+    background_t.setRepeated(true);
     background_s.setTextureRect(sf::Rect(0, 0, 1280, 720));
     background_s.setTexture(background_t);
 
     while (this->_window.isOpen()) {
         deltaTime = clock.restart().asSeconds();
         this->_window.clear();
-        playEvent(player);
+        playEvent(player, entities);
         this->_window.draw(background_s);
         positionSystem.update(
             client.get_entities(), &this->_window, deltaTime);
         renderSystem.update(client.get_entities(), &this->_window, deltaTime);
         client.manage_buffers();
+        bulletSystem.update(entities, &this->_window, deltaTime);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
     }
 }
 
-void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player)
+void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player,
+    std::vector<std::shared_ptr<ecs::Entity>> &entities)
 {
     sf::Event event;
     auto velocity = player->getComponent<ecs::VelocityComponent>();
@@ -141,6 +146,24 @@ void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player)
             } else if (event.key.code == sf::Keyboard::Left) {
                 velocity->setVx(-200.0f);
                 this->playerAnimations(player, "left");
+            } else if (event.key.code == sf::Keyboard::Space) {
+                auto bullet = std::make_shared<ecs::Entity>(rand());
+                bullet->addComponent(
+                    std::make_shared<ecs::BulletComponent>(1));
+                bullet->addComponent(std::make_shared<ecs::PositionComponent>(
+                    player->getComponent<ecs::PositionComponent>()->getX()
+                        + 100,
+                    player->getComponent<ecs::PositionComponent>()->getY()
+                        + 25));
+                bullet->addComponent(
+                    std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+                bullet->addComponent(std::make_shared<ecs::RenderComponent>(
+                    ecs::ObjectType::SPRITE, this->_bulletTexture));
+                bullet->getComponent<ecs::RenderComponent>()
+                    ->getSprite()
+                    ->setTextureRect(sf::Rect(137, 153, 64, 16));
+
+                entities.push_back(bullet);
             }
         }
 
@@ -176,16 +199,13 @@ void RenderClass::playerAnimations(
     }
 }
 
-void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock)
+void RenderClass::backgroundAnimation(sf::Sprite *bg, sf::Clock *clock)
 {
     float s = clock->getElapsedTime().asSeconds();
 
     if (s > 0.01) {
         bg->setTextureRect(
-            sf::Rect(bg->getTextureRect().left + 2, 0, 1280, 720));
-        if (bg->getTextureRect().left > 768) {
-            bg->setTextureRect(sf::Rect(0, 0, 1280, 720));
-        }
+            sf::Rect(bg->getTextureRect().left + 2, 0, int(getWindow().getSize().x), int(getWindow().getSize().y)));
         clock->restart();
     }
 }
