@@ -27,7 +27,7 @@ class RenderClass {
     void setFrameRate(int frameRate);
 
     void renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entities, std::shared_ptr<ecs::Entity> player);
-    void playEvent(std::shared_ptr<ecs::Entity> player);
+    void playEvent(std::shared_ptr<ecs::Entity> player, std::vector<std::shared_ptr<ecs::Entity>> &entities);
     void playerAnimations(std::shared_ptr<ecs::Entity> player, std::string direction);
 
   private:
@@ -35,6 +35,7 @@ class RenderClass {
     std::string _title;
     sf::VideoMode _videoMode;
     int _frameRate;
+    sf::Texture _bulletTexture;
 };
 
 void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);

@@ -37,6 +37,7 @@ RenderClass::RenderClass(
 
     this->_window.create(this->_videoMode, title);
     this->_window.setFramerateLimit(static_cast<unsigned int>(frameRate));
+    this->_bulletTexture.loadFromFile("./assets/sprites/r-typesheet1.gif");
 
     if (!this->_window.isOpen()) {
         throw ErrorClass("RTC001 : Failed to create the SFML window.");
@@ -109,7 +110,7 @@ void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entitie
     while (this->_window.isOpen()) {
         deltaTime = clock.restart().asSeconds();
         this->_window.clear();
-        playEvent(player);
+        playEvent(player, entities);
         this->_window.draw(background_s);
         positionSystem.update(entities, &this->_window, deltaTime);
         renderSystem.update(entities, &this->_window, deltaTime);
@@ -119,7 +120,7 @@ void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entitie
     }
 }
 
-void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player)
+void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player, std::vector<std::shared_ptr<ecs::Entity>> &entities)
 {
     sf::Event event;
     auto velocity = player->getComponent<ecs::VelocityComponent>();
@@ -141,6 +142,17 @@ void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player)
             } else if (event.key.code == sf::Keyboard::Left) {
                 velocity->setVx(-200.0f);
                 this->playerAnimations(player, "left");
+            } else if (event.key.code == sf::Keyboard::Space) {
+                auto bullet = std::make_shared<ecs::Entity>(rand());
+                bullet->addComponent(std::make_shared<ecs::BulletComponent>(1));
+                bullet->addComponent(std::make_shared<ecs::PositionComponent>(player->getComponent<ecs::PositionComponent>()->getX() + 100, player->getComponent<ecs::PositionComponent>()->getY() + 25));
+                bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+                bullet->addComponent(std::make_shared<ecs::RenderComponent>(
+                    ecs::ObjectType::SPRITE, this->_bulletTexture));
+                bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
+            sf::Rect(137, 153, 64, 16));
+
+                entities.push_back(bullet);
             }
         }
 
