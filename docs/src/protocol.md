@@ -15,7 +15,7 @@ format : CODE SP <?ARGS> HTLF
 
 - Player (100)
 
-    - Player connection (id, x, y) - 101 🔄
+    - Player connection (id, name, x, y) - 101 🔄
     - Player change position (id, x, y) - 102 🔄
     - Player killed (id) - 103 ➡️
     - Player shooting (id, x, y) - 104 🔄
@@ -41,3 +41,8 @@ format : CODE SP <?ARGS> HTLF
     - Win - 133 ➡️
     - Lose - 134 ➡️
     - Game Over - 135 ➡️
+
+
+## TODO, Binary Protocol:
+For the binary protocol:
+Add a `Networked` component in the ecs, then for all networked entities, send a packet like this: `<EntityID>:[<Component1TypeID>:[property1: value, property2: value, ...]...]`

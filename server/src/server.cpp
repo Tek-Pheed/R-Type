@@ -39,23 +39,23 @@ server::~server()
 {
 }
 
-template <>
-std::string getString(const char *arg) {
+template <> std::string getString(const char *arg)
+{
     return (std::string(arg));
 }
 
-template <>
-std::string getString(const std::string &arg) {
+template <> std::string getString(const std::string &arg)
+{
     return (arg);
 }
 
-template <>
-std::string getString(std::string &arg) {
+template <> std::string getString(std::string &arg)
+{
     return (arg);
 }
 
-template <>
-std::string getString(std::string arg) {
+template <> std::string getString(std::string arg)
+{
     return (arg);
 }
 
@@ -71,6 +71,17 @@ void server::writeToClient(Client &client, const std::string &data,
         client.writeBufferUDP += data;
     }
     _writeCondition.notify_one();
+}
+
+void server::handleNewPlayer(size_t id)
+{
+    auto player = std::make_shared<ecs::Entity>(rand());
+    player->addComponent(std::make_shared<ecs::PlayerComponent>(
+        std::string("Player ") + std::to_string(id)));
+    player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
+    player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
+    _gameState.emplace_back(player);
+    playerConnection(id);
 }
 
 void server::handle_packet(
@@ -94,8 +105,8 @@ void server::handle_packet(
             } else {
                 accept = makePacket(C_AUTHENTICATED_UDP, "OK");
                 client.isReady = true;
+                handleNewPlayer(clientID);
                 syncNewClientGameState(clientID);
-                playerConnection(clientID);
             }
             this->writeToClient(client, accept, System::Network::ISocket::TCP);
         }
@@ -187,21 +198,6 @@ int server::manage_buffer(std::string buffer)
     return 0;
 }
 
-void server::createGameState()
-{
-    // Create Players
-    for (size_t i = 0; i < MAX_PLAYERS; i++) {
-        auto player = std::make_shared<ecs::Entity>(rand());
-        player->addComponent(std::make_shared<ecs::PlayerComponent>(
-            std::string("Player ") + std::to_string(i)));
-        player->addComponent(
-            std::make_shared<ecs::PositionComponent>(100, 100));
-        player->addComponent(
-            std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
-        _gameState.emplace_back(player);
-    }
-}
-
 int main()
 {
     System::Network::initNetwork();
@@ -209,7 +205,6 @@ int main()
 
     try {
         s.create_server();
-        s.createGameState();
     } catch (const std::exception &e) {
         std::cerr << "Failed to launch the server: " << e.what() << std::endl;
         return (84);

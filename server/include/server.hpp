@@ -12,7 +12,6 @@
     #define NOMINMAX
 #endif
 
-#include <array>
 #include <cstddef>
 #include <mutex>
 #include <sys/types.h>
@@ -84,7 +83,7 @@ class server {
     {
         std::string pack = std::to_string(protocolCode);
 
-        for (const auto ag : {args...}) {
+        for (const auto &ag : {args...}) {
             pack += " " + getString(ag);
         }
         pack += PACKET_END;
@@ -143,7 +142,7 @@ class server {
 
     ssize_t authenticateUDPClient(const System::Network::byteArray &packet);
 
-    void createGameState();
+    void handleNewPlayer(size_t id);
 
   private:
     std::mutex _globalMutex;

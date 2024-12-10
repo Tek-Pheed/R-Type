@@ -20,8 +20,12 @@ std::shared_ptr<ecs::Entity> server::getPlayer(size_t playerID)
     auto players = getEntitiesByComponent<ecs::PlayerComponent>();
 
     for (const auto &pl : players) {
-        if (pl->getID() == playerID)
-            return (pl);
+        if (pl != nullptr) {
+            auto ps = pl->getComponent<ecs::PlayerComponent>();
+            if (ps != nullptr
+                && ps->getName() == "Player " + getString(playerID))
+                return (pl);
+        }
     }
     return (nullptr);
 }
@@ -33,12 +37,12 @@ int server::playerConnection(size_t id)
     if (player == nullptr)
         return (-1);
     auto playerPosition = player->getComponent<ecs::PositionComponent>();
+    auto playerComp = player->getComponent<ecs::PlayerComponent>();
     if (playerPosition == nullptr)
         return (-1);
     send_to_others(
-        makePacket(P_CONN, playerPosition->getX(), playerPosition->getY()),
-        id);
-    return 0;
+        makePacket(P_CONN, playerPosition->getX(), playerPosition->getY()), id);
+    return (0);
 }
 
 int server::playerPosition(int id, int x, int y)
