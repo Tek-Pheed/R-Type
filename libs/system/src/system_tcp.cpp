@@ -68,6 +68,8 @@ void TCPSocket::initSocket(
 TCPSocket::TCPSocket()
 {
     tcpSockID++;
+    this->_sockfd = 0;
+    this->_mode = CONNECT;
     this->_type = System::Network::ISocket::TCP;
     this->_uid = tcpSockID;
     this->_opened = false;
