@@ -39,6 +39,7 @@ class client {
     void create_new_player(std::vector<std::string> &tokens);
     void set_new_position(std::vector<std::string> &tokens);
     void player_dead(std::vector<std::string> &tokens);
+    void create_projectile(std::vector<std::string> &tokens);
     void set_player_health(std::vector<std::string> &tokens);
     void player_disconnection(std::vector<std::string> &tokens);
 

@@ -36,6 +36,7 @@ RenderClass::RenderClass(
 
     this->_window.create(this->_videoMode, title);
     this->_window.setFramerateLimit(static_cast<unsigned int>(frameRate));
+    this->_bulletTexture.loadFromFile("./assets/sprites/r-typesheet1.gif");
 
     if (!this->_window.isOpen()) {
         throw ErrorClass("RTC001 : Failed to create the SFML window.");

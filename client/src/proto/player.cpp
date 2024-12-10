@@ -63,6 +63,41 @@ void client::player_dead(std::vector<std::string> &tokens)
     }
 }
 
+void client::create_projectile(std::vector<std::string> &tokens)
+{
+    const int id = std::stoi(tokens[0]);
+    float x = 0.0f;
+    float y = 0.0f;
+
+    sf::Texture bulletTexture;
+    bulletTexture.loadFromFile("./assets/sprites/r-typesheet1.gif");
+
+    for (auto &entity : _entities) {
+        if (entity->getID() == static_cast<size_t>(id)) {
+            auto playerComp = entity->getComponent<ecs::PlayerComponent>();
+            if (playerComp == nullptr)
+                return;
+            auto position = entity->getComponent<ecs::PositionComponent>();
+            x = position->getX();
+            y = position->getY();
+            break;
+        }
+    }
+
+    auto bullet = std::make_shared<ecs::Entity>(rand());
+    bullet->addComponent(std::make_shared<ecs::BulletComponent>(1));
+    bullet->addComponent(
+        std::make_shared<ecs::PositionComponent>(x + 100, y + 25));
+    bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+
+    bullet->addComponent(std::make_shared<ecs::RenderComponent>(
+        ecs::ObjectType::SPRITE, bulletTexture));
+
+    bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
+        sf::Rect(137, 153, 64, 16));
+    _entities.push_back(bullet);
+}
+
 void client::set_player_health(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);

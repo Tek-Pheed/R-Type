@@ -36,6 +36,7 @@ class RenderClass {
     std::string _title;
     sf::VideoMode _videoMode;
     int _frameRate;
+    sf::Texture _bulletTexture;
 };
 
 void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);
