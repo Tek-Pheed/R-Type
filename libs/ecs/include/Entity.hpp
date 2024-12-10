@@ -43,6 +43,9 @@ namespace ecs
             this->_components.erase(typeid(componentType));
         }
 
+        std::size_t getID() const;
+        void setID(std::size_t id);
+
       private:
         std::size_t _id;
         std::unordered_map<std::type_index, std::shared_ptr<Component>>
