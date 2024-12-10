@@ -50,9 +50,10 @@ Client &server::getClient(size_t id)
 
 void server::removeClient(size_t id)
 {
-    std::unique_lock lock(_globalMutex);
-
-    _clients.erase(id);
+    _globalMutex.lock();
+    _clients.at(id).isDisconnected = true;
+    _globalMutex.unlock();
+    playerDisconnection(id);
     std::cout << "Removed a client (" << std::to_string(_clientCounter)
               << ") from the server." << std::endl;
 }

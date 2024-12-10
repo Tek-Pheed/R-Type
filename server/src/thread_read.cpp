@@ -42,7 +42,7 @@ void server::threadedServerRead()
         System::Network::byteArray arr;
         System::Network::byteArray vect;
         System::Network::socketSetGeneric readfds;
-        System::Network::timeoutStruct tv = {{0, 500000}};
+        System::Network::timeoutStruct tv = {{0, 50000}};
 
         while (true) {
             readfds.clear();
@@ -50,7 +50,8 @@ void server::threadedServerRead()
             readfds.emplace_back(&_serverSocketUDP);
             for (auto &pair : _clients) {
                 Client &ref = pair.second;
-                readfds.emplace_back(&ref.tcpSocket);
+                if (!ref.isDisconnected)
+                    readfds.emplace_back(&ref.tcpSocket);
             }
             this->_globalMutex.unlock();
             System::Network::select(&readfds, nullptr, nullptr, tv);
@@ -74,8 +75,10 @@ void server::threadedServerRead()
                                       << std::endl;
                             removeClient((size_t) id);
                         } else {
-                            vect = sock->receive();
                             Client &client = this->getClient((size_t) id);
+                            if (client.isDisconnected)
+                                continue;
+                            vect = sock->receive();
                             std::string buff =
                                 System::Network::decodeString(vect);
                             std::cout
@@ -127,6 +130,8 @@ void server::threadedServerRead()
                                           << std::to_string(sock->getUID())
                                           << ")" << std::endl;
                                 Client &client = getClient((size_t) id);
+                                if (client.isDisconnected)
+                                    continue;
                                 client.ip = addr;
                                 client.port = port;
                                 this->handle_packet((size_t) id,
@@ -134,6 +139,8 @@ void server::threadedServerRead()
                             }
                         }
                         Client &client = getClient((size_t) id);
+                        if (client.isDisconnected)
+                            continue;
                         std::string buff = System::Network::decodeString(vect);
                         std::cout << "[Read Thread] Message received on UDP ("
                                   << std::to_string(sock->getUID())

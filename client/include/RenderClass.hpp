@@ -30,6 +30,7 @@ class RenderClass {
     void playEvent(std::shared_ptr<ecs::Entity> player);
     void playerAnimations(
         std::shared_ptr<ecs::Entity> player, std::string direction);
+    void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);
 
     void setPlayerTexture(sf::Texture &texture);
     sf::Texture &getPlayerTexture();
@@ -43,6 +44,5 @@ class RenderClass {
     sf::Texture _playerTexture;
 };
 
-void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);
 
 #endif /* !RENDERCLASS_HPP_ */
