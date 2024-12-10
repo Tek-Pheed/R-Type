@@ -6,6 +6,7 @@
 */
 
 #include <cstddef>
+#include <string>
 #include "Components.hpp"
 #include "server.hpp"
 
@@ -40,8 +41,11 @@ int server::playerConnection(size_t id)
     auto playerComp = player->getComponent<ecs::PlayerComponent>();
     if (playerPosition == nullptr)
         return (-1);
-    send_to_others(
-        makePacket(P_CONN, playerPosition->getX(), playerPosition->getY()), id);
+    std::string idStr = std::to_string(id);
+    std::string name = "TEST";
+    std::string xStr = std::to_string(playerPosition->getX());
+    std::string yStr = std::to_string(playerPosition->getY());
+    send_to_others(makePacket(P_CONN, idStr, name, xStr, yStr), id);
     return (0);
 }
 

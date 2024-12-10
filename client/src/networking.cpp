@@ -41,7 +41,7 @@ int is_code_valid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
-    if (code >= C_INIT_UDP && code <= C_START_UDP)
+    if (code >= C_INIT_UDP && code <= C_AUTH)
         return 9;
     return -1;
 }
@@ -49,7 +49,6 @@ int is_code_valid(int code)
 int client::manage_buffers()
 {
     std::unique_lock lock(_mutex);
-    std::cout << "Manage buffers " << _buffers.size() << std::endl;
     if (_buffers.size() == 0)
         return 0;
     for (auto buffer : _buffers) {
@@ -57,13 +56,14 @@ int client::manage_buffers()
         int code = atoi(codeStr.c_str());
         int code_int = is_code_valid(code);
         std::vector<std::string> tokens;
-
+        std::cout << "Code: " << code_int << std::endl;
         if (code_int == -1) {
             return -1;
         }
         std::string str = buffer.substr(4, buffer.size() - 4);
         std::istringstream ss(str);
         std::string token;
+        std::cout << "Buffer: " << buffer << std::endl;
         while (std::getline(ss, token, ' ')) {
             tokens.push_back(token);
         }

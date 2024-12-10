@@ -14,6 +14,7 @@
 
 #include <cstddef>
 #include <mutex>
+#include <string>
 #include <sys/types.h>
 #include <vector>
 #include "Entity.hpp"
@@ -63,7 +64,7 @@ class Client {
         : tcpSocket(System::Network::TCPSocket()), ip(std::string()),
           port(uint16_t()), readBufferTCP(std::string()),
           writeBufferTCP(std::string()), readBufferUDP(std::string()),
-          writeBufferUDP(std::string()), isReady(false) {};
+          writeBufferUDP(std::string()), isReady(false){};
 };
 
 template <typename T> std::string getString(T arg)

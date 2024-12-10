@@ -54,7 +54,17 @@ template <> std::string getString(std::string &arg)
     return (arg);
 }
 
+template <> std::string getString(const std::string &arg)
+{
+    return (arg);
+}
+
 template <> std::string getString(std::string arg)
+{
+    return (arg);
+}
+
+template <> std::string getString(const std::string arg)
 {
     return (arg);
 }
