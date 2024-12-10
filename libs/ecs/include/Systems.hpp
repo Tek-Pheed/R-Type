@@ -24,14 +24,17 @@ namespace ecs
       public:
         void update(std::vector<std::shared_ptr<ecs::Entity>> &entity,
             sf::RenderWindow *window, float deltaTime) override;
-
     };
 
     class PositionSystem : public ISystem {
       public:
+        void update(std::vector<std::shared_ptr<ecs::Entity>> &entities,
+            sf::RenderWindow *window, float deltaTime) override;
+    };
 
-        void update(std::vector<std::shared_ptr<ecs::Entity>> &entities, sf::RenderWindow *window, float deltaTime) override;
-
+    class BulletSystem : public ISystem {
+        void update(std::vector<std::shared_ptr<ecs::Entity>> &entities,
+            sf::RenderWindow *window, float deltaTime) override;
     };
 } // namespace ecs
 
