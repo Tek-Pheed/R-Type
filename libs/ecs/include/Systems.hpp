@@ -33,6 +33,7 @@ namespace ecs
     };
 
     class BulletSystem : public ISystem {
+      public:
         void update(std::vector<std::shared_ptr<ecs::Entity>> &entities,
             sf::RenderWindow *window, float deltaTime) override;
     };

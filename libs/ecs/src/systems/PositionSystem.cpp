@@ -13,24 +13,39 @@ void ecs::PositionSystem::update(
 {
     for (auto &entity : entities) {
         auto positionComponent =
-            entity.get()->getComponent<ecs::PositionComponent>();
+            entity->getComponent<ecs::PositionComponent>();
         auto velocityComponent =
-            entity.get()->getComponent<ecs::VelocityComponent>();
-        if (positionComponent && velocityComponent) {
+            entity->getComponent<ecs::VelocityComponent>();
+        auto bullet = entity->getComponent<ecs::BulletComponent>();
+        auto render = entity->getComponent<ecs::RenderComponent>();
+        if (positionComponent && velocityComponent && !bullet && render) {
             float newX = static_cast<float>(positionComponent->getX())
                 + static_cast<float>(velocityComponent->getVx()) * deltaTime;
             float newY = static_cast<float>(positionComponent->getY())
                 + static_cast<float>(velocityComponent->getVy()) * deltaTime;
 
-            auto windowSize = window->getSize();
-            float windowWidth = static_cast<float>(windowSize.x);
-            float windowHeight = static_cast<float>(windowSize.y);
-            
-            if (newX >= 0 && newX <= windowWidth) {
-                positionComponent->setX(newX);
+            positionComponent->setX(newX);
+            positionComponent->setY(newY);
+
+            float maxX = float(window->getSize().x)
+                - float(render->getSprite()->getTextureRect().width)
+                - float(render->getSprite()->getScale().x);
+
+            float maxY = float(window->getSize().y)
+                - float(render->getSprite()->getTextureRect().height)
+                - float(render->getSprite()->getScale().y);
+
+            if (positionComponent->getX() < 0) {
+                positionComponent->setX(0);
             }
-            if (newY >= 0 && newY <= windowHeight) {
-                positionComponent->setY(newY);
+            if (positionComponent->getX() > maxX) {
+                positionComponent->setX(maxX);
+            }
+            if (positionComponent->getY() < 0) {
+                positionComponent->setY(0);
+            }
+            if (positionComponent->getY() > maxY) {
+                positionComponent->setY(maxY);
             }
         }
     }
