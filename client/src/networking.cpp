@@ -49,7 +49,7 @@ int is_code_valid(int code)
 int client::manage_buffers()
 {
     std::unique_lock lock(_mutex);
-
+    std::cout << "Manage buffers " << _buffers.size() << std::endl;
     if (_buffers.size() == 0)
         return 0;
     for (auto buffer : _buffers) {
@@ -67,7 +67,8 @@ int client::manage_buffers()
         while (std::getline(ss, token, ' ')) {
             tokens.push_back(token);
         }
-
+        std::cout << "Manage buffer: " << buffer << std::endl;
+        std::cout << "Code: " << code << std::endl;
         switch (code_int) {
             case 0: handle_player(code, tokens); break;
             case 1: handle_enemy(code, tokens); break;

@@ -39,7 +39,7 @@ int main(void)
     System::Network::initNetwork();
 
     // To be set to user input later
-    client.create_connection("127.0.0.1", 8081, 8082);
+    client.create_connection("10.15.193.55", 8081, 8082);
     std::thread(&client::receive_message, &client).detach();
     std::cout << "Client connected" << std::endl;
 

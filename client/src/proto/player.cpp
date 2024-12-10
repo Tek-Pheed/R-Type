@@ -12,6 +12,7 @@
 
 void client::create_new_player(std::vector<std::string> &tokens)
 {
+    std::cout << "Create new player" << std::endl;
     const int id = std::stoi(tokens[0]);
     const float x = std::stof(tokens[1]);
     const float y = std::stof(tokens[2]);
@@ -132,7 +133,7 @@ void client::player_disconnection(std::vector<std::string> &tokens)
 
 void client::handle_player(int code, std::vector<std::string> &tokens)
 {
-    (void) tokens;
+    std::cout << "Handling player" << std::endl;
     switch (code) {
         case P_CONN: {
             create_new_player(tokens);
