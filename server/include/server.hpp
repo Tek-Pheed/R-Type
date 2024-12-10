@@ -113,16 +113,17 @@ class server {
     void threadedServerWrite();
 
     template <typename T>
-    std::shared_ptr<ecs::Entity> getEntityByComponent(size_t clientID)
+    std::vector<std::shared_ptr<ecs::Entity>> getEntitiesByComponent()
     {
-        std::shared_ptr<T> component;
+        std::vector<std::shared_ptr<ecs::Entity>> ent;
+        std::shared_ptr<T> comp = nullptr;
 
-        for (auto entity : _gameStates.at(clientID)) {
-            component = entity->getComponent<T>();
-            if (component != nullptr)
-                return (entity);
+        for (auto entity : _gameState) {
+            comp = entity->getComponent<T>();
+            if (comp != nullptr)
+                ent.emplace_back(entity);
         }
-        return (nullptr);
+        return (ent);
     }
 
     void syncNewClientGameState(size_t newClient);
@@ -154,8 +155,7 @@ class server {
     System::Network::UDPSocket _serverSocketUDP;
 
     std::unordered_map<size_t, Client> _clients;
-    std::unordered_map<size_t, std::vector<std::shared_ptr<ecs::Entity>>>
-        _gameStates;
+    std::vector<std::shared_ptr<ecs::Entity>> _gameState;
 
     std::vector<Player_t> _players;
     std::vector<Enemy_t> _enemies;

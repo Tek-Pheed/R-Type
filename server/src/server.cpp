@@ -198,7 +198,7 @@ void server::createGameState()
             std::make_shared<ecs::PositionComponent>(100, 100));
         player->addComponent(
             std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
-        _gameStates[i].emplace_back(player);
+        _gameState.emplace_back(player);
     }
 }
 

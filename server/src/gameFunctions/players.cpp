@@ -9,14 +9,21 @@
 #include "Components.hpp"
 #include "server.hpp"
 
-void server::syncNewClientGameState(size_t newClient) {
+void server::syncNewClientGameState(size_t newClient)
+{
     std::cout << "The player will receive the gameState now" << std::endl;
-    //TODO: Sync newly connected client
+    // TODO: Sync newly connected client
 }
 
 std::shared_ptr<ecs::Entity> server::getPlayer(size_t playerID)
 {
-    return (getEntityByComponent<ecs::PlayerComponent>(playerID));
+    auto players = getEntitiesByComponent<ecs::PlayerComponent>();
+
+    for (const auto &pl : players) {
+        if (pl->getID() == playerID)
+            return (pl);
+    }
+    return (nullptr);
 }
 
 int server::playerConnection(size_t id)
