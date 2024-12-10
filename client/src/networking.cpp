@@ -5,9 +5,11 @@
 ** networking
 */
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
+
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
@@ -73,6 +75,11 @@ int client::manage_buffers()
             case 3: handle_mechs(code, tokens); break;
             case 9: handle_connection(code, tokens); break;
             default: break;
+        }
+        auto it =
+            std::find(_buffers.begin(), _buffers.end(), std::string(buffer));
+        if (it != _buffers.end()) {
+            _buffers.erase(it);
         }
     }
     return 0;
