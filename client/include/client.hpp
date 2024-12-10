@@ -12,6 +12,7 @@
 #include <mutex>
 
 #include "Entity.hpp"
+class RenderClass;
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
@@ -19,7 +20,7 @@
 class client {
     /* data */
   public:
-    client();
+    client(RenderClass &render);
     ~client();
     int create_connection(const char *ip, int portTCP, int portUDP);
     int manage_buffers();
@@ -35,6 +36,9 @@ class client {
     std::vector<std::shared_ptr<ecs::Entity>> &get_entities();
     int get_id();
 
+    void update_localplayer_position();
+    std::shared_ptr<ecs::Entity> &getLocalPlayer();
+
     // Player Management
     void create_new_player(std::vector<std::string> &tokens);
     void set_new_position(std::vector<std::string> &tokens);
@@ -48,9 +52,11 @@ class client {
     System::Network::UDPSocket _clientSocketUDP;
 
     int _id;
+    std::shared_ptr<ecs::Entity> _player;
     std::vector<std::string> _buffers;
     std::mutex _mutex;
     std::vector<std::shared_ptr<ecs::Entity>> _entities;
+    RenderClass &_refRender;
 };
 
 #endif /*CLIENT_HPP*/

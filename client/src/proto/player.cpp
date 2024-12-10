@@ -6,6 +6,7 @@
 */
 
 #include "Entity.hpp"
+#include "RenderClass.hpp"
 #include "client.hpp"
 #include "protocol.hpp"
 
@@ -17,9 +18,6 @@ void client::create_new_player(std::vector<std::string> &tokens)
     const std::string name = tokens[1];
     const float x = std::stof(tokens[2]);
     const float y = std::stof(tokens[3]);
-    sf::Texture playerTexture;
-
-    playerTexture.loadFromFile("assets/sprites/r-typesheet42.gif");
 
     auto player = std::make_shared<ecs::Entity>(id);
     player->addComponent(std::make_shared<ecs::PlayerComponent>(name));
@@ -27,7 +25,7 @@ void client::create_new_player(std::vector<std::string> &tokens)
     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
 
     player->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, playerTexture));
+        ecs::ObjectType::SPRITE, _refRender.getPlayerTexture()));
 
     player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(66, 0, 33, 14));
@@ -140,7 +138,6 @@ void client::player_disconnection(std::vector<std::string> &tokens)
 
 void client::handle_player(int code, std::vector<std::string> &tokens)
 {
-    std::cout << "Handling player" << std::endl;
     switch (code) {
         case P_CONN: {
             create_new_player(tokens);

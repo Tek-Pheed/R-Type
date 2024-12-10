@@ -21,9 +21,10 @@
 #include "client.hpp"
 #include "protocol.hpp"
 
-client::client()
+client::client(RenderClass &render)
     : _clientSocketTCP(System::Network::TCPSocket()),
-      _clientSocketUDP(System::Network::UDPSocket()), _id(-1)
+      _clientSocketUDP(System::Network::UDPSocket()), _id(-1),
+      _refRender(render)
 {
     return;
 }
@@ -60,7 +61,6 @@ int client::manage_buffers()
         int code = atoi(codeStr.c_str());
         int code_int = is_code_valid(code);
         std::vector<std::string> tokens;
-        std::cout << "Code: " << code_int << std::endl;
         if (code_int == -1) {
             return -1;
         }
@@ -71,8 +71,6 @@ int client::manage_buffers()
         while (std::getline(ss, token, ' ')) {
             tokens.push_back(token);
         }
-        std::cout << "Manage buffer: " << buffer << std::endl;
-        std::cout << "Code: " << code << std::endl;
         switch (code_int) {
             case 0: handle_player(code, tokens); break;
             case 1: handle_enemy(code, tokens); break;
@@ -97,7 +95,6 @@ void client::writeToServer(
         std::cout << "Sending TCP: " << data << std::endl;
         _clientSocketTCP.sendData(System::Network::encodeString(data));
     } else {
-        std::cout << "Sending UDP: " << data << std::endl;
         _clientSocketUDP.sendData(System::Network::encodeString(data));
     }
 }

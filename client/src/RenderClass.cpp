@@ -11,6 +11,7 @@
 
 #include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
+#include "Components.hpp"
 #include <thread>
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
@@ -69,7 +70,6 @@ int RenderClass::getFrameRate() const
 {
     return this->_frameRate;
 }
-
 void RenderClass::setTitle(const std::string &newTitle)
 {
     if (newTitle.empty()) {
@@ -90,8 +90,17 @@ void RenderClass::setFrameRate(int newFrameRate)
     this->_window.setFramerateLimit(static_cast<unsigned int>(newFrameRate));
 }
 
-void RenderClass::renderWindow(
-    std::shared_ptr<ecs::Entity> player, client &client)
+void RenderClass::setPlayerTexture(sf::Texture &texture)
+{
+    _playerTexture = texture;
+}
+
+sf::Texture &RenderClass::getPlayerTexture()
+{
+    return _playerTexture;
+}
+
+void RenderClass::renderWindow(client &client)
 {
     sf::Clock clock;
     sf::Clock clockAnim;
@@ -100,6 +109,7 @@ void RenderClass::renderWindow(
     ecs::BulletSystem bulletSystem;
     sf::Texture background_t;
     sf::Sprite background_s;
+    auto player = client.getLocalPlayer();
     float deltaTime = 0.00;
 
     _window.setMouseCursorVisible(false);
@@ -115,6 +125,7 @@ void RenderClass::renderWindow(
         this->_window.draw(background_s);
         positionSystem.update(
             client.get_entities(), &this->_window, deltaTime);
+        client.update_localplayer_position();
         renderSystem.update(client.get_entities(), &this->_window, deltaTime);
         client.manage_buffers();
         bulletSystem.update(entities, &this->_window, deltaTime);
