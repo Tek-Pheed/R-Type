@@ -118,7 +118,7 @@ void RenderClass::renderWindow(client &client)
         this->_window.draw(background_s);
         positionSystem.update(
             client.get_entities(), &this->_window, deltaTime);
-        // client.update_localplayer_position();
+        client.update_localplayer_position();
         renderSystem.update(client.get_entities(), &this->_window, deltaTime);
         client.manage_buffers();
         this->_window.display();

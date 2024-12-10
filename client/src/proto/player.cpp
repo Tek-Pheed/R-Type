@@ -139,7 +139,6 @@ void client::player_disconnection(std::vector<std::string> &tokens)
 
 void client::handle_player(int code, std::vector<std::string> &tokens)
 {
-    std::cout << "Handling player" << std::endl;
     switch (code) {
         case P_CONN: {
             create_new_player(tokens);
