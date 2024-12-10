@@ -121,14 +121,14 @@ void RenderClass::renderWindow(client &client)
     while (this->_window.isOpen()) {
         deltaTime = clock.restart().asSeconds();
         this->_window.clear();
-        playEvent(player, entities);
+        playEvent(player, client.get_entities());
         this->_window.draw(background_s);
         positionSystem.update(
             client.get_entities(), &this->_window, deltaTime);
         client.update_localplayer_position();
         renderSystem.update(client.get_entities(), &this->_window, deltaTime);
         client.manage_buffers();
-        bulletSystem.update(entities, &this->_window, deltaTime);
+        bulletSystem.update(client.get_entities(), &this->_window, deltaTime);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
     }
