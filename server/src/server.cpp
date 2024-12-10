@@ -92,7 +92,7 @@ void server::handle_packet(
     if (socketType == System::Network::ISocket::UDP) {
         if (!client.isReady) {
             std::string accept = "";
-            if (_clients.size() >= MAX_PLAYERS) {
+            if (_clients.size() > MAX_PLAYERS) {
                 accept = makePacket(C_AUTH, "KO");
                 std::cout
                     << "Server: Maximum number of player reached, cannot "

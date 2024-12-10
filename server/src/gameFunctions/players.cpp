@@ -73,12 +73,14 @@ int server::playerPosition(int id, float x, float y)
     std::shared_ptr<ecs::Entity> player = getPlayer((size_t) id);
 
     if (player == nullptr) {
-        std::cerr << "Failed to update player: " << std::to_string(id) << std::endl;
+        std::cerr << "Failed to update player: " << std::to_string(id)
+                  << std::endl;
         return (-1);
     }
     auto pos = player->getComponent<ecs::PositionComponent>();
     if (pos == nullptr) {
-        std::cerr << "Failed to update player: " << std::to_string(id) << std::endl;
+        std::cerr << "Failed to update player: " << std::to_string(id)
+                  << std::endl;
         return (-1);
     }
     std::cout << "Update player pos" << std::endl;
@@ -94,7 +96,8 @@ int server::playerKilled(size_t id)
     std::unique_lock lock(_globalMutex);
     auto player = getPlayer(id);
 
-    auto foundPlayerIt = std::find( _gameState.begin(), _gameState.end(), player);
+    auto foundPlayerIt =
+        std::find(_gameState.begin(), _gameState.end(), player);
 
     if (foundPlayerIt != _gameState.end()) {
         _gameState.erase(foundPlayerIt);
@@ -104,27 +107,33 @@ int server::playerKilled(size_t id)
     return (0);
 }
 
-int server::playerShooting(int id, int x, int y)
+int server::playerShooting(int id)
 {
     // send to all projectiles at x y
+    std::string pack = makePacket(player::P_SHOOT, id);
+    send_to_others(pack, (size_t) id);
     return 0;
 }
 
 int server::playerDamaged(int id, int amount)
 {
-    // Player_t *player = nullptr;
-    // for (size_t i = 0; i != _players.size(); i++) {
-    //     if (_players[i].id == id)
-    //         player = &_players[i];
-    // }
-    // if (player == nullptr)
-    //     return (-1);
-    // player->hp -= amount;
-    // if (player->hp <= 0)
-    //    playerKilled(id);
-    // else
-    //  send to all;
-    return 0;
+    auto playerEntity = getPlayer((size_t) id);
+
+    if (playerEntity != nullptr) {
+        auto playerHealth = playerEntity->getComponent<ecs::HealthComponent>();
+        if (playerHealth != nullptr) {
+            playerHealth->setHealth(playerHealth->getHealth() - amount);
+            if (playerHealth->getHealth() <= 0) {
+                playerKilled((size_t) id);
+                return (0);
+            }
+            std::string pack = makePacket(player::P_DMG, id, playerHealth->getHealth());
+            send_to_all(pack);
+            return (0);
+        }
+        return (-1);
+    }
+    return (-1);
 }
 
 int server::playerDisconnection(size_t id)

@@ -169,7 +169,7 @@ class server {
     int playerConnection(size_t id);
     int playerPosition(int id, float x, float y);
     int playerKilled(size_t id);
-    int playerShooting(int id, int x, int y);
+    int playerShooting(int id);
     int playerDamaged(int id, int amount);
     int playerDisconnection(size_t id);
     int handle_player(int code, const std::vector<std::string> &tokens);
