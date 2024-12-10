@@ -5,6 +5,10 @@
 ** networking
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -17,9 +21,10 @@
 #include "client.hpp"
 #include "protocol.hpp"
 
-client::client()
+client::client(RenderClass &render)
     : _clientSocketTCP(System::Network::TCPSocket()),
-      _clientSocketUDP(System::Network::UDPSocket()), _id(-1)
+      _clientSocketUDP(System::Network::UDPSocket()), _id(-1),
+      _refRender(render)
 {
     return;
 }
@@ -41,7 +46,7 @@ int is_code_valid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
-    if (code >= C_INIT_UDP && code <= C_START_UDP)
+    if (code >= C_INIT_UDP && code <= C_AUTH)
         return 9;
     return -1;
 }
@@ -49,7 +54,6 @@ int is_code_valid(int code)
 int client::manage_buffers()
 {
     std::unique_lock lock(_mutex);
-
     if (_buffers.size() == 0)
         return 0;
     for (auto buffer : _buffers) {
@@ -57,17 +61,16 @@ int client::manage_buffers()
         int code = atoi(codeStr.c_str());
         int code_int = is_code_valid(code);
         std::vector<std::string> tokens;
-
         if (code_int == -1) {
             return -1;
         }
         std::string str = buffer.substr(4, buffer.size() - 4);
         std::istringstream ss(str);
         std::string token;
+        std::cout << "Buffer: " << buffer << std::endl;
         while (std::getline(ss, token, ' ')) {
             tokens.push_back(token);
         }
-
         switch (code_int) {
             case 0: handle_player(code, tokens); break;
             case 1: handle_enemy(code, tokens); break;
@@ -92,7 +95,6 @@ void client::writeToServer(
         std::cout << "Sending TCP: " << data << std::endl;
         _clientSocketTCP.sendData(System::Network::encodeString(data));
     } else {
-        std::cout << "Sending UDP: " << data << std::endl;
         _clientSocketUDP.sendData(System::Network::encodeString(data));
     }
 }

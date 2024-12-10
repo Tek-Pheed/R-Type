@@ -13,7 +13,7 @@
 enum connect {
     C_INIT_UDP = 901,
     C_START_UDP = 902,
-    C_AUTHENTICATED_UDP = 903,
+    C_AUTH = 903,
 };
 
 enum player {

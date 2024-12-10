@@ -5,14 +5,34 @@
 ** players
 */
 
+#include <algorithm>
 #include <cstddef>
+#include <memory>
+#include <mutex>
+#include <string>
 #include "Components.hpp"
 #include "server.hpp"
 
 void server::syncNewClientGameState(size_t newClient)
 {
-    std::cout << "The player will receive the gameState now" << std::endl;
-    // TODO: Sync newly connected client
+    auto players = getEntitiesByComponent<ecs::PlayerComponent>();
+
+    for (const auto &p : players) {
+        if (p != nullptr) {
+            auto comp_player = p->getComponent<ecs::PlayerComponent>();
+            auto comp_pos = p->getComponent<ecs::PositionComponent>();
+            std::string pack = "";
+            if (comp_player == nullptr || comp_pos == nullptr)
+                continue;
+            if (p->getID() == newClient)
+                continue;
+            std::string id = getString(p->getID());
+            std::string x = getString(comp_pos->getX());
+            std::string y = getString(comp_pos->getY());
+            pack = makePacket(P_CONN, id, comp_player->getName(), x, y);
+            send_to_one(pack, newClient);
+        }
+    }
 }
 
 std::shared_ptr<ecs::Entity> server::getPlayer(size_t playerID)
@@ -20,8 +40,12 @@ std::shared_ptr<ecs::Entity> server::getPlayer(size_t playerID)
     auto players = getEntitiesByComponent<ecs::PlayerComponent>();
 
     for (const auto &pl : players) {
-        if (pl->getID() == playerID)
-            return (pl);
+        if (pl != nullptr) {
+            auto ps = pl->getComponent<ecs::PlayerComponent>();
+            if (ps != nullptr
+                && ps->getName() == "Player " + getString(playerID))
+                return (pl);
+        }
     }
     return (nullptr);
 }
@@ -33,34 +57,51 @@ int server::playerConnection(size_t id)
     if (player == nullptr)
         return (-1);
     auto playerPosition = player->getComponent<ecs::PositionComponent>();
+    auto playerComp = player->getComponent<ecs::PlayerComponent>();
     if (playerPosition == nullptr)
         return (-1);
-    send_to_others(
-        makePacket(P_CONN, playerPosition->getX(), playerPosition->getY()),
-        id);
-    return 0;
+    std::string idStr = std::to_string(id);
+    std::string name = playerComp->getName();
+    std::string xStr = std::to_string(playerPosition->getX());
+    std::string yStr = std::to_string(playerPosition->getY());
+    send_to_others(makePacket(P_CONN, idStr, name, xStr, yStr), id);
+    return (0);
 }
 
-int server::playerPosition(int id, int x, int y)
+int server::playerPosition(int id, float x, float y)
 {
-    Player_t *player = nullptr;
-    for (size_t i = 0; i != _players.size(); i++) {
-        if (_players[i].id == id)
-            player = &_players[i];
-    }
-    if (player == nullptr)
+    std::shared_ptr<ecs::Entity> player = getPlayer((size_t) id);
+
+    if (player == nullptr) {
+        std::cerr << "Failed to update player: " << std::to_string(id) << std::endl;
         return (-1);
-    player->x = x;
-    player->y = y;
-    // send to all
+    }
+    auto pos = player->getComponent<ecs::PositionComponent>();
+    if (pos == nullptr) {
+        std::cerr << "Failed to update player: " << std::to_string(id) << std::endl;
+        return (-1);
+    }
+    std::cout << "Update player pos" << std::endl;
+    pos->setX(x);
+    pos->setY(x);
+    std::string pack = makePacket(player::P_POS, (float) id, x, y);
+    send_to_others(pack, (size_t) id);
     return 0;
 }
 
-int server::playerKilled(int id)
+int server::playerKilled(size_t id)
 {
-    _players.erase(_players.begin() + id);
-    // send to all
-    return 0;
+    std::unique_lock lock(_globalMutex);
+    auto player = getPlayer(id);
+
+    auto foundPlayerIt = std::find( _gameState.begin(), _gameState.end(), player);
+
+    if (foundPlayerIt != _gameState.end()) {
+        _gameState.erase(foundPlayerIt);
+    }
+    std::string pack = makePacket(player::P_DEAD, id);
+    send_to_all(pack);
+    return (0);
 }
 
 int server::playerShooting(int id, int x, int y)
@@ -71,23 +112,25 @@ int server::playerShooting(int id, int x, int y)
 
 int server::playerDamaged(int id, int amount)
 {
-    Player_t *player = nullptr;
-    for (size_t i = 0; i != _players.size(); i++) {
-        if (_players[i].id == id)
-            player = &_players[i];
-    }
-    if (player == nullptr)
-        return (-1);
-    player->hp -= amount;
-    if (player->hp <= 0)
-        playerKilled(id);
+    // Player_t *player = nullptr;
+    // for (size_t i = 0; i != _players.size(); i++) {
+    //     if (_players[i].id == id)
+    //         player = &_players[i];
+    // }
+    // if (player == nullptr)
+    //     return (-1);
+    // player->hp -= amount;
+    // if (player->hp <= 0)
+    //    playerKilled(id);
     // else
     //  send to all;
     return 0;
 }
 
-int server::playerDisconnection(int id)
+int server::playerDisconnection(size_t id)
 {
     playerKilled(id);
+    std::string pack = makePacket(player::P_DISCONN, id);
+    send_to_all(pack);
     return 0;
 }

@@ -23,12 +23,18 @@ namespace ecs
 
         float getX();
         float getY();
+        float getOldY();
+        float getOldX();
         void setX(float x);
         void setY(float y);
+        void setOldX(float oldX);
+        void setOldY(float oldY);
 
       private:
         float _x;
         float _y;
+        float _oldX;
+        float _oldY;
     };
 
     class PlayerComponent : public Component {

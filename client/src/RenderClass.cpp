@@ -5,8 +5,13 @@
 ** RenderClass
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
+#include "Components.hpp"
 #include <thread>
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
@@ -65,7 +70,6 @@ int RenderClass::getFrameRate() const
 {
     return this->_frameRate;
 }
-
 void RenderClass::setTitle(const std::string &newTitle)
 {
     if (newTitle.empty()) {
@@ -86,11 +90,18 @@ void RenderClass::setFrameRate(int newFrameRate)
     this->_window.setFramerateLimit(static_cast<unsigned int>(newFrameRate));
 }
 
-void RenderClass::renderWindow(
-    std::vector<std::shared_ptr<ecs::Entity>> entities,
-    std::shared_ptr<ecs::Entity> player)
+void RenderClass::setPlayerTexture(sf::Texture &texture)
 {
-    client client;
+    _playerTexture = texture;
+}
+
+sf::Texture &RenderClass::getPlayerTexture()
+{
+    return _playerTexture;
+}
+
+void RenderClass::renderWindow(client &client)
+{
     sf::Clock clock;
     sf::Clock clockAnim;
     ecs::RenderSystem renderSystem;
@@ -98,15 +109,11 @@ void RenderClass::renderWindow(
     ecs::BulletSystem bulletSystem;
     sf::Texture background_t;
     sf::Sprite background_s;
+    auto player = client.getLocalPlayer();
     float deltaTime = 0.00;
 
-    // To be set to user input later
-    client.create_connection("127.0.0.1", 8081, 8082);
-    std::thread(&client::receive_message, &client).detach();
-    std::cout << "Client connected" << std::endl;
-
     _window.setMouseCursorVisible(false);
-    background_t.loadFromFile("./assets/background/background.png");
+    background_t.loadFromFile("assets/background/background.png");
     background_t.setRepeated(true);
     background_s.setTextureRect(sf::Rect(0, 0, 1280, 720));
     background_s.setTexture(background_t);
@@ -114,14 +121,16 @@ void RenderClass::renderWindow(
     while (this->_window.isOpen()) {
         deltaTime = clock.restart().asSeconds();
         this->_window.clear();
-        playEvent(player, entities);
+        playEvent(player, client.get_entities());
         this->_window.draw(background_s);
-        positionSystem.update(entities, &this->_window, deltaTime);
-        bulletSystem.update(entities, &this->_window, deltaTime);
-        renderSystem.update(entities, &this->_window, deltaTime);
+        positionSystem.update(
+            client.get_entities(), &this->_window, deltaTime);
+        client.update_localplayer_position();
+        renderSystem.update(client.get_entities(), &this->_window, deltaTime);
+        client.manage_buffers();
+        bulletSystem.update(client.get_entities(), &this->_window, deltaTime);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
-        client.manage_buffers();
     }
 }
 

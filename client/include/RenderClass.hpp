@@ -5,11 +5,11 @@
 ** RenderClass
 */
 
-#include "Entity.hpp"
 #include <SFML/Graphics.hpp>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include "Entity.hpp"
+#include "client.hpp"
 
 #ifndef RENDERCLASS_HPP_
     #define RENDERCLASS_HPP_
@@ -26,10 +26,15 @@ class RenderClass {
     int getFrameRate() const;
     void setFrameRate(int frameRate);
 
-    void renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entities, std::shared_ptr<ecs::Entity> player);
-    void playEvent(std::shared_ptr<ecs::Entity> player, std::vector<std::shared_ptr<ecs::Entity>> &entities);
-    void playerAnimations(std::shared_ptr<ecs::Entity> player, std::string direction);
+    void renderWindow(client &client);
+    void playEvent(std::shared_ptr<ecs::Entity> player,
+        std::vector<std::shared_ptr<ecs::Entity>> &entities);
+    void playerAnimations(
+        std::shared_ptr<ecs::Entity> player, std::string direction);
     void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);
+
+    void setPlayerTexture(sf::Texture &texture);
+    sf::Texture &getPlayerTexture();
 
   private:
     sf::RenderWindow _window;
@@ -37,7 +42,7 @@ class RenderClass {
     sf::VideoMode _videoMode;
     int _frameRate;
     sf::Texture _bulletTexture;
+    sf::Texture _playerTexture;
 };
-
 
 #endif /* !RENDERCLASS_HPP_ */

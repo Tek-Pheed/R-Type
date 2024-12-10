@@ -12,9 +12,9 @@
     #define NOMINMAX
 #endif
 
-#include <array>
 #include <cstddef>
 #include <mutex>
+#include <string>
 #include <sys/types.h>
 #include <vector>
 #include "Entity.hpp"
@@ -59,17 +59,39 @@ class Client {
     std::string readBufferUDP;
     std::string writeBufferUDP;
     bool isReady;
+    bool isDisconnected;
 
     Client()
         : tcpSocket(System::Network::TCPSocket()), ip(std::string()),
           port(uint16_t()), readBufferTCP(std::string()),
           writeBufferTCP(std::string()), readBufferUDP(std::string()),
-          writeBufferUDP(std::string()), isReady(false) {};
+          writeBufferUDP(std::string()), isReady(false),
+          isDisconnected(false) {};
 };
 
 template <typename T> std::string getString(T arg)
 {
     return (std::to_string(arg));
+}
+
+template <> inline std::string getString(const char *arg)
+{
+    return (std::string(arg));
+}
+
+template <> inline std::string getString(const std::string &arg)
+{
+    return (arg);
+}
+
+template <> inline std::string getString(std::string &arg)
+{
+    return (arg);
+}
+
+template <> inline std::string getString(std::string arg)
+{
+    return (arg);
 }
 
 class server {
@@ -84,7 +106,7 @@ class server {
     {
         std::string pack = std::to_string(protocolCode);
 
-        for (const auto ag : {args...}) {
+        for (const auto &ag : {args...}) {
             pack += " " + getString(ag);
         }
         pack += PACKET_END;
@@ -102,6 +124,7 @@ class server {
     void handle_connection();
     void send_to_all(const std::string &message);
     void send_to_others(const std::string &message, size_t except_clientID);
+    void send_to_one(const std::string &message, size_t clientID);
 
     void handle_packet(
         size_t clientID, System::Network::ISocket::Type socketType);
@@ -126,15 +149,29 @@ class server {
         return (ent);
     }
 
+    template <typename T> int findEntityByComponent()
+    {
+        std::shared_ptr<T> comp = nullptr;
+        size_t i = 0;
+
+        for (auto entity : _gameState) {
+            comp = entity->getComponent<T>();
+            if (comp != nullptr)
+                return ((int) i);
+            i++;
+        }
+        return (-1);
+    }
+
     void syncNewClientGameState(size_t newClient);
 
     std::shared_ptr<ecs::Entity> getPlayer(size_t playerID);
     int playerConnection(size_t id);
-    int playerPosition(int id, int x, int y);
-    int playerKilled(int id);
+    int playerPosition(int id, float x, float y);
+    int playerKilled(size_t id);
     int playerShooting(int id, int x, int y);
     int playerDamaged(int id, int amount);
-    int playerDisconnection(int id);
+    int playerDisconnection(size_t id);
     int handle_player(int code, const std::vector<std::string> &tokens);
     int manage_buffer(std::string buffer);
 
@@ -143,7 +180,7 @@ class server {
 
     ssize_t authenticateUDPClient(const System::Network::byteArray &packet);
 
-    void createGameState();
+    void handleNewPlayer(size_t id);
 
   private:
     std::mutex _globalMutex;
@@ -157,7 +194,6 @@ class server {
     std::unordered_map<size_t, Client> _clients;
     std::vector<std::shared_ptr<ecs::Entity>> _gameState;
 
-    std::vector<Player_t> _players;
     std::vector<Enemy_t> _enemies;
     std::vector<Terrain_t> _terrains;
 

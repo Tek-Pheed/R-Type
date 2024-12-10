@@ -5,6 +5,7 @@
 ** RenderSystem.cpp
 */
 
+#include "Components.hpp"
 #include "Systems.hpp"
 
 sf::CircleShape createCircleShape()
@@ -23,7 +24,8 @@ void ecs::RenderSystem::update(
     for (auto &entity : entities) {
         auto renderComponent = entity->getComponent<RenderComponent>();
         auto position = entity->getComponent<PositionComponent>();
-        
+        auto player = entity->getComponent<PlayerComponent>();
+
         if (renderComponent->getObjectType() == ecs::ObjectType::SPRITE) {
             renderComponent->getSprite()->setPosition(
                 position->getX(), position->getY());
@@ -33,7 +35,8 @@ void ecs::RenderSystem::update(
             renderComponent->getRectangleShape()->setPosition(
                 position->getX(), position->getY());
             renderComponent->getRectangleShape()->setFillColor(sf::Color::Red);
-            renderComponent->getRectangleShape()->setSize(sf::Vector2f(100, 100));
+            renderComponent->getRectangleShape()->setSize(
+                sf::Vector2f(100, 100));
             window->draw(*(renderComponent->getRectangleShape()));
         } else if (renderComponent->getObjectType()
             == ecs::ObjectType::CIRCLE) {

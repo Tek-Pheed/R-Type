@@ -22,7 +22,7 @@ void server::threadedServerWrite()
 {
     try {
         System::Network::socketSetGeneric writefds;
-        System::Network::timeoutStruct tv = {{1, 0}};
+        System::Network::timeoutStruct tv = {{0, 50000}};
         bool shouldWait = true;
 
         while (true) {
@@ -34,8 +34,8 @@ void server::threadedServerWrite()
             writefds.emplace_back(&_serverSocketUDP);
             for (auto &pair : _clients) {
                 Client &ref = pair.second;
-                if (ref.writeBufferTCP.length() > 0
-                    || ref.writeBufferUDP.length() > 0)
+                if ((ref.writeBufferTCP.length() > 0
+                    || ref.writeBufferUDP.length() > 0 )&& !ref.isDisconnected)
                     writefds.emplace_back(&ref.tcpSocket);
             }
             System::Network::select(nullptr, &writefds, nullptr, tv);
@@ -44,6 +44,8 @@ void server::threadedServerWrite()
                 continue;
             for (auto sock : writefds) {
                 ssize_t len = 0;
+                int removeID = -1;
+                bool can_remove = false;
                 switch (sock->getType()) {
                     case System::Network::ISocket::TCP: {
                         ssize_t id = this->identifyClient(*sock);
@@ -52,6 +54,12 @@ void server::threadedServerWrite()
                                          "write thread)"
                                       << std::endl;
                         Client &client = this->getClient((size_t) id);
+                        if (client.isDisconnected) {
+                            removeID = (int) id;
+                            if (client.writeBufferTCP.length() == 0
+                                && client.writeBufferUDP.length() == 0)
+                                can_remove = true;
+                        }
                         if (!sock->isOpen()) {
                             std::cout << "[Write Thread] client ("
                                       << std::to_string(id)
@@ -82,7 +90,14 @@ void server::threadedServerWrite()
                             for (auto &cl : _clients) {
                                 size_t index = cl.first;
                                 auto &cli = cl.second;
-                                if (cli.port == 0 || cli.ip.empty() || cli.writeBufferUDP.length() == 0)
+                                if (cli.isDisconnected) {
+                                    removeID = (int) index;
+                                    if (cli.writeBufferTCP.length() == 0
+                                        && cli.writeBufferUDP.length() == 0)
+                                        can_remove = true;
+                                }
+                                if (cli.port == 0 || cli.ip.empty()
+                                    || cli.writeBufferUDP.length() == 0)
                                     continue;
                                 len = _serverSocketUDP.sendDataTo(
                                     System::Network::encodeString(
@@ -105,6 +120,10 @@ void server::threadedServerWrite()
                     default: {
                         break;
                     };
+                }
+                if (removeID != -1 && can_remove == true) {
+                    std::unique_lock lock(_globalMutex);
+                    _clients.erase((size_t) removeID);
                 }
             }
         }

@@ -38,6 +38,17 @@ namespace ecs
             return nullptr;
         }
 
+        std::vector<std::type_index> getComponents()
+        {
+            std::vector<std::type_index> types;
+
+            types.reserve(_components.size());
+            for (const auto &t : _components) {
+                types.emplace_back(t.first);
+            }
+            return (types);
+        }
+
         template <typename componentType> void deleteComponent()
         {
             this->_components.erase(typeid(componentType));
