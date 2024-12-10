@@ -5,7 +5,6 @@
 ** player
 */
 
-#include <FLAC/format.h>
 #include "Entity.hpp"
 #include "client.hpp"
 #include "protocol.hpp"

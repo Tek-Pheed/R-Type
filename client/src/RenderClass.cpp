@@ -5,6 +5,10 @@
 ** RenderClass
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
 #include "ErrorClass.hpp"

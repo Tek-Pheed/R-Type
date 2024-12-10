@@ -5,6 +5,10 @@
 ** networking
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <algorithm>
 #include <iostream>
 #include <sstream>
