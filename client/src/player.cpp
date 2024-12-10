@@ -19,7 +19,6 @@ std::shared_ptr<ecs::Entity> &client::getLocalPlayer()
 void client::update_localplayer_position()
 {
     auto position = _player->getComponent<ecs::PositionComponent>();
-
     if (position) {
         float x = position->getX();
         float y = position->getY();
