@@ -15,7 +15,6 @@
 #include <iostream>
 #include <mutex>
 #include <sstream>
-#include <string>
 #include <thread>
 
 #include "system_network.hpp"
@@ -37,36 +36,6 @@ server::server()
 
 server::~server()
 {
-}
-
-template <> std::string getString(const char *arg)
-{
-    return (std::string(arg));
-}
-
-template <> std::string getString(const std::string &arg)
-{
-    return (arg);
-}
-
-template <> std::string getString(std::string &arg)
-{
-    return (arg);
-}
-
-template <> std::string getString(const std::string &arg)
-{
-    return (arg);
-}
-
-template <> std::string getString(std::string arg)
-{
-    return (arg);
-}
-
-template <> std::string getString(const std::string arg)
-{
-    return (arg);
 }
 
 void server::writeToClient(Client &client, const std::string &data,

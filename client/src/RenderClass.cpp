@@ -108,8 +108,8 @@ void RenderClass::renderWindow(
         this->_window.draw(background_s);
         positionSystem.update(
             client.get_entities(), &this->_window, deltaTime);
-        client.manage_buffers();
         renderSystem.update(client.get_entities(), &this->_window, deltaTime);
+        client.manage_buffers();
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
     }

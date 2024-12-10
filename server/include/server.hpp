@@ -72,6 +72,26 @@ template <typename T> std::string getString(T arg)
     return (std::to_string(arg));
 }
 
+template <> inline std::string getString(const char *arg)
+{
+    return (std::string(arg));
+}
+
+template <> inline std::string getString(const std::string &arg)
+{
+    return (arg);
+}
+
+template <> inline std::string getString(std::string &arg)
+{
+    return (arg);
+}
+
+template <> inline std::string getString(std::string arg)
+{
+    return (arg);
+}
+
 class server {
   public:
     static constexpr int MAX_PLAYERS = 4;

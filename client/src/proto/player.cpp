@@ -13,21 +13,29 @@
 void client::create_new_player(std::vector<std::string> &tokens)
 {
     std::cout << "Create new player" << std::endl;
+
     const int id = std::stoi(tokens[0]);
-    const float x = std::stof(tokens[1]);
-    const float y = std::stof(tokens[2]);
+    const std::string name = tokens[1];
+    const float x = std::stof(tokens[2]);
+    const float y = std::stof(tokens[3]);
     sf::Texture playerTexture;
 
-    playerTexture.loadFromFile("../../assets/sprites/r-typesheet42.gif");
+    playerTexture.loadFromFile("assets/sprites/r-typesheet42.gif");
 
     auto player = std::make_shared<ecs::Entity>(id);
-    player->addComponent(std::make_shared<ecs::PlayerComponent>(tokens[1]));
+    player->addComponent(std::make_shared<ecs::PlayerComponent>(name));
     player->addComponent(std::make_shared<ecs::PositionComponent>(x, y));
     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
 
     player->addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::ObjectType::SPRITE, playerTexture));
-    _entities.push_back(player);
+
+    player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
+        sf::Rect(66, 0, 33, 14));
+
+    player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
+        sf::Vector2f(3, 3));
+    add_entity(player);
 }
 
 void client::set_new_position(std::vector<std::string> &tokens)
