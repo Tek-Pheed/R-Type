@@ -5,11 +5,11 @@
 ** RenderClass
 */
 
-#include "Entity.hpp"
 #include <SFML/Graphics.hpp>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include "Entity.hpp"
+#include "client.hpp"
 
 #ifndef RENDERCLASS_HPP_
     #define RENDERCLASS_HPP_
@@ -26,9 +26,10 @@ class RenderClass {
     int getFrameRate() const;
     void setFrameRate(int frameRate);
 
-    void renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entities, std::shared_ptr<ecs::Entity> player);
+    void renderWindow(std::shared_ptr<ecs::Entity> player, client &client);
     void playEvent(std::shared_ptr<ecs::Entity> player);
-    void playerAnimations(std::shared_ptr<ecs::Entity> player, std::string direction);
+    void playerAnimations(
+        std::shared_ptr<ecs::Entity> player, std::string direction);
 
   private:
     sf::RenderWindow _window;

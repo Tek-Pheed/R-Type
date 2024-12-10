@@ -5,11 +5,10 @@
 ** RenderClass
 */
 
-#include <thread>
+#include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
-#include "RenderClass.hpp"
 #include "client.hpp"
 
 RenderClass::RenderClass(
@@ -85,9 +84,9 @@ void RenderClass::setFrameRate(int newFrameRate)
     this->_window.setFramerateLimit(static_cast<unsigned int>(newFrameRate));
 }
 
-void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entities, std::shared_ptr<ecs::Entity> player)
+void RenderClass::renderWindow(
+    std::shared_ptr<ecs::Entity> player, client &client)
 {
-    client client;
     sf::Clock clock;
     sf::Clock clockAnim;
     ecs::RenderSystem renderSystem;
@@ -96,14 +95,9 @@ void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entitie
     sf::Sprite background_s;
     float deltaTime = 0.00;
 
-    // To be set to user input later
-    client.create_connection("127.0.0.1", 8081, 8082);
-    std::thread(&client::receive_message, &client).detach();
-    std::cout << "Client connected" << std::endl;
-
     _window.setMouseCursorVisible(false);
     background_t.loadFromFile("./assets/background/starry_night.png");
-    background_s.setTextureRect(sf::Rect (0, 0, 1280, 720));
+    background_s.setTextureRect(sf::Rect(0, 0, 1280, 720));
     background_s.setTexture(background_t);
 
     while (this->_window.isOpen()) {
@@ -111,8 +105,9 @@ void RenderClass::renderWindow(std::vector<std::shared_ptr<ecs::Entity>> entitie
         this->_window.clear();
         playEvent(player);
         this->_window.draw(background_s);
-        positionSystem.update(entities, &this->_window, deltaTime);
-        renderSystem.update(entities, &this->_window, deltaTime);
+        positionSystem.update(
+            client.get_entities(), &this->_window, deltaTime);
+        renderSystem.update(client.get_entities(), &this->_window, deltaTime);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
         client.manage_buffers();
@@ -146,34 +141,45 @@ void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player)
 
         if (event.type == sf::Event::KeyReleased) {
             this->playerAnimations(player, "none");
-            if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down) {
+            if (event.key.code == sf::Keyboard::Up
+                || event.key.code == sf::Keyboard::Down) {
                 velocity->setVy(0.0f);
             }
-            if (event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right) {
+            if (event.key.code == sf::Keyboard::Left
+                || event.key.code == sf::Keyboard::Right) {
                 velocity->setVx(0.0f);
             }
         }
     }
 }
 
-void RenderClass::playerAnimations(std::shared_ptr<ecs::Entity> player, std::string direction)
+void RenderClass::playerAnimations(
+    std::shared_ptr<ecs::Entity> player, std::string direction)
 {
     if (direction == "top") {
-        player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(sf::Rect (132, 0, 33, 14));
+        player->getComponent<ecs::RenderComponent>()
+            ->getSprite()
+            ->setTextureRect(sf::Rect(132, 0, 33, 14));
     } else if (direction == "down") {
-        player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(sf::Rect (0, 0, 33, 14));
+        player->getComponent<ecs::RenderComponent>()
+            ->getSprite()
+            ->setTextureRect(sf::Rect(0, 0, 33, 14));
     } else {
-        player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(sf::Rect (66, 0, 33, 14));
+        player->getComponent<ecs::RenderComponent>()
+            ->getSprite()
+            ->setTextureRect(sf::Rect(66, 0, 33, 14));
     }
 }
 
-void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock) {
+void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock)
+{
     float s = clock->getElapsedTime().asSeconds();
 
     if (s > 0.01) {
-        bg->setTextureRect(sf::Rect (bg->getTextureRect().left + 2, 0, 1280, 720));
+        bg->setTextureRect(
+            sf::Rect(bg->getTextureRect().left + 2, 0, 1280, 720));
         if (bg->getTextureRect().left > 768) {
-            bg->setTextureRect(sf::Rect (0, 0, 1280, 720));
+            bg->setTextureRect(sf::Rect(0, 0, 1280, 720));
         }
         clock->restart();
     }
