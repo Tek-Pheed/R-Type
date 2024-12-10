@@ -9,7 +9,6 @@
     #define NOMINMAX
 #endif
 
-#include "system_network.hpp"
 #include "client.hpp"
 #include <ctime>
 #include <memory>
@@ -18,6 +17,7 @@
 #include "Entity.hpp"
 #include "RenderClass.hpp"
 #include "Systems.hpp"
+#include "system_network.hpp"
 
 int main(void)
 {
@@ -30,6 +30,7 @@ int main(void)
 
     player1texture.loadFromFile("./assets/sprites/r-typesheet42.gif");
 
+    // TODO Change id to be the _id in client CLASS
     auto player = std::make_shared<ecs::Entity>(rand());
     player->addComponent(std::make_shared<ecs::PlayerComponent>("Samy"));
     player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
