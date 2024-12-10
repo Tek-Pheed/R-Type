@@ -42,3 +42,7 @@ format : CODE SP <?ARGS> HTLF
     -   Win - 133 ➡️
     -   Lose - 134 ➡️
     -   Game Over - 135 ➡️
+
+## TODO, Binary Protocol:
+For the binary protocol:
+Add a `Networked` component in the ecs, then for all networked entities, send a packet like this: `<EntityID>:[<Component1TypeID>:[property1: value, property2: value, ...]...]`
