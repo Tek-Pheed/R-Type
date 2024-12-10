@@ -64,7 +64,6 @@ int RenderClass::getFrameRate() const
 {
     return this->_frameRate;
 }
-
 void RenderClass::setTitle(const std::string &newTitle)
 {
     if (newTitle.empty()) {
@@ -83,6 +82,16 @@ void RenderClass::setFrameRate(int newFrameRate)
     }
     this->_frameRate = newFrameRate;
     this->_window.setFramerateLimit(static_cast<unsigned int>(newFrameRate));
+}
+
+void RenderClass::setPlayerTexture(sf::Texture &texture)
+{
+    _playerTexture = texture;
+}
+
+sf::Texture &RenderClass::getPlayerTexture()
+{
+    return _playerTexture;
 }
 
 void RenderClass::renderWindow(

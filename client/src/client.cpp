@@ -33,9 +33,26 @@ int client::get_id()
     return _id;
 }
 
+auto create_player(client &client, RenderClass &render)
+{
+    auto player = std::make_shared<ecs::Entity>(client.get_id());
+    player->addComponent(std::make_shared<ecs::PlayerComponent>("Samy"));
+    player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
+    player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
+    player->addComponent(std::make_shared<ecs::RenderComponent>(
+        ecs::ObjectType::SPRITE, render.getPlayerTexture()));
+    player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
+        sf::Rect(66, 0, 33, 14));
+    player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
+        sf::Vector2f(3, 3));
+    client.add_entity(player);
+    return player;
+}
+
 int main(void)
 {
-    client client;
+    RenderClass render(1280, 720, "R-Type", 120);
+    client client(render);
     System::Network::initNetwork();
 
     // To be set to user input later
@@ -43,27 +60,12 @@ int main(void)
     std::thread(&client::receive_message, &client).detach();
     std::cout << "Client connected" << std::endl;
 
-    RenderClass render(1280, 720, "R-Type", 120);
-
-    sf::Texture player1texture;
+    sf::Texture playerTexture;
+    playerTexture.loadFromFile("assets/sprites/r-typesheet42.gif");
     srand(static_cast<unsigned int>(time(0)));
+    render.setPlayerTexture(playerTexture);
 
-    player1texture.loadFromFile("assets/sprites/r-typesheet42.gif");
+    auto player = create_player(client, render);
 
-    auto player = std::make_shared<ecs::Entity>(client.get_id());
-    player->addComponent(std::make_shared<ecs::PlayerComponent>("Samy"));
-    player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
-    player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
-
-    player->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, player1texture));
-
-    player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
-        sf::Rect(66, 0, 33, 14));
-
-    player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
-        sf::Vector2f(3, 3));
-
-    client.add_entity(player);
     render.renderWindow(player, client);
 }

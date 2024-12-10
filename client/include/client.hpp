@@ -12,6 +12,7 @@
 #include <mutex>
 
 #include "Entity.hpp"
+class RenderClass;
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
@@ -19,7 +20,7 @@
 class client {
     /* data */
   public:
-    client();
+    client(RenderClass &render);
     ~client();
     int create_connection(const char *ip, int portTCP, int portUDP);
     int manage_buffers();
@@ -51,6 +52,7 @@ class client {
     std::vector<std::string> _buffers;
     std::mutex _mutex;
     std::vector<std::shared_ptr<ecs::Entity>> _entities;
+    RenderClass &_refRender;
 };
 
 #endif /*CLIENT_HPP*/

@@ -31,12 +31,16 @@ class RenderClass {
     void playerAnimations(
         std::shared_ptr<ecs::Entity> player, std::string direction);
 
+    void setPlayerTexture(sf::Texture &texture);
+    sf::Texture &getPlayerTexture();
+
   private:
     sf::RenderWindow _window;
     std::string _title;
     sf::VideoMode _videoMode;
     int _frameRate;
     sf::Texture _bulletTexture;
+    sf::Texture _playerTexture;
 };
 
 void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);

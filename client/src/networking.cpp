@@ -17,9 +17,10 @@
 #include "client.hpp"
 #include "protocol.hpp"
 
-client::client()
+client::client(RenderClass &render)
     : _clientSocketTCP(System::Network::TCPSocket()),
-      _clientSocketUDP(System::Network::UDPSocket()), _id(-1)
+      _clientSocketUDP(System::Network::UDPSocket()), _id(-1),
+      _refRender(render)
 {
     return;
 }
