@@ -6,6 +6,7 @@
 */
 
 #include <cstdlib>
+#include "Components.hpp"
 #include "Systems.hpp"
 #include "protocol.hpp"
 #include "server.hpp"
@@ -61,9 +62,40 @@ void server::gameUpdate(long deltaTimeMs)
 
     if (_enemyTimerMS >= ENEMY_SPAWN_DELAY_MS) {
         _enemyTimerMS = 0;
-        createEnemy((unsigned int) rand(), randRange(800, 1200), randRange(50, 700));
+        createEnemy(
+            (unsigned int) rand(), randRange(800, 1200), randRange(50, 700));
+    }
+    positionSystem.update(_gameState, nullptr, (float) deltaTimeMs, true);
+    bulletSystem.update(_gameState, nullptr, (float) deltaTimeMs, true);
+
+    auto bullets = getEntitiesByComponent<ecs::BulletComponent>();
+
+    for (const auto &b : bullets) {
+        if (b == nullptr)
+            continue;
+        auto pos = b->getComponent<ecs::PositionComponent>();
+        if (pos->getX() > 4000 || pos->getY() > 2200 || pos->getX() < 0
+            || pos->getY() < 0) {
+            std::cout << "Delete component: " << b->getID() << std::endl;
+            _gameState.erase(
+                std::remove(_gameState.begin(), _gameState.end(), b));
+        }
     }
 
+    auto enemies = getEntitiesByComponent<ecs::EnemyComponent>();
+
+    for (const auto &b : enemies) {
+        if (b == nullptr)
+            continue;
+        auto pos = b->getComponent<ecs::PositionComponent>();
+        std::cout << b->getID() << " " << pos->getX() << " " << pos->getY() << std::endl;
+        if (pos->getX() > 4000 || pos->getY() > 2200 || pos->getX() < 0
+            || pos->getY() < 0) {
+            std::cout << "Delete component: " << b->getID() << std::endl;
+            _gameState.erase(
+                std::remove(_gameState.begin(), _gameState.end(), b));
+        }
+    }
 }
 
 void server::internalUpdate(long deltaTimeMs)
