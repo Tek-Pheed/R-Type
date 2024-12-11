@@ -9,7 +9,7 @@
 
 void ecs::PositionSystem::update(
     std::vector<std::shared_ptr<ecs::Entity>> &entities,
-    sf::RenderWindow *window, float deltaTime)
+    sf::RenderWindow *window, float deltaTime, bool isServer)
 {
     for (auto &entity : entities) {
         auto positionComponent =
@@ -27,25 +27,27 @@ void ecs::PositionSystem::update(
             positionComponent->setX(newX);
             positionComponent->setY(newY);
 
-            float maxX = float(window->getSize().x)
-                - float(render->getSprite()->getTextureRect().width)
-                - float(render->getSprite()->getScale().x);
+            if (!isServer) {
+                float maxX = float(window->getSize().x)
+                    - float(render->getSprite()->getTextureRect().width)
+                    - float(render->getSprite()->getScale().x);
 
-            float maxY = float(window->getSize().y)
-                - float(render->getSprite()->getTextureRect().height)
-                - float(render->getSprite()->getScale().y);
+                float maxY = float(window->getSize().y)
+                    - float(render->getSprite()->getTextureRect().height)
+                    - float(render->getSprite()->getScale().y);
 
-            if (positionComponent->getX() < 0) {
-                positionComponent->setX(0);
-            }
-            if (positionComponent->getX() > maxX) {
-                positionComponent->setX(maxX);
-            }
-            if (positionComponent->getY() < 0) {
-                positionComponent->setY(0);
-            }
-            if (positionComponent->getY() > maxY) {
-                positionComponent->setY(maxY);
+                if (positionComponent->getX() < 0) {
+                    positionComponent->setX(0);
+                }
+                if (positionComponent->getX() > maxX) {
+                    positionComponent->setX(maxX);
+                }
+                if (positionComponent->getY() < 0) {
+                    positionComponent->setY(0);
+                }
+                if (positionComponent->getY() > maxY) {
+                    positionComponent->setY(maxY);
+                }
             }
         }
     }
