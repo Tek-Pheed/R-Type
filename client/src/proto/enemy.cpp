@@ -14,7 +14,6 @@
 
 void client::createEnemy(std::vector<std::string> &tokens)
 {
-    (void) tokens;
     std::cout << "Create new enemy" << std::endl;
     // id, x, y
     const std::string name = "enemy";
