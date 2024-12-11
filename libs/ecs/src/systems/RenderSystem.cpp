@@ -17,9 +17,10 @@ sf::CircleShape createCircleShape()
 
 void ecs::RenderSystem::update(
     std::vector<std::shared_ptr<ecs::Entity>> &entities,
-    sf::RenderWindow *window, float deltaTime)
+    sf::RenderWindow *window, float deltaTime, bool isServer)
 {
     (void) deltaTime;
+    (void) isServer;
 
     for (auto &entity : entities) {
         auto renderComponent = entity->getComponent<RenderComponent>();

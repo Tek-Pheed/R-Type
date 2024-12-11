@@ -9,8 +9,9 @@
 
 void ecs::BulletSystem::update(
     std::vector<std::shared_ptr<ecs::Entity>> &entities,
-    sf::RenderWindow *window, float deltaTime)
+    sf::RenderWindow *window, float deltaTime, bool isServer)
 {
+    (void) isServer;
     std::vector<std::shared_ptr<ecs::Entity>> bulletToRemove;
 
     for (auto &entity : entities) {
