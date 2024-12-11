@@ -7,6 +7,7 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
+#include <SFML/Graphics.hpp>
 #include <string>
 
 namespace ecs
@@ -18,16 +19,22 @@ namespace ecs
 
     class PositionComponent : public Component {
       public:
-        PositionComponent(int x, int y);
+        PositionComponent(float x = 0, float y = 0);
 
-        int getX();
-        int getY();
-        void setX(int x);
-        void setY(int y);
+        float getX();
+        float getY();
+        float getOldY();
+        float getOldX();
+        void setX(float x);
+        void setY(float y);
+        void setOldX(float oldX);
+        void setOldY(float oldY);
 
       private:
-        int _x;
-        int _y;
+        float _x;
+        float _y;
+        float _oldX;
+        float _oldY;
     };
 
     class PlayerComponent : public Component {
@@ -39,22 +46,22 @@ namespace ecs
 
       private:
         std::string _name;
-  	};
+    };
 
     class VelocityComponent : public Component {
       public:
-        VelocityComponent(int vx, int vy);
+        VelocityComponent(float vx, float vy);
 
-        int getVx();
-        int getVy();
+        float getVx();
+        float getVy();
 
-        void setVx(int vx);
-        void setVy(int vy);
+        void setVx(float vx);
+        void setVy(float vy);
 
       private:
-        int _vx;
-        int _vy;
-	  };
+        float _vx;
+        float _vy;
+    };
 
     class HealthComponent : public Component {
       public:
@@ -94,14 +101,46 @@ namespace ecs
 
     class RenderComponent : public Component {
       public:
-        explicit RenderComponent(ObjectType type);
+        RenderComponent(ObjectType type, const sf::Texture &texture,
+            sf::Vector2f position = sf::Vector2f(0, 0));
 
-        ObjectType getType() const;
-        void setType(ObjectType type);
+        ecs::ObjectType getObjectType() const;
+        void setObjectType(ecs::ObjectType type);
+
+        sf::Sprite *getSprite();
+
+        sf::CircleShape *getCircleShape();
+
+        sf::RectangleShape *getRectangleShape();
 
       private:
-        ObjectType _type;
+        ecs::ObjectType _type;
+        sf::Sprite *sprite = nullptr;
+        sf::CircleShape *circleShape = nullptr;
+        sf::RectangleShape *rectangleShape = nullptr;
     };
-}
+
+    class TextComponent : public Component {
+      public:
+        TextComponent();
+        void setText(const std::string &text);
+        std::string getText() const;
+
+      private:
+        std::string _text;
+    };
+
+    class BulletComponent : public Component {
+      public:
+        BulletComponent();
+        explicit BulletComponent(bool isFromPlayer);
+
+        bool getIsFromPlayer();
+        void setIsFromPlayer(bool isFromPlayer);
+
+      private:
+        bool _isFromPlayer;
+    };
+} // namespace ecs
 
 #endif // R_TYPE_COMPONENT_HPP

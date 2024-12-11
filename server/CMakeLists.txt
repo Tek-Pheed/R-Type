@@ -30,11 +30,10 @@ include_directories(../libs/ecs/include)
 
 if(WIN32)
     add_definitions(-DWIN32)
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall
-    )
 else()
     add_definitions(-DLINUX)
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror
+    target_link_libraries(${PROJECT_NAME} pthread)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra
         -Wswitch-default -Wcast-align -Wpointer-arith -Wundef -Wcast-qual
         -Wshadow -Wwrite-strings -Wconversion -Wunreachable-code -Wunused-macros
         $<$<CONFIG:Debug>:-g3>
