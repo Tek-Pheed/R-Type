@@ -35,7 +35,7 @@ int main() {
         RenderClass renderWindow(800, 600, "My Game", 60);
         renderWindow.renderWindow();
     } catch (const ErrorClass &e) {
-        std::cerr << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
     return 0;
 }

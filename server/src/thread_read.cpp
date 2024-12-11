@@ -5,6 +5,10 @@
 ** thread_read
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <climits>
 #include <cstddef>
 #include <cstdlib>
@@ -38,13 +42,13 @@ ssize_t server::authenticateUDPClient(const System::Network::byteArray &packet)
 
 void server::threadedServerRead()
 {
-    try {
-        System::Network::byteArray arr;
-        System::Network::byteArray vect;
-        System::Network::socketSetGeneric readfds;
-        System::Network::timeoutStruct tv = {{0, 50000}};
+    System::Network::byteArray arr;
+    System::Network::byteArray vect;
+    System::Network::socketSetGeneric readfds;
+    System::Network::timeoutStruct tv = {{0, 500000}};
 
-        while (true) {
+    while (true) {
+        try {
             readfds.clear();
             this->_globalMutex.lock();
             readfds.emplace_back(&_serverSocketUDP);
@@ -64,7 +68,7 @@ void server::threadedServerRead()
                     case System::Network::ISocket::TCP: {
                         ssize_t id = identifyClient(*sock);
                         if (id == -1)
-                            std::cerr << "Unable to idendify client (TCP - "
+                            std::cout << "Unable to idendify client (TCP - "
                                          "read thread)"
                                       << std::endl;
                         if (!sock->isOpen()) {
@@ -114,7 +118,7 @@ void server::threadedServerRead()
                         if (id == -1) {
                             id = authenticateUDPClient(vect);
                             if (id == -1) {
-                                std::cerr
+                                std::cout
                                     << "[Read Thread] Failed to identify "
                                        "client on UDP ("
                                     << std::to_string(sock->getUID())
@@ -166,9 +170,9 @@ void server::threadedServerRead()
                     }
                 }
             }
+        } catch (const std::exception &e) {
+            std::cout << "[Read Thread] failed with exception: " << e.what()
+                      << std::endl;
         }
-    } catch (const std::exception &e) {
-        std::cerr << "[Read Thread] failed with exception: " << e.what()
-                  << std::endl;
     }
 }

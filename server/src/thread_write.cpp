@@ -5,12 +5,15 @@
 ** thread_write
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <cstddef>
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <string>
-#include "server.hpp"
 
 #include "system_network.hpp"
 #include "system_tcp.hpp"
@@ -20,12 +23,12 @@
 
 void server::threadedServerWrite()
 {
-    try {
-        System::Network::socketSetGeneric writefds;
-        System::Network::timeoutStruct tv = {{0, 50000}};
-        bool shouldWait = true;
+    System::Network::socketSetGeneric writefds;
+    System::Network::timeoutStruct tv = {{0, 50000}};
+    bool shouldWait = true;
 
-        while (true) {
+    while (true) {
+        try {
             if (shouldWait) {
                 std::unique_lock lock(_writeMutex);
                 _writeCondition.wait(lock);
@@ -35,7 +38,8 @@ void server::threadedServerWrite()
             for (auto &pair : _clients) {
                 Client &ref = pair.second;
                 if ((ref.writeBufferTCP.length() > 0
-                    || ref.writeBufferUDP.length() > 0 )&& !ref.isDisconnected)
+                        || ref.writeBufferUDP.length() > 0)
+                    && !ref.isDisconnected)
                     writefds.emplace_back(&ref.tcpSocket);
             }
             System::Network::select(nullptr, &writefds, nullptr, tv);
@@ -50,7 +54,7 @@ void server::threadedServerWrite()
                     case System::Network::ISocket::TCP: {
                         ssize_t id = this->identifyClient(*sock);
                         if (id == -1)
-                            std::cerr << "Unable to idendify client (TCP - "
+                            std::cout << "Unable to idendify client (TCP - "
                                          "write thread)"
                                       << std::endl;
                         Client &client = this->getClient((size_t) id);
@@ -126,9 +130,9 @@ void server::threadedServerWrite()
                     _clients.erase((size_t) removeID);
                 }
             }
+        } catch (const std::exception &e) {
+            std::cout << "[Write Thread] failed with exception: " << e.what()
+                      << std::endl;
         }
-    } catch (const std::exception &e) {
-        std::cerr << "[Write Thread] failed with exception: " << e.what()
-                  << std::endl;
     }
 }

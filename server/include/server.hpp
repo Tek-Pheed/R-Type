@@ -8,9 +8,15 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include <chrono>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
+
+#define SERVER_TPS  30
+
+#define ENEMY_SPAWN_DELAY_MS    5 * 1000
+#define randRange(min, max) (rand() % (max + 1 - min) + min)
 
 #include <cstddef>
 #include <mutex>
@@ -121,7 +127,7 @@ class server {
     void removeClient(size_t id);
 
     void receive_message();
-    void handle_connection();
+    void handleConnection();
     void send_to_all(const std::string &message);
     void send_to_others(const std::string &message, size_t except_clientID);
     void send_to_one(const std::string &message, size_t clientID);
@@ -169,7 +175,7 @@ class server {
     int playerConnection(size_t id);
     int playerPosition(int id, float x, float y);
     int playerKilled(size_t id);
-    int playerShooting(int id, int x, int y);
+    int playerShooting(int id);
     int playerDamaged(int id, int amount);
     int playerDisconnection(size_t id);
     int handle_player(int code, const std::vector<std::string> &tokens);
@@ -181,6 +187,11 @@ class server {
     ssize_t authenticateUDPClient(const System::Network::byteArray &packet);
 
     void handleNewPlayer(size_t id);
+
+    void internalUpdate(long deltaTimeMs);
+    void createEnemy(unsigned int id, int x, int y);
+    void createProjectile(int id);
+    void gameUpdate(long deltaTimeMs);
 
   private:
     std::mutex _globalMutex;
@@ -196,6 +207,8 @@ class server {
 
     std::vector<Enemy_t> _enemies;
     std::vector<Terrain_t> _terrains;
+
+    long _enemyTimerMS;
 
     int _currentPlayers;
 };

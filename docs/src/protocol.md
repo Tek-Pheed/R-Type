@@ -20,7 +20,7 @@ format : CODE SP <?ARGS> HTLF
     -   Player change position (id, x, y) - 102 🔄
     -   Player killed (id) - 103 ➡️
     -   Player shooting (id) - 104 🔄
-    -   Player damage (id, amount) - 105 ➡️
+    -   Player damage (id, amount) - 105 ➡️ (The server return the new health to everyone)
     -   Player disconnection (id) - 106 🔄
 
 -   Enemy (110)
@@ -29,7 +29,7 @@ format : CODE SP <?ARGS> HTLF
     -   Enemy change position (id, x, y) - 112 ➡️
     -   Enemy killed (id) - 113 ➡️
     -   Enemy shooting (id) - 114 ➡️
-    -   Enemy damage (id, amount) - 115 ➡️
+    -   Enemy damage (id, new_health) - 115 ➡️
 
 -   Terrain (120)
 

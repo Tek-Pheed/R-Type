@@ -56,6 +56,8 @@ void UDPSocket::initSocket(
 UDPSocket::UDPSocket()
 {
     udpSockID++;
+    this->_mode = CONNECT;
+    this->_sockfd = 0;
     this->_type = System::Network::ISocket::UDP;
     this->_uid = udpSockID;
     this->_opened = false;

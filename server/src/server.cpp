@@ -5,19 +5,20 @@
 ** server
 */
 
-#include <cstdlib>
-#include <string>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "server.hpp"
+#include <chrono>
 #include <cstddef>
+#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <sstream>
+#include <string>
 #include <thread>
-#include "server.hpp"
 
 #include "system_network.hpp"
 #include "system_tcp.hpp"
@@ -46,7 +47,7 @@ static int is_code_valid(int code)
 
 server::server()
     : _clientCounter(0), _serverSocketTCP(System::Network::TCPSocket()),
-      _currentPlayers(0)
+      _enemyTimerMS(0), _currentPlayers(0)
 {
     return;
 }
@@ -73,7 +74,7 @@ void server::handleNewPlayer(size_t id)
 {
     auto player = std::make_shared<ecs::Entity>(id);
     player->addComponent(std::make_shared<ecs::PlayerComponent>(
-        std::string("Player ") + std::to_string(id)));
+        std::string("Player_") + std::to_string(id)));
     player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
     _gameState.emplace_back(player);
@@ -92,7 +93,7 @@ void server::handle_packet(
     if (socketType == System::Network::ISocket::UDP) {
         if (!client.isReady) {
             std::string accept = "";
-            if (_clients.size() >= MAX_PLAYERS) {
+            if (_clients.size() > MAX_PLAYERS) {
                 accept = makePacket(C_AUTH, "KO");
                 std::cout
                     << "Server: Maximum number of player reached, cannot "
@@ -133,7 +134,7 @@ void server::handle_packet(
     }
 }
 
-void server::handle_connection()
+void server::handleConnection()
 {
     System::Network::socketSetGeneric readfds;
 
@@ -143,7 +144,7 @@ void server::handle_connection()
         try {
             System::Network::select(&readfds);
         } catch (const std::exception &s) {
-            std::cerr << "An error occured on the server: " << s.what()
+            std::cout << "An error occured on the server: " << s.what()
                       << std::endl;
         }
         if (readfds.size() == 0)
@@ -210,13 +211,31 @@ int main()
     try {
         s.create_server();
     } catch (const std::exception &e) {
-        std::cerr << "Failed to launch the server: " << e.what() << std::endl;
+        std::cout << "Failed to launch the server: " << e.what() << std::endl;
         return (84);
     }
     std::thread(&server::threadedServerRead, &s).detach();
     std::thread(&server::threadedServerWrite, &s).detach();
-    std::thread(&server::handle_connection, &s).detach();
+    std::thread(&server::handleConnection, &s).detach();
 
-    while (true) {}
+    auto now = std::chrono::time_point_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now());
+    auto last = std::chrono::time_point_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now());
+
+    while (true) {
+        now = std::chrono::time_point_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now());
+        auto next = std::chrono::time_point_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now());
+        next += std::chrono::milliseconds(1000 / SERVER_TPS);
+        auto deltaTimeMs =
+            std::chrono::duration_cast<std::chrono::milliseconds>(now - last)
+                .count();
+        s.internalUpdate(deltaTimeMs);
+        last = now;
+        std::this_thread::sleep_until(next);
+    }
+
     return (0);
 }

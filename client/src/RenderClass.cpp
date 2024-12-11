@@ -11,8 +11,8 @@
 
 #include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
-#include "Components.hpp"
 #include <thread>
+#include "Components.hpp"
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
 #include "client.hpp"
@@ -124,11 +124,13 @@ void RenderClass::renderWindow(client &client)
         playEvent(player, client.get_entities());
         this->_window.draw(background_s);
         positionSystem.update(
-            client.get_entities(), &this->_window, deltaTime);
+            client.get_entities(), &this->_window, deltaTime, false);
         client.update_localplayer_position();
-        renderSystem.update(client.get_entities(), &this->_window, deltaTime);
+        renderSystem.update(
+            client.get_entities(), &this->_window, deltaTime, false);
         client.manage_buffers();
-        bulletSystem.update(client.get_entities(), &this->_window, deltaTime);
+        bulletSystem.update(
+            client.get_entities(), &this->_window, deltaTime, false);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
     }
@@ -215,8 +217,8 @@ void RenderClass::backgroundAnimation(sf::Sprite *bg, sf::Clock *clock)
     float s = clock->getElapsedTime().asSeconds();
 
     if (s > 0.01) {
-        bg->setTextureRect(
-            sf::Rect(bg->getTextureRect().left + 2, 0, int(getWindow().getSize().x), int(getWindow().getSize().y)));
+        bg->setTextureRect(sf::Rect(bg->getTextureRect().left + 2, 0,
+            int(getWindow().getSize().x), int(getWindow().getSize().y)));
         clock->restart();
     }
 }
