@@ -217,6 +217,8 @@ int main()
     std::thread(&server::threadedServerWrite, &s).detach();
     std::thread(&server::handle_connection, &s).detach();
 
-    while (true) {}
+    while (true) {
+        
+    }
     return (0);
 }

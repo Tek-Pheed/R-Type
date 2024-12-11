@@ -72,7 +72,7 @@ int client::manage_buffers()
             tokens.push_back(token);
         }
         switch (code_int) {
-            case 0: handle_player(code, tokens); break;
+            case 0: handlePlayer(code, tokens); break;
             case 1: handle_enemy(code, tokens); break;
             case 2: handle_terrain(code, tokens); break;
             case 3: handle_mechs(code, tokens); break;

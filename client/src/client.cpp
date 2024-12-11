@@ -48,19 +48,6 @@ void create_player(client &client, RenderClass &render)
     player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
         sf::Vector2f(3, 3));
     client.add_entity(player);
-
-    auto enemy = std::make_shared<ecs::Entity>(10);
-    enemy->addComponent(std::make_shared<ecs::EnemyComponent>("Samy"));
-    enemy->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
-    enemy->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
-    enemy->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, render.getEnemyTexture()));
-    enemy->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
-        sf::Rect(0, 16, 32, 32));
-    enemy->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
-        sf::Vector2f(2, 2));
-    client.add_entity(enemy);
-
 }
 
 int print_help()
@@ -89,12 +76,8 @@ int main(int argc, char **argv)
 
     sf::Texture playerTexture;
     playerTexture.loadFromFile("assets/sprites/r-typesheet42.gif");
-    sf::Texture enemyTexture;
-    enemyTexture.loadFromFile("assets/sprites/r-typesheet31.gif");
-    srand(static_cast<unsigned int>(time(0)));
-    
+
     render.setPlayerTexture(playerTexture);
-    render.setEnemyTexture(enemyTexture);
 
     create_player(client, render);
 

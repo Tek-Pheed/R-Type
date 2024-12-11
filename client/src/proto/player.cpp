@@ -10,7 +10,7 @@
 #include "client.hpp"
 #include "protocol.hpp"
 
-void client::create_new_player(std::vector<std::string> &tokens)
+void client::createNewPlayer(std::vector<std::string> &tokens)
 {
     std::cout << "Create new player" << std::endl;
 
@@ -35,7 +35,7 @@ void client::create_new_player(std::vector<std::string> &tokens)
     add_entity(player);
 }
 
-void client::set_new_position(std::vector<std::string> &tokens)
+void client::setNewPosition(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     const float x = std::stof(tokens[1]);
@@ -53,7 +53,7 @@ void client::set_new_position(std::vector<std::string> &tokens)
     }
 }
 
-void client::player_dead(std::vector<std::string> &tokens)
+void client::playerDead(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
 
@@ -69,7 +69,7 @@ void client::player_dead(std::vector<std::string> &tokens)
     }
 }
 
-void client::create_projectile(std::vector<std::string> &tokens)
+void client::createProjectile(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     float x = 0.0f;
@@ -101,7 +101,7 @@ void client::create_projectile(std::vector<std::string> &tokens)
     _entities.push_back(bullet);
 }
 
-void client::set_player_health(std::vector<std::string> &tokens)
+void client::setPlayerHealth(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     const int dmg = std::stoi(tokens[1]);
@@ -117,7 +117,7 @@ void client::set_player_health(std::vector<std::string> &tokens)
     }
 }
 
-void client::player_disconnection(std::vector<std::string> &tokens)
+void client::playerDisconnection(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
 
@@ -133,31 +133,31 @@ void client::player_disconnection(std::vector<std::string> &tokens)
     }
 }
 
-void client::handle_player(int code, std::vector<std::string> &tokens)
+void client::handlePlayer(int code, std::vector<std::string> &tokens)
 {
     switch (code) {
         case P_CONN: {
-            create_new_player(tokens);
+            createNewPlayer(tokens);
             break;
         }
         case P_POS: {
-            set_new_position(tokens);
+            setNewPosition(tokens);
             break;
         }
         case P_DEAD: {
-            player_dead(tokens);
+            playerDead(tokens);
             break;
         }
         case P_SHOOT: {
-            create_projectile(tokens);
+            createProjectile(tokens);
             break;
         }
         case P_DMG: {
-            set_player_health(tokens);
+            setPlayerHealth(tokens);
             break;
         }
         case P_DISCONN: {
-            player_disconnection(tokens);
+            playerDisconnection(tokens);
             break;
         }
         default: {
