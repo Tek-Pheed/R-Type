@@ -47,6 +47,9 @@ class client {
     void set_player_health(std::vector<std::string> &tokens);
     void player_disconnection(std::vector<std::string> &tokens);
 
+    // Enemy Management
+    void create_enemy(std::vector<std::string> &tokens);
+
   private:
     System::Network::TCPSocket _clientSocketTCP;
     System::Network::UDPSocket _clientSocketUDP;
