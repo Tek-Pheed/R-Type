@@ -65,8 +65,9 @@ void server::gameUpdate(long deltaTimeMs)
         createEnemy(
             (unsigned int) rand(), randRange(800, 1200), randRange(50, 700));
     }
-    positionSystem.update(_gameState, nullptr, (float) deltaTimeMs, true);
-    bulletSystem.update(_gameState, nullptr, (float) deltaTimeMs, true);
+
+    positionSystem.update(_gameState, nullptr, (float) deltaTimeMs / 1000, true);
+    bulletSystem.update(_gameState, nullptr, (float) deltaTimeMs / 1000, true);
 
     auto bullets = getEntitiesByComponent<ecs::BulletComponent>();
 
@@ -81,9 +82,7 @@ void server::gameUpdate(long deltaTimeMs)
                 std::remove(_gameState.begin(), _gameState.end(), b));
         }
     }
-
     auto enemies = getEntitiesByComponent<ecs::EnemyComponent>();
-
     for (const auto &b : enemies) {
         if (b == nullptr)
             continue;
