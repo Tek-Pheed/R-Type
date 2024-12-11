@@ -11,7 +11,6 @@ void ecs::BulletSystem::update(
     std::vector<std::shared_ptr<ecs::Entity>> &entities,
     sf::RenderWindow *window, float deltaTime, bool isServer)
 {
-    (void) isServer;
     std::vector<std::shared_ptr<ecs::Entity>> bulletToRemove;
 
     for (auto &entity : entities) {
@@ -27,7 +26,7 @@ void ecs::BulletSystem::update(
                 position->setY(
                     position->getY() + velocity->getVy() * deltaTime);
 
-                if (position->getX() >= float(window->getSize().x)
+                if (position->getX() >= float(window->getSize().x && !isServer)
                     || position->getX() < 0) {
                     bulletToRemove.push_back(entity);
                     continue;

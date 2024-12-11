@@ -12,8 +12,6 @@
 #include <vector>
 #include "Entity.hpp"
 
-#define MODE 0
-
 namespace ecs
 {
     class ISystem {
