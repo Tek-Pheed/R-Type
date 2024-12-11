@@ -42,7 +42,7 @@ void client::setNewPosition(std::vector<std::string> &tokens)
     const float y = std::stof(tokens[2]);
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -58,7 +58,7 @@ void client::playerDead(std::vector<std::string> &tokens)
     const int id = std::stoi(tokens[0]);
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -76,7 +76,7 @@ void client::createProjectile(std::vector<std::string> &tokens)
     float y = 0.0f;
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -107,7 +107,7 @@ void client::setPlayerHealth(std::vector<std::string> &tokens)
     const int dmg = std::stoi(tokens[1]);
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -122,7 +122,7 @@ void client::playerDisconnection(std::vector<std::string> &tokens)
     const int id = std::stoi(tokens[0]);
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
