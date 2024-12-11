@@ -64,20 +64,19 @@ int main(int argc, char **argv)
         return print_help();
     int portTCP = atoi(argv[2]);
     int portUDP = atoi(argv[3]);
+    System::Network::initNetwork();
     std::cout << "Connecting to: " << argv[1] << " on port " << portTCP << " "
               << portUDP << std::endl;
     RenderClass render(1280, 720, "R-Type", 120);
     client client(render);
-    System::Network::initNetwork();
 
-    // To be set to user input later
     client.create_connection(argv[1], portTCP, portUDP);
     std::thread(&client::receive_message, &client).detach();
     std::cout << "Client connected" << std::endl;
 
     sf::Texture playerTexture;
     playerTexture.loadFromFile("assets/sprites/r-typesheet42.gif");
-    srand(static_cast<unsigned int>(time(0)));
+
     render.setPlayerTexture(playerTexture);
 
     create_player(client, render);

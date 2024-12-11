@@ -10,7 +10,7 @@
 #include "client.hpp"
 #include "protocol.hpp"
 
-void client::create_new_player(std::vector<std::string> &tokens)
+void client::createNewPlayer(std::vector<std::string> &tokens)
 {
     std::cout << "Create new player" << std::endl;
 
@@ -35,14 +35,14 @@ void client::create_new_player(std::vector<std::string> &tokens)
     add_entity(player);
 }
 
-void client::set_new_position(std::vector<std::string> &tokens)
+void client::setNewPosition(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     const float x = std::stof(tokens[1]);
     const float y = std::stof(tokens[2]);
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -53,12 +53,12 @@ void client::set_new_position(std::vector<std::string> &tokens)
     }
 }
 
-void client::player_dead(std::vector<std::string> &tokens)
+void client::playerDead(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -69,17 +69,14 @@ void client::player_dead(std::vector<std::string> &tokens)
     }
 }
 
-void client::create_projectile(std::vector<std::string> &tokens)
+void client::createProjectile(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     float x = 0.0f;
     float y = 0.0f;
 
-    sf::Texture bulletTexture;
-    bulletTexture.loadFromFile("./assets/sprites/r-typesheet1.gif");
-
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -97,20 +94,20 @@ void client::create_projectile(std::vector<std::string> &tokens)
     bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
 
     bullet->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, bulletTexture));
+        ecs::ObjectType::SPRITE, _refRender.getBulletTexture()));
 
     bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(137, 153, 64, 16));
     _entities.push_back(bullet);
 }
 
-void client::set_player_health(std::vector<std::string> &tokens)
+void client::setPlayerHealth(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     const int dmg = std::stoi(tokens[1]);
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -120,12 +117,12 @@ void client::set_player_health(std::vector<std::string> &tokens)
     }
 }
 
-void client::player_disconnection(std::vector<std::string> &tokens)
+void client::playerDisconnection(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
 
     for (auto &entity : _entities) {
-        if (entity->getID() == static_cast<size_t>(id)) {
+        if (entity != nullptr && entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
             if (playerComp == nullptr)
                 return;
@@ -136,31 +133,31 @@ void client::player_disconnection(std::vector<std::string> &tokens)
     }
 }
 
-void client::handle_player(int code, std::vector<std::string> &tokens)
+void client::handlePlayer(int code, std::vector<std::string> &tokens)
 {
     switch (code) {
         case P_CONN: {
-            create_new_player(tokens);
+            createNewPlayer(tokens);
             break;
         }
         case P_POS: {
-            set_new_position(tokens);
+            setNewPosition(tokens);
             break;
         }
         case P_DEAD: {
-            player_dead(tokens);
+            playerDead(tokens);
             break;
         }
         case P_SHOOT: {
-            // TODO spawn bullet
+            createProjectile(tokens);
             break;
         }
         case P_DMG: {
-            set_player_health(tokens);
+            setPlayerHealth(tokens);
             break;
         }
         case P_DISCONN: {
-            player_disconnection(tokens);
+            playerDisconnection(tokens);
             break;
         }
         default: {

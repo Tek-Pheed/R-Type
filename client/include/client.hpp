@@ -28,7 +28,6 @@ class client {
         const std::string &data, System::Network::ISocket::Type socketType);
     void receive_message();
     void handle_connection(int code, std::vector<std::string> &tokens);
-    void handle_player(int code, std::vector<std::string> &tokens);
     void handle_enemy(int code, std::vector<std::string> &tokens);
     void handle_terrain(int code, std::vector<std::string> &tokens);
     void handle_mechs(int code, std::vector<std::string> &tokens);
@@ -40,12 +39,19 @@ class client {
     std::shared_ptr<ecs::Entity> &getLocalPlayer();
 
     // Player Management
-    void create_new_player(std::vector<std::string> &tokens);
-    void set_new_position(std::vector<std::string> &tokens);
-    void player_dead(std::vector<std::string> &tokens);
-    void create_projectile(std::vector<std::string> &tokens);
-    void set_player_health(std::vector<std::string> &tokens);
-    void player_disconnection(std::vector<std::string> &tokens);
+    void handlePlayer(int code, std::vector<std::string> &tokens);
+    void createNewPlayer(std::vector<std::string> &tokens);
+    void setNewPosition(std::vector<std::string> &tokens);
+    void playerDead(std::vector<std::string> &tokens);
+    void createProjectile(std::vector<std::string> &tokens);
+    void setPlayerHealth(std::vector<std::string> &tokens);
+    void playerDisconnection(std::vector<std::string> &tokens);
+
+    // Enemy Management
+    void createEnemy(std::vector<std::string> &tokens);
+    void enemyDead(std::vector<std::string> &tokens);
+    void enemyShoot(std::vector<std::string> &tokens);
+    void enemyDamage(std::vector<std::string> &tokens);
 
   private:
     System::Network::TCPSocket _clientSocketTCP;
