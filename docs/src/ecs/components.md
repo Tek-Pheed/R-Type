@@ -1,8 +1,32 @@
 # Components
 
-This class is used for grouped all components in same class.
+Components are one of the 3 main parts of ECS.
+They enable [entities](./entity.md) to have dynamic data that we can retrieve
+or define.
 
-This class is built with destructor only
+## Example of a component
+
+PlayerComponent is used to define an entity as a player.
+
+```cpp
+#include "Components.hpp"
+
+ecs::PlayerComponent::PlayerComponent(const std::string &name)
+{
+    this->_name = name;
+}
+
+std::string ecs::PlayerComponent::getName() const
+{
+    return this->_name;
+}
+
+void ecs::PlayerComponent::setName(const std::string &name)
+{
+    this->_name = name;
+}
+
+```
 
 ## Components list
 

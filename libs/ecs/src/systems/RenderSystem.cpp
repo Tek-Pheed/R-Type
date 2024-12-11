@@ -8,13 +8,6 @@
 #include "Components.hpp"
 #include "Systems.hpp"
 
-sf::CircleShape createCircleShape()
-{
-    sf::CircleShape circle;
-
-    return circle;
-}
-
 void ecs::RenderSystem::update(
     std::vector<std::shared_ptr<ecs::Entity>> &entities,
     sf::RenderWindow *window, float deltaTime)
