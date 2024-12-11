@@ -64,11 +64,11 @@ int main(int argc, char **argv)
         return print_help();
     int portTCP = atoi(argv[2]);
     int portUDP = atoi(argv[3]);
+    System::Network::initNetwork();
     std::cout << "Connecting to: " << argv[1] << " on port " << portTCP << " "
               << portUDP << std::endl;
     RenderClass render(1280, 720, "R-Type", 120);
     client client(render);
-    System::Network::initNetwork();
 
     client.create_connection(argv[1], portTCP, portUDP);
     std::thread(&client::receive_message, &client).detach();

@@ -45,6 +45,70 @@ void client::createEnemy(std::vector<std::string> &tokens)
     add_entity(enemy);
 }
 
+void client::enemyDead(std::vector<std::string> &tokens)
+{
+    const int id = std::stoi(tokens[0]);
+
+    for (auto &entity : _entities) {
+        if (entity->getID() == static_cast<size_t>(id)) {
+            auto enemyComp = entity->getComponent<ecs::EnemyComponent>();
+            if (enemyComp == nullptr)
+                return;
+            _entities.erase(
+                std::remove(_entities.begin(), _entities.end(), entity),
+                _entities.end());
+        }
+    }
+}
+
+void client::enemyShoot(std::vector<std::string> &tokens)
+{
+    const int id = std::stoi(tokens[0]);
+    float x = 0.0f;
+    float y = 0.0f;
+
+    for (auto &entity : _entities) {
+        if (entity->getID() == static_cast<size_t>(id)) {
+            auto enemyComp = entity->getComponent<ecs::EnemyComponent>();
+            if (enemyComp == nullptr)
+                return;
+            auto position = entity->getComponent<ecs::PositionComponent>();
+            x = position->getX();
+            y = position->getY();
+            break;
+        }
+    }
+
+    auto bullet = std::make_shared<ecs::Entity>(rand());
+    bullet->addComponent(std::make_shared<ecs::BulletComponent>(0));
+    bullet->addComponent(
+        std::make_shared<ecs::PositionComponent>(x + 100, y + 25));
+    bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+
+    bullet->addComponent(std::make_shared<ecs::RenderComponent>(
+        ecs::ObjectType::SPRITE, _refRender.getBulletTexture()));
+
+    bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
+        sf::Rect(137, 153, 64, 16));
+    _entities.push_back(bullet);
+}
+
+void client::enemyDamage(std::vector<std::string> &tokens)
+{
+    const int id = std::stoi(tokens[0]);
+    const int dmg = std::stoi(tokens[1]);
+
+    for (auto &entity : _entities) {
+        if (entity->getID() == static_cast<size_t>(id)) {
+            auto enemyComp = entity->getComponent<ecs::EnemyComponent>();
+            if (enemyComp == nullptr)
+                return;
+            auto health = entity->getComponent<ecs::HealthComponent>();
+            health->setHealth(health->getHealth() - dmg);
+        }
+    }
+}
+
 void client::handle_enemy(int code, std::vector<std::string> &tokens)
 {
     switch (code) {
@@ -52,15 +116,9 @@ void client::handle_enemy(int code, std::vector<std::string> &tokens)
         case E_POS:
             // code
             break;
-        case E_DEAD:
-            // code
-            break;
-        case E_SHOOT:
-            // code
-            break;
-        case E_DMG:
-            // code
-            break;
+        case E_DEAD: enemyDead(tokens); break;
+        case E_SHOOT: enemyShoot(tokens); break;
+        case E_DMG: enemyDamage(tokens); break;
         default: break;
     }
 }

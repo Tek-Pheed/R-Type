@@ -109,51 +109,58 @@ void client::receive_message()
         readfds.clear();
         readfds.emplace_back(&_clientSocketTCP);
         readfds.emplace_back(&_clientSocketUDP);
-        System::Network::select(&readfds, nullptr, nullptr);
-        if (readfds.size() == 0)
-            continue;
-        for (auto sock : readfds) {
-            vect.clear();
-            arr.clear();
-            switch (sock->getType()) {
-                case System::Network::ISocket::TCP: {
-                    vect = _clientSocketTCP.receive();
-                    if (vect.size() > 0) {
-                        std::string buffer =
-                            System::Network::decodeString(vect);
-                        while (buffer.size() > 0
-                            && buffer[buffer.size() - 1] != '\n'
-                            && buffer[buffer.size() - 2] != '\t') {
-                            buffer += System::Network::decodeString(
-                                _clientSocketTCP.receive());
+        try {
+            System::Network::select(&readfds, nullptr, nullptr);
+            if (readfds.size() == 0)
+                continue;
+            for (auto sock : readfds) {
+                vect.clear();
+                arr.clear();
+                switch (sock->getType()) {
+                    case System::Network::ISocket::TCP: {
+                        vect = _clientSocketTCP.receive();
+                        if (vect.size() > 0) {
+                            std::string buffer =
+                                System::Network::decodeString(vect);
+                            while (buffer.size() > 0
+                                && buffer[buffer.size() - 1] != '\n'
+                                && buffer[buffer.size() - 2] != '\t') {
+                                buffer += System::Network::decodeString(
+                                    _clientSocketTCP.receive());
+                            }
+                            std::cout << "Received TCP: " << buffer
+                                      << std::endl;
+                            _mutex.lock();
+                            _buffers.push_back(buffer);
+                            _mutex.unlock();
                         }
-                        std::cout << "Received TCP: " << buffer << std::endl;
-                        _mutex.lock();
-                        _buffers.push_back(buffer);
-                        _mutex.unlock();
+                        break;
                     }
-                    break;
+                    case System::Network::ISocket::UDP: {
+                        vect = _clientSocketUDP.receive();
+                        if (vect.size() > 0) {
+                            std::string buffer =
+                                System::Network::decodeString(vect);
+                            while (buffer.size() > 0
+                                && buffer[buffer.size() - 1] != '\n'
+                                && buffer[buffer.size() - 2] != '\t') {
+                                buffer += System::Network::decodeString(
+                                    _clientSocketUDP.receive());
+                            }
+                            std::cout << "Received UDP: " << buffer
+                                      << std::endl;
+                            _mutex.lock();
+                            _buffers.push_back(buffer);
+                            _mutex.unlock();
+                        }
+                        break;
+                    };
+                    default: break;
                 }
-                case System::Network::ISocket::UDP: {
-                    vect = _clientSocketUDP.receive();
-                    if (vect.size() > 0) {
-                        std::string buffer =
-                            System::Network::decodeString(vect);
-                        while (buffer.size() > 0
-                            && buffer[buffer.size() - 1] != '\n'
-                            && buffer[buffer.size() - 2] != '\t') {
-                            buffer += System::Network::decodeString(
-                                _clientSocketUDP.receive());
-                        }
-                        std::cout << "Received UDP: " << buffer << std::endl;
-                        _mutex.lock();
-                        _buffers.push_back(buffer);
-                        _mutex.unlock();
-                    }
-                    break;
-                };
-                default: break;
             }
+        } catch (...) {
+            std::cout << "Select catch" << std::endl;
+            return;
         }
     }
 }
@@ -165,8 +172,8 @@ int client::create_connection(const char *ip, int portTCP, int portUDP)
             System::Network::ISocket::CONNECT, ip);
         _clientSocketUDP.initSocket(static_cast<uint16_t>(portUDP),
             System::Network::ISocket::CONNECT, ip);
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << '\n';
+    } catch (...) {
+        std::cerr << "Create connection catch" << std::endl;
         return -1;
     }
     return 0;

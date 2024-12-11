@@ -49,6 +49,9 @@ class client {
 
     // Enemy Management
     void createEnemy(std::vector<std::string> &tokens);
+    void enemyDead(std::vector<std::string> &tokens);
+    void enemyShoot(std::vector<std::string> &tokens);
+    void enemyDamage(std::vector<std::string> &tokens);
 
   private:
     System::Network::TCPSocket _clientSocketTCP;
