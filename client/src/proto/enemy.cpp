@@ -14,19 +14,20 @@
 
 void client::create_enemy(std::vector<std::string> &tokens)
 {
+    (void)tokens;
     std::cout << "Create new enemy" << std::endl;
     // id, x, y
-    const std::string name = "enemy";
+    /*const std::string name = "enemy";
     const int id = std::stoi(tokens[0]);
     const float x = std::stof(tokens[1]);
-    const float y = std::stof(tokens[2]);
+    const float y = std::stof(tokens[2]);*/
 
-    auto enemy = std::make_shared<ecs::Entity>(id);
+    /*auto enemy = std::make_shared<ecs::Entity>(id);
     enemy->addComponent(std::make_shared<ecs::EnemyComponent>());
     enemy->addComponent(std::make_shared<ecs::PositionComponent>(x, y));
     enemy->addComponent(
         std::make_shared<ecs::VelocityComponent>(-200.0f, 0.0f));
-    enemy->addComponent(std::make_shared<ecs::HealthComponent>(100));
+    enemy->addComponent(std::make_shared<ecs::HealthComponent>(100));*/
 
     /*enemy->addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::ObjectType::SPRITE, _refRender.getEnemyTexture()));
@@ -45,7 +46,7 @@ void client::create_enemy(std::vector<std::string> &tokens)
     player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
         sf::Vector2f(3, 3));*/
 
-    add_entity(enemy);
+    //add_entity(enemy);
 }
 
 void client::handle_enemy(int code, std::vector<std::string> &tokens)

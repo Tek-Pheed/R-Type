@@ -100,6 +100,16 @@ sf::Texture &RenderClass::getPlayerTexture()
     return _playerTexture;
 }
 
+void RenderClass::setEnemyTexture(sf::Texture &texture)
+{
+    _enemyTexture = texture;
+}
+
+sf::Texture &RenderClass::getEnemyTexture()
+{
+    return _enemyTexture;
+}
+
 void RenderClass::setBulletTexture(sf::Texture &texture)
 {
     _bulletTexture = texture;

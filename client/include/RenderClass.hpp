@@ -39,6 +39,9 @@ class RenderClass {
     void setBulletTexture(sf::Texture &texture);
     sf::Texture &getBulletTexture();
 
+    void setEnemyTexture(sf::Texture &texture);
+    sf::Texture &getEnemyTexture();
+
   private:
     sf::RenderWindow _window;
     std::string _title;
@@ -46,6 +49,7 @@ class RenderClass {
     int _frameRate;
     sf::Texture _bulletTexture;
     sf::Texture _playerTexture;
+    sf::Texture _enemyTexture;
 };
 
 #endif /* !RENDERCLASS_HPP_ */
