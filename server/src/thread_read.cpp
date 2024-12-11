@@ -38,13 +38,13 @@ ssize_t server::authenticateUDPClient(const System::Network::byteArray &packet)
 
 void server::threadedServerRead()
 {
-    try {
-        System::Network::byteArray arr;
-        System::Network::byteArray vect;
-        System::Network::socketSetGeneric readfds;
-        System::Network::timeoutStruct tv = {{0, 500000}};
+    System::Network::byteArray arr;
+    System::Network::byteArray vect;
+    System::Network::socketSetGeneric readfds;
+    System::Network::timeoutStruct tv = {{0, 500000}};
 
-        while (true) {
+    while (true) {
+        try {
             readfds.clear();
             this->_globalMutex.lock();
             readfds.emplace_back(&_serverSocketUDP);
@@ -166,9 +166,9 @@ void server::threadedServerRead()
                     }
                 }
             }
+        } catch (const std::exception &e) {
+            std::cout << "[Read Thread] failed with exception: " << e.what()
+                      << std::endl;
         }
-    } catch (const std::exception &e) {
-        std::cout << "[Read Thread] failed with exception: " << e.what()
-                  << std::endl;
     }
 }

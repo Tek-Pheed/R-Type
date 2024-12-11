@@ -91,6 +91,8 @@ void server::gameUpdate(long deltaTimeMs)
         if (pos->getX() > 4000 || pos->getY() > 2200 || pos->getX() < 0
             || pos->getY() < 0) {
             std::cout << "Delete component: " << b->getID() << std::endl;
+            std::string pack = makePacket(E_DEAD, b->getID());
+            send_to_all(pack);
             _gameState.erase(
                 std::remove(_gameState.begin(), _gameState.end(), b));
         }
