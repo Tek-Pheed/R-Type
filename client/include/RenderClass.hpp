@@ -27,14 +27,17 @@ class RenderClass {
     void setFrameRate(int frameRate);
 
     void renderWindow(client &client);
-    void playEvent(std::shared_ptr<ecs::Entity> player,
-        std::vector<std::shared_ptr<ecs::Entity>> &entities);
+    void playEvent(
+        client &client, std::vector<std::shared_ptr<ecs::Entity>> &entities);
     void playerAnimations(
         std::shared_ptr<ecs::Entity> player, std::string direction);
     void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);
 
     void setPlayerTexture(sf::Texture &texture);
     sf::Texture &getPlayerTexture();
+
+    void setBulletTexture(sf::Texture &texture);
+    sf::Texture &getBulletTexture();
 
   private:
     sf::RenderWindow _window;

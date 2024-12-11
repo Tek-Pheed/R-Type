@@ -75,9 +75,6 @@ void client::create_projectile(std::vector<std::string> &tokens)
     float x = 0.0f;
     float y = 0.0f;
 
-    sf::Texture bulletTexture;
-    bulletTexture.loadFromFile("./assets/sprites/r-typesheet1.gif");
-
     for (auto &entity : _entities) {
         if (entity->getID() == static_cast<size_t>(id)) {
             auto playerComp = entity->getComponent<ecs::PlayerComponent>();
@@ -97,7 +94,7 @@ void client::create_projectile(std::vector<std::string> &tokens)
     bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
 
     bullet->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, bulletTexture));
+        ecs::ObjectType::SPRITE, _refRender.getBulletTexture()));
 
     bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(137, 153, 64, 16));
@@ -152,7 +149,7 @@ void client::handle_player(int code, std::vector<std::string> &tokens)
             break;
         }
         case P_SHOOT: {
-            // TODO spawn bullet
+            create_projectile(tokens);
             break;
         }
         case P_DMG: {

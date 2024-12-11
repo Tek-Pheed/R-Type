@@ -11,8 +11,8 @@
 
 #include "RenderClass.hpp"
 #include <SFML/Graphics.hpp>
+#include <sstream>
 #include "Components.hpp"
-#include <thread>
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
 #include "client.hpp"
@@ -100,6 +100,16 @@ sf::Texture &RenderClass::getPlayerTexture()
     return _playerTexture;
 }
 
+void RenderClass::setBulletTexture(sf::Texture &texture)
+{
+    _bulletTexture = texture;
+}
+
+sf::Texture &RenderClass::getBulletTexture()
+{
+    return _bulletTexture;
+}
+
 void RenderClass::renderWindow(client &client)
 {
     sf::Clock clock;
@@ -121,7 +131,7 @@ void RenderClass::renderWindow(client &client)
     while (this->_window.isOpen()) {
         deltaTime = clock.restart().asSeconds();
         this->_window.clear();
-        playEvent(player, client.get_entities());
+        playEvent(client, client.get_entities());
         this->_window.draw(background_s);
         positionSystem.update(
             client.get_entities(), &this->_window, deltaTime);
@@ -134,10 +144,12 @@ void RenderClass::renderWindow(client &client)
     }
 }
 
-void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player,
-    std::vector<std::shared_ptr<ecs::Entity>> &entities)
+void RenderClass::playEvent(
+    client &client, std::vector<std::shared_ptr<ecs::Entity>> &entities)
 {
     sf::Event event;
+    std::stringstream ss;
+    auto player = client.getLocalPlayer();
     auto velocity = player->getComponent<ecs::VelocityComponent>();
 
     while (this->_window.pollEvent(event)) {
@@ -173,7 +185,8 @@ void RenderClass::playEvent(std::shared_ptr<ecs::Entity> player,
                 bullet->getComponent<ecs::RenderComponent>()
                     ->getSprite()
                     ->setTextureRect(sf::Rect(137, 153, 64, 16));
-
+                ss << "104 " << client.get_id() << "\t\n";
+                client.writeToServer(ss.str(), System::Network::ISocket::UDP);
                 entities.push_back(bullet);
             }
         }
@@ -215,8 +228,8 @@ void RenderClass::backgroundAnimation(sf::Sprite *bg, sf::Clock *clock)
     float s = clock->getElapsedTime().asSeconds();
 
     if (s > 0.01) {
-        bg->setTextureRect(
-            sf::Rect(bg->getTextureRect().left + 2, 0, int(getWindow().getSize().x), int(getWindow().getSize().y)));
+        bg->setTextureRect(sf::Rect(bg->getTextureRect().left + 2, 0,
+            int(getWindow().getSize().x), int(getWindow().getSize().y)));
         clock->restart();
     }
 }

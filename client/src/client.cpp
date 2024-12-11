@@ -70,7 +70,6 @@ int main(int argc, char **argv)
     client client(render);
     System::Network::initNetwork();
 
-    // To be set to user input later
     client.create_connection(argv[1], portTCP, portUDP);
     std::thread(&client::receive_message, &client).detach();
     std::cout << "Client connected" << std::endl;
