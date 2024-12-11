@@ -11,11 +11,13 @@
 #include <mutex>
 #include <string>
 #include "Components.hpp"
+#include "protocol.hpp"
 #include "server.hpp"
 
 void server::syncNewClientGameState(size_t newClient)
 {
     auto players = getEntitiesByComponent<ecs::PlayerComponent>();
+    auto enemies = getEntitiesByComponent<ecs::EnemyComponent>();
 
     for (const auto &p : players) {
         if (p != nullptr) {
@@ -33,6 +35,17 @@ void server::syncNewClientGameState(size_t newClient)
             send_to_one(pack, newClient);
         }
     }
+    for (const auto &p : enemies) {
+        auto comp_pos = p->getComponent<ecs::PositionComponent>();
+        std::string pack = "";
+        if (comp_pos == nullptr)
+            continue;
+        std::string id = getString(p->getID());
+        std::string x = getString(comp_pos->getX());
+        std::string y = getString(comp_pos->getY());
+        pack = makePacket(E_SPAWN, id, x, y);
+        send_to_one(pack, newClient);
+    }
 }
 
 std::shared_ptr<ecs::Entity> server::getPlayer(size_t playerID)
@@ -41,9 +54,7 @@ std::shared_ptr<ecs::Entity> server::getPlayer(size_t playerID)
 
     for (const auto &pl : players) {
         if (pl != nullptr) {
-            auto ps = pl->getComponent<ecs::PlayerComponent>();
-            if (ps != nullptr
-                && ps->getName() == "Player " + getString(playerID))
+            if (pl != nullptr && pl->getID() == playerID)
                 return (pl);
         }
     }
@@ -83,9 +94,8 @@ int server::playerPosition(int id, float x, float y)
                   << std::endl;
         return (-1);
     }
-    std::cout << "Update player pos" << std::endl;
     pos->setX(x);
-    pos->setY(x);
+    pos->setY(y);
     std::string pack = makePacket(player::P_POS, (float) id, x, y);
     send_to_others(pack, (size_t) id);
     return 0;
@@ -127,7 +137,8 @@ int server::playerDamaged(int id, int amount)
                 playerKilled((size_t) id);
                 return (0);
             }
-            std::string pack = makePacket(player::P_DMG, id, playerHealth->getHealth());
+            std::string pack =
+                makePacket(player::P_DMG, id, playerHealth->getHealth());
             send_to_all(pack);
             return (0);
         }

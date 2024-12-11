@@ -42,7 +42,7 @@ void server::threadedServerRead()
         System::Network::byteArray arr;
         System::Network::byteArray vect;
         System::Network::socketSetGeneric readfds;
-        System::Network::timeoutStruct tv = {{0, 50000}};
+        System::Network::timeoutStruct tv = {{0, 500000}};
 
         while (true) {
             readfds.clear();
