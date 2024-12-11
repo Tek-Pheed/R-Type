@@ -50,7 +50,7 @@ void server::threadedServerWrite()
                     case System::Network::ISocket::TCP: {
                         ssize_t id = this->identifyClient(*sock);
                         if (id == -1)
-                            std::cerr << "Unable to idendify client (TCP - "
+                            std::cout << "Unable to idendify client (TCP - "
                                          "write thread)"
                                       << std::endl;
                         Client &client = this->getClient((size_t) id);
@@ -128,7 +128,7 @@ void server::threadedServerWrite()
             }
         }
     } catch (const std::exception &e) {
-        std::cerr << "[Write Thread] failed with exception: " << e.what()
+        std::cout << "[Write Thread] failed with exception: " << e.what()
                   << std::endl;
     }
 }

@@ -144,7 +144,7 @@ void server::handleConnection()
         try {
             System::Network::select(&readfds);
         } catch (const std::exception &s) {
-            std::cerr << "An error occured on the server: " << s.what()
+            std::cout << "An error occured on the server: " << s.what()
                       << std::endl;
         }
         if (readfds.size() == 0)
@@ -211,7 +211,7 @@ int main()
     try {
         s.create_server();
     } catch (const std::exception &e) {
-        std::cerr << "Failed to launch the server: " << e.what() << std::endl;
+        std::cout << "Failed to launch the server: " << e.what() << std::endl;
         return (84);
     }
     std::thread(&server::threadedServerRead, &s).detach();

@@ -84,13 +84,13 @@ int server::playerPosition(int id, float x, float y)
     std::shared_ptr<ecs::Entity> player = getPlayer((size_t) id);
 
     if (player == nullptr) {
-        std::cerr << "Failed to update player: " << std::to_string(id)
+        std::cout << "Failed to update player: " << std::to_string(id)
                   << std::endl;
         return (-1);
     }
     auto pos = player->getComponent<ecs::PositionComponent>();
     if (pos == nullptr) {
-        std::cerr << "Failed to update player: " << std::to_string(id)
+        std::cout << "Failed to update player: " << std::to_string(id)
                   << std::endl;
         return (-1);
     }

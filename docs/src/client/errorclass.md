@@ -19,7 +19,7 @@ int main() {
         throw ErrorClass("Custom error occurred");
 
     } catch (const ErrorClass &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cout << "Error: " << e.what() << std::endl;
     }
 
     return 0;

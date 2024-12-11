@@ -166,7 +166,7 @@ int client::create_connection(const char *ip, int portTCP, int portUDP)
         _clientSocketUDP.initSocket(static_cast<uint16_t>(portUDP),
             System::Network::ISocket::CONNECT, ip);
     } catch (const std::exception &e) {
-        std::cerr << e.what() << '\n';
+        std::cout << e.what() << '\n';
         return -1;
     }
     return 0;

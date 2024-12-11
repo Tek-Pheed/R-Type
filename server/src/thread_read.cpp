@@ -64,7 +64,7 @@ void server::threadedServerRead()
                     case System::Network::ISocket::TCP: {
                         ssize_t id = identifyClient(*sock);
                         if (id == -1)
-                            std::cerr << "Unable to idendify client (TCP - "
+                            std::cout << "Unable to idendify client (TCP - "
                                          "read thread)"
                                       << std::endl;
                         if (!sock->isOpen()) {
@@ -114,7 +114,7 @@ void server::threadedServerRead()
                         if (id == -1) {
                             id = authenticateUDPClient(vect);
                             if (id == -1) {
-                                std::cerr
+                                std::cout
                                     << "[Read Thread] Failed to identify "
                                        "client on UDP ("
                                     << std::to_string(sock->getUID())
@@ -168,7 +168,7 @@ void server::threadedServerRead()
             }
         }
     } catch (const std::exception &e) {
-        std::cerr << "[Read Thread] failed with exception: " << e.what()
+        std::cout << "[Read Thread] failed with exception: " << e.what()
                   << std::endl;
     }
 }

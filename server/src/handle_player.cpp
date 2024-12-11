@@ -42,7 +42,7 @@ int server::handle_player(int code, const std::vector<std::string> &tokens)
     switch (code) {
         case P_POS:
             if (tokens.size() <= 2) {
-                std::cerr << "Ignoring Invalid Packet" << std::endl;
+                std::cout << "Ignoring Invalid Packet" << std::endl;
                 break;
             }
             float x, y;
@@ -54,7 +54,7 @@ int server::handle_player(int code, const std::vector<std::string> &tokens)
 
         case P_SHOOT:
             if (tokens.size() == 0) {
-                std::cerr << "Ignoring Invalid Packet" << std::endl;
+                std::cout << "Ignoring Invalid Packet" << std::endl;
                 break;
             }
             id = std::stoi(tokens[0]);
@@ -63,7 +63,7 @@ int server::handle_player(int code, const std::vector<std::string> &tokens)
 
         case P_DMG:
             if (tokens.size() <= 1) {
-                std::cerr << "Ignoring Invalid Packet" << std::endl;
+                std::cout << "Ignoring Invalid Packet" << std::endl;
                 break;
             }
             id = std::stoi(tokens[0]);
