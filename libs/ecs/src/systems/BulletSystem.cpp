@@ -26,10 +26,12 @@ void ecs::BulletSystem::update(
                 position->setY(
                     position->getY() + velocity->getVy() * deltaTime);
 
-                if (position->getX() >= float(window->getSize().x && !isServer)
-                    || position->getX() < 0) {
-                    bulletToRemove.push_back(entity);
-                    continue;
+                if (!isServer) {
+                    if (position->getX() >= float(window->getSize().x)
+                        || position->getX() < 0) {
+                        bulletToRemove.push_back(entity);
+                        continue;
+                    }
                 }
             }
         }

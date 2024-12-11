@@ -18,7 +18,8 @@ void ecs::PositionSystem::update(
             entity->getComponent<ecs::VelocityComponent>();
         auto bullet = entity->getComponent<ecs::BulletComponent>();
         auto render = entity->getComponent<ecs::RenderComponent>();
-        if (positionComponent && velocityComponent && !bullet && render) {
+
+        if (positionComponent && velocityComponent && !bullet) {
             float newX = static_cast<float>(positionComponent->getX())
                 + static_cast<float>(velocityComponent->getVx()) * deltaTime;
             float newY = static_cast<float>(positionComponent->getY())
