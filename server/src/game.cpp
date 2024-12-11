@@ -77,7 +77,6 @@ void server::gameUpdate(long deltaTimeMs)
         auto pos = b->getComponent<ecs::PositionComponent>();
         if (pos->getX() > 4000 || pos->getY() > 2200 || pos->getX() < 0
             || pos->getY() < 0) {
-            std::cout << "Delete component: " << b->getID() << std::endl;
             _gameState.erase(
                 std::remove(_gameState.begin(), _gameState.end(), b));
         }
@@ -87,10 +86,8 @@ void server::gameUpdate(long deltaTimeMs)
         if (b == nullptr)
             continue;
         auto pos = b->getComponent<ecs::PositionComponent>();
-        std::cout << b->getID() << " " << pos->getX() << " " << pos->getY() << std::endl;
         if (pos->getX() > 4000 || pos->getY() > 2200 || pos->getX() < 0
             || pos->getY() < 0) {
-            std::cout << "Delete component: " << b->getID() << std::endl;
             std::string pack = makePacket(E_DEAD, b->getID());
             send_to_all(pack);
             _gameState.erase(
