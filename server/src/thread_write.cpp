@@ -5,6 +5,10 @@
 ** thread_write
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <cstddef>
 #include <exception>
 #include <iostream>

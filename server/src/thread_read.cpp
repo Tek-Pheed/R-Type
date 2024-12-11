@@ -5,6 +5,10 @@
 ** thread_read
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <climits>
 #include <cstddef>
 #include <cstdlib>

@@ -5,14 +5,10 @@
 ** game
 */
 
-#include <cstdlib>
 #include "Components.hpp"
 #include "Systems.hpp"
 #include "protocol.hpp"
 #include "server.hpp"
-#include "system_network.hpp"
-#include "system_tcp.hpp"
-#include "system_udp.hpp"
 
 void server::createEnemy(unsigned int id, int x, int y)
 {
