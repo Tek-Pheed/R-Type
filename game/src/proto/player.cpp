@@ -26,7 +26,7 @@ void game::createNewPlayer(std::vector<std::string> &tokens)
     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
 
     player->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, _refRender.getPlayerTexture()));
+        ecs::ObjectType::SPRITE, _refRender->getPlayerTexture()));
 
     player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(66, 0, 33, 14));
@@ -101,7 +101,7 @@ void game::createProjectile(std::vector<std::string> &tokens)
     bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
 
     bullet->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, _refRender.getBulletTexture()));
+        ecs::ObjectType::SPRITE, _refRender->getBulletTexture()));
 
     bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(137, 153, 64, 16));

@@ -22,26 +22,30 @@ class game {
   public:
     game();
     ~game();
+
     int createConnection(const char *ip, int portTCP, int portUDP);
     int manageBuffers();
     void writeToServer(
         const std::string &data, System::Network::ISocket::Type socketType);
     void receiveMessage();
+
     void handleConnection(int code, std::vector<std::string> &tokens);
     void handleEnemy(int code, std::vector<std::string> &tokens);
     void handleTerrain(int code, std::vector<std::string> &tokens);
     void handleMechs(int code, std::vector<std::string> &tokens);
     void addEntity(std::shared_ptr<ecs::Entity> entity);
+
     std::vector<std::shared_ptr<ecs::Entity>> &getEntities();
     int getId();
 
     void setServerMode(bool mode);
-    RenderClass &getRenderClass();
 
     void updateLocalplayerPosition();
     std::shared_ptr<ecs::Entity> &getLocalPlayer();
 
     // Client Management
+    void setRenderClass(RenderClass *refRender);
+    RenderClass *getRenderClass();
     void loadTexture();
     void createPlayer();
 
@@ -69,7 +73,7 @@ class game {
     std::vector<std::string> _buffers;
     std::mutex _mutex;
     std::vector<std::shared_ptr<ecs::Entity>> _entities;
-    RenderClass _refRender;
+    RenderClass *_refRender;
     bool _isServer;
 };
 

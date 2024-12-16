@@ -30,7 +30,7 @@ void game::createEnemy(std::vector<std::string> &tokens)
     enemy->addComponent(std::make_shared<ecs::HealthComponent>(100));
 
     enemy->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, _refRender.getEnemyTexture()));
+        ecs::ObjectType::SPRITE, _refRender->getEnemyTexture()));
     enemy->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(0, 16, 32, 32));
     enemy->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
@@ -84,7 +84,7 @@ void game::enemyShoot(std::vector<std::string> &tokens)
     bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
 
     bullet->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, _refRender.getBulletTexture()));
+        ecs::ObjectType::SPRITE, _refRender->getBulletTexture()));
 
     bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(137, 153, 64, 16));
