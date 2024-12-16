@@ -23,6 +23,8 @@ void setIdPlayer(game &game)
 void game::handleConnection(int code, std::vector<std::string> &tokens)
 {
     if (code == 901) {
+        if (tokens.size() < 1)
+            return;
         _id = atoi(tokens[0].c_str());
         setIdPlayer(*this);
         std::stringstream ss;
