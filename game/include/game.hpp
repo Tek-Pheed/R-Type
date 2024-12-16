@@ -2,11 +2,11 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** client
+** game
 */
 
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#ifndef GAME_HPP
+#define GAME_HPP
 
 #include <memory>
 #include <mutex>
@@ -17,11 +17,11 @@ class RenderClass;
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
 
-class client {
+class game {
     /* data */
   public:
-    client(RenderClass &render);
-    ~client();
+    game(RenderClass &render);
+    ~game();
     int create_connection(const char *ip, int portTCP, int portUDP);
     int manage_buffers();
     void writeToServer(
@@ -54,8 +54,8 @@ class client {
     void enemyDamage(std::vector<std::string> &tokens);
 
   private:
-    System::Network::TCPSocket _clientSocketTCP;
-    System::Network::UDPSocket _clientSocketUDP;
+    System::Network::TCPSocket _gameSocketTCP;
+    System::Network::UDPSocket _gameSocketUDP;
 
     int _id;
     std::shared_ptr<ecs::Entity> _player;
@@ -63,6 +63,7 @@ class client {
     std::mutex _mutex;
     std::vector<std::shared_ptr<ecs::Entity>> _entities;
     RenderClass &_refRender;
+    bool _isServer;
 };
 
-#endif /*CLIENT_HPP*/
+#endif /*game_HPP*/

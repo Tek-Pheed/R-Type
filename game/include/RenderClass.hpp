@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 #include "Entity.hpp"
-#include "client.hpp"
+#include "game.hpp"
 
 #ifndef RENDERCLASS_HPP_
     #define RENDERCLASS_HPP_
@@ -26,9 +26,9 @@ class RenderClass {
     int getFrameRate() const;
     void setFrameRate(int frameRate);
 
-    void renderWindow(client &client);
+    void renderWindow(game &game);
     void playEvent(
-        client &client, std::vector<std::shared_ptr<ecs::Entity>> &entities);
+        game &game, std::vector<std::shared_ptr<ecs::Entity>> &entities);
     void playerAnimations(
         std::shared_ptr<ecs::Entity> player, std::string direction);
     void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);

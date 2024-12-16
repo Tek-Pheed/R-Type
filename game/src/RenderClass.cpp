@@ -16,7 +16,7 @@
 #include "Components.hpp"
 #include "ErrorClass.hpp"
 #include "Systems.hpp"
-#include "client.hpp"
+#include "game.hpp"
 
 RenderClass::RenderClass(
     int width, int height, const std::string &title, int frameRate)
@@ -121,7 +121,7 @@ sf::Texture &RenderClass::getBulletTexture()
     return _bulletTexture;
 }
 
-void RenderClass::renderWindow(client &client)
+void RenderClass::renderWindow(game &game)
 {
     sf::Clock clock;
     sf::Clock clockAnim;
@@ -130,7 +130,7 @@ void RenderClass::renderWindow(client &client)
     ecs::BulletSystem bulletSystem;
     sf::Texture background_t;
     sf::Sprite background_s;
-    auto player = client.getLocalPlayer();
+    auto player = game.getLocalPlayer();
     float deltaTime = 0.00;
 
     _window.setMouseCursorVisible(false);
@@ -142,27 +142,27 @@ void RenderClass::renderWindow(client &client)
     while (this->_window.isOpen()) {
         deltaTime = clock.restart().asSeconds();
         this->_window.clear();
-        playEvent(client, client.get_entities());
+        playEvent(game, game.get_entities());
         this->_window.draw(background_s);
         positionSystem.update(
-            client.get_entities(), &this->_window, deltaTime, false);
-        client.update_localplayer_position();
+            game.get_entities(), &this->_window, deltaTime, false);
+        game.update_localplayer_position();
         renderSystem.update(
-            client.get_entities(), &this->_window, deltaTime, false);
-        client.manage_buffers();
+            game.get_entities(), &this->_window, deltaTime, false);
+        game.manage_buffers();
         bulletSystem.update(
-            client.get_entities(), &this->_window, deltaTime, false);
+            game.get_entities(), &this->_window, deltaTime, false);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
     }
 }
 
 void RenderClass::playEvent(
-    client &client, std::vector<std::shared_ptr<ecs::Entity>> &entities)
+    game &game, std::vector<std::shared_ptr<ecs::Entity>> &entities)
 {
     sf::Event event;
     std::stringstream ss;
-    auto player = client.getLocalPlayer();
+    auto player = game.getLocalPlayer();
     auto velocity = player->getComponent<ecs::VelocityComponent>();
 
     while (this->_window.pollEvent(event)) {
@@ -198,8 +198,8 @@ void RenderClass::playEvent(
                 bullet->getComponent<ecs::RenderComponent>()
                     ->getSprite()
                     ->setTextureRect(sf::Rect(137, 153, 64, 16));
-                ss << "104 " << client.get_id() << "\t\n";
-                client.writeToServer(ss.str(), System::Network::ISocket::UDP);
+                ss << "104 " << game.get_id() << "\t\n";
+                game.writeToServer(ss.str(), System::Network::ISocket::UDP);
                 entities.push_back(bullet);
             }
         }

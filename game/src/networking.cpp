@@ -18,22 +18,21 @@
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
 
-#include "client.hpp"
+#include "game.hpp"
 #include "protocol.hpp"
 
-client::client(RenderClass &render)
-    : _clientSocketTCP(System::Network::TCPSocket()),
-      _clientSocketUDP(System::Network::UDPSocket()), _id(-1),
-      _refRender(render)
+game::game(RenderClass &render)
+    : _gameSocketTCP(System::Network::TCPSocket()),
+      _gameSocketUDP(System::Network::UDPSocket()), _id(-1), _refRender(render)
 {
     return;
 }
 
-client::~client()
+game::~game()
 {
     _id = -1;
-    _clientSocketTCP.closeSocket();
-    _clientSocketUDP.closeSocket();
+    _gameSocketTCP.closeSocket();
+    _gameSocketUDP.closeSocket();
 }
 
 int is_code_valid(int code)
@@ -51,7 +50,7 @@ int is_code_valid(int code)
     return -1;
 }
 
-int client::manage_buffers()
+int game::manage_buffers()
 {
     std::unique_lock lock(_mutex);
     if (_buffers.size() == 0)
@@ -88,18 +87,18 @@ int client::manage_buffers()
     return 0;
 }
 
-void client::writeToServer(
+void game::writeToServer(
     const std::string &data, System::Network::ISocket::Type socketType)
 {
     if (socketType == System::Network::ISocket::TCP) {
         std::cout << "Sending TCP: " << data << std::endl;
-        _clientSocketTCP.sendData(System::Network::encodeString(data));
+        _gameSocketTCP.sendData(System::Network::encodeString(data));
     } else {
-        _clientSocketUDP.sendData(System::Network::encodeString(data));
+        _gameSocketUDP.sendData(System::Network::encodeString(data));
     }
 }
 
-void client::receive_message()
+void game::receive_message()
 {
     System::Network::byteArray vect;
     System::Network::byteArray arr;
@@ -107,8 +106,8 @@ void client::receive_message()
 
     while (true) {
         readfds.clear();
-        readfds.emplace_back(&_clientSocketTCP);
-        readfds.emplace_back(&_clientSocketUDP);
+        readfds.emplace_back(&_gameSocketTCP);
+        readfds.emplace_back(&_gameSocketUDP);
         try {
             System::Network::select(&readfds, nullptr, nullptr);
             if (readfds.size() == 0)
@@ -118,7 +117,7 @@ void client::receive_message()
                 arr.clear();
                 switch (sock->getType()) {
                     case System::Network::ISocket::TCP: {
-                        vect = _clientSocketTCP.receive();
+                        vect = _gameSocketTCP.receive();
                         if (vect.size() > 0) {
                             std::string buffer =
                                 System::Network::decodeString(vect);
@@ -126,7 +125,7 @@ void client::receive_message()
                                 && buffer[buffer.size() - 1] != '\n'
                                 && buffer[buffer.size() - 2] != '\t') {
                                 buffer += System::Network::decodeString(
-                                    _clientSocketTCP.receive());
+                                    _gameSocketTCP.receive());
                             }
                             std::cout << "Received TCP: " << buffer
                                       << std::endl;
@@ -137,7 +136,7 @@ void client::receive_message()
                         break;
                     }
                     case System::Network::ISocket::UDP: {
-                        vect = _clientSocketUDP.receive();
+                        vect = _gameSocketUDP.receive();
                         if (vect.size() > 0) {
                             std::string buffer =
                                 System::Network::decodeString(vect);
@@ -145,7 +144,7 @@ void client::receive_message()
                                 && buffer[buffer.size() - 1] != '\n'
                                 && buffer[buffer.size() - 2] != '\t') {
                                 buffer += System::Network::decodeString(
-                                    _clientSocketUDP.receive());
+                                    _gameSocketUDP.receive());
                             }
                             std::cout << "Received UDP: " << buffer
                                       << std::endl;
@@ -165,12 +164,12 @@ void client::receive_message()
     }
 }
 
-int client::create_connection(const char *ip, int portTCP, int portUDP)
+int game::create_connection(const char *ip, int portTCP, int portUDP)
 {
     try {
-        _clientSocketTCP.initSocket(static_cast<uint16_t>(portTCP),
+        _gameSocketTCP.initSocket(static_cast<uint16_t>(portTCP),
             System::Network::ISocket::CONNECT, ip);
-        _clientSocketUDP.initSocket(static_cast<uint16_t>(portUDP),
+        _gameSocketUDP.initSocket(static_cast<uint16_t>(portUDP),
             System::Network::ISocket::CONNECT, ip);
     } catch (...) {
         std::cerr << "Create connection catch" << std::endl;

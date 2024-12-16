@@ -5,10 +5,10 @@
 ** terrain
 */
 
-#include "client.hpp"
+#include "game.hpp"
 #include "protocol.hpp"
 
-void client::handle_terrain(int code, std::vector<std::string> &tokens)
+void game::handle_terrain(int code, std::vector<std::string> &tokens)
 {
     (void) tokens;
     switch (code) {

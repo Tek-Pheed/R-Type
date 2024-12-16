@@ -9,14 +9,14 @@
 
 #include "Components.hpp"
 #include "RenderClass.hpp"
-#include "client.hpp"
+#include "game.hpp"
 
-std::shared_ptr<ecs::Entity> &client::getLocalPlayer()
+std::shared_ptr<ecs::Entity> &game::getLocalPlayer()
 {
     return _player;
 }
 
-void client::update_localplayer_position()
+void game::update_localplayer_position()
 {
     auto position = _player->getComponent<ecs::PositionComponent>();
     if (position) {
