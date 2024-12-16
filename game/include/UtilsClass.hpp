@@ -9,11 +9,9 @@
 #define UTILSCLASS_HPP_
 
 class UtilsClass {
-
-    public:
-        UtilsClass();
-        ~UtilsClass();
-
+  public:
+    UtilsClass();
+    ~UtilsClass();
 };
 
 #endif /* !UTILSCLASS_HPP_ */

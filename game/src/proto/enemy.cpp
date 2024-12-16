@@ -9,10 +9,10 @@
 #include "Components.hpp"
 #include "Entity.hpp"
 #include "RenderClass.hpp"
-#include "client.hpp"
+#include "game.hpp"
 #include "protocol.hpp"
 
-void client::createEnemy(std::vector<std::string> &tokens)
+void game::createEnemy(std::vector<std::string> &tokens)
 {
     std::cout << "Create new enemy" << std::endl;
     // id, x, y
@@ -47,7 +47,7 @@ void client::createEnemy(std::vector<std::string> &tokens)
     add_entity(enemy);
 }
 
-void client::enemyDead(std::vector<std::string> &tokens)
+void game::enemyDead(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
 
@@ -63,7 +63,7 @@ void client::enemyDead(std::vector<std::string> &tokens)
     }
 }
 
-void client::enemyShoot(std::vector<std::string> &tokens)
+void game::enemyShoot(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     float x = 0.0f;
@@ -98,7 +98,7 @@ void client::enemyShoot(std::vector<std::string> &tokens)
     _entities.push_back(bullet);
 }
 
-void client::enemyDamage(std::vector<std::string> &tokens)
+void game::enemyDamage(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     const int dmg = std::stoi(tokens[1]);
@@ -114,7 +114,7 @@ void client::enemyDamage(std::vector<std::string> &tokens)
     }
 }
 
-void client::handle_enemy(int code, std::vector<std::string> &tokens)
+void game::handle_enemy(int code, std::vector<std::string> &tokens)
 {
     switch (code) {
         case E_SPAWN: createEnemy(tokens); break;

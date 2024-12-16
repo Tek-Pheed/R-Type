@@ -5,10 +5,10 @@
 ** mechs
 */
 
-#include "client.hpp"
+#include "game.hpp"
 #include "protocol.hpp"
 
-void client::handle_mechs(int code, std::vector<std::string> &tokens)
+void game::handle_mechs(int code, std::vector<std::string> &tokens)
 {
     (void) tokens;
     switch (code) {

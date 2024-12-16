@@ -193,13 +193,11 @@ void RenderClass::playEvent(
                         + 25));
                 bullet->addComponent(
                     std::make_shared<ecs::VelocityComponent>(350.0f, 0));
-                sf::Sprite sprite(this->_bulletTexture);
-                sprite.setTextureRect(sf::Rect(137, 153, 64, 16));
                 bullet->addComponent(std::make_shared<ecs::RenderComponent>(
-                    ecs::ObjectType::SPRITE));
-                bullet->addComponent(
-                    std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-                        sprite, 0, 0));
+                    ecs::ObjectType::SPRITE, this->_bulletTexture));
+                bullet->getComponent<ecs::RenderComponent>()
+                    ->getSprite()
+                    ->setTextureRect(sf::Rect(137, 153, 64, 16));
                 ss << "104 " << client.get_id() << "\t\n";
                 client.writeToServer(ss.str(), System::Network::ISocket::UDP);
                 entities.push_back(bullet);
@@ -224,17 +222,17 @@ void RenderClass::playerAnimations(
     std::shared_ptr<ecs::Entity> player, std::string direction)
 {
     if (direction == "top") {
-        player->getComponent<ecs::SpriteComponent<sf::Sprite>>()
+        player->getComponent<ecs::RenderComponent>()
             ->getSprite()
-            .setTextureRect(sf::Rect(132, 0, 33, 14));
+            ->setTextureRect(sf::Rect(132, 0, 33, 14));
     } else if (direction == "down") {
-        player->getComponent<ecs::SpriteComponent<sf::Sprite>>()
+        player->getComponent<ecs::RenderComponent>()
             ->getSprite()
-            .setTextureRect(sf::Rect(0, 0, 33, 14));
+            ->setTextureRect(sf::Rect(0, 0, 33, 14));
     } else {
-        player->getComponent<ecs::SpriteComponent<sf::Sprite>>()
+        player->getComponent<ecs::RenderComponent>()
             ->getSprite()
-            .setTextureRect(sf::Rect(66, 0, 33, 14));
+            ->setTextureRect(sf::Rect(66, 0, 33, 14));
     }
 }
 

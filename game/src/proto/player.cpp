@@ -7,10 +7,10 @@
 
 #include "Entity.hpp"
 #include "RenderClass.hpp"
-#include "client.hpp"
+#include "game.hpp"
 #include "protocol.hpp"
 
-void client::createNewPlayer(std::vector<std::string> &tokens)
+void game::createNewPlayer(std::vector<std::string> &tokens)
 {
     std::cout << "Create new player" << std::endl;
 
@@ -37,7 +37,7 @@ void client::createNewPlayer(std::vector<std::string> &tokens)
     add_entity(player);
 }
 
-void client::setNewPosition(std::vector<std::string> &tokens)
+void game::setNewPosition(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     const float x = std::stof(tokens[1]);
@@ -55,7 +55,7 @@ void client::setNewPosition(std::vector<std::string> &tokens)
     }
 }
 
-void client::playerDead(std::vector<std::string> &tokens)
+void game::playerDead(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
 
@@ -71,7 +71,7 @@ void client::playerDead(std::vector<std::string> &tokens)
     }
 }
 
-void client::createProjectile(std::vector<std::string> &tokens)
+void game::createProjectile(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     float x = 0.0f;
@@ -106,7 +106,7 @@ void client::createProjectile(std::vector<std::string> &tokens)
     _entities.push_back(bullet);
 }
 
-void client::setPlayerHealth(std::vector<std::string> &tokens)
+void game::setPlayerHealth(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
     const int dmg = std::stoi(tokens[1]);
@@ -122,7 +122,7 @@ void client::setPlayerHealth(std::vector<std::string> &tokens)
     }
 }
 
-void client::playerDisconnection(std::vector<std::string> &tokens)
+void game::playerDisconnection(std::vector<std::string> &tokens)
 {
     const int id = std::stoi(tokens[0]);
 
@@ -138,7 +138,7 @@ void client::playerDisconnection(std::vector<std::string> &tokens)
     }
 }
 
-void client::handlePlayer(int code, std::vector<std::string> &tokens)
+void game::handlePlayer(int code, std::vector<std::string> &tokens)
 {
     switch (code) {
         case P_CONN: {
