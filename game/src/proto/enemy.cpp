@@ -15,8 +15,9 @@
 void game::createEnemy(std::vector<std::string> &tokens)
 {
     std::cout << "Create new enemy" << std::endl;
-    // id, x, y
     const std::string name = "enemy";
+    if (tokens.size() < 3)
+        return;
     const int id = std::stoi(tokens[0]);
     const float x = std::stof(tokens[1]);
     const float y = std::stof(tokens[2]);
@@ -40,6 +41,8 @@ void game::createEnemy(std::vector<std::string> &tokens)
 
 void game::enemyDead(std::vector<std::string> &tokens)
 {
+    if (tokens.size() < 1)
+        return;
     const int id = std::stoi(tokens[0]);
 
     for (auto &entity : _entities) {
@@ -56,6 +59,8 @@ void game::enemyDead(std::vector<std::string> &tokens)
 
 void game::enemyShoot(std::vector<std::string> &tokens)
 {
+    if (tokens.size() < 1)
+        return;
     const int id = std::stoi(tokens[0]);
     float x = 0.0f;
     float y = 0.0f;
@@ -88,6 +93,8 @@ void game::enemyShoot(std::vector<std::string> &tokens)
 
 void game::enemyDamage(std::vector<std::string> &tokens)
 {
+    if (tokens.size() < 2)
+        return;
     const int id = std::stoi(tokens[0]);
     const int dmg = std::stoi(tokens[1]);
 

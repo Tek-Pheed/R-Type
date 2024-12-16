@@ -13,7 +13,8 @@
 void game::createNewPlayer(std::vector<std::string> &tokens)
 {
     std::cout << "Create new player" << std::endl;
-
+    if (tokens.size() < 4)
+        return;
     const int id = std::stoi(tokens[0]);
     const std::string name = tokens[1];
     const float x = std::stof(tokens[2]);
@@ -37,6 +38,8 @@ void game::createNewPlayer(std::vector<std::string> &tokens)
 
 void game::setNewPosition(std::vector<std::string> &tokens)
 {
+    if (tokens.size() < 3)
+        return;
     const int id = std::stoi(tokens[0]);
     const float x = std::stof(tokens[1]);
     const float y = std::stof(tokens[2]);
@@ -55,6 +58,8 @@ void game::setNewPosition(std::vector<std::string> &tokens)
 
 void game::playerDead(std::vector<std::string> &tokens)
 {
+    if (tokens.size() < 1)
+        return;
     const int id = std::stoi(tokens[0]);
 
     for (auto &entity : _entities) {
@@ -71,6 +76,8 @@ void game::playerDead(std::vector<std::string> &tokens)
 
 void game::createProjectile(std::vector<std::string> &tokens)
 {
+    if (tokens.size() < 1)
+        return;
     const int id = std::stoi(tokens[0]);
     float x = 0.0f;
     float y = 0.0f;
@@ -103,6 +110,8 @@ void game::createProjectile(std::vector<std::string> &tokens)
 
 void game::setPlayerHealth(std::vector<std::string> &tokens)
 {
+    if (tokens.size() < 2)
+        return;
     const int id = std::stoi(tokens[0]);
     const int dmg = std::stoi(tokens[1]);
 
@@ -119,6 +128,8 @@ void game::setPlayerHealth(std::vector<std::string> &tokens)
 
 void game::playerDisconnection(std::vector<std::string> &tokens)
 {
+    if (tokens.size() < 1)
+        return;
     const int id = std::stoi(tokens[0]);
 
     for (auto &entity : _entities) {
