@@ -58,6 +58,11 @@ int print_help()
 
 int main(int argc, char **argv)
 {
+
+    #if defined(RTYPE_SERVER)
+        std::cout << "Je suis un serveur" << std::endl;
+    #endif
+
     if (argc != 4)
         return print_help();
     if (!atoi(argv[1]) || !atoi(argv[2]))
