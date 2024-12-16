@@ -15,10 +15,8 @@
 
 game::game()
     : _gameSocketTCP(System::Network::TCPSocket()),
-      _gameSocketUDP(System::Network::UDPSocket()), _id(-1),
-      _refRender(1280, 720, "R-Type", 120)
+      _gameSocketUDP(System::Network::UDPSocket()), _id(-1)
 {
-    return;
 }
 
 game::~game()
@@ -26,7 +24,12 @@ game::~game()
     _id = -1;
     _gameSocketTCP.closeSocket();
     _gameSocketUDP.closeSocket();
-    _refRender.~RenderClass();
+    _refRender->~RenderClass();
+}
+
+void game::setRenderClass(RenderClass *refRender)
+{
+    _refRender = refRender;
 }
 
 void game::loadTexture()
@@ -36,11 +39,11 @@ void game::loadTexture()
     sf::Texture bulletTexture;
 
     if (playerTexture.loadFromFile("assets/sprites/r-typesheet42.gif"))
-        _refRender.setPlayerTexture(playerTexture);
+        _refRender->setPlayerTexture(playerTexture);
     if (enemyTexture.loadFromFile("assets/sprites/r-typesheet31.gif"))
-        _refRender.setEnemyTexture(enemyTexture);
+        _refRender->setEnemyTexture(enemyTexture);
     if (bulletTexture.loadFromFile("assets/sprites/r-typesheet1.gif"))
-        _refRender.setBulletTexture(bulletTexture);
+        _refRender->setBulletTexture(bulletTexture);
 }
 
 void game::addEntity(std::shared_ptr<ecs::Entity> entity)
@@ -67,7 +70,7 @@ void game::createPlayer()
     player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
     player->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, _refRender.getPlayerTexture()));
+        ecs::ObjectType::SPRITE, _refRender->getPlayerTexture()));
     player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(66, 0, 33, 14));
     player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
@@ -75,7 +78,7 @@ void game::createPlayer()
     addEntity(player);
 }
 
-RenderClass &game::getRenderClass()
+RenderClass *game::getRenderClass()
 {
     return _refRender;
 }

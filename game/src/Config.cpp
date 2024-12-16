@@ -19,7 +19,7 @@ Config::~Config()
 {
 }
 
-const std::map<int, std::string>& Config::getConfig()
+const std::map<int, std::string> &Config::getConfig()
 {
     return _configData;
 }
@@ -33,12 +33,10 @@ void Config::saveConfig()
     std::ofstream savefile(_filename);
 
     if (!savefile.is_open()) {
-        throw ErrorClass(
-            "RTC006 : Invalid file: file not found.");
+        throw ErrorClass("RTC006 : Invalid file: file not found.");
     }
     if (_configData.empty()) {
-        throw ErrorClass(
-            "RTC005 : Invalid config: the config file is empty.");
+        throw ErrorClass("RTC005 : Invalid config: the config file is empty.");
     }
     for (const auto &line : _configData) {
         savefile << line.second << std::endl;
@@ -114,8 +112,7 @@ void Config::parseConfig()
 {
     std::ifstream infile(_filename);
     if (!infile.is_open()) {
-        throw ErrorClass(
-            "RTC006 : Invalid file: could not open file.");
+        throw ErrorClass("RTC005 : Invalid config: the config file is empty.");
     }
 
     std::string line;

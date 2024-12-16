@@ -35,7 +35,6 @@ int main(int argc, char **argv)
     game.setServerMode(true);
 #endif
     game.setServerMode(false);
-
     if (argc != 4)
         return print_help();
     if (!atoi(argv[1]) || !atoi(argv[2]))
@@ -46,9 +45,11 @@ int main(int argc, char **argv)
               << portUDP << std::endl;
 
     game.createConnection(argv[1], portTCP, portUDP);
+    RenderClass render(1280, 720, "R-Type", 60);
+    game.setRenderClass(&render);
     std::thread(&game::receiveMessage, &game).detach();
     std::cout << "game connected" << std::endl;
 
     game.createPlayer();
-    game.getRenderClass().renderWindow(game);
+    game.getRenderClass()->renderWindow(game);
 }
