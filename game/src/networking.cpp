@@ -21,21 +21,7 @@
 #include "game.hpp"
 #include "protocol.hpp"
 
-game::game(RenderClass &render)
-    : _gameSocketTCP(System::Network::TCPSocket()),
-      _gameSocketUDP(System::Network::UDPSocket()), _id(-1), _refRender(render)
-{
-    return;
-}
-
-game::~game()
-{
-    _id = -1;
-    _gameSocketTCP.closeSocket();
-    _gameSocketUDP.closeSocket();
-}
-
-int is_code_valid(int code)
+int isCodeValid(int code)
 {
     if (code >= P_CONN && code <= P_DISCONN)
         return 0;
@@ -50,7 +36,7 @@ int is_code_valid(int code)
     return -1;
 }
 
-int game::manage_buffers()
+int game::manageBuffers()
 {
     std::unique_lock lock(_mutex);
     if (_buffers.size() == 0)
@@ -58,7 +44,7 @@ int game::manage_buffers()
     for (auto buffer : _buffers) {
         std::string codeStr = std::string(buffer).substr(0, 3);
         int code = atoi(codeStr.c_str());
-        int code_int = is_code_valid(code);
+        int code_int = isCodeValid(code);
         std::vector<std::string> tokens;
         if (code_int == -1) {
             return -1;
@@ -72,10 +58,10 @@ int game::manage_buffers()
         }
         switch (code_int) {
             case 0: handlePlayer(code, tokens); break;
-            case 1: handle_enemy(code, tokens); break;
-            case 2: handle_terrain(code, tokens); break;
-            case 3: handle_mechs(code, tokens); break;
-            case 9: handle_connection(code, tokens); break;
+            case 1: handleEnemy(code, tokens); break;
+            case 2: handleTerrain(code, tokens); break;
+            case 3: handleMechs(code, tokens); break;
+            case 9: handleConnection(code, tokens); break;
             default: break;
         }
         auto it =
@@ -98,7 +84,7 @@ void game::writeToServer(
     }
 }
 
-void game::receive_message()
+void game::receiveMessage()
 {
     System::Network::byteArray vect;
     System::Network::byteArray arr;
@@ -164,7 +150,7 @@ void game::receive_message()
     }
 }
 
-int game::create_connection(const char *ip, int portTCP, int portUDP)
+int game::createConnection(const char *ip, int portTCP, int portUDP)
 {
     try {
         _gameSocketTCP.initSocket(static_cast<uint16_t>(portTCP),

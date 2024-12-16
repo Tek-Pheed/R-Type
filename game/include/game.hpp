@@ -12,7 +12,7 @@
 #include <mutex>
 
 #include "Entity.hpp"
-class RenderClass;
+#include "RenderClass.hpp"
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
@@ -20,23 +20,30 @@ class RenderClass;
 class game {
     /* data */
   public:
-    game(RenderClass &render);
+    game();
     ~game();
-    int create_connection(const char *ip, int portTCP, int portUDP);
-    int manage_buffers();
+    int createConnection(const char *ip, int portTCP, int portUDP);
+    int manageBuffers();
     void writeToServer(
         const std::string &data, System::Network::ISocket::Type socketType);
-    void receive_message();
-    void handle_connection(int code, std::vector<std::string> &tokens);
-    void handle_enemy(int code, std::vector<std::string> &tokens);
-    void handle_terrain(int code, std::vector<std::string> &tokens);
-    void handle_mechs(int code, std::vector<std::string> &tokens);
-    void add_entity(std::shared_ptr<ecs::Entity> entity);
-    std::vector<std::shared_ptr<ecs::Entity>> &get_entities();
-    int get_id();
+    void receiveMessage();
+    void handleConnection(int code, std::vector<std::string> &tokens);
+    void handleEnemy(int code, std::vector<std::string> &tokens);
+    void handleTerrain(int code, std::vector<std::string> &tokens);
+    void handleMechs(int code, std::vector<std::string> &tokens);
+    void addEntity(std::shared_ptr<ecs::Entity> entity);
+    std::vector<std::shared_ptr<ecs::Entity>> &getEntities();
+    int getId();
 
-    void update_localplayer_position();
+    void setServerMode(bool mode);
+    RenderClass &getRenderClass();
+
+    void updateLocalplayerPosition();
     std::shared_ptr<ecs::Entity> &getLocalPlayer();
+
+    // Client Management
+    void loadTexture();
+    void createPlayer();
 
     // Player Management
     void handlePlayer(int code, std::vector<std::string> &tokens);
@@ -62,7 +69,7 @@ class game {
     std::vector<std::string> _buffers;
     std::mutex _mutex;
     std::vector<std::shared_ptr<ecs::Entity>> _entities;
-    RenderClass &_refRender;
+    RenderClass _refRender;
     bool _isServer;
 };
 

@@ -8,7 +8,7 @@
 #include "game.hpp"
 #include "protocol.hpp"
 
-void game::handle_terrain(int code, std::vector<std::string> &tokens)
+void game::handleTerrain(int code, std::vector<std::string> &tokens)
 {
     (void) tokens;
     switch (code) {
