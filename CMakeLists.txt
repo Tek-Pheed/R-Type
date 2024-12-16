@@ -16,7 +16,7 @@ file(MAKE_DIRECTORY ${RELEASE_DIR})
 add_subdirectory(${PROJECT_SOURCE_DIR}/dependencies/SFML)
 add_subdirectory(libs/ecs)
 add_subdirectory(libs/system)
-add_subdirectory(client)
+add_subdirectory(game)
 
 set(CLIENT_BINARY $<TARGET_FILE:client>)
 set(SERVER_BINARY $<TARGET_FILE:server>)
