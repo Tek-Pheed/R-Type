@@ -21,12 +21,6 @@ void game::createEnemy(std::vector<std::string> &tokens)
     const float x = std::stof(tokens[1]);
     const float y = std::stof(tokens[2]);
 
-    if (_refRender.getEnemyTexture().getSize().x == 0) {
-        sf::Texture enemyText;
-        enemyText.loadFromFile("assets/sprites/r-typesheet31.gif");
-        _refRender.setEnemyTexture(enemyText);
-    }
-
     auto enemy = std::make_shared<ecs::Entity>(id);
     enemy->addComponent(std::make_shared<ecs::EnemyComponent>("Enemy"));
     enemy->addComponent(std::make_shared<ecs::PositionComponent>(x, y));
@@ -41,7 +35,7 @@ void game::createEnemy(std::vector<std::string> &tokens)
     enemy->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
         sf::Vector2f(2, 2));
 
-    add_entity(enemy);
+    addEntity(enemy);
 }
 
 void game::enemyDead(std::vector<std::string> &tokens)
@@ -108,7 +102,7 @@ void game::enemyDamage(std::vector<std::string> &tokens)
     }
 }
 
-void game::handle_enemy(int code, std::vector<std::string> &tokens)
+void game::handleEnemy(int code, std::vector<std::string> &tokens)
 {
     switch (code) {
         case E_SPAWN: createEnemy(tokens); break;

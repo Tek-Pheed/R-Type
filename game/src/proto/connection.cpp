@@ -10,21 +10,21 @@
 
 #include "game.hpp"
 
-void set_id_player(game &game)
+void setIdPlayer(game &game)
 {
-    for (auto &entity : game.get_entities()) {
+    for (auto &entity : game.getEntities()) {
         if (entity->getID() == static_cast<std::size_t>(-1)) {
-            entity->setID(static_cast<std::size_t>(game.get_id()));
+            entity->setID(static_cast<std::size_t>(game.getId()));
             break;
         }
     }
 }
 
-void game::handle_connection(int code, std::vector<std::string> &tokens)
+void game::handleConnection(int code, std::vector<std::string> &tokens)
 {
     if (code == 901) {
         _id = atoi(tokens[0].c_str());
-        set_id_player(*this);
+        setIdPlayer(*this);
         std::stringstream ss;
         ss << "902 " << tokens[0] << "\t\f";
         std::string formattedString = ss.str();

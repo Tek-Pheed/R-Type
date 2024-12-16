@@ -5,14 +5,14 @@
 ** RenderClass
 */
 
+#ifndef RENDERCLASS_HPP_
+#define RENDERCLASS_HPP_
+
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <string>
 #include "Entity.hpp"
-#include "game.hpp"
-
-#ifndef RENDERCLASS_HPP_
-    #define RENDERCLASS_HPP_
+class game;
 
 class RenderClass {
   public:

@@ -32,7 +32,7 @@ void game::createNewPlayer(std::vector<std::string> &tokens)
 
     player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
         sf::Vector2f(3, 3));
-    add_entity(player);
+    addEntity(player);
 }
 
 void game::setNewPosition(std::vector<std::string> &tokens)

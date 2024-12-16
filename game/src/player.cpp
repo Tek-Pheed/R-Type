@@ -16,7 +16,7 @@ std::shared_ptr<ecs::Entity> &game::getLocalPlayer()
     return _player;
 }
 
-void game::update_localplayer_position()
+void game::updateLocalplayerPosition()
 {
     auto position = _player->getComponent<ecs::PositionComponent>();
     if (position) {

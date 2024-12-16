@@ -43,7 +43,6 @@ RenderClass::RenderClass(
 
     this->_window.create(this->_videoMode, title);
     this->_window.setFramerateLimit(static_cast<unsigned int>(frameRate));
-    this->_bulletTexture.loadFromFile("./assets/sprites/r-typesheet1.gif");
 
     if (!this->_window.isOpen()) {
         throw ErrorClass("RTC001 : Failed to create the SFML window.");
@@ -142,16 +141,16 @@ void RenderClass::renderWindow(game &game)
     while (this->_window.isOpen()) {
         deltaTime = clock.restart().asSeconds();
         this->_window.clear();
-        playEvent(game, game.get_entities());
+        playEvent(game, game.getEntities());
         this->_window.draw(background_s);
         positionSystem.update(
-            game.get_entities(), &this->_window, deltaTime, false);
-        game.update_localplayer_position();
+            game.getEntities(), &this->_window, deltaTime, false);
+        game.updateLocalplayerPosition();
         renderSystem.update(
-            game.get_entities(), &this->_window, deltaTime, false);
-        game.manage_buffers();
+            game.getEntities(), &this->_window, deltaTime, false);
+        game.manageBuffers();
         bulletSystem.update(
-            game.get_entities(), &this->_window, deltaTime, false);
+            game.getEntities(), &this->_window, deltaTime, false);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
     }
@@ -198,7 +197,7 @@ void RenderClass::playEvent(
                 bullet->getComponent<ecs::RenderComponent>()
                     ->getSprite()
                     ->setTextureRect(sf::Rect(137, 153, 64, 16));
-                ss << "104 " << game.get_id() << "\t\n";
+                ss << "104 " << game.getId() << "\t\n";
                 game.writeToServer(ss.str(), System::Network::ISocket::UDP);
                 entities.push_back(bullet);
             }
