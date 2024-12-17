@@ -13,13 +13,13 @@
 #include <typeindex>
 
 #include "Entity.hpp"
+#include "Networking.hpp"
 #include "RenderClass.hpp"
+#include "Systems.hpp"
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
 #include <unordered_map>
-#include "Networking.hpp"
-#include "Systems.hpp"
 
 class game {
     /* data */
@@ -48,13 +48,25 @@ class game {
     void updateLocalplayerPosition();
     std::shared_ptr<ecs::Entity> &getLocalPlayer();
 
-    // To Move into Game Engine
-    void gameUpdate(void);
+    // These functions should be moved in a game Engine class
+    void gameUpdate(float deltaTime_sec);
     Networking &getNetworking();
-    void createSubsystem();
-    void deleteSubsystem();
-    void getSubSystem();
-    // -- 
+
+    template <class T> void createSubsystem()
+    {
+        _subsystems[std::type_index(typeid(T))] = T();
+    }
+
+    template <class T> void deleteSubsystem()
+    {
+        _subsystems.erase(std::type_index(typeid(T)));
+    }
+
+    template <class T> T &getSubSystem()
+    {
+        return (_subsystems.at(std::type_index(typeid(T))));
+    }
+    // --
 
     // Client Management
     void setRenderClass(RenderClass *refRender);
@@ -89,7 +101,6 @@ class game {
 
     // To move into game Engine
     std::unordered_map<std::type_index, ecs::ISystem> _subsystems;
-
 };
 
 #endif /*game_HPP*/
