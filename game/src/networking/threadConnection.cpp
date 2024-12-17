@@ -15,7 +15,7 @@ void Networking::runConnectThread()
 
     while (true) {
         readfds.clear();
-        readfds.emplace_back(&_serverSocketTCP);
+        readfds.emplace_back(&_SocketTCP);
         try {
             System::Network::select(&readfds);
         } catch (const std::exception &s) {
@@ -25,7 +25,7 @@ void Networking::runConnectThread()
         if (readfds.size() == 0)
             continue;
         NetClient cl;
-        cl.tcpSocket = System::Network::accept(_serverSocketTCP);
+        cl.tcpSocket = System::Network::accept(_SocketTCP);
         NetClient &client = addClient(cl);
         std::string toWrite = makePacket(C_INIT_UDP, _clientCounter);
         writeToClient(client, toWrite, System::Network::ISocket::TCP);
