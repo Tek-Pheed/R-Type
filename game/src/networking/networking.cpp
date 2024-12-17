@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <climits>
 
 #include "system_network.hpp"
 #include "system_tcp.hpp"
