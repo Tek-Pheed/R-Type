@@ -120,6 +120,50 @@ namespace ecs
         sf::RectangleShape *rectangleShape = nullptr;
     };
 
+    template <typename spriteType> class SpriteComponent : public Component {
+      public:
+        SpriteComponent(spriteType sprite, int sizeX, int sizeY);
+
+      private:
+        spriteType _sprite;
+        int _sizeX;
+        int _sizeY;
+    };
+
+    template <typename circleType> class CircleComponent : public Component {
+      public:
+        CircleComponent(circleType circle, int radius);
+
+        circleType getCircle() const;
+        int getRadius() const;
+
+        void setCircle(circleType circle);
+        void setRadius(int radius);
+
+      private:
+        circleType _circle;
+        int _radius;
+    };
+
+    template <typename rectangleType>
+    class RectangleComponent : public Component {
+      public:
+        RectangleComponent(rectangleType rectangle, int sizeX, int sizeY);
+
+        int getSizeX() const;
+        int getSizeY() const;
+        rectangleType getRectangle() const;
+
+        void setSizeX(int sizeX);
+        void setSizeY(int sizeY);
+        void setRectangle(rectangleType rectangle);
+
+      private:
+        rectangleType _rectangle;
+        int _sizeX;
+        int _sizeY;
+    };
+
     class TextComponent : public Component {
       public:
         TextComponent();
