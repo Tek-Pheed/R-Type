@@ -33,7 +33,7 @@ void Networking::runReadThread()
         try {
             readfds.clear();
             this->_globalMutex.lock();
-            readfds.emplace_back(&_serverSocketUDP);
+            readfds.emplace_back(&_SocketUDP);
             for (auto &pair : _clients) {
                 NetClient &ref = pair.second;
                 if (!ref.isDisconnected)
@@ -48,18 +48,23 @@ void Networking::runReadThread()
                 arr.clear();
                 switch (sock->getType()) {
                     case System::Network::ISocket::TCP: {
-                        ssize_t id = identifyClient(*sock);
-                        if (id == -1)
-                            std::cout << "Unable to idendify client (TCP - "
-                                         "read thread)"
-                                      << std::endl;
+                        ssize_t id = 1;
+                        if (_isServer) {
+                            id = identifyClient(*sock);
+                            if (id == -1)
+                                std::cout
+                                    << "Unable to idendify client (TCP - "
+                                       "read thread)"
+                                    << std::endl;
+                        }
                         if (!sock->isOpen()) {
                             std::cout << "[Read Thread] client ("
                                       << std::to_string(id)
                                       << ") closed TCP connection ("
                                       << std::to_string(sock->getUID()) << ")"
                                       << std::endl;
-                            removeClient((size_t) id);
+                            if (_isServer)
+                                removeClient((size_t) id);
                         } else {
                             NetClient &client = this->getClient((size_t) id);
                             if (client.isDisconnected)
@@ -80,10 +85,7 @@ void Networking::runReadThread()
                                     == '\n'
                                 && client.readBufferTCP
                                         [client.readBufferTCP.size() - 2]
-                                    == '\t') {
-                                this->handle_packet((size_t) id,
-                                    System::Network::ISocket::TCP);
-                            }
+                                    == '\t') {}
                         }
                         break;
                     }
@@ -95,8 +97,9 @@ void Networking::runReadThread()
                         if (s == nullptr)
                             break;
                         vect = s->receiveFrom(addr, port);
-                        ssize_t id =
-                            identifyClient(addr, std::to_string(port));
+                        ssize_t id = 1;
+                        if (_isServer)
+                            id = identifyClient(addr, std::to_string(port));
                         if (id == -1) {
                             id = authenticateUDPClient(vect);
                             if (id == -1) {
@@ -120,8 +123,6 @@ void Networking::runReadThread()
                                     continue;
                                 client.ip = addr;
                                 client.port = port;
-                                this->handle_packet((size_t) id,
-                                    System::Network::ISocket::UDP);
                             }
                         }
                         NetClient &client = getClient((size_t) id);
@@ -141,10 +142,7 @@ void Networking::runReadThread()
                                 == '\n'
                             && client.readBufferUDP[client.readBufferUDP.size()
                                    - 2]
-                                == '\t') {
-                            this->handle_packet(
-                                (size_t) id, System::Network::ISocket::UDP);
-                        }
+                                == '\t') {}
                         break;
                     }
                     default: {
