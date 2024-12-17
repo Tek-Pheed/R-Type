@@ -1,23 +1,23 @@
-/*
-** EPITECH PROJECT, 2024
-** R-Type
-** File description:
-** terrain
-*/
+// /*
+// ** EPITECH PROJECT, 2024
+// ** R-Type
+// ** File description:
+// ** terrain
+// */
 
-#include "game.hpp"
-#include "protocol.hpp"
+// #include "game.hpp"
+// #include "protocol.hpp"
 
-void game::handleTerrain(int code, std::vector<std::string> &tokens)
-{
-    (void) tokens;
-    switch (code) {
-        case T_SPAWN:
-            /* code */
-            break;
-        case T_DEAD:
-            /* code */
-            break;
-        default: break;
-    }
-}
+// void game::handleTerrain(int code, std::vector<std::string> &tokens)
+// {
+//     (void) tokens;
+//     switch (code) {
+//         case T_SPAWN:
+//             /* code */
+//             break;
+//         case T_DEAD:
+//             /* code */
+//             break;
+//         default: break;
+//     }
+// }
