@@ -11,7 +11,3 @@ ErrorClass::ErrorClass(const std::string &message)
     : std::runtime_error(message)
 {
 }
-
-ErrorClass::ErrorClass(const char *message) : std::runtime_error(message)
-{
-}
