@@ -7,15 +7,15 @@
 
 #include <cstdint>
 #include "Networking.hpp"
+#include "Systems.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
-#include "game.hpp"
 #include <ctime>
-#include <thread>
-#include "server.hpp"
 #include "RenderClass.hpp"
+#include "game.hpp"
+#include "server.hpp"
 #include "system_network.hpp"
 
 void game::setServerMode(bool mode)
@@ -23,7 +23,8 @@ void game::setServerMode(bool mode)
     _isServer = mode;
 }
 
-bool game::isServer(void) {
+bool game::isServer(void)
+{
     return (_isServer);
 }
 
@@ -38,10 +39,13 @@ Networking &game::getNetworking()
     return (_refNetwork);
 }
 
-void game::gameUpdate() {
+void game::gameUpdate(float deltaTime_sec)
+{
+    ecs::BulletSystem &bulletSystem = getSubSystem<ecs::BulletSystem>();
+    ecs::PositionSystem &positionSystem = getSubSystem<ecs::PositionSystem>();
 
-    bulletSystem.update(
-            game.getEntities(), &this->_window, deltaTime, false);
+    bulletSystem.update(getEntities(), nullptr, deltaTime_sec, isServer());
+    positionSystem.update(getEntities(), nullptr, deltaTime_sec, isServer());
 }
 
 int main(int argc, char **argv)
@@ -67,7 +71,8 @@ int main(int argc, char **argv)
         net.setupServer((uint16_t) portTCP, (uint16_t) portUDP);
         serverLoop(net, game);
     } else {
-        net.setupClient((uint16_t) portTCP, (uint16_t) portUDP, std::string(argv[1]));
+        net.setupClient(
+            (uint16_t) portTCP, (uint16_t) portUDP, std::string(argv[1]));
         RenderClass render(1280, 720, "R-Type", 60);
         game.setRenderClass(&render);
         std::cout << "game connected" << std::endl;
