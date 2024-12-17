@@ -78,14 +78,19 @@ void Networking::runReadThread()
                                 << ") for client (" << std::to_string(id)
                                 << "): " << buff << std::endl;
                             std::unique_lock lock(_globalMutex);
-                            client.readBufferTCP += buff;
-                            if (client.readBufferTCP.size() > 2
-                                && client.readBufferTCP
-                                        [client.readBufferTCP.size() - 1]
-                                    == '\n'
-                                && client.readBufferTCP
-                                        [client.readBufferTCP.size() - 2]
-                                    == '\t') {}
+                            std::string buffer =
+                                System::Network::decodeString(vect);
+                            while (buffer.size() > 0
+                                && buffer[buffer.size() - 1] != '\n'
+                                && buffer[buffer.size() - 2] != '\t') {
+                                buffer += System::Network::decodeString(
+                                    client.tcpSocket.receive());
+                            }
+                            std::cout << "Received TCP: " << buffer
+                                      << std::endl;
+                            _globalMutex.lock();
+                            client.readBufferTCP.push_back(buffer);
+                            _globalMutex.unlock();
                         }
                         break;
                     }
@@ -134,15 +139,16 @@ void Networking::runReadThread()
                                   << ") for client (" << std::to_string(id)
                                   << "): " << buff << std::endl;
                         _globalMutex.lock();
-                        client.readBufferUDP += buff;
+                        std::string buffer =
+                            System::Network::decodeString(vect);
+                        while (buffer.size() > 0
+                            && buffer[buffer.size() - 1] != '\n'
+                            && buffer[buffer.size() - 2] != '\t') {
+                            buffer += System::Network::decodeString(
+                                _SocketUDP.receive());
+                        }
+                        client.readBufferUDP.push_back(buffer);
                         _globalMutex.unlock();
-                        if (client.readBufferUDP.size() > 2
-                            && client.readBufferUDP[client.readBufferUDP.size()
-                                   - 1]
-                                == '\n'
-                            && client.readBufferUDP[client.readBufferUDP.size()
-                                   - 2]
-                                == '\t') {}
                         break;
                     }
                     default: {

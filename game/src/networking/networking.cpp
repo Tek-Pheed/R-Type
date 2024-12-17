@@ -36,11 +36,14 @@ std::vector<std::string> Networking::readReceivedPackets()
 {
     std::unique_lock lock(_globalMutex);
     std::vector<std::string> packets;
-    std::string buff = "";
 
     for (const auto &cli : _clients) {
-        buff = cli.second.readBufferTCP;
-       // Befferise here
+        for (const auto &buff : cli.second.readBufferTCP) {
+            packets.push_back(buff);
+        }
+        for (const auto &buff : cli.second.readBufferUDP) {
+            packets.push_back(buff);
+        }
     }
     return (packets);
 }

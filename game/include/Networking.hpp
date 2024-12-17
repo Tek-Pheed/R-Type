@@ -28,6 +28,31 @@
 #define UDP_PORT    8082
 #define MAX_PLAYERS 4
 
+template <typename T> std::string getString(T arg)
+{
+    return (std::to_string(arg));
+}
+
+template <> inline std::string getString(const char *arg)
+{
+    return (std::string(arg));
+}
+
+template <> inline std::string getString(const std::string &arg)
+{
+    return (arg);
+}
+
+template <> inline std::string getString(std::string &arg)
+{
+    return (arg);
+}
+
+template <> inline std::string getString(std::string arg)
+{
+    return (arg);
+}
+
 template <typename... Args>
 std::string makePacket(int protocolCode, Args... args)
 {
@@ -46,18 +71,20 @@ class Networking {
         System::Network::TCPSocket tcpSocket;
         std::string ip;
         uint16_t port;
-        std::string readBufferTCP;
+        std::vector<std::string> readBufferTCP;
         std::string writeBufferTCP;
-        std::string readBufferUDP;
+        std::vector<std::string> readBufferUDP;
         std::string writeBufferUDP;
         bool isReady;
         bool isDisconnected;
 
         NetClient()
             : tcpSocket(System::Network::TCPSocket()), port(uint16_t()),
-              readBufferTCP(std::string()), writeBufferTCP(std::string()),
-              readBufferUDP(std::string()), writeBufferUDP(std::string()),
-              isReady(false), isDisconnected(false) {};
+              readBufferTCP(std::vector<std::string>()),
+              writeBufferTCP(std::string()),
+              readBufferUDP(std::vector<std::string>()),
+              writeBufferUDP(std::string()), isReady(false),
+              isDisconnected(false) {};
     };
 
   public:
