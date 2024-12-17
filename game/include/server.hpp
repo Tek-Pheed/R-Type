@@ -20,4 +20,6 @@
 
 #define SERVER_TPS 30
 
+void serverLoop(Networking &net, game &game);
+
 #endif /*SERVER_HPP*/

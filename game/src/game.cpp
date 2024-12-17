@@ -14,6 +14,7 @@
 #include "game.hpp"
 #include <ctime>
 #include <thread>
+#include "server.hpp"
 #include "RenderClass.hpp"
 #include "system_network.hpp"
 
@@ -32,7 +33,16 @@ int print_help()
     return 0;
 }
 
+Networking &game::getNetworking()
+{
+    return (_refNetwork);
+}
 
+void game::gameUpdate() {
+
+    bulletSystem.update(
+            game.getEntities(), &this->_window, deltaTime, false);
+}
 
 int main(int argc, char **argv)
 {
@@ -55,6 +65,7 @@ int main(int argc, char **argv)
 
     if (game.isServer()) {
         net.setupServer((uint16_t) portTCP, (uint16_t) portUDP);
+        serverLoop(net, game);
     } else {
         net.setupClient((uint16_t) portTCP, (uint16_t) portUDP, std::string(argv[1]));
         RenderClass render(1280, 720, "R-Type", 60);
