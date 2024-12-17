@@ -94,7 +94,7 @@ std::vector<size_t> ECSManager::findEntitiesByComponent()
     std::shared_ptr<ComponentType> comp = nullptr;
 
     for (auto const &[id, entity] : _entities) {
-        comp = entity->getComponent<ComponentType>();
+        comp = entity->template getComponent<ComponentType>();
         if (comp != nullptr)
             ent.emplace_back(id);
     }
@@ -108,7 +108,7 @@ std::vector<std::shared_ptr<ecs::Entity>> ECSManager::findEntitiesByComponent()
     std::shared_ptr<ComponentType> comp = nullptr;
 
     for (auto const &[id, entity] : _entities) {
-        comp = entity->getComponent<ComponentType>();
+        comp = entity->template getComponent<ComponentType>();
         if (comp != nullptr)
             ent.emplace_back(entity);
     }
