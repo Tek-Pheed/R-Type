@@ -73,14 +73,33 @@ int game::manageBuffers()
     return 0;
 }
 
+void serializeString(const std::string &str, std::ostream &out)
+{
+    size_t size = str.size();
+    out.write(reinterpret_cast<const char *>(&size), sizeof(size));
+    out.write(str.data(), static_cast<std::streamsize>(size));
+}
+
+std::string deserializeString(std::istream &in)
+{
+    size_t size;
+    in.read(reinterpret_cast<char *>(&size), sizeof(size));
+    std::vector<char> buffer(size);
+    in.read(buffer.data(), static_cast<std::streamsize>(size));
+    return std::string(buffer.begin(), buffer.end());
+}
+
 void game::writeToServer(
     const std::string &data, System::Network::ISocket::Type socketType)
 {
+    std::ostringstream out;
+    serializeString(data, out);
+    std::string serializedData = out.str();
     if (socketType == System::Network::ISocket::TCP) {
         std::cout << "Sending TCP: " << data << std::endl;
-        _gameSocketTCP.sendData(System::Network::encodeString(data));
+        _gameSocketTCP.sendData(System::Network::encodeString(serializedData));
     } else {
-        _gameSocketUDP.sendData(System::Network::encodeString(data));
+        _gameSocketUDP.sendData(System::Network::encodeString(serializedData));
     }
 }
 
@@ -113,6 +132,10 @@ void game::receiveMessage()
                                 buffer += System::Network::decodeString(
                                     _gameSocketTCP.receive());
                             }
+                            std::istringstream in(
+                                std::string(buffer, buffer.size()));
+                            buffer = deserializeString(in);
+
                             std::cout << "Received TCP: " << buffer
                                       << std::endl;
                             _mutex.lock();
