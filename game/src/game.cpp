@@ -5,6 +5,8 @@
 ** game
 */
 
+#include <cstdint>
+#include "Networking.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -20,21 +22,28 @@ void game::setServerMode(bool mode)
     _isServer = mode;
 }
 
+bool game::isServer(void) {
+    return (_isServer);
+}
+
 int print_help()
 {
     std::cout << "USAGE: ./game {IP} {PORT TCP} {PORT UDP}" << std::endl;
     return 0;
 }
 
+
+
 int main(int argc, char **argv)
 {
-    game game;
     System::Network::initNetwork();
+    Networking net;
+    game game(net);
+    game.setServerMode(false);
+
 #if defined(RTYPE_SERVER)
-    std::cout << "Je suis un serveur" << std::endl;
     game.setServerMode(true);
 #endif
-    game.setServerMode(false);
     if (argc != 4)
         return print_help();
     if (!atoi(argv[1]) || !atoi(argv[2]))
@@ -44,12 +53,14 @@ int main(int argc, char **argv)
     std::cout << "Connecting to: " << argv[1] << " on port " << portTCP << " "
               << portUDP << std::endl;
 
-    game.createConnection(argv[1], portTCP, portUDP);
-    RenderClass render(1280, 720, "R-Type", 60);
-    game.setRenderClass(&render);
-    std::thread(&game::receiveMessage, &game).detach();
-    std::cout << "game connected" << std::endl;
-
-    game.createPlayer();
-    game.getRenderClass()->renderWindow(game);
+    if (game.isServer()) {
+        net.setupServer((uint16_t) portTCP, (uint16_t) portUDP);
+    } else {
+        net.setupClient((uint16_t) portTCP, (uint16_t) portUDP, std::string(argv[1]));
+        RenderClass render(1280, 720, "R-Type", 60);
+        game.setRenderClass(&render);
+        std::cout << "game connected" << std::endl;
+        game.createPlayer();
+        game.getRenderClass()->renderWindow(game);
+    }
 }

@@ -16,11 +16,12 @@
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
+#include "Networking.hpp"
 
 class game {
     /* data */
   public:
-    game();
+    game(Networking &net);
     ~game();
 
     int createConnection(const char *ip, int portTCP, int portUDP);
@@ -39,6 +40,7 @@ class game {
     int getId();
 
     void setServerMode(bool mode);
+    bool isServer(void);
 
     void updateLocalplayerPosition();
     std::shared_ptr<ecs::Entity> &getLocalPlayer();
@@ -65,9 +67,6 @@ class game {
     void enemyDamage(std::vector<std::string> &tokens);
 
   private:
-    System::Network::TCPSocket _gameSocketTCP;
-    System::Network::UDPSocket _gameSocketUDP;
-
     int _id;
     std::shared_ptr<ecs::Entity> _player;
     std::vector<std::string> _buffers;
@@ -75,6 +74,7 @@ class game {
     std::vector<std::shared_ptr<ecs::Entity>> _entities;
     RenderClass *_refRender;
     bool _isServer;
+    Networking &_refNetwork;
 };
 
 #endif /*game_HPP*/

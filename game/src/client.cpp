@@ -9,21 +9,19 @@
 #include <memory>
 #include <vector>
 #include "Entity.hpp"
+#include "Networking.hpp"
 #include "RenderClass.hpp"
 #include "game.hpp"
 #include "system_network.hpp"
 
-game::game()
-    : _gameSocketTCP(System::Network::TCPSocket()),
-      _gameSocketUDP(System::Network::UDPSocket()), _id(-1)
+game::game(Networking &net)
+    : _id(-1), _refNetwork(net)
 {
 }
 
 game::~game()
 {
     _id = -1;
-    _gameSocketTCP.closeSocket();
-    _gameSocketUDP.closeSocket();
     _refRender->~RenderClass();
 }
 
