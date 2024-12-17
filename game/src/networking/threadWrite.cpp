@@ -13,11 +13,11 @@
 #include <exception>
 #include <iostream>
 #include <string>
-
+#include "Networking.hpp"
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 
-void server::threadedServerWrite()
+void Networking::runWriteThread()
 {
     System::Network::socketSetGeneric writefds;
     System::Network::timeoutStruct tv = {{0, 50000}};
@@ -30,9 +30,9 @@ void server::threadedServerWrite()
                 _writeCondition.wait(lock);
             }
             writefds.clear();
-            writefds.emplace_back(&_serverSocketUDP);
+            writefds.emplace_back(&_SocketUDP);
             for (auto &pair : _clients) {
-                Client &ref = pair.second;
+                NetClient &ref = pair.second;
                 if ((ref.writeBufferTCP.length() > 0
                         || ref.writeBufferUDP.length() > 0)
                     && !ref.isDisconnected)
@@ -53,7 +53,7 @@ void server::threadedServerWrite()
                             std::cout << "Unable to idendify client (TCP - "
                                          "write thread)"
                                       << std::endl;
-                        Client &client = this->getClient((size_t) id);
+                        NetClient &client = this->getClient((size_t) id);
                         if (client.isDisconnected) {
                             removeID = (int) id;
                             if (client.writeBufferTCP.length() == 0
@@ -86,7 +86,7 @@ void server::threadedServerWrite()
                     }
                     case System::Network::ISocket::UDP: {
                         if (sock->getUID()
-                            == this->_serverSocketUDP.getUID()) {
+                            == this->_SocketUDP.getUID()) {
                             for (auto &cl : _clients) {
                                 size_t index = cl.first;
                                 auto &cli = cl.second;
@@ -99,7 +99,7 @@ void server::threadedServerWrite()
                                 if (cli.port == 0 || cli.ip.empty()
                                     || cli.writeBufferUDP.length() == 0)
                                     continue;
-                                len = _serverSocketUDP.sendDataTo(
+                                len = _SocketUDP.sendDataTo(
                                     System::Network::encodeString(
                                         cli.writeBufferUDP),
                                     cli.ip, cli.port);

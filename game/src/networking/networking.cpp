@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <string>
+#include <thread>
+#include <climits>
 
 #include "system_network.hpp"
 #include "system_tcp.hpp"
@@ -18,8 +20,107 @@
 
 #include "Networking.hpp"
 
-void Networking::writeToClient(Networking::NetClient &client, const std::string &data,
-    System::Network::ISocket::Type socketType)
+Networking::Networking()
+{
+}
+
+Networking::~Networking()
+{
+}
+
+void Networking::setClientID(size_t id)
+{
+    _clientID = id;
+}
+
+std::vector<std::string> Networking::readReceivedPackets()
+{
+    std::unique_lock lock(_globalMutex);
+    std::vector<std::string> packets;
+
+    for (const auto &cli : _clients) {
+        for (const auto &buff : cli.second.readBufferTCP) {
+            packets.push_back(buff);
+        }
+        for (const auto &buff : cli.second.readBufferUDP) {
+            packets.push_back(buff);
+        }
+    }
+    return (packets);
+}
+
+void Networking::setupServer(uint16_t TCP_port, uint16_t UDP_port)
+{
+    _isServer = true;
+    _SocketTCP.initSocket(TCP_port, System::Network::ISocket::SERVE);
+    _SocketUDP.initSocket(UDP_port);
+    std::cout << "Running server on port TCP:" << std::to_string(TCP_port)
+              << ", UDP:" << std::to_string(UDP_port) << std::endl;
+
+    std::thread(&Networking::runReadThread, this).detach();
+    std::thread(&Networking::runWriteThread, this).detach();
+    std::thread(&Networking::runConnectThread, this).detach();
+}
+
+void Networking::setupClient(
+    uint16_t TCP_port, uint16_t UDP_port, const std::string &ip)
+{
+    _isServer = false;
+    std::cout << "Connecting to server on port TCP:"
+              << std::to_string(TCP_PORT)
+              << ", UDP:" << std::to_string(UDP_PORT) << ", Address: " << ip
+              << std::endl;
+    _SocketUDP.initSocket(static_cast<uint16_t>(UDP_port),
+        System::Network::ISocket::CONNECT, ip);
+    NetClient cli;
+    cli.tcpSocket.initSocket(TCP_port, System::Network::ISocket::SERVE);
+    addClient(cli);
+    std::thread(&Networking::runReadThread, this).detach();
+    std::thread(&Networking::runWriteThread, this).detach();
+}
+
+void Networking::sendToAll(
+    System::Network::ISocket::Type socketType, const std::string &buffer)
+{
+    for (auto &client : _clients) {
+        writeToClient(client.second, buffer, socketType);
+    }
+}
+
+void Networking::sendToOthers(size_t except_id,
+    System::Network::ISocket::Type socketType, const std::string &buffer)
+{
+    for (auto &client : _clients) {
+        if (client.first != except_id)
+            writeToClient(client.second, buffer, socketType);
+    }
+}
+
+void Networking::sendToOne(size_t id,
+    System::Network::ISocket::Type socketType, const std::string &buffer)
+{
+    for (auto &client : _clients) {
+        if (client.first == id)
+            writeToClient(client.second, buffer, socketType);
+    }
+}
+
+ssize_t Networking::authenticateUDPClient(
+    const System::Network::byteArray &packet)
+{
+    std::string decoded = System::Network::decodeString(packet);
+    if (decoded.starts_with(std::to_string(C_START_UDP))) {
+        std::string::size_type p = decoded.find(' ');
+        auto id = std::strtol(&decoded[p], nullptr, 10);
+        if (id == LLONG_MAX || id == LLONG_MIN)
+            return (-1);
+        return (id);
+    }
+    return (-1);
+}
+
+void Networking::writeToClient(Networking::NetClient &client,
+    const std::string &data, System::Network::ISocket::Type socketType)
 {
     std::unique_lock lock(_writeMutex);
 
@@ -30,20 +131,4 @@ void Networking::writeToClient(Networking::NetClient &client, const std::string 
         client.writeBufferUDP += data;
     }
     _writeCondition.notify_one();
-}
-
-void Networking::setClientID(size_t id) {
-    _clientID = id;
-}
-
-void Networking::setupServer()
-{
-    _serverSocketTCP.initSocket(TCP_PORT, System::Network::ISocket::SERVE);
-    _serverSocketUDP.initSocket(UDP_PORT);
-    std::cout << "Running server on port TCP:" << std::to_string(TCP_PORT)
-              << ", UDP:" << std::to_string(UDP_PORT) << std::endl;
-
-    std::thread(&Networking::runReadThread, this).detach();
-    std::thread(&Networking::runWriteThread, this).detach();
-    std::thread(&Networking::runConnectThread, this).detach();
 }
