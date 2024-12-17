@@ -9,10 +9,11 @@
     #define NOMINMAX
 #endif
 
+#include <climits>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <thread>
-#include <climits>
 
 #include "system_network.hpp"
 #include "system_tcp.hpp"
@@ -33,6 +34,15 @@ void Networking::setClientID(size_t id)
     _clientID = id;
 }
 
+std::string deserializeString(std::istream &in)
+{
+    size_t size;
+    in.read(reinterpret_cast<char *>(&size), sizeof(size));
+    std::vector<char> buffer(size);
+    in.read(buffer.data(), static_cast<std::streamsize>(size));
+    return std::string(buffer.begin(), buffer.end());
+}
+
 std::vector<std::string> Networking::readReceivedPackets()
 {
     std::unique_lock lock(_globalMutex);
@@ -40,9 +50,13 @@ std::vector<std::string> Networking::readReceivedPackets()
 
     for (const auto &cli : _clients) {
         for (const auto &buff : cli.second.readBufferTCP) {
-            packets.push_back(buff);
+            std::istringstream in(std::string(buff, buff.size()));
+            std::string deserializedBuff = deserializeString(in);
+            packets.push_back(deserializedBuff);
         }
         for (const auto &buff : cli.second.readBufferUDP) {
+            std::istringstream in(std::string(buff, buff.size()));
+            std::string deserializedBuff = deserializeString(in);
             packets.push_back(buff);
         }
     }
@@ -119,16 +133,26 @@ ssize_t Networking::authenticateUDPClient(
     return (-1);
 }
 
+void serializeString(const std::string &str, std::ostream &out)
+{
+    size_t size = str.size();
+    out.write(reinterpret_cast<const char *>(&size), sizeof(size));
+    out.write(str.data(), static_cast<std::streamsize>(size));
+}
+
 void Networking::writeToClient(Networking::NetClient &client,
     const std::string &data, System::Network::ISocket::Type socketType)
 {
+    std::ostringstream out;
+    serializeString(data, out);
+    std::string serializedData = out.str();
     std::unique_lock lock(_writeMutex);
 
     if (socketType == System::Network::ISocket::TCP) {
-        client.writeBufferTCP += data;
+        client.writeBufferTCP += serializedData;
     }
     if (socketType == System::Network::ISocket::UDP) {
-        client.writeBufferUDP += data;
+        client.writeBufferUDP += serializedData;
     }
     _writeCondition.notify_one();
 }
