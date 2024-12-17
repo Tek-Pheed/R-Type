@@ -15,7 +15,7 @@
 #include "system_network.hpp"
 #include "server.hpp"
 
-void serverLoop(Networking &net, game &game)
+void serverLoop(game &game)
 {
     auto now = std::chrono::time_point_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now());
@@ -32,6 +32,7 @@ void serverLoop(Networking &net, game &game)
             std::chrono::duration_cast<std::chrono::milliseconds>(now - last)
                 .count();
         last = now;
+        game.gameUpdate();
         std::this_thread::sleep_until(next);
     }
 }

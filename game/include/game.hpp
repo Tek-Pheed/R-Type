@@ -10,13 +10,16 @@
 
 #include <memory>
 #include <mutex>
+#include <typeindex>
 
 #include "Entity.hpp"
 #include "RenderClass.hpp"
 #include "system_network.hpp"
 #include "system_tcp.hpp"
 #include "system_udp.hpp"
+#include <unordered_map>
 #include "Networking.hpp"
+#include "Systems.hpp"
 
 class game {
     /* data */
@@ -44,6 +47,14 @@ class game {
 
     void updateLocalplayerPosition();
     std::shared_ptr<ecs::Entity> &getLocalPlayer();
+
+    // To Move into Game Engine
+    void gameUpdate(void);
+    Networking &getNetworking();
+    void createSubsystem();
+    void deleteSubsystem();
+    void getSubSystem();
+    // -- 
 
     // Client Management
     void setRenderClass(RenderClass *refRender);
@@ -75,6 +86,10 @@ class game {
     RenderClass *_refRender;
     bool _isServer;
     Networking &_refNetwork;
+
+    // To move into game Engine
+    std::unordered_map<std::type_index, ecs::ISystem> _subsystems;
+
 };
 
 #endif /*game_HPP*/
