@@ -1,0 +1,280 @@
+
+
+
+
+R-Type                                                      R. Scandella
+Internet-Draft     F-TYPE V8 444 CH, 0-100 km/h 3.7s, TOP SPEED 300 km/h
+Intended status: Informational                          18 December 2024
+Expires: 21 June 2025
+
+
+                        RFC999 - R-Type Protocol
+                         r-type-protocol-latest
+
+Abstract
+
+   This document provides the informations regarding the communication
+   protocol for the R-Type.  This protocol will be used both by the
+   client and the server.
+
+   The format for the instuctions will always be the following
+
+   CODE "SPACE" [ARGS] "HLTF"
+
+   i.e. "901 1\t\n"
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 21 June 2025.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+
+
+
+Scandella                 Expires 21 June 2025                  [Page 1]
+
+Internet-Draft               R-Type Protocol               December 2024
+
+
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   3
+   3.  Connection handshake  . . . . . . . . . . . . . . . . . . . .   3
+   4.  Connection Management (900) . . . . . . . . . . . . . . . . .   3
+   5.  Player Management (100) . . . . . . . . . . . . . . . . . . .   3
+   6.  Enemy Management (110)  . . . . . . . . . . . . . . . . . . .   4
+   7.  Terrain management (120)  . . . . . . . . . . . . . . . . . .   5
+   8.  Game Mechanics (130)  . . . . . . . . . . . . . . . . . . . .   5
+   9.  Normative References  . . . . . . . . . . . . . . . . . . . .   5
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   5
+
+1.  Introduction
+
+   The communication between the server and the client will be done
+   using TCP as well as UDP.  The protocol used will be specified for
+   each instructions and must be used accordingly by both sides.
+
+   The format that should be use is
+
+   CODE "SPACE" [ARGS] "HLTF"
+
+   The code is composed of three numbers, each ten representing a
+   category of instructions (100 for Player, 110 for enemies, etc...),
+   excepting the connection management who will be set at 900.
+
+   followed by a space, then the optional arguments, represented between
+   parenthesis on the next pages.
+
+   All of the instructions will be ended by a "\t\n", which will be used
+   by both the client and server to separate paquets.
+
+   An exemple of a valid instructions would be
+
+   "901 4\t\n"
+
+   The protocol used (TPC/UDP) will be explicitly precised, and the way
+   the paquet is sent will also be showned
+
+   *  -> From Server to Client
+
+   *  <- From Client to Server
+
+
+
+
+Scandella                 Expires 21 June 2025                  [Page 2]
+
+Internet-Draft               R-Type Protocol               December 2024
+
+
+   *  <-> From Both
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Connection handshake
+
+   This process is done when a new player connect.  The process is made
+   so the server can identify which client is associated to which UDP
+   socket.
+
+   TCP Server--901-ClientId-->Client
+
+   UDP Server<--902-ClientId--Client
+
+   TCP Server---903-OK/KO---->Client
+
+4.  Connection Management (900)
+
+   The instructions used regarding the connection of the client and
+   server are
+
+   *  Init UDP Connection (clientID) - 901 -> TCP
+
+   This is the first isntruction sent to the server, its used so the
+   client knows its id.
+
+   *  Start UDP (clientId) - 902 <- UDP
+
+   As seen in the handshake, this instructions is used to associate a
+   UDP socket to a client.
+
+   *  Authenticated client (OK/KO) - 903 -> TCP
+
+5.  Player Management (100)
+
+   The following isntructions are the one used to manage players
+
+   *  Player connection (clientId, name, x, y) - 101 <-> UDP
+
+   This is sent to all the clients when a new player join the game.
+
+   *  Player change position(clientId, x, y) - 102 <-> UDP
+
+
+
+Scandella                 Expires 21 June 2025                  [Page 3]
+
+Internet-Draft               R-Type Protocol               December 2024
+
+
+   This instructions is sent by both the server and the client to update
+   the position of a specific player.
+
+   *  Player killed (id) - 103 -> UDP
+
+   Used when a player die, so it can be removed from the clients and
+   server.
+
+   *  Player shooting (id) - 104 <-> UDP
+
+   Allow the server to process the shoot and its collision, and the
+   client to create a projectiles on their screen.
+
+   *  Player damage (id, newHealth) - 105 -> UDP
+
+   Set the player health.
+
+   *  Player disconnection (id) - 106 <-> UDP
+
+   Used when a player disconnect, has the same behaviour as the
+   instruction 103.
+
+6.  Enemy Management (110)
+
+   This are the instructions used to manage the enemies
+
+   *  Enemy spawn (id, x, y) - 111 -> UDP
+
+   Sent by the server to all the clients to spawn an enemy at a specific
+   position.
+
+   *  Enemy change position (id, x, y) - 112 -> UDP
+
+   *  Enemy killed (id) - 113 -> UDP
+
+   Remove an enemy if it has been shot down or if it reach the border of
+   the screen.
+
+   *  Enemy shooting (id) - 114 -> UDP
+
+   Create a projectile from an enemy position.  It allows the client to
+   create a projectile at the position.
+
+   *  Enemy damage (id, new_health) - 115 -> UDP
+
+   Set the health of an enemy.
+
+
+
+
+
+Scandella                 Expires 21 June 2025                  [Page 4]
+
+Internet-Draft               R-Type Protocol               December 2024
+
+
+7.  Terrain management (120)
+
+   To manage the terrain, this are the instructions used
+
+   *  Terrain spawn (x, y) - 121 -> UDP
+
+   Spawn terrain at a specific postion on all the clients.
+
+   *  Terrain destroyed (x, y) - 122 -> UDP
+
+   Removed a terrain, if its has been destroyed or went off the screen.
+
+8.  Game Mechanics (130)
+
+   *  New wave (waveNb) - 131 -> UDP
+
+   *  Wave over (waveNb) - 132 -> UDP
+
+   *  Win - 133 -> UDP
+
+   *  Lose - 134 -> UDP
+
+   *  Game Over - 135 -> UDP
+
+9.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+Author's Address
+
+   Raphael Scandella
+   F-TYPE V8 444 CH, 0-100 km/h 3.7s, TOP SPEED 300 km/h
+   Email: raphael.scandella@epitech.eu
+
+
+
+
+
+
+
+
+
+
+
+Scandella                 Expires 21 June 2025                  [Page 5]
