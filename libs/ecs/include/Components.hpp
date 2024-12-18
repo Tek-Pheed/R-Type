@@ -39,13 +39,7 @@ namespace ecs
 
     class PlayerComponent : public Component {
       public:
-        explicit PlayerComponent(const std::string &name);
-
-        std::string getName() const;
-        void setName(const std::string &name);
-
-      private:
-        std::string _name;
+        PlayerComponent();
     };
 
     class VelocityComponent : public Component {
@@ -77,52 +71,59 @@ namespace ecs
 
     class BossComponent : public Component {
       public:
-        explicit BossComponent(const std::string &name);
-
-        std::string getName() const;
-        void setName(const std::string &name);
-
-      private:
-        std::string _name;
+        explicit BossComponent();
     };
 
     class EnemyComponent : public Component {
       public:
-        explicit EnemyComponent(const std::string &name);
-
-        std::string getName() const;
-        void setName(const std::string &name);
-
-      private:
-        std::string _name;
+        explicit EnemyComponent();
     };
 
     enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };
 
     class RenderComponent : public Component {
       public:
-        RenderComponent(ObjectType type, const sf::Texture &texture,
-            sf::Vector2f position = sf::Vector2f(0, 0));
+        explicit RenderComponent(ObjectType type);
 
         ecs::ObjectType getObjectType() const;
         void setObjectType(ecs::ObjectType type);
 
-        sf::Sprite *getSprite();
-
-        sf::CircleShape *getCircleShape();
-
-        sf::RectangleShape *getRectangleShape();
-
       private:
         ecs::ObjectType _type;
-        sf::Sprite *sprite = nullptr;
-        sf::CircleShape *circleShape = nullptr;
-        sf::RectangleShape *rectangleShape = nullptr;
     };
 
     template <typename spriteType> class SpriteComponent : public Component {
       public:
-        SpriteComponent(spriteType sprite, int sizeX, int sizeY);
+        SpriteComponent(spriteType &sprite, int sizeX, int sizeY)
+            : _sprite(sprite), _sizeX(sizeX), _sizeY(sizeY)
+        {
+        }
+
+        void setSprite(spriteType &sprite)
+        {
+            this->_sprite = sprite;
+        }
+        void setSizeX(int sizeX)
+        {
+            this->_sizeX = sizeX;
+        }
+        void setSizeY(int sizeY)
+        {
+            this->_sizeY = sizeY;
+        }
+
+        spriteType &getSprite()
+        {
+            return this->_sprite;
+        }
+        int getSizeX() const
+        {
+            return this->_sizeX;
+        }
+        int getSizeY() const
+        {
+            return this->_sizeY;
+        }
 
       private:
         spriteType _sprite;
@@ -132,13 +133,28 @@ namespace ecs
 
     template <typename circleType> class CircleComponent : public Component {
       public:
-        CircleComponent(circleType circle, int radius);
+        CircleComponent(circleType &circle, int radius)
+            : _circle(circle), _radius(radius)
+        {
+        }
 
-        circleType getCircle() const;
-        int getRadius() const;
+        circleType &getCircle()
+        {
+            return this->_circle;
+        }
+        int getRadius() const
+        {
+            return this->_radius;
+        }
 
-        void setCircle(circleType circle);
-        void setRadius(int radius);
+        void setCircle(circleType circle)
+        {
+            this->_circle = circle;
+        }
+        void setRadius(int radius)
+        {
+            this->_radius = radius;
+        }
 
       private:
         circleType _circle;
@@ -148,15 +164,36 @@ namespace ecs
     template <typename rectangleType>
     class RectangleComponent : public Component {
       public:
-        RectangleComponent(rectangleType rectangle, int sizeX, int sizeY);
+        RectangleComponent(rectangleType &rectangle, int sizeX, int sizeY)
+            : _rectangle(rectangle), _sizeX(sizeX), _sizeY(sizeY)
+        {
+        }
 
-        int getSizeX() const;
-        int getSizeY() const;
-        rectangleType getRectangle() const;
+        int getSizeX() const
+        {
+            return this->_sizeX;
+        }
+        int getSizeY() const
+        {
+            return this->_sizeY;
+        }
+        rectangleType &getRectangle()
+        {
+            return this->_rectangle;
+        }
 
-        void setSizeX(int sizeX);
-        void setSizeY(int sizeY);
-        void setRectangle(rectangleType rectangle);
+        void setSizeX(int sizeX)
+        {
+            this->_sizeX = sizeX;
+        }
+        void setSizeY(int sizeY)
+        {
+            this->_sizeY = sizeY;
+        }
+        void setRectangle(rectangleType rectangle)
+        {
+            this->_rectangle = rectangle;
+        }
 
       private:
         rectangleType _rectangle;
@@ -164,14 +201,34 @@ namespace ecs
         int _sizeY;
     };
 
-    class TextComponent : public Component {
+    template <typename textType> class TextComponent : public Component {
       public:
-        TextComponent();
-        void setText(const std::string &text);
-        std::string getText() const;
+        TextComponent(textType &text, const std::string &str)
+            : _text(text), _str(str)
+        {
+        }
+
+        textType &getText()
+        {
+            return this->_text;
+        }
+        void setText(const textType &text)
+        {
+            this->_text = text;
+        }
+
+        std::string getStr() const
+        {
+            return this->_str;
+        }
+        void setStr(const std::string &str)
+        {
+            this->_str = str;
+        }
 
       private:
-        std::string _text;
+        textType _text;
+        std::string _str;
     };
 
     class BulletComponent : public Component {
@@ -184,6 +241,17 @@ namespace ecs
 
       private:
         bool _isFromPlayer;
+    };
+
+    class NameComponent : public Component {
+      public:
+        explicit NameComponent(const std::string &name);
+
+        std::string getName() const;
+        void setName(const std::string &name);
+
+      private:
+        std::string _name;
     };
 } // namespace ecs
 
