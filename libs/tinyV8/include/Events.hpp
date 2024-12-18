@@ -2,59 +2,61 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** Events
+** Networking
 */
 
-#ifndef TINY_V8_EVENT_HPP
-#define TINY_V8_EVENT_HPP
+#ifndef TINY_V8_EVENT
+#define TINY_V8_EVENT
 
 #include <functional>
 #include "Engine.hpp"
 
-// Work in progress TODO
-
 namespace Engine
 {
+    namespace Feature
+    {
 
-    class IEvent {
-        /* Some comodity event types */
-        enum EngineEventType {
-            APP_START,
-            BEGIN_PLAY,
-            TICK,
-            END_PLAY,
-            APP_END
+        class EventManager : public AEngineFeature {
+          public:
+            explicit EventManager(Core &engineRef);
+            ~EventManager();
+
+            // template <typename TargetClass, typename... FncArgs>
+            // void bindEvent(
+            //     TargetClass *classParamRef,
+            //     std::function<void(FncArgs...)>);
+
+            template <class T>
+            void bindOnStart(std::function<void(void)> onStartFunc, T &ref)
+            {
+                _onStartFunc = std::bind(onStartFunc, ref);
+            }
+
+            template <class T>
+            void bindOnStop(std::function<void(void)> OnStopFunc, T &ref)
+            {
+                _onStopFunc = std::bind(OnStopFunc, ref);
+            }
+
+            template <class T>
+            void bindOnTick(std::function<void(float)> OnTickFunc, T &ref)
+            {
+                _onTickFunc =
+                    std::bind(OnTickFunc, ref, std::placeholders::_1);
+            }
+
+          protected:
+            void onStart(void) override;
+            void onTick(float deltaTimeSec) override;
+            void onStop(void) override;
+
+            std::function<void(void)> _onStartFunc;
+            std::function<void(void)> _onStopFunc;
+            std::function<void(float)> _onTickFunc;
         };
 
-        using EventAppStart = std::function<void(Core &engineCore)>;
-        using EventBeginPlay = std::function<void(Core &engineCore)>;
-        using EventTick =
-            std::function<void(Core &engineCore, float deltaTimeSeconds)>;
-        using EventEndPlay = std::function<void(Core &engineCore)>;
-        using EventEnd = std::function<void(Core &engineCore)>;
-        /**  */
-
-      public:
-      protected:
-    };
-
-    // class EventManager : AEngineFeature {
-    //   public:
-    //     explicit EventManager(Core &engineRef) : AEngineFeature(engineRef) {};
-    //     ~EventManager();
-
-
-    //     // template <typename TargetClass, typename... FncArgs>
-    //     // void bindEvent(
-    //     //     TargetClass *classParamRef, std::function<void(FncArgs...)>);
-
-
-    //   protected:
-    //     void onStart(void) override;
-    //     void onTick(void) override;
-    //     void onStop(void) override;
-    // };
+    } // namespace Feature
 
 } // namespace Engine
 
-#endif /* TINY_V8_EVENT_HPP */
+#endif /* TINY_V8_EVENT */
