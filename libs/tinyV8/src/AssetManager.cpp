@@ -7,13 +7,28 @@
 
 #include "AssetManager.hpp"
 
-// using namespace Engine::Feature;
+using namespace Engine::Feature;
 
-// AssetManager::AssetManager(Core &engineRef) : AEngineFeature(engineRef)
-// {
-// }
+AssetManager::AssetManager(Core &engineRef) : AEngineFeature(engineRef)
+{
+}
 
-// AssetManager::~AssetManager()
-// {
-// }
+AssetManager::~AssetManager()
+{
+}
 
+void AssetManager::onStart()
+{
+    return;
+}
+
+void AssetManager::onTick(float deltaTimeSec)
+{
+    (void) deltaTimeSec;
+    return;
+}
+
+void AssetManager::onStop(void)
+{
+    return;
+}
