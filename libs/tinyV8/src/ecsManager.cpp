@@ -36,7 +36,7 @@ bool ECSManager::destroyEntityById(size_t id)
     return (true);
 }
 
-bool ECSManager::doesEntityExists(size_t id)
+bool ECSManager::doesEntityExists(size_t id) const
 {
     if (_entities.find(id) != _entities.end())
         return (true);
@@ -119,8 +119,10 @@ void ECSManager::onStart()
 {
     return;
 }
-void ECSManager::onTick()
+
+void ECSManager::onTick(float deltaTimeSec)
 {
+    (void) deltaTimeSec;
     // TODO: Replace SFML references in ECS
     // otherwise this will not work
 
