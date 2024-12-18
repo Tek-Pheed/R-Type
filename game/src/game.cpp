@@ -86,55 +86,98 @@
 
 #include <iostream>
 #include <memory>
-#include "AssetManager.hpp"
+#include <sstream>
+
 #include "ECSManager.hpp"
 #include "Engine.hpp"
-#include "SFML/Graphics/Rect.hpp"
-#include "SFML/Graphics/Text.hpp"
-#include "SFML/Graphics/Texture.hpp"
 #include "Systems.hpp"
 
-int main(int argc, char **argv)
+#include "game.hpp"
+
+Game::Game(Engine::Core &engineRef) : _refGameEngine(engineRef)
 {
-    (void) argc;
-    (void) argv;
+}
 
-    Engine::Core gameEngine;
+Game::~Game()
+{
+    _refGameEngine.stop();
+}
 
-    gameEngine.setTickRate(60);
-    gameEngine.loadFeature<Engine::Feature::ECSManager>();
+bool Game::getServerMode()
+{
+    return _isServer;
+}
 
-    auto &manager = gameEngine.getFeature<Engine::Feature::ECSManager>();
+void Game::setServerMode(bool mode)
+{
+    _isServer = mode;
+}
 
-    manager.createSubsystem<ecs::BulletSystem>();
+void Game::gameLoop(float deltaTime)
+{
+    auto manager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
+    auto posSystem = manager.getSubsystem<ecs::PositionSystem>();
+    auto renderSystem = manager.getSubsystem<ecs::RenderSystem>();
+    auto bulletSystem = manager.getSubsystem<ecs::BulletSystem>();
 
-    auto &bulletSub = manager.getSubsystem<ecs::BulletSystem>();
-    auto entity = manager.createEntity();
-    // entity->addComponent((bulletSub));
+    if (!_isServer) {
+        _window->clear();
+        playEvent();
+        _window->draw(_backgroundSprite);
+        // clientLoop();
+    }
+    /*    .this->_window.clear();
+    playEvent(game, game.getEntities());
+    this->_window.draw(background_s);
+    positionSystem.update(
+        game.getEntities(), &this->_window, deltaTime, false);
+    game.updateLocalplayerPosition();
+    renderSystem.update(game.getEntities(), &this->_window, deltaTime, false);
+    game.manageBuffers();
+    bulletSystem.update(game.getEntities(),
+    &this->_window, deltaTime, false); this->_window.display();
+    backgroundAnimation(&background_s, &clockAnim);*/
+}
 
-    gameEngine.setTickRate(20);
+void Game::playEvent()
+{
+    sf::Event event;
+    std::stringstream ss;
+    auto ecsManager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
+    auto player = ecsManager.getEntityById(_ClientId);
+    auto velocity = player->getComponent<ecs::VelocityComponent>();
 
-    (void) bulletSub;
-
-    auto assetManager =
-        gameEngine.loadFeature<Engine::Feature::AssetManager>();
-
-    // from 'bool (sf::Texture::*)(const std::string &, const IntRect &)' to
-    //  'std::function<bool (const std::string &)>'
-
-    sf::Texture &texture = assetManager.loadAsset(
-        "image.png", "image", &sf::Texture::loadFromFile, sf::IntRect());
-
-    sf::Texture &txt = assetManager.getAsset<sf::Texture>("image");
-
-
-    // sf::Texture s;
-    // s.loadFromFile()
-    std::cout << "Texture max size: " << texture.getMaximumSize() << " " << txt.getSize().x << std::endl;
-
-    std::cout << "Bonjour: " << entity->getID() << std::endl;
-
-    assetManager.unloadAsset<sf::Texture>("image");
-
-    gameEngine.mainLoop();
+    while (_window->pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            this->_window->close();
+        }
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Up) {
+                velocity->setVy(-200.0f);
+                this->playerAnimations(player, "top");
+            } else if (event.key.code == sf::Keyboard::Down) {
+                velocity->setVy(200.0f);
+                this->playerAnimations(player, "down");
+            } else if (event.key.code == sf::Keyboard::Right) {
+                velocity->setVx(200.0f);
+                this->playerAnimations(player, "right");
+            } else if (event.key.code == sf::Keyboard::Left) {
+                velocity->setVx(-200.0f);
+                this->playerAnimations(player, "left");
+            } else if (event.key.code == sf::Keyboard::Space) {
+                playerShoot(player);
+            }
+        }
+        if (event.type == sf::Event::KeyReleased) {
+            this->playerAnimations(player, "none");
+            if (event.key.code == sf::Keyboard::Up
+                || event.key.code == sf::Keyboard::Down) {
+                velocity->setVy(0.0f);
+            }
+            if (event.key.code == sf::Keyboard::Left
+                || event.key.code == sf::Keyboard::Right) {
+                velocity->setVx(0.0f);
+            }
+        }
+    }
 }
