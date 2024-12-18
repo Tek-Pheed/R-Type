@@ -85,7 +85,7 @@
 #include <memory>
 #include "Engine.hpp"
 #include "Systems.hpp"
-#include "ecsManager.hpp"
+#include "ECSManager.hpp"
 
 int main(int argc, char **argv) {
 
