@@ -82,7 +82,9 @@
 // }
 
 #include <iostream>
+#include <memory>
 #include "Engine.hpp"
+#include "Systems.hpp"
 #include "ecsManager.hpp"
 
 int main(int argc, char **argv) {
@@ -98,10 +100,16 @@ int main(int argc, char **argv) {
     auto &manager = gameEngine.getFeature<Engine::Feature::ECSManager>();
 
 
-
     manager.createSubsystem<ecs::BulletSystem>();
 
+    auto &bulletSub = manager.getSubsystem<ecs::BulletSystem>();
+    auto entity = manager.createEntity();
+    //entity->addComponent((bulletSub));
 
-    std::cout << "Bonjour" << std::endl;
+    gameEngine.setTickRate(20);
 
+    (void) bulletSub;
+
+    std::cout << "Bonjour: " << entity->getID() << std::endl;
+    gameEngine.mainLoop();
 }

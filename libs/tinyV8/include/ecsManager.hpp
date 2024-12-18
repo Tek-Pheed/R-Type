@@ -29,7 +29,7 @@ namespace Engine
 
             bool addEntity(std::shared_ptr<ecs::Entity> entity);
             bool destroyEntityById(size_t id);
-            bool doesEntityExists(size_t id);
+            bool doesEntityExists(size_t id) const;
             std::shared_ptr<ecs::Entity> &getEntityById(size_t id);
 
             std::vector<std::shared_ptr<ecs::Entity>> getEntities(void);
@@ -75,7 +75,7 @@ namespace Engine
 
           protected:
             void onStart(void) override;
-            void onTick(void) override;
+            void onTick(float deltaTimeSec) override;
             void onStop(void) override;
 
             struct SubSys_t {

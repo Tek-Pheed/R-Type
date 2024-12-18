@@ -26,7 +26,7 @@ namespace Engine
         ~AEngineFeature() {};
 
         virtual void onStart(void) = 0;
-        virtual void onTick(void) = 0;
+        virtual void onTick(float deltaTimeSec) = 0;
         virtual void onStop(void) = 0;
 
       protected:
@@ -43,9 +43,9 @@ namespace Engine
         void start(void);
         void stop(void);
         void setUpdateMode(UpdateMode mode);
-        UpdateMode getUpdateMode(void);
+        UpdateMode getUpdateMode(void) const;
         void setTickRate(uint16_t tickRateHZ);
-        uint16_t getTickRate(void);
+        uint16_t getTickRate(void) const;
 
         template <class EngineFeature> EngineFeature &getFeature(void)
         {
@@ -76,10 +76,14 @@ namespace Engine
             return (false);
         }
 
-      protected:
         void mainLoop(void);
 
-        bool _running = false;
+      protected:
+        void onStart(void);
+        void onTick(float deltaTimeSec);
+        void onStop(void);
+
+        bool _running = true;
         UpdateMode _updateMode = LOCKED;
         uint16_t _tickRate = DEFAULT_TICK_RATE;
         std::mutex _engineLock;

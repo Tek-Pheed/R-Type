@@ -39,7 +39,7 @@ namespace Engine
 
           protected:
             void onStart(void) override;
-            void onTick(void) override;
+            void onTick(float deltaTimeSec) override;
             void onStop(void) override;
         };
 
