@@ -11,19 +11,8 @@ PlayerComponent is used to define an entity as a player.
 ```cpp
 #include "Components.hpp"
 
-ecs::PlayerComponent::PlayerComponent(const std::string &name)
+ecs::PlayerComponent::PlayerComponent()
 {
-    this->_name = name;
-}
-
-std::string ecs::PlayerComponent::getName() const
-{
-    return this->_name;
-}
-
-void ecs::PlayerComponent::setName(const std::string &name)
-{
-    this->_name = name;
 }
 
 ```

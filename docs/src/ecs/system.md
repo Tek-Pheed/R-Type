@@ -29,14 +29,14 @@ void ecs::RenderSystem::update(
     (void) deltaTime;
 
     for (auto &entity : entities) {
-        auto renderComponent = entity->getComponent<RenderComponent>();
-        auto position = entity->getComponent<PositionComponent>();
-        auto player = entity->getComponent<PlayerComponent>();
+        auto position = entity->getComponent<ecs::PositionComponent>();
+        auto player = entity->getComponent<ecs::PlayerComponent>();
+        auto sprite = entity->getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
-        if (player && position && renderComponent) {
-            renderComponent->getSprite()->setPosition(
+        if (player && position && sprite) {
+            sprite->getSprite().setPosition(
                 position->getX(), position->getY());
-            window->draw(*(renderComponent->getSprite()));
+            window->draw(sprite->getSprite());
         }
     }
 }
