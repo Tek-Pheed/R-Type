@@ -1,90 +1,120 @@
-// /*
-// ** EPITECH PROJECT, 2024
-// ** R-Type
-// ** File description:
-// ** game
-// */
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description:
+** game
+*/
 
-// #ifndef GAME_HPP
-// #define GAME_HPP
+#ifndef GAME_HPP
+#define GAME_HPP
 
-// #include <memory>
-// #include <mutex>
-// #include <typeindex>
+#include <SFML/Graphics.hpp>
+#include <memory>
+#include <mutex>
+#include <typeindex>
 
-// #include "Entity.hpp"
-// #include "Networking.hpp"
-// #include "RenderClass.hpp"
-// #include "Systems.hpp"
-// #include "system_network.hpp"
-// #include "system_tcp.hpp"
-// #include "system_udp.hpp"
-// #include <unordered_map>
+#include "Engine.hpp"
+#include "Entity.hpp"
+#include "Networking.hpp"
+#include "RenderClass.hpp"
+#include "Systems.hpp"
+#include "system_network.hpp"
+#include "system_tcp.hpp"
+#include "system_udp.hpp"
+#include <unordered_map>
 
-// class game {
-//     /* data */
-//   public:
-//     game(Networking &net);
-//     ~game();
+class Game {
+    /* data */
+  public:
+    Game(Engine::Core &engineRef);
+    ~Game();
+    void gameLoop(float deltaTime);
 
-//     int createConnection(const char *ip, int portTCP, int portUDP);
-//     int manageBuffers();
-//     void writeToServer(
-//         const std::string &data, System::Network::ISocket::Type socketType);
-//     void receiveMessage();
+    bool getServerMode();
+    void setServerMode(bool mode);
 
-//     void handleConnection(int code, std::vector<std::string> &tokens);
-//     void handleEnemy(int code, std::vector<std::string> &tokens);
-//     void handleTerrain(int code, std::vector<std::string> &tokens);
-//     void handleMechs(int code, std::vector<std::string> &tokens);
-//     void addEntity(std::shared_ptr<ecs::Entity> entity);
+    void setupClient();
+    void setupServer();
 
-//     std::vector<std::shared_ptr<ecs::Entity>> &getEntities();
-//     int getId();
+    // Window Utilities
+    sf::RenderWindow &getWindow();
 
-//     void setServerMode(bool mode);
-//     bool isServer(void);
+    // Texture Utilities
+    void LoadTexture();
 
-//     void updateLocalplayerPosition();
-//     std::shared_ptr<ecs::Entity> &getLocalPlayer();
+    // Player Utilities
+    void playEvent();
+    void playerAnimations(
+        std::shared_ptr<ecs::Entity> player, std::string direction);
+    void playerShoot(std::shared_ptr<ecs::Entity> player);
 
-//     // These functions should be moved in a game Engine class
+    //     int createConnection(const char *ip, int portTCP, int portUDP);
+    //     int manageBuffers();
+    //     void writeToServer(
+    //         const std::string &data, System::Network::ISocket::Type
+    //         socketType);
+    //     void receiveMessage();
 
-//     // --
+    //     void handleConnection(int code, std::vector<std::string>
+    //     &tokens); void handleEnemy(int code, std::vector<std::string>
+    //     &tokens); void handleTerrain(int code, std::vector<std::string>
+    //     &tokens); void handleMechs(int code, std::vector<std::string>
+    //     &tokens); void addEntity(std::shared_ptr<ecs::Entity> entity);
 
-//     // Client Management
-//     void setRenderClass(RenderClass *refRender);
-//     RenderClass *getRenderClass();
-//     void loadTexture();
-//     void createPlayer();
+    //     std::vector<std::shared_ptr<ecs::Entity>> &getEntities();
+    //     int getId();
 
-//     // Player Management
-//     void handlePlayer(int code, std::vector<std::string> &tokens);
-//     void createNewPlayer(std::vector<std::string> &tokens);
-//     void setNewPosition(std::vector<std::string> &tokens);
-//     void playerDead(std::vector<std::string> &tokens);
-//     void createProjectile(std::vector<std::string> &tokens);
-//     void setPlayerHealth(std::vector<std::string> &tokens);
-//     void playerDisconnection(std::vector<std::string> &tokens);
+    //     void setServerMode(bool mode);
+    //     bool isServer(void);
 
-//     // Enemy Management
-//     void createEnemy(std::vector<std::string> &tokens);
-//     void enemyDead(std::vector<std::string> &tokens);
-//     void enemyShoot(std::vector<std::string> &tokens);
-//     void enemyDamage(std::vector<std::string> &tokens);
+    //     void updateLocalplayerPosition();
+    //     std::shared_ptr<ecs::Entity> &getLocalPlayer();
 
-//   private:
-//     int _id;
-//     std::shared_ptr<ecs::Entity> _player;
-//     std::vector<std::string> _buffers;
-//     std::mutex _mutex;
-//     std::vector<std::shared_ptr<ecs::Entity>> _entities;
-//     RenderClass *_refRender;
-//     bool _isServer;
-//     Networking &_refNetwork;
+    //     // These functions should be moved in a game Engine class
 
-//     // To move into game Engine
-//     std::unordered_map<std::type_index, ecs::ISystem> _subsystems;
-// };
+    //     // --
 
-// #endif /*game_HPP*/
+    //     // Client Management
+    //     void setRenderClass(RenderClass *refRender);
+    //     RenderClass *getRenderClass();
+    //     void loadTexture();
+    //     void createPlayer();
+
+    //     // Player Management
+    //     void handlePlayer(int code, std::vector<std::string> &tokens);
+    //     void createNewPlayer(std::vector<std::string> &tokens);
+    //     void setNewPosition(std::vector<std::string> &tokens);
+    //     void playerDead(std::vector<std::string> &tokens);
+    //     void createProjectile(std::vector<std::string> &tokens);
+    //     void setPlayerHealth(std::vector<std::string> &tokens);
+    //     void playerDisconnection(std::vector<std::string> &tokens);
+
+    //     // Enemy Management
+    //     void createEnemy(std::vector<std::string> &tokens);
+    //     void enemyDead(std::vector<std::string> &tokens);
+    //     void enemyShoot(std::vector<std::string> &tokens);
+    //     void enemyDamage(std::vector<std::string> &tokens);
+
+  private:
+    size_t _ClientId;
+    bool _isServer;
+    Engine::Core &_refGameEngine;
+
+    std::unique_ptr<sf::RenderWindow> _window;
+
+    // Client textures
+    sf::Texture _playerTexture;
+    sf::Texture _enemyTexture;
+    sf::Texture _bulletTexture;
+    sf::Texture _backgroundTexture;
+
+    // Client Sprites
+    sf::Sprite _backgroundSprite;
+
+    //     std::vector<std::shared_ptr<ecs::Entity>> _entities;
+
+    //     // To move into game Engine
+    //     std::unordered_map<std::type_index, ecs::ISystem> _subsystems;
+};
+
+#endif /*game_HPP*/
