@@ -5,7 +5,7 @@
 ** ecsManager
 */
 
-#include "ECSManager.hpp"
+#include "EngineECSManager.hpp"
 #include <cstdint>
 #include <memory>
 
