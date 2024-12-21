@@ -5,13 +5,16 @@
 ** Networking
 */
 
+#include <sstream>
 #include <iostream>
+#include <mutex>
 #include <string>
 #include "EngineNetworking.hpp"
 
 using namespace Engine::Feature;
 
-NetworkingManager::NetworkingManager(Core &engineRef) : AEngineFeature(engineRef)
+NetworkingManager::NetworkingManager(Core &engineRef)
+    : AEngineFeature(engineRef)
 {
 }
 
@@ -116,7 +119,8 @@ void NetworkingManager::sendToOne(size_t id,
     }
 }
 
-NetworkingManager::NetClient &NetworkingManager::addClient(const NetClient &client)
+NetworkingManager::NetClient &NetworkingManager::addClient(
+    const NetClient &client)
 {
     std::unique_lock lock(_globalMutex);
 
@@ -130,154 +134,79 @@ NetworkingManager::NetClient &NetworkingManager::addClient(const NetClient &clie
 NetworkingManager::NetClient &NetworkingManager::getClient(size_t id)
 {
     std::unique_lock lock(_globalMutex);
+
     return (_clients.at(id));
 }
 
 void NetworkingManager::removeClient(size_t id)
 {
-    _globalMutex.lock();
+    std::unique_lock lock(_globalMutex);
+
     _clients.at(id).isDisconnected = true;
-    _globalMutex.unlock();
     std::cout << "Removed a client (" << std::to_string(_clientCounter)
               << ") from the server." << std::endl;
 }
 
-void NetworkingManager::runConnectThread()
+ssize_t NetworkingManager::identifyClient(
+    const System::Network::ISocket &socket)
 {
-    System::Network::socketSetGeneric readfds;
+    std::unique_lock lock(_globalMutex);
 
-    while (true) {
-        readfds.clear();
-        readfds.emplace_back(&_SocketTCP);
-        try {
-            System::Network::select(&readfds);
-        } catch (const std::exception &s) {
-            std::cout << "An error occured on the server: " << s.what()
-                      << std::endl;
-        }
-        if (readfds.size() == 0)
-            continue;
-        NetClient cl;
-        cl.tcpSocket = System::Network::accept(_SocketTCP);
-        addClient(cl);
-        // std::string toWrite = makePacket(C_INIT_UDP, _clientCounter);
-        // writeToClient(client, toWrite, System::Network::ISocket::TCP);
+    for (auto &pair : _clients) {
+        if (pair.second.tcpSocket.getUID() == socket.getUID())
+            return (ssize_t) pair.first;
     }
+    return -1;
 }
 
-void NetworkingManager::runWriteThread()
+ssize_t NetworkingManager::identifyClient(
+    const std::string &ip, const std::string &port)
 {
-    System::Network::socketSetGeneric writefds;
-    System::Network::timeoutStruct tv = {{0, 50000}};
-    bool shouldWait = true;
+    std::unique_lock lock(_globalMutex);
 
-    while (true) {
-        try {
-            if (shouldWait) {
-                std::unique_lock lock(_writeMutex);
-                _writeCondition.wait(lock);
-            }
-            writefds.clear();
-            writefds.emplace_back(&_SocketUDP);
-            for (auto &pair : _clients) {
-                NetClient &ref = pair.second;
-                if ((ref.writeBufferTCP.length() > 0
-                        || ref.writeBufferUDP.length() > 0)
-                    && !ref.isDisconnected)
-                    writefds.emplace_back(&ref.tcpSocket);
-            }
-            System::Network::select(nullptr, &writefds, nullptr, tv);
-            shouldWait = true;
-            if (writefds.size() == 0)
-                continue;
-            for (auto sock : writefds) {
-                ssize_t len = 0;
-                int removeID = -1;
-                bool can_remove = false;
-                switch (sock->getType()) {
-                    case System::Network::ISocket::TCP: {
-                        ssize_t id = this->identifyClient(*sock);
-                        if (id == -1)
-                            std::cout << "Unable to idendify client (TCP - "
-                                         "write thread)"
-                                      << std::endl;
-                        NetClient &client = this->getClient((size_t) id);
-                        if (client.isDisconnected) {
-                            removeID = (int) id;
-                            if (client.writeBufferTCP.length() == 0
-                                && client.writeBufferUDP.length() == 0)
-                                can_remove = true;
-                        }
-                        if (!sock->isOpen()) {
-                            std::cout << "[Write Thread] client ("
-                                      << std::to_string(id)
-                                      << ") closed TCP connection ("
-                                      << std::to_string(sock->getUID()) << ")"
-                                      << std::endl;
-                            this->removeClient((size_t) id);
-                        }
-                        if (client.writeBufferTCP.size() > 0) {
-                            len = sock->sendData(System::Network::encodeString(
-                                client.writeBufferTCP));
-                            std::cout << "[Write Thread] Sending: "
-                                      << client.writeBufferTCP.substr(
-                                             0, (size_t) len)
-                                      << "to client (" << std::to_string(id)
-                                      << ") on TCP connection ("
-                                      << std::to_string(sock->getUID()) << ")"
-                                      << std::endl;
-                            if ((size_t) len < client.writeBufferTCP.length())
-                                shouldWait = false;
-                            client.writeBufferTCP.erase(0, (size_t) len);
-                        }
-                        break;
-                    }
-                    case System::Network::ISocket::UDP: {
-                        if (sock->getUID()
-                            == this->_SocketUDP.getUID()) {
-                            for (auto &cl : _clients) {
-                                size_t index = cl.first;
-                                auto &cli = cl.second;
-                                if (cli.isDisconnected) {
-                                    removeID = (int) index;
-                                    if (cli.writeBufferTCP.length() == 0
-                                        && cli.writeBufferUDP.length() == 0)
-                                        can_remove = true;
-                                }
-                                if (cli.port == 0 || cli.ip.empty()
-                                    || cli.writeBufferUDP.length() == 0)
-                                    continue;
-                                len = _SocketUDP.sendDataTo(
-                                    System::Network::encodeString(
-                                        cli.writeBufferUDP),
-                                    cli.ip, cli.port);
-                                std::cout
-                                    << "[Write Thread] Sending: "
-                                    << cli.writeBufferUDP.substr(
-                                           0, (size_t) len)
-                                    << "to client (" << std::to_string(index)
-                                    << ") on UDP connection ("
-                                    << std::to_string(sock->getUID()) << ")"
-                                    << std::endl;
-                                if ((size_t) len < cli.writeBufferUDP.length())
-                                    shouldWait = false;
-                                cli.writeBufferUDP.erase(0, (size_t) len);
-                            }
-                        }
-                    }
-                    default: {
-                        break;
-                    };
-                }
-                if (removeID != -1 && can_remove == true) {
-                    std::unique_lock lock(_globalMutex);
-                    _clients.erase((size_t) removeID);
-                }
-            }
-        } catch (const std::exception &e) {
-            std::cout << "[Write Thread] failed with exception: " << e.what()
-                      << std::endl;
-        }
+    for (const auto &pair : _clients) {
+        if (pair.second.ip == ip && std::to_string(pair.second.port) == port)
+            return (ssize_t) pair.first;
     }
+    return -1;
 }
 
+
+// This function should be handeled by the game
+ssize_t NetworkingManager::authenticateUDPClient(
+    const System::Network::byteArray &packet)
+{
+    std::string decoded = System::Network::decodeString(packet);
+    if (decoded.starts_with(std::to_string(902))) {
+        std::string::size_type p = decoded.find(' ');
+        auto id = std::strtol(&decoded[p], nullptr, 10);
+        if (id == LLONG_MAX || id == LLONG_MIN)
+            return (-1);
+        return (id);
+    }
+    return (-1);
+}
+
+void serializeString(const std::string &str, std::ostream &out)
+{
+    size_t size = str.size();
+    out.write(reinterpret_cast<const char *>(&size), sizeof(size));
+    out.write(str.data(), static_cast<std::streamsize>(size));
+}
+
+void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
+    const std::string &data, System::Network::ISocket::Type socketType)
+{
+    std::ostringstream out;
+    serializeString(data, out);
+    std::string serializedData = out.str();
+    std::unique_lock lock(_writeMutex);
+
+    if (socketType == System::Network::ISocket::TCP) {
+        client.writeBufferTCP += serializedData;
+    }
+    if (socketType == System::Network::ISocket::UDP) {
+        client.writeBufferUDP += serializedData;
+    }
+    _writeCondition.notify_one();
+}

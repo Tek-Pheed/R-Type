@@ -5,6 +5,10 @@
 ** Networking
 */
 
+/**
+ * @file Warning: This library is not ready yet. Do not use it yet, it's API will change.
+ */
+
 #ifndef TINY_V8_NETWORKING
 #define TINY_V8_NETWORKING
 
@@ -19,6 +23,7 @@
 #include "system_udp.hpp"
 #include <condition_variable>
 #include <unordered_map>
+
 
 template <typename T> std::string getString(T arg)
 {
@@ -86,7 +91,7 @@ namespace Engine
             void setupServer(uint16_t TCP_port, uint16_t UDP_port);
             void setupClient(
                 uint16_t TCP_port, uint16_t UDP_port, const std::string &ip);
-            void setClientID(size_t id);
+            void setClientID(size_t id); //TO Change
             std::string readUDPBuffer();
             std::string readTCPBuffer();
             void sendToAll(System::Network::ISocket::Type socketType,
@@ -113,6 +118,8 @@ namespace Engine
 
             void writeToClient(NetClient &client, const std::string &data,
                 System::Network::ISocket::Type socketType);
+
+            // This function should be handeled by the game
             ssize_t authenticateUDPClient(
                 const System::Network::byteArray &packet);
 
