@@ -8,9 +8,9 @@
 #include <iostream>
 #include <memory>
 
-#include "ECSManager.hpp"
+#include "EngineECSManager.hpp"
 #include "Engine.hpp"
-#include "Events.hpp"
+#include "EngineEvents.hpp"
 #include "Networking.hpp"
 #include "SFML/Window/VideoMode.hpp"
 #include "Systems.hpp"

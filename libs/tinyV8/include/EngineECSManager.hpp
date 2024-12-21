@@ -79,7 +79,7 @@ namespace Engine
             void onStop(void) override;
 
             struct SubSys_t {
-                SubSys_t(std::unique_ptr<ecs::ISystem> s, bool updt)
+                explicit SubSys_t(std::unique_ptr<ecs::ISystem> s, bool updt)
                     : sys(std::move(s)), update(updt) {};
 
                 std::unique_ptr<ecs::ISystem> sys;

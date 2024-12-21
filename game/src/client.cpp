@@ -85,7 +85,7 @@
 #include <SFML/Graphics.hpp>
 #include <sstream>
 
-#include "ECSManager.hpp"
+#include "EngineECSManager.hpp"
 #include "Entity.hpp"
 #include "game.hpp"
 
@@ -106,7 +106,7 @@ void Game::playerShoot(std::shared_ptr<ecs::Entity> player)
     bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
     bullet->addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::ObjectType::SPRITE, this->_bulletTexture));
-        
+
     bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
         sf::Rect(137, 153, 64, 16));
     ss << "104 " << _ClientId << "\t\n";
