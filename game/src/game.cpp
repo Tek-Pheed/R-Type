@@ -88,7 +88,7 @@
 #include <memory>
 #include <sstream>
 
-#include "ECSManager.hpp"
+#include "EngineECSManager.hpp"
 #include "Engine.hpp"
 #include "Systems.hpp"
 
@@ -115,10 +115,15 @@ void Game::setServerMode(bool mode)
 
 void Game::gameLoop(float deltaTime)
 {
-    auto manager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
-    auto posSystem = manager.getSubsystem<ecs::PositionSystem>();
-    auto renderSystem = manager.getSubsystem<ecs::RenderSystem>();
-    auto bulletSystem = manager.getSubsystem<ecs::BulletSystem>();
+    auto &manager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
+    auto &posSystem = manager.getSubsystem<ecs::PositionSystem>();
+    auto &renderSystem = manager.getSubsystem<ecs::RenderSystem>();
+    auto &bulletSystem = manager.getSubsystem<ecs::BulletSystem>();
+
+    (void) posSystem;
+    (void) renderSystem;
+    (void) bulletSystem;
+    (void) deltaTime;
 
     if (!_isServer) {
         _window->clear();
@@ -143,8 +148,8 @@ void Game::playEvent()
 {
     sf::Event event;
     std::stringstream ss;
-    auto ecsManager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
-    auto player = ecsManager.getEntityById(_ClientId);
+    auto &ecsManager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
+    auto &player = ecsManager.getEntityById(_ClientId);
     auto velocity = player->getComponent<ecs::VelocityComponent>();
 
     while (_window->pollEvent(event)) {

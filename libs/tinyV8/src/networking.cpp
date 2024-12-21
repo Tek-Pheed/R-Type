@@ -234,7 +234,7 @@ void NetworkingManager::runWriteThread()
                     }
                     case System::Network::ISocket::UDP: {
                         if (sock->getUID()
-                            == this->_serverSocketUDP.getUID()) {
+                            == this->_SocketUDP.getUID()) {
                             for (auto &cl : _clients) {
                                 size_t index = cl.first;
                                 auto &cli = cl.second;
@@ -247,7 +247,7 @@ void NetworkingManager::runWriteThread()
                                 if (cli.port == 0 || cli.ip.empty()
                                     || cli.writeBufferUDP.length() == 0)
                                     continue;
-                                len = _serverSocketUDP.sendDataTo(
+                                len = _SocketUDP.sendDataTo(
                                     System::Network::encodeString(
                                         cli.writeBufferUDP),
                                     cli.ip, cli.port);
