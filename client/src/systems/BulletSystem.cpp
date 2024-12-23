@@ -27,7 +27,7 @@ void ecs::BulletSystem::update(
                     position->getY() + velocity->getVy() * deltaTime);
 
                 if (!isServer) {
-                    if (position->getX() >= float(window->getSize().x)
+                    if (position->getX() >= (float) window->getSize().x
                         || position->getX() < 0) {
                         bulletToRemove.push_back(entity);
                         continue;
