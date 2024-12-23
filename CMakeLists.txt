@@ -50,6 +50,11 @@ set_target_properties(tinyV8 PROPERTIES
     BUILD_RPATH "$ORIGIN"
 )
 
+set_target_properties(tinyV8 PROPERTIES
+    INSTALL_RPATH "$ORIGIN"
+    BUILD_RPATH "$ORIGIN"
+)
+
 set_target_properties(ossystem PROPERTIES
         INSTALL_RPATH "$ORIGIN"
         BUILD_RPATH "$ORIGIN"
