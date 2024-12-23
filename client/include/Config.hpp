@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2024
+** R-Type [WSL: Ubuntu]
+** File description:
+** Config
+*/
+
 #ifndef CONFIGCLASS_HPP_
 #define CONFIGCLASS_HPP_
 

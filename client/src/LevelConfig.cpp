@@ -1,30 +1,30 @@
 /*
 ** EPITECH PROJECT, 2024
-** R-Type [WSL: Ubuntu-24.04]
+** R-Type [WSL: Ubuntu]
 ** File description:
-** Config
+** LevelConfig
 */
- 
-#include "Config.hpp"
+
+#include "LevelConfig.hpp"
 #include "ErrorClass.hpp"
 #include <vector>
 
-Config::Config(const std::string &filename) : _filename(filename)
+LevelConfig::LevelConfig(const std::string &filename) : _filename(filename)
 {
-    validateOrCreateConfig();
-    parseConfig();
+    validateOrCreateLevelConfig();
+    parseLevelConfig();
 }
 
-Config::~Config()
+LevelConfig::~LevelConfig()
 {
 }
 
-const std::map<int, std::string> &Config::getConfig()
+const std::map<int, std::string> &LevelConfig::getLevelConfig()
 {
     return _configData;
 }
 
-void Config::saveConfig()
+void LevelConfig::saveLevelConfig()
 {
     if (_filename.find(".cfg") != _filename.size() - 4) {
         _filename += ".cfg";
@@ -47,7 +47,7 @@ void Config::saveConfig()
     savefile.close();
 }
 
-void Config::validateOrCreateConfig()
+void LevelConfig::validateOrCreateLevelConfig()
 {
     std::ifstream infile(_filename);
     if (!infile.is_open()) {
@@ -56,20 +56,18 @@ void Config::validateOrCreateConfig()
             throw ErrorClass(
                 "RTC006 : Invalid file: could not create file.");
         }
-        newfile << "MOVE_UP=sf::Keyboard::Up\n";
-        newfile << "MOVE_RIGHT=sf::Keyboard::Right\n";
-        newfile << "MOVE_LEFT=sf::Keyboard::Left\n";
-        newfile << "MOVE_DOWN=sf::Keyboard::Down\n";
-        newfile << "SOUND_VOLUME=50\n";
-        newfile << "RESOLUTION=1920x1080\n";
-        newfile << "AUTO_FIRE=true\n";
+        newfile << "NB_MAX_PLAYERS=4\n";
+        newfile << "GAMEMODE=CLASSIC\n";
+        newfile << "DIFFICULTY=NORMAL\n";
+        newfile << "WAVES_BEFORE_BOSS=5\n";
+        newfile << "BONUSES=false\n";
         newfile.close();
         return;
     }
 
     std::string line;
     std::vector<std::string> expectedKeys = {
-        "MOVE_UP=", "MOVE_RIGHT=", "MOVE_LEFT=", "MOVE_DOWN=", "SOUND_VOLUME=", "RESOLUTION=", "AUTO_FIRE="
+        "NB_MAX_PLAYERS=", "GAMEMODE=", "DIFFICULTY=", "WAVES_BEFORE_BOSS=", "BONUSES="
     };
     size_t lineCount = 0;
 
@@ -79,23 +77,35 @@ void Config::validateOrCreateConfig()
                 "RTC007 : Invalid config: file content does not match expected format.");
         }
 
-        if (lineCount == 4) {
-            int volume = std::stoi(line.substr(expectedKeys[lineCount].size()));
-            if (volume < 0 || volume > 100) {
+        if (lineCount == 0) {
+            int maxPlayersNb = std::stoi(line.substr(expectedKeys[lineCount].size()));
+            if (maxPlayersNb <= 0 || maxPlayersNb > 4) {
                 throw ErrorClass(
-                    "RTC010 : Invalid config: SOUND_VOLUME must be between 0 and 100.");
+                    "RTC013 : Invalid config: NB_MAX_PLAYERS must be between 1 and 4.");
             }
-        } else if (lineCount == 5) {
-            std::string resolution = line.substr(expectedKeys[lineCount].size());
-            if (resolution != "1920x1080" && resolution != "3840x2160" && resolution != "2560x1440" && resolution != "1280x720") {
+        } else if (lineCount == 1) {
+            std::string gamemode = line.substr(expectedKeys[lineCount].size());
+            if (gamemode != "CLASSIC" && gamemode != "PVP") {
                 throw ErrorClass(
-                    "RTC011 : Invalid config: RESOLUTION must be 1920x1080 or 3840x2160 or 2560x1440 or 1280x720.");
+                    "RTC014 : Invalid config: GAMEMODE must be CLASSIC or PVP.");
             }
-        } else if (lineCount == 6) {
-            std::string autoFire = line.substr(expectedKeys[lineCount].size());
-            if (autoFire != "true" && autoFire != "false") {
+        } else if (lineCount == 2) {
+            std::string difficulty = line.substr(expectedKeys[lineCount].size());
+            if (difficulty != "EASY" && difficulty != "NORMAL" && difficulty != "HARD") {
                 throw ErrorClass(
-                    "RTC012 : Invalid config: AUTO_FIRE must be true or false.");
+                    "RTC015 : Invalid config: DIFFICULTY must be EASY, NORMAL or HARD.");
+            }
+        } else if (lineCount == 3) {
+            int wavesBeforeBoss = std::stoi(line.substr(expectedKeys[lineCount].size()));
+            if (wavesBeforeBoss <= 0 ) {
+                throw ErrorClass(
+                    "RTC016 : Invalid config: WAVES_BEFORE_BOSS can't be 0 or less.");
+            }
+        } else if (lineCount == 4) {
+            std::string bonuses = line.substr(expectedKeys[lineCount].size());
+            if (bonuses != "true" && bonuses != "false") {
+                throw ErrorClass(
+                    "RTC017 : Invalid config: BONUSES must be true or false.");
             }
         }
 
@@ -109,8 +119,8 @@ void Config::validateOrCreateConfig()
 
     infile.close();
 }
- 
-void Config::parseConfig()
+
+void LevelConfig::parseLevelConfig()
 {
     std::ifstream infile(_filename);
     if (!infile.is_open()) {
@@ -127,7 +137,7 @@ void Config::parseConfig()
     infile.close();
 }
 
-void Config::updateConfigValue(const std::string &key, const std::string &newValue)
+void LevelConfig::updateLevelConfigValue(const std::string &key, const std::string &newValue)
 {
     for (auto &line : _configData) {
         if (line.second.find(key + "=") == 0) {
