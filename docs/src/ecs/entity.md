@@ -30,7 +30,7 @@ int main(void)
 {
     auto &player = std::make_shared<ecs::Entity>(0);
     
-    player->addComponent(std::make_shared<ecs::PlayerComponent>("Samy"));
+    player->addComponent(std::make_shared<ecs::PlayerComponent>());
     player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
     

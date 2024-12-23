@@ -16,7 +16,6 @@ file(MAKE_DIRECTORY ${RELEASE_DIR})
 add_subdirectory(${PROJECT_SOURCE_DIR}/dependencies/SFML)
 add_subdirectory(libs/ecs)
 add_subdirectory(libs/system)
-add_subdirectory(server)
 add_subdirectory(client)
 
 set(CLIENT_BINARY $<TARGET_FILE:client>)
@@ -25,14 +24,13 @@ set(ECS_LIBRARY $<TARGET_FILE:ecs>)
 set(SYSTEM_LIBRARY $<TARGET_FILE:ossystem>)
 
 add_custom_target(copy_binaries ALL
-    COMMENT "Copying binaries to release folder"
+        COMMENT "Copying binaries to release folder"
 )
 
 add_custom_command(TARGET copy_binaries POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${CLIENT_BINARY} ${RELEASE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${SERVER_BINARY} ${RELEASE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${ECS_LIBRARY} ${RELEASE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${SYSTEM_LIBRARY} ${RELEASE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CLIENT_BINARY} ${RELEASE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${ECS_LIBRARY} ${RELEASE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${SYSTEM_LIBRARY} ${RELEASE_DIR}
 )
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -40,21 +38,16 @@ set(CMAKE_INSTALL_RPATH "$ORIGIN")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set_target_properties(client PROPERTIES
-    INSTALL_RPATH "$ORIGIN"
-    BUILD_RPATH "$ORIGIN"
-)
-
-set_target_properties(server PROPERTIES
-    INSTALL_RPATH "$ORIGIN"
-    BUILD_RPATH "$ORIGIN"
+        INSTALL_RPATH "$ORIGIN"
+        BUILD_RPATH "$ORIGIN"
 )
 
 set_target_properties(ecs PROPERTIES
-    INSTALL_RPATH "$ORIGIN"
-    BUILD_RPATH "$ORIGIN"
+        INSTALL_RPATH "$ORIGIN"
+        BUILD_RPATH "$ORIGIN"
 )
 
 set_target_properties(ossystem PROPERTIES
-    INSTALL_RPATH "$ORIGIN"
-    BUILD_RPATH "$ORIGIN"
+        INSTALL_RPATH "$ORIGIN"
+        BUILD_RPATH "$ORIGIN"
 )

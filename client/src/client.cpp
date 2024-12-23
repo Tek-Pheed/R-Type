@@ -36,17 +36,19 @@ int client::get_id()
 void create_player(client &client, RenderClass &render)
 {
     auto &player = client.getLocalPlayer();
+    sf::Sprite playerSP(render.getPlayerTexture());
 
     player = std::make_shared<ecs::Entity>(client.get_id());
-    player->addComponent(std::make_shared<ecs::PlayerComponent>("Samy"));
+    player->addComponent(std::make_shared<ecs::PlayerComponent>());
     player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
-    player->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, render.getPlayerTexture()));
-    player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
-        sf::Rect(66, 0, 33, 14));
-    player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
-        sf::Vector2f(3, 3));
+    player->addComponent(
+        std::make_shared<ecs::RenderComponent>(ecs::ObjectType::SPRITE));
+    playerSP.setTextureRect(sf::Rect(66, 0, 33, 14));
+    playerSP.setScale(sf::Vector2f(3, 3));
+    playerSP.setPosition(100, 100);
+    player->addComponent(
+        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(playerSP, 3, 3));
     client.add_entity(player);
 }
 

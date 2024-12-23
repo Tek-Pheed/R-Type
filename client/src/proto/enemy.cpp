@@ -27,19 +27,22 @@ void client::createEnemy(std::vector<std::string> &tokens)
         _refRender.setEnemyTexture(enemyText);
     }
 
+    sf::Sprite enemySP(_refRender.getEnemyTexture());
+
     auto enemy = std::make_shared<ecs::Entity>(id);
-    enemy->addComponent(std::make_shared<ecs::EnemyComponent>("Enemy"));
+    enemy->addComponent(std::make_shared<ecs::EnemyComponent>());
     enemy->addComponent(std::make_shared<ecs::PositionComponent>(x, y));
     enemy->addComponent(
         std::make_shared<ecs::VelocityComponent>(-200.0f, 0.0f));
     enemy->addComponent(std::make_shared<ecs::HealthComponent>(100));
 
-    enemy->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, _refRender.getEnemyTexture()));
-    enemy->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
-        sf::Rect(0, 16, 32, 32));
-    enemy->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
-        sf::Vector2f(2, 2));
+    enemySP.setTextureRect(sf::Rect(0, 16, 32, 32));
+    enemySP.setScale(sf::Vector2f(2, 2));
+
+    enemy->addComponent(
+        std::make_shared<ecs::RenderComponent>(ecs::ObjectType::SPRITE));
+    enemy->addComponent(
+        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(enemySP, 2, 2));
 
     add_entity(enemy);
 }
@@ -84,11 +87,14 @@ void client::enemyShoot(std::vector<std::string> &tokens)
         std::make_shared<ecs::PositionComponent>(x + 100, y + 25));
     bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
 
-    bullet->addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::ObjectType::SPRITE, _refRender.getBulletTexture()));
+    bullet->addComponent(
+        std::make_shared<ecs::RenderComponent>(ecs::ObjectType::SPRITE));
 
-    bullet->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
-        sf::Rect(137, 153, 64, 16));
+    sf::Sprite bulletSP(_refRender.getBulletTexture());
+    bulletSP.setTextureRect(sf::Rect(137, 153, 64, 16));
+
+    bullet->addComponent(
+        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(bulletSP, 1, 1));
     _entities.push_back(bullet);
 }
 

@@ -17,7 +17,6 @@ void ecs::PositionSystem::update(
         auto velocityComponent =
             entity->getComponent<ecs::VelocityComponent>();
         auto bullet = entity->getComponent<ecs::BulletComponent>();
-        auto render = entity->getComponent<ecs::RenderComponent>();
 
         if (positionComponent && velocityComponent && !bullet) {
             float newX = static_cast<float>(positionComponent->getX())
@@ -29,13 +28,21 @@ void ecs::PositionSystem::update(
             positionComponent->setY(newY);
 
             if (!isServer) {
-                float maxX = float(window->getSize().x)
-                    - float(render->getSprite()->getTextureRect().width)
-                    - float(render->getSprite()->getScale().x);
+                auto sprite =
+                    entity->getComponent<SpriteComponent<sf::Sprite>>();
 
-                float maxY = float(window->getSize().y)
-                    - float(render->getSprite()->getTextureRect().height)
-                    - float(render->getSprite()->getScale().y);
+                float maxX = 0;
+                float maxY = 0;
+
+                if (sprite) {
+                    maxX = (float) window->getSize().x
+                        - (float) sprite->getSprite().getTextureRect().width
+                        - (float) sprite->getSprite().getScale().x;
+
+                    maxY = (float) window->getSize().y
+                        - (float) sprite->getSprite().getTextureRect().height
+                        - (float) sprite->getSprite().getScale().y;
+                }
 
                 if (positionComponent->getX() < 0) {
                     positionComponent->setX(0);
