@@ -76,7 +76,12 @@ namespace ecs
 
     class EnemyComponent : public Component {
       public:
-        explicit EnemyComponent();
+        explicit EnemyComponent(const std::string &name);
+        std::string getName() const;
+        void setName(const std::string &name);
+
+      private:
+        std::string _name;
     };
 
     enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };

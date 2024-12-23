@@ -15,7 +15,6 @@
 
 #include "Engine.hpp"
 #include "Entity.hpp"
-#include "Networking.hpp"
 #include "RenderClass.hpp"
 #include "Systems.hpp"
 #include "system_network.hpp"
