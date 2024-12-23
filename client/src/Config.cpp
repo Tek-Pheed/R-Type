@@ -62,7 +62,7 @@ void Config::validateOrCreateConfig()
         newfile << "MOVE_DOWN=sf::Keyboard::Down\n";
         newfile << "SOUND_VOLUME=50\n";
         newfile << "RESOLUTION=1920x1080\n";
-        newfile << "AUTO_FIRE=ON\n";
+        newfile << "AUTO_FIRE=true\n";
         newfile.close();
         return;
     }
@@ -93,9 +93,9 @@ void Config::validateOrCreateConfig()
             }
         } else if (lineCount == 6) {
             std::string autoFire = line.substr(expectedKeys[lineCount].size());
-            if (autoFire != "ON" && autoFire != "OFF") {
+            if (autoFire != "true" && autoFire != "false") {
                 throw ErrorClass(
-                    "RTC012 : Invalid config: AUTO_FIRE must be ON or OFF.");
+                    "RTC012 : Invalid config: AUTO_FIRE must be true or false.");
             }
         }
 
