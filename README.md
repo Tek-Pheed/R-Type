@@ -58,3 +58,5 @@ The project was developed by the following team members:
 - **[Scandella Raphaël]**
 - **[AUGAIT Arnaud]**
 - **[NASSET Samy]**
+
+### Go see our MdBook ! Our whole documentation can be seen there : [Documentation](https://r-type.leafs-studio.com/)

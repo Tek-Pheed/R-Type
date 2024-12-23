@@ -29,10 +29,15 @@ The project is developed using the following libraries:
 ## 3. How to Launch
 Soon
 
-## 4. Authors
+## 4. Benchmarks
+Benchmarks have been made in order to choose the best way to realise this project, one for the languages and one for the graphical libraries.
+You can find the [Benchmarks](./benchmarks.md) here.
+
+## 5. Authors
 The project was developed by the following team members:
 - **[RICARD Alexandre]**
 - **[Loustalot Lucas]**
 - **[Scandella Raphaël]**
 - **[AUGAIT Arnaud]**
 - **[NASSET Samy]**
+

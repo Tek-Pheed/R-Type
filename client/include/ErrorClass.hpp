@@ -15,7 +15,6 @@ class ErrorClass : public std::runtime_error {
 
     public:
         explicit ErrorClass(const std::string &message);
-        explicit ErrorClass(const char *message);
 
 };
 
