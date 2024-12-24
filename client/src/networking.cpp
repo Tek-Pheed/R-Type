@@ -24,7 +24,7 @@
 client::client(RenderClass &render)
     : _clientSocketTCP(System::Network::TCPSocket()),
       _clientSocketUDP(System::Network::UDPSocket()), _id(-1),
-      _refRender(render)
+      _player((std::size_t) rand()), _refRender(render)
 {
     return;
 }

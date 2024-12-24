@@ -145,25 +145,24 @@ void RenderClass::renderWindow(client &client)
         playEvent(client, client.get_entities());
         this->_window.draw(background_s);
         positionSystem.update(
-            client.get_entities(), &this->_window, deltaTime, false);
+            client.get_entities(), this->_window, deltaTime, false);
         client.update_localplayer_position();
         renderSystem.update(
-            client.get_entities(), &this->_window, deltaTime, false);
+            client.get_entities(), this->_window, deltaTime, false);
         client.manage_buffers();
         bulletSystem.update(
-            client.get_entities(), &this->_window, deltaTime, false);
+            client.get_entities(), this->_window, deltaTime, false);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
     }
 }
 
-void RenderClass::playEvent(
-    client &client, std::vector<std::shared_ptr<ecs::Entity>> &entities)
+void RenderClass::playEvent(client &client, std::vector<ecs::Entity> &entities)
 {
     sf::Event event;
     std::stringstream ss;
-    auto player = client.getLocalPlayer();
-    auto velocity = player->getComponent<ecs::VelocityComponent>();
+    auto &player = client.getLocalPlayer();
+    auto velocity = player.getComponent<ecs::VelocityComponent>();
 
     while (this->_window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -183,21 +182,20 @@ void RenderClass::playEvent(
                 velocity->setVx(-200.0f);
                 this->playerAnimations(player, "left");
             } else if (event.key.code == sf::Keyboard::Space) {
-                auto bullet = std::make_shared<ecs::Entity>(rand());
-                bullet->addComponent(
-                    std::make_shared<ecs::BulletComponent>(1));
-                bullet->addComponent(std::make_shared<ecs::PositionComponent>(
-                    player->getComponent<ecs::PositionComponent>()->getX()
+                auto bullet = ecs::Entity((std::size_t) rand());
+                bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
+                bullet.addComponent(std::make_shared<ecs::PositionComponent>(
+                    player.getComponent<ecs::PositionComponent>()->getX()
                         + 100,
-                    player->getComponent<ecs::PositionComponent>()->getY()
+                    player.getComponent<ecs::PositionComponent>()->getY()
                         + 25));
-                bullet->addComponent(
+                bullet.addComponent(
                     std::make_shared<ecs::VelocityComponent>(350.0f, 0));
                 sf::Sprite sprite(this->_bulletTexture);
                 sprite.setTextureRect(sf::Rect(137, 153, 64, 16));
-                bullet->addComponent(std::make_shared<ecs::RenderComponent>(
+                bullet.addComponent(std::make_shared<ecs::RenderComponent>(
                     ecs::ObjectType::SPRITE));
-                bullet->addComponent(
+                bullet.addComponent(
                     std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
                         sprite, 0, 0));
                 ss << "104 " << client.get_id() << "\t\n";
@@ -220,19 +218,18 @@ void RenderClass::playEvent(
     }
 }
 
-void RenderClass::playerAnimations(
-    std::shared_ptr<ecs::Entity> player, std::string direction)
+void RenderClass::playerAnimations(ecs::Entity &player, std::string direction)
 {
     if (direction == "top") {
-        player->getComponent<ecs::SpriteComponent<sf::Sprite>>()
+        player.getComponent<ecs::SpriteComponent<sf::Sprite>>()
             ->getSprite()
             .setTextureRect(sf::Rect(132, 0, 33, 14));
     } else if (direction == "down") {
-        player->getComponent<ecs::SpriteComponent<sf::Sprite>>()
+        player.getComponent<ecs::SpriteComponent<sf::Sprite>>()
             ->getSprite()
             .setTextureRect(sf::Rect(0, 0, 33, 14));
     } else {
-        player->getComponent<ecs::SpriteComponent<sf::Sprite>>()
+        player.getComponent<ecs::SpriteComponent<sf::Sprite>>()
             ->getSprite()
             .setTextureRect(sf::Rect(66, 0, 33, 14));
     }

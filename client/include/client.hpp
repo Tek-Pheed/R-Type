@@ -31,12 +31,12 @@ class client {
     void handle_enemy(int code, std::vector<std::string> &tokens);
     void handle_terrain(int code, std::vector<std::string> &tokens);
     void handle_mechs(int code, std::vector<std::string> &tokens);
-    void add_entity(std::shared_ptr<ecs::Entity> entity);
-    std::vector<std::shared_ptr<ecs::Entity>> &get_entities();
+    void add_entity(ecs::Entity &entity);
+    std::vector<ecs::Entity> &get_entities();
     int get_id();
 
     void update_localplayer_position();
-    std::shared_ptr<ecs::Entity> &getLocalPlayer();
+    ecs::Entity &getLocalPlayer();
 
     // Player Management
     void handlePlayer(int code, std::vector<std::string> &tokens);
@@ -58,10 +58,10 @@ class client {
     System::Network::UDPSocket _clientSocketUDP;
 
     int _id;
-    std::shared_ptr<ecs::Entity> _player;
+    ecs::Entity _player;
     std::vector<std::string> _buffers;
     std::mutex _mutex;
-    std::vector<std::shared_ptr<ecs::Entity>> _entities;
+    std::vector<ecs::Entity> _entities;
     RenderClass &_refRender;
 };
 

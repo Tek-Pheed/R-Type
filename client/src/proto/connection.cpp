@@ -13,8 +13,8 @@
 void set_id_player(client &client)
 {
     for (auto &entity : client.get_entities()) {
-        if (entity->getID() == static_cast<std::size_t>(-1)) {
-            entity->setID(static_cast<std::size_t>(client.get_id()));
+        if (entity.getID() == static_cast<std::size_t>(-1)) {
+            entity.setID(static_cast<std::size_t>(client.get_id()));
             break;
         }
     }

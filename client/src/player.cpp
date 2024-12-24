@@ -11,14 +11,14 @@
 #include "RenderClass.hpp"
 #include "client.hpp"
 
-std::shared_ptr<ecs::Entity> &client::getLocalPlayer()
+ecs::Entity &client::getLocalPlayer()
 {
     return _player;
 }
 
 void client::update_localplayer_position()
 {
-    auto position = _player->getComponent<ecs::PositionComponent>();
+    auto position = _player.getComponent<ecs::PositionComponent>();
     if (position) {
         float oldX = position->getOldX();
         float oldY = position->getOldY();
