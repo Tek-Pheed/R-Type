@@ -278,6 +278,19 @@ namespace ecs
         std::string _name;
     };
 
+	enum Bonus { RAPIDFIRE, DOUBLEFIRE, TRIPLEFIRE, ALLIES };
+
+    class BonusComponent : public Component {
+      public:
+        explicit BonusComponent(const Bonus &bonus);
+
+        Bonus getBonus();
+        void setBonus(const Bonus &bonus);
+
+      private:
+        Bonus _bonus;
+    };
+
     // class ReplicationComponent : public Component {
     //     enum ReplicationMode { NO_REPLICATION, OTHER_ONLY, MULTICAST };
     //     enum ReplicationMethod { FAST, RELIABLE };
