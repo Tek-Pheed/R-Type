@@ -40,16 +40,53 @@ The project is developed using the following libraries:
 
 - **SFML (Simple and Fast Multimedia Library)**: Used for graphics, audio, and
   event handling.
-    - [Official SFML Website](https://www.sfml-dev.org/)
+  - [Official SFML Website](https://www.sfml-dev.org/)
 - **Criterion**: For unit testing during development.
-    - [Criterion](https://github.com/Snaipe/Criterion)
+  - [Criterion](https://github.com/Snaipe/Criterion)
 
-## 3. Documentation
+## 3. How to Launch
 
-You can found a complete technical
-documentation [here](https://r-type.leafs-studio.com)
+### Build and launch R-Type
 
-## 4. Authors
+This projet works with Dockerfile.
+
+First build the docker image :
+
+```bash
+docker build -f Dockerfile -t r-type:latest .
+```
+
+Now run it :
+
+```bash
+docker run --rm -it -v $PWD/r-type/ r-type
+```
+
+Once inside you can run the following command for building the projet:
+
+```bash
+./tools/build-linux.sh
+```
+
+### Read the documentation
+
+You can run the mdbook server who contains the documentation of the project :
+
+```bash
+cd docs/
+docker build -f Dockerfile -t r-type-mdbook:latest .
+docker run --rm -it r-type-mdbook
+```
+
+or you can go [here](https://r-type.leafs-studio.com) to see it !
+
+## 4. Benchmarks
+
+Benchmarks have been made in order to choose the best way to realise this
+project, one for the languages and one for the graphical libraries.
+You can find the [Benchmarks](./benchmarks.md) here.
+
+## 5. Authors
 
 The project was developed by the following team members:
 
@@ -59,4 +96,3 @@ The project was developed by the following team members:
 - **[AUGAIT Arnaud]**
 - **[NASSET Samy]**
 
-### Go see our MdBook ! Our whole documentation can be seen there : [Documentation](https://r-type.leafs-studio.com/)
