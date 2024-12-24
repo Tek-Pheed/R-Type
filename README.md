@@ -40,9 +40,9 @@ The project is developed using the following libraries:
 
 - **SFML (Simple and Fast Multimedia Library)**: Used for graphics, audio, and
   event handling.
-    - [Official SFML Website](https://www.sfml-dev.org/)
+  - [Official SFML Website](https://www.sfml-dev.org/)
 - **Criterion**: For unit testing during development.
-    - [Criterion](https://github.com/Snaipe/Criterion)
+  - [Criterion](https://github.com/Snaipe/Criterion)
 
 ## 3. How to Launch
 
