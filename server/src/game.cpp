@@ -62,7 +62,8 @@ void server::gameUpdate(long deltaTimeMs)
             (unsigned int) rand(), randRange(800, 1200), randRange(50, 700));
     }
 
-    positionSystem.update(_gameState, nullptr, (float) deltaTimeMs / 1000, true);
+    positionSystem.update(
+        _gameState, nullptr, (float) deltaTimeMs / 1000, true);
     bulletSystem.update(_gameState, nullptr, (float) deltaTimeMs / 1000, true);
 
     auto bullets = getEntitiesByComponent<ecs::BulletComponent>();
