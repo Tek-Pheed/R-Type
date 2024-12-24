@@ -7,6 +7,9 @@
 
 #include "Components.hpp"
 
-ecs::EnemyComponent::EnemyComponent()
+namespace ecs
 {
-}
+    EnemyComponent::EnemyComponent()
+    {
+    }
+} // namespace ecs

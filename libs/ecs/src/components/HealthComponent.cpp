@@ -7,22 +7,25 @@
 
 #include "Components.hpp"
 
-ecs::HealthComponent::HealthComponent()
+namespace ecs
 {
-    this->_health = 100;
-}
+    HealthComponent::HealthComponent()
+    {
+        this->_health = 100;
+    }
 
-ecs::HealthComponent::HealthComponent(int health)
-{
-    this->_health = health;
-}
+    HealthComponent::HealthComponent(int health)
+    {
+        this->_health = health;
+    }
 
-int ecs::HealthComponent::getHealth()
-{
-    return this->_health;
-}
+    int HealthComponent::getHealth()
+    {
+        return this->_health;
+    }
 
-void ecs::HealthComponent::setHealth(int health)
-{
-    this->_health = health;
-}
+    void HealthComponent::setHealth(int health)
+    {
+        this->_health = health;
+    }
+} // namespace ecs

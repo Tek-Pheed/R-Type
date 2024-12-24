@@ -7,21 +7,24 @@
 
 #include "Entity.hpp"
 
-ecs::Entity::Entity(std::size_t id)
+namespace ecs
 {
-    this->_id = id;
-}
+    Entity::Entity(std::size_t id)
+    {
+        this->_id = id;
+    }
 
-ecs::Entity::~Entity()
-{
-}
+    Entity::~Entity()
+    {
+    }
 
-std::size_t ecs::Entity::getID() const
-{
-    return this->_id;
-}
+    std::size_t Entity::getID() const
+    {
+        return this->_id;
+    }
 
-void ecs::Entity::setID(std::size_t id)
-{
-    this->_id = id;
-}
+    void Entity::setID(std::size_t id)
+    {
+        this->_id = id;
+    }
+} // namespace ecs

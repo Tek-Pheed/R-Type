@@ -7,52 +7,55 @@
 
 #include "Components.hpp"
 
-ecs::PositionComponent::PositionComponent(float x, float y)
+namespace ecs
 {
-    this->_x = x;
-    this->_y = y;
-    this->_oldX = x;
-    this->_oldY = y;
-}
+    PositionComponent::PositionComponent(float x, float y)
+    {
+        this->_x = x;
+        this->_y = y;
+        this->_oldX = x;
+        this->_oldY = y;
+    }
 
-float ecs::PositionComponent::getX()
-{
-    return this->_x;
-}
+    float PositionComponent::getX()
+    {
+        return this->_x;
+    }
 
-float ecs::PositionComponent::getY()
-{
-    return this->_y;
-}
+    float PositionComponent::getY()
+    {
+        return this->_y;
+    }
 
-float ecs::PositionComponent::getOldX()
-{
-    return this->_oldX;
-}
+    float PositionComponent::getOldX()
+    {
+        return this->_oldX;
+    }
 
-float ecs::PositionComponent::getOldY()
-{
-    return this->_oldY;
-}
+    float PositionComponent::getOldY()
+    {
+        return this->_oldY;
+    }
 
-void ecs::PositionComponent::setX(float x)
-{
-    this->setOldX(this->_x);
-    this->_x = x;
-}
+    void PositionComponent::setX(float x)
+    {
+        this->setOldX(this->_x);
+        this->_x = x;
+    }
 
-void ecs::PositionComponent::setY(float y)
-{
-    this->setOldY(this->_y);
-    this->_y = y;
-}
+    void PositionComponent::setY(float y)
+    {
+        this->setOldY(this->_y);
+        this->_y = y;
+    }
 
-void ecs::PositionComponent::setOldX(float oldX)
-{
-    this->_oldX = oldX;
-}
+    void PositionComponent::setOldX(float oldX)
+    {
+        this->_oldX = oldX;
+    }
 
-void ecs::PositionComponent::setOldY(float oldY)
-{
-    this->_oldY = oldY;
-}
+    void PositionComponent::setOldY(float oldY)
+    {
+        this->_oldY = oldY;
+    }
+} // namespace ecs

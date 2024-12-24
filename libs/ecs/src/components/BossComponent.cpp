@@ -7,6 +7,9 @@
 
 #include "Components.hpp"
 
-ecs::BossComponent::BossComponent()
+namespace ecs
 {
-}
+    BossComponent::BossComponent()
+    {
+    }
+} // namespace ecs
