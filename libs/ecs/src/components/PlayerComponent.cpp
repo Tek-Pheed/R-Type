@@ -7,6 +7,9 @@
 
 #include "Components.hpp"
 
-ecs::PlayerComponent::PlayerComponent()
+namespace ecs
 {
-}
+    PlayerComponent::PlayerComponent()
+    {
+    }
+} // namespace ecs

@@ -7,22 +7,25 @@
 
 #include "Components.hpp"
 
-ecs::BulletComponent::BulletComponent()
+namespace ecs
 {
-    this->_isFromPlayer = false;
-}
+    BulletComponent::BulletComponent()
+    {
+        this->_isFromPlayer = false;
+    }
 
-ecs::BulletComponent::BulletComponent(bool isFromPlayer)
-{
-    this->_isFromPlayer = isFromPlayer;
-}
+    BulletComponent::BulletComponent(bool isFromPlayer)
+    {
+        this->_isFromPlayer = isFromPlayer;
+    }
 
-bool ecs::BulletComponent::getIsFromPlayer()
-{
-    return this->_isFromPlayer;
-}
+    bool BulletComponent::getIsFromPlayer()
+    {
+        return this->_isFromPlayer;
+    }
 
-void ecs::BulletComponent::setIsFromPlayer(bool isFromPlayer)
-{
-    this->_isFromPlayer = isFromPlayer;
-}
+    void BulletComponent::setIsFromPlayer(bool isFromPlayer)
+    {
+        this->_isFromPlayer = isFromPlayer;
+    }
+} // namespace ecs

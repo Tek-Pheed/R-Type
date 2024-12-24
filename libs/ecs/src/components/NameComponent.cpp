@@ -7,17 +7,20 @@
 
 #include "Components.hpp"
 
-ecs::NameComponent::NameComponent(const std::string &name)
+namespace ecs
 {
-    this->_name = name;
-}
+    NameComponent::NameComponent(const std::string &name)
+    {
+        this->_name = name;
+    }
 
-std::string ecs::NameComponent::getName() const
-{
-    return this->_name;
-}
+    std::string NameComponent::getName() const
+    {
+        return this->_name;
+    }
 
-void ecs::NameComponent::setName(const std::string &name)
-{
-    this->_name = name;
-}
+    void NameComponent::setName(const std::string &name)
+    {
+        this->_name = name;
+    }
+} // namespace ecs

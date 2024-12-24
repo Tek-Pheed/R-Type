@@ -7,28 +7,31 @@
 
 #include "Components.hpp"
 
-ecs::VelocityComponent::VelocityComponent(float vx, float vy)
+namespace ecs
 {
-    this->_vx = vx;
-    this->_vy = vy;
-}
+    VelocityComponent::VelocityComponent(float vx, float vy)
+    {
+        this->_vx = vx;
+        this->_vy = vy;
+    }
 
-float ecs::VelocityComponent::getVx()
-{
-    return this->_vx;
-}
+    float VelocityComponent::getVx()
+    {
+        return this->_vx;
+    }
 
-float ecs::VelocityComponent::getVy()
-{
-    return this->_vy;
-}
+    float VelocityComponent::getVy()
+    {
+        return this->_vy;
+    }
 
-void ecs::VelocityComponent::setVx(float vx)
-{
-    this->_vx = vx;
-}
+    void VelocityComponent::setVx(float vx)
+    {
+        this->_vx = vx;
+    }
 
-void ecs::VelocityComponent::setVy(float vy)
-{
-    this->_vy = vy;
-}
+    void VelocityComponent::setVy(float vy)
+    {
+        this->_vy = vy;
+    }
+} // namespace ecs
