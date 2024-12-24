@@ -8,7 +8,7 @@
 #include "Systems.hpp"
 
 void ecs::PositionSystem::update(std::vector<ecs::Entity> &entities,
-    sf::RenderWindow *window, float deltaTime, bool isServer)
+    sf::RenderWindow &window, float deltaTime, bool isServer)
 {
     for (auto &entity : entities) {
         auto positionComponent = entity.getComponent<ecs::PositionComponent>();
@@ -32,11 +32,11 @@ void ecs::PositionSystem::update(std::vector<ecs::Entity> &entities,
                 float maxY = 0;
 
                 if (sprite) {
-                    maxX = (float) window->getSize().x
+                    maxX = (float) window.getSize().x
                         - (float) sprite->getSprite().getTextureRect().width
                         - (float) sprite->getSprite().getScale().x;
 
-                    maxY = (float) window->getSize().y
+                    maxY = (float) window.getSize().y
                         - (float) sprite->getSprite().getTextureRect().height
                         - (float) sprite->getSprite().getScale().y;
                 }

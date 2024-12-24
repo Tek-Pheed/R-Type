@@ -9,7 +9,7 @@
 #include "Systems.hpp"
 
 void ecs::RenderSystem::update(std::vector<ecs::Entity> &entities,
-    sf::RenderWindow *window, float deltaTime, bool isServer)
+    sf::RenderWindow &window, float deltaTime, bool isServer)
 {
     (void) deltaTime;
     (void) isServer;
@@ -23,7 +23,7 @@ void ecs::RenderSystem::update(std::vector<ecs::Entity> &entities,
                 entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
             sprite->getSprite().setPosition(
                 position->getX(), position->getY());
-            window->draw(sprite->getSprite());
+            window.draw(sprite->getSprite());
         } else if (renderComponent->getObjectType()
             == ecs::ObjectType::RECTANGLE) {
             auto rectangle = entity.getComponent<
@@ -33,7 +33,7 @@ void ecs::RenderSystem::update(std::vector<ecs::Entity> &entities,
             rectangle->getRectangle().setFillColor(sf::Color::Red);
             rectangle->getRectangle().setSize(sf::Vector2f(
                 (float) rectangle->getSizeX(), (float) rectangle->getSizeY()));
-            window->draw(rectangle->getRectangle());
+            window.draw(rectangle->getRectangle());
         } else if (renderComponent->getObjectType()
             == ecs::ObjectType::CIRCLE) {
             auto circle =
@@ -42,7 +42,7 @@ void ecs::RenderSystem::update(std::vector<ecs::Entity> &entities,
                 position->getX(), position->getY());
             circle->getCircle().setFillColor(sf::Color::Green);
             circle->getCircle().setRadius((float) circle->getRadius());
-            window->draw(circle->getCircle());
+            window.draw(circle->getCircle());
         }
     }
 }

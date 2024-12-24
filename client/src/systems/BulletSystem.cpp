@@ -8,7 +8,7 @@
 #include "Systems.hpp"
 
 void ecs::BulletSystem::update(std::vector<ecs::Entity> &entities,
-    sf::RenderWindow *window, float deltaTime, bool isServer)
+    sf::RenderWindow &window, float deltaTime, bool isServer)
 {
     std::vector<ecs::Entity> bulletToRemove;
 
@@ -22,9 +22,9 @@ void ecs::BulletSystem::update(std::vector<ecs::Entity> &entities,
             position->setX(position->getX() + velocity->getVx() * deltaTime);
             position->setY(position->getY() + velocity->getVy() * deltaTime);
 
-            if (position->getX() >= (float) window->getSize().x
+            if (position->getX() >= (float) window.getSize().x
                 || position->getX() < 0
-                || position->getY() >= (float) window->getSize().y
+                || position->getY() >= (float) window.getSize().y
                 || position->getY() < 0) {
                 bulletToRemove.push_back(entity);
                 continue;
