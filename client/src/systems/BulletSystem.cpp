@@ -7,38 +7,33 @@
 
 #include "Systems.hpp"
 
-void ecs::BulletSystem::update(
-    std::vector<std::shared_ptr<ecs::Entity>> &entities,
+void ecs::BulletSystem::update(std::vector<ecs::Entity> &entities,
     sf::RenderWindow *window, float deltaTime, bool isServer)
 {
-    std::vector<std::shared_ptr<ecs::Entity>> bulletToRemove;
+    std::vector<ecs::Entity> bulletToRemove;
 
     for (auto &entity : entities) {
-        auto bullet = entity->getComponent<ecs::BulletComponent>();
+        auto bullet = entity.getComponent<ecs::BulletComponent>();
 
-        if (bullet) {
-            auto position = entity->getComponent<ecs::PositionComponent>();
-            auto velocity = entity->getComponent<ecs::VelocityComponent>();
+        if (bullet && !isServer) {
+            auto position = entity.getComponent<ecs::PositionComponent>();
+            auto velocity = entity.getComponent<ecs::VelocityComponent>();
 
-            if (position && velocity) {
-                position->setX(
-                    position->getX() + velocity->getVx() * deltaTime);
-                position->setY(
-                    position->getY() + velocity->getVy() * deltaTime);
+            position->setX(position->getX() + velocity->getVx() * deltaTime);
+            position->setY(position->getY() + velocity->getVy() * deltaTime);
 
-                if (!isServer) {
-                    if (position->getX() >= (float) window->getSize().x
-                        || position->getX() < 0) {
-                        bulletToRemove.push_back(entity);
-                        continue;
-                    }
-                }
+            if (position->getX() >= (float) window->getSize().x
+                || position->getX() < 0
+                || position->getY() >= (float) window->getSize().y
+                || position->getY() < 0) {
+                bulletToRemove.push_back(entity);
+                continue;
             }
         }
     }
 
-    for (auto &bullet : bulletToRemove) {
+    /*for (auto &bullet : bulletToRemove) {
         entities.erase(std::remove(entities.begin(), entities.end(), bullet),
             entities.end());
-    }
+    }*/
 }

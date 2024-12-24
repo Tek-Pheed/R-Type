@@ -7,16 +7,13 @@
 
 #include "Systems.hpp"
 
-void ecs::PositionSystem::update(
-    std::vector<std::shared_ptr<ecs::Entity>> &entities,
+void ecs::PositionSystem::update(std::vector<ecs::Entity> &entities,
     sf::RenderWindow *window, float deltaTime, bool isServer)
 {
     for (auto &entity : entities) {
-        auto positionComponent =
-            entity->getComponent<ecs::PositionComponent>();
-        auto velocityComponent =
-            entity->getComponent<ecs::VelocityComponent>();
-        auto bullet = entity->getComponent<ecs::BulletComponent>();
+        auto positionComponent = entity.getComponent<ecs::PositionComponent>();
+        auto velocityComponent = entity.getComponent<ecs::VelocityComponent>();
+        auto bullet = entity.getComponent<ecs::BulletComponent>();
 
         if (positionComponent && velocityComponent && !bullet) {
             float newX = static_cast<float>(positionComponent->getX())
@@ -29,7 +26,7 @@ void ecs::PositionSystem::update(
 
             if (!isServer) {
                 auto sprite =
-                    entity->getComponent<SpriteComponent<sf::Sprite>>();
+                    entity.getComponent<SpriteComponent<sf::Sprite>>();
 
                 float maxX = 0;
                 float maxY = 0;

@@ -16,25 +16,25 @@ namespace ecs
 {
     class ISystem {
       public:
-        virtual void update(std::vector<std::shared_ptr<ecs::Entity>> &entity,
+        virtual void update(std::vector<ecs::Entity> &entity,
             sf::RenderWindow *window, float deltaTime, bool isServer) = 0;
     };
 
     class RenderSystem : public ISystem {
       public:
-        void update(std::vector<std::shared_ptr<ecs::Entity>> &entity,
-            sf::RenderWindow *window, float deltaTime, bool isServer) override;
+        void update(std::vector<ecs::Entity> &entity, sf::RenderWindow *window,
+            float deltaTime, bool isServer) override;
     };
 
     class PositionSystem : public ISystem {
       public:
-        void update(std::vector<std::shared_ptr<ecs::Entity>> &entities,
+        void update(std::vector<ecs::Entity> &entities,
             sf::RenderWindow *window, float deltaTime, bool isServer) override;
     };
 
     class BulletSystem : public ISystem {
       public:
-        void update(std::vector<std::shared_ptr<ecs::Entity>> &entities,
+        void update(std::vector<ecs::Entity> &entities,
             sf::RenderWindow *window, float deltaTime, bool isServer) override;
     };
 } // namespace ecs

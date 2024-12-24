@@ -8,26 +8,25 @@
 #include "Components.hpp"
 #include "Systems.hpp"
 
-void ecs::RenderSystem::update(
-    std::vector<std::shared_ptr<ecs::Entity>> &entities,
+void ecs::RenderSystem::update(std::vector<ecs::Entity> &entities,
     sf::RenderWindow *window, float deltaTime, bool isServer)
 {
     (void) deltaTime;
     (void) isServer;
 
     for (auto &entity : entities) {
-        auto renderComponent = entity->getComponent<RenderComponent>();
-        auto position = entity->getComponent<PositionComponent>();
+        auto renderComponent = entity.getComponent<ecs::RenderComponent>();
+        auto position = entity.getComponent<ecs::PositionComponent>();
 
         if (renderComponent->getObjectType() == ecs::ObjectType::SPRITE) {
             auto sprite =
-                entity->getComponent<ecs::SpriteComponent<sf::Sprite>>();
+                entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
             sprite->getSprite().setPosition(
                 position->getX(), position->getY());
             window->draw(sprite->getSprite());
         } else if (renderComponent->getObjectType()
             == ecs::ObjectType::RECTANGLE) {
-            auto rectangle = entity->getComponent<
+            auto rectangle = entity.getComponent<
                 ecs::RectangleComponent<sf::RectangleShape>>();
             rectangle->getRectangle().setPosition(
                 position->getX(), position->getY());
@@ -38,7 +37,7 @@ void ecs::RenderSystem::update(
         } else if (renderComponent->getObjectType()
             == ecs::ObjectType::CIRCLE) {
             auto circle =
-                entity->getComponent<ecs::CircleComponent<sf::CircleShape>>();
+                entity.getComponent<ecs::CircleComponent<sf::CircleShape>>();
             circle->getCircle().setPosition(
                 position->getX(), position->getY());
             circle->getCircle().setFillColor(sf::Color::Green);

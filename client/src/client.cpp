@@ -10,20 +10,17 @@
 #endif
 
 #include "client.hpp"
-#include <ctime>
 #include <memory>
 #include <thread>
 #include <vector>
-#include "Entity.hpp"
 #include "RenderClass.hpp"
-#include "system_network.hpp"
 
-void client::add_entity(std::shared_ptr<ecs::Entity> entity)
+void client::add_entity(ecs::Entity &entity)
 {
     _entities.push_back(entity);
 }
 
-std::vector<std::shared_ptr<ecs::Entity>> &client::get_entities()
+std::vector<ecs::Entity> &client::get_entities()
 {
     return _entities;
 }
@@ -38,16 +35,16 @@ void create_player(client &client, RenderClass &render)
     auto &player = client.getLocalPlayer();
     sf::Sprite playerSP(render.getPlayerTexture());
 
-    player = std::make_shared<ecs::Entity>(client.get_id());
-    player->addComponent(std::make_shared<ecs::PlayerComponent>());
-    player->addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
-    player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
-    player->addComponent(
+    player = ecs::Entity((std::size_t) client.get_id());
+    player.addComponent(std::make_shared<ecs::PlayerComponent>());
+    player.addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
+    player.addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
+    player.addComponent(
         std::make_shared<ecs::RenderComponent>(ecs::ObjectType::SPRITE));
     playerSP.setTextureRect(sf::Rect(66, 0, 33, 14));
     playerSP.setScale(sf::Vector2f(3, 3));
     playerSP.setPosition(100, 100);
-    player->addComponent(
+    player.addComponent(
         std::make_shared<ecs::SpriteComponent<sf::Sprite>>(playerSP, 3, 3));
     client.add_entity(player);
 }
