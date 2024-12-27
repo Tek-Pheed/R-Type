@@ -98,15 +98,15 @@
 #include "game.hpp"
 
 Game::Game(Engine::Core &engineRef)
-    : _refGameEngine(engineRef),
-      _entityManager(engineRef.getFeature<Engine::Feature::ECSManager>()),
-      _assetManager(engineRef.getFeature<Engine::Feature::AssetManager>())
+    : refGameEngine(engineRef),
+      entityManager(engineRef.getFeature<Engine::Feature::ECSManager<Game>>()),
+      assetManager(engineRef.getFeature<Engine::Feature::AssetManager>())
 {
 }
 
 Game::~Game()
 {
-    _refGameEngine.stop();
+    refGameEngine.stop();
 }
 
 bool Game::getServerMode()
@@ -121,7 +121,7 @@ void Game::setServerMode(bool mode)
 
 ecs::Entity &Game::getLocalPlayer()
 {
-    return (_entityManager.getEntityById(_PlayerId));
+    return (entityManager.getEntityById(_PlayerId));
 }
 
 size_t Game::getPlayerId()
@@ -132,6 +132,11 @@ size_t Game::getPlayerId()
 int Game::manageBuffers()
 {
     return 0;
+}
+
+bool Game::isServer() const
+{
+    return (_isServer);
 }
 
 void Game::updateLocalPlayerPosition()
@@ -146,17 +151,16 @@ void Game::updateLocalPlayerPosition()
         if (oldX != x || oldY != y) {
             std::stringstream ss;
             ss << "102 " << _PlayerId << " " << x << " " << y << "\t\n";
-            //writeToServer(ss.str(), System::Network::ISocket::UDP);
+            // writeToServer(ss.str(), System::Network::ISocket::UDP);
         }
     }
 }
 
 void Game::gameLoop(float deltaTime)
 {
-    auto &manager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
-    auto &posSystem = manager.getSubsystem<PositionSystem>();
-    auto &renderSystem = manager.getSubsystem<RenderSystem>();
-    auto &bulletSystem = manager.getSubsystem<BulletSystem>();
+    auto &posSystem = entityManager.getSubsystem<PositionSystem>();
+    auto &renderSystem = entityManager.getSubsystem<RenderSystem>();
+    auto &bulletSystem = entityManager.getSubsystem<BulletSystem>();
 
     (void) posSystem;
     (void) renderSystem;
@@ -184,19 +188,14 @@ void Game::gameLoop(float deltaTime)
 
 std::vector<ecs::Entity> &Game::getEntities()
 {
-    auto &manager =
-        this->_refGameEngine.getFeature<Engine::Feature::ECSManager>();
-
-    return (manager.getEntitiesVect());
+    return (entityManager.getEntitiesVect());
 }
 
 void Game::playEvent()
 {
     sf::Event event;
     std::stringstream ss;
-    auto &ecsManager =
-        _refGameEngine.getFeature<Engine::Feature::ECSManager>();
-    auto &player = ecsManager.getEntityById(_PlayerId);
+    auto &player = entityManager.getEntityById(_PlayerId);
     auto velocity = player.getComponent<ecs::VelocityComponent>();
 
     while (_window->pollEvent(event)) {

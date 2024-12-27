@@ -7,14 +7,15 @@
 
 #include "Components.hpp"
 #include "GameSystems.hpp"
+#include "game.hpp"
 
-void PositionSystem::initSystem(sf::RenderWindow *win)
+void PositionSystem::initSystem(Game &gameRef)
 {
-    _win = win;
+    _game = &gameRef;
 }
 
 void PositionSystem::update(
-    std::vector<ecs::Entity> &entities, float deltaTime, bool isServer)
+    std::vector<ecs::Entity> &entities, float deltaTime)
 {
     for (auto &entity : entities) {
         auto positionComponent = entity.getComponent<ecs::PositionComponent>();
@@ -30,7 +31,7 @@ void PositionSystem::update(
             positionComponent->setX(newX);
             positionComponent->setY(newY);
 
-            if (!isServer) {
+            if (!this->_game->isServer()) {
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
@@ -38,11 +39,11 @@ void PositionSystem::update(
                 float maxY = 0;
 
                 if (sprite) {
-                    maxX = (float) _win->getSize().x
+                    maxX = (float) _game->getWindow().getSize().x
                         - (float) sprite->getSprite().getTextureRect().width
                         - (float) sprite->getSprite().getScale().x;
 
-                    maxY = (float) _win->getSize().y
+                    maxY = (float) _game->getWindow().getSize().y
                         - (float) sprite->getSprite().getTextureRect().height
                         - (float) sprite->getSprite().getScale().y;
                 }

@@ -28,14 +28,14 @@ void Game::LoadTexture()
         "playerTexture", "enemyTexture", "bulletTexture", "backgroundTexture"};
 
     for (size_t i = 0; i < sizeof(files) / sizeof(files[0]); i++) {
-        _assetManager.loadAsset(
+        assetManager.loadAsset(
             files[i], names[i], &sf::Texture::loadFromFile, sf::IntRect());
     }
-    _assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
-    _assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
+    assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
+    assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
     _backgroundSprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
     _backgroundSprite.setTexture(
-        _assetManager.getAsset<sf::Texture>("backgroundTexture"));
+        assetManager.getAsset<sf::Texture>("backgroundTexture"));
 }
 
 void Game::setupClient()
@@ -45,7 +45,7 @@ void Game::setupClient()
     sf::VideoMode videoMode(
         1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);
     _window->create(videoMode, "R-Type");
-    _window->setFramerateLimit(_refGameEngine.getTickRate());
+    _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
     }
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
     Engine::Core gameEngine;
     gameEngine.setTickRate(60);
-    gameEngine.loadFeature<Engine::Feature::ECSManager>();
+    gameEngine.loadFeature<Engine::Feature::ECSManager<Game>>();
     gameEngine.loadFeature<Engine::Feature::EventManager>();
     gameEngine.loadFeature<Engine::Feature::AssetManager>();
     // gameEngine.loadFeature<Engine::Feature::Networking>();

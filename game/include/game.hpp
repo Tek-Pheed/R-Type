@@ -41,9 +41,8 @@ class Game {
 
     // Player Utilities
     void playEvent();
-    void playerAnimations(
-        ecs::Entity & player, std::string direction);
-    void playerShoot(ecs::Entity & player);
+    void playerAnimations(ecs::Entity &player, std::string direction);
+    void playerShoot(ecs::Entity &player);
 
     std::vector<ecs::Entity> &getEntities();
     int manageBuffers();
@@ -51,6 +50,11 @@ class Game {
     ecs::Entity &getLocalPlayer();
     size_t getPlayerId();
 
+    bool isServer() const;
+
+    Engine::Core &refGameEngine;
+    Engine::Feature::ECSManager<Game> &entityManager;
+    Engine::Feature::AssetManager &assetManager;
 
     //     int createConnection(const char *ip, int portTCP, int portUDP);
     //     void writeToServer(
@@ -102,10 +106,7 @@ class Game {
     size_t _PlayerId;
     bool _isServer;
 
-    Engine::Core &_refGameEngine;
-    Engine::Feature::ECSManager &_entityManager;
-    Engine::Feature::AssetManager &_assetManager;
-    //Engine::Feature::Networking &_networkManager;
+    // Engine::Feature::Networking &_networkManager;
 
     std::unique_ptr<sf::RenderWindow> _window;
 

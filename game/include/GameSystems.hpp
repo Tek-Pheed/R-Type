@@ -10,45 +10,38 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "Systems.hpp"
 #include "Entity.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
+#include "SFML/Window/Window.hpp"
+#include "Systems.hpp"
 
-// TODO:
-// A better solution then using raw pointer here would be
-// to handle the ownership of the window in the game engine
-// with a templated renderSubSystem storing the window
-// then just pass the game engine in the system update
+class Game;
 
-class RenderSystem : public ecs::ISystem {
+class RenderSystem : public ecs::ISystem<Game> {
   public:
-
-    void initSystem(sf::RenderWindow *win);
-    void update(std::vector<ecs::Entity> &entity,
-        float deltaTime, bool isServer) override;
+    void initSystem(Game &gameRef) override;
+    void update(std::vector<ecs::Entity> &entity, float deltaTime) override;
 
   protected:
-    sf::RenderWindow *_win;
+    Game *_game;
 };
 
-class PositionSystem : public ecs::ISystem {
+class PositionSystem : public ecs::ISystem<Game> {
   public:
-    void initSystem(sf::RenderWindow *win);
-    void update(std::vector<ecs::Entity> &entity,
-        float deltaTime, bool isServer) override;
+    void initSystem(Game &gameRef) override;
+    void update(std::vector<ecs::Entity> &entity, float deltaTime) override;
 
   protected:
-    sf::RenderWindow *_win;
+    Game *_game;
 };
 
-class BulletSystem : public ecs::ISystem {
+class BulletSystem : public ecs::ISystem<Game> {
   public:
-    void initSystem(sf::RenderWindow *win);
-    void update(std::vector<ecs::Entity> &entity,
-        float deltaTime, bool isServer) override;
+    void initSystem(Game &gameRef) override;
+    void update(std::vector<ecs::Entity> &entity, float deltaTime) override;
 
   protected:
-    sf::RenderWindow *_win;
+    Game *_game;
 };
 
 #endif // R_TYPE_SYSTEMS_HPP

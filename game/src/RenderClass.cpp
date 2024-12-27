@@ -144,11 +144,11 @@ void RenderClass::renderWindow(Game &client)
         this->_window.clear();
         playEvent(client, client.getEntities());
         this->_window.draw(background_s);
-        positionSystem.update(client.getEntities(), deltaTime, false);
+        positionSystem.update(client.getEntities(), deltaTime);
         client.updateLocalPlayerPosition();
-        renderSystem.update(client.getEntities(), deltaTime, false);
+        renderSystem.update(client.getEntities(), deltaTime);
         client.manageBuffers();
-        bulletSystem.update(client.getEntities(), deltaTime, false);
+        bulletSystem.update(client.getEntities(), deltaTime);
         this->_window.display();
         backgroundAnimation(&background_s, &clockAnim);
     }

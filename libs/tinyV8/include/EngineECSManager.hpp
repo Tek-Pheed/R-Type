@@ -10,40 +10,127 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
+#include <stdexcept>
 #include <vector>
 #include "Engine.hpp"
-
 #include "Entity.hpp"
 #include "Systems.hpp"
-#include <unordered_map>
 
 namespace Engine
 {
+    size_t generateNewId(void);
     namespace Feature
     {
+
+        template <typename GameClass>
         class ECSManager : public AEngineFeature {
           public:
-            explicit ECSManager(Core &engineRef);
-            ~ECSManager();
+            explicit ECSManager(Core &engineRef)
+                : AEngineFeature(engineRef) {};
+            ~ECSManager() {};
 
-            ecs::Entity &createEntity();
+            ecs::Entity &createEntity()
+            {
+                const size_t id = generateNewId();
 
-            bool addEntity(ecs::Entity &entity);
-            bool destroyEntityById(size_t id);
-            bool doesEntityExists(size_t id) const;
-            ecs::Entity &getEntityById(size_t id);
+                _entities[id] = ecs::Entity(id);
+                return (_entities[id]);
+            }
 
-            std::vector<std::reference_wrapper<ecs::Entity>> getEntities(void);
-            std::vector<ecs::Entity> &getEntitiesVect(void);
+            bool addEntity(ecs::Entity &entity)
+            {
+                if (doesEntityExists(entity.getID()))
+                    return (false);
+                _entities[entity.getID()] = entity;
+                return (true);
+            }
+
+            bool destroyEntityById(size_t id)
+            {
+                if (!doesEntityExists(id))
+                    return (false);
+                for (size_t i = 0; i < _entities.size(); i++) {
+                    if (_entities[i].getID() == id) {
+                        _entities.erase(_entities.begin() + (long) i);
+                        break;
+                    }
+                }
+                return (true);
+            }
+
+            bool doesEntityExists(size_t id) const
+            {
+                for (auto &entity : _entities) {
+                    if (entity.getID() == id)
+                        return (true);
+                }
+                return (false);
+            }
+
+            ecs::Entity &getEntityById(size_t id)
+            {
+                for (auto &entity : _entities) {
+                    if (entity.getID() == id)
+                        return (entity);
+                }
+                throw std::out_of_range("Id not found");
+            }
+
+            std::vector<std::reference_wrapper<ecs::Entity>> getEntities(void)
+            {
+                std::vector<std::reference_wrapper<ecs::Entity>> vect;
+
+                for (auto &entity : _entities) {
+                    vect.emplace_back(entity);
+                }
+                return (vect);
+            }
+
+            std::vector<ecs::Entity> &getEntitiesVect(void)
+            {
+                return (_entities);
+            }
+
+            bool changeEntityId(size_t oldId, size_t newId)
+            {
+                if (!doesEntityExists(oldId))
+                    return (false);
+                ecs::Entity ent = getEntityById(oldId);
+                destroyEntityById(oldId);
+                ent.setID(newId);
+                addEntity(ent);
+                return (true);
+            }
 
             template <typename ComponentType>
-            std::vector<size_t> findEntitiesByComponent();
+            std::vector<size_t> findEntitiesIdByComponent()
+            {
+                std::vector<size_t> ent;
+                std::shared_ptr<ComponentType> comp = nullptr;
+
+                for (auto &entity : _entities) {
+                    comp = entity.template getComponent<ComponentType>();
+                    if (comp != nullptr)
+                        ent.emplace_back(entity.getID());
+                }
+                return (ent);
+            }
 
             template <typename ComponentType>
             std::vector<std::reference_wrapper<ecs::Entity>>
-            findEntitiesByComponent();
+            findEntitiesByComponent()
+            {
+                std::vector<std::reference_wrapper<ecs::Entity>> ent;
+                std::shared_ptr<ComponentType> comp = nullptr;
 
-            bool changeEntityId(size_t oldId, size_t newId);
+                for (auto &entity : _entities) {
+                    comp = entity.template getComponent<ComponentType>();
+                    if (comp != nullptr)
+                        ent.emplace_back(entity);
+                }
+                return (ent);
+            }
 
             template <class SubSystem> SubSystem &getSubsystem(void)
             {
@@ -51,7 +138,6 @@ namespace Engine
                     _systems.at(typeid(SubSystem)).sys.get())));
             }
 
-            // TODO: Pass initializer function as argument
             template <class SubSystem>
             SubSystem &createSubsystem(bool updateOnTick = true)
             {
@@ -77,15 +163,24 @@ namespace Engine
             }
 
           protected:
-            void onStart(void) override;
-            void onTick(float deltaTimeSec) override;
-            void onStop(void) override;
+            void onStart(void) override {};
+            void onStop(void) override {};
+            void onTick(float deltaTimeSec) override
+            {
+                (void) deltaTimeSec;
+
+                for (auto const &[typeIndex, subsystem] : _systems) {
+                    if (subsystem.update)
+                        subsystem.sys->update(_entities, deltaTimeSec);
+                }
+            }
 
             struct SubSys_t {
-                explicit SubSys_t(std::unique_ptr<ecs::ISystem> s, bool updt)
+                explicit SubSys_t(
+                    std::unique_ptr<ecs::ISystem<GameClass>> s, bool updt)
                     : sys(std::move(s)), update(updt) {};
 
-                std::unique_ptr<ecs::ISystem> sys;
+                std::unique_ptr<ecs::ISystem<GameClass>> sys;
                 bool update;
             };
 

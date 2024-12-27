@@ -99,7 +99,7 @@ sf::RenderWindow &Game::getWindow()
 void Game::playerShoot(ecs::Entity &player)
 {
     std::stringstream ss;
-    auto &manager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
+    auto &manager = refGameEngine.getFeature<Engine::Feature::ECSManager<Game>>();
     auto bullet = manager.createEntity();
     auto positionComp = player.getComponent<ecs::PositionComponent>();
 
