@@ -59,24 +59,6 @@
 //     return _id;
 // }
 
-// void game::createPlayer()
-// {
-//     auto &player = getLocalPlayer();
-
-//     player = std::make_shared<ecs::Entity>(getId());
-//     player->addComponent(std::make_shared<ecs::PlayerComponent>("Samy"));
-//     player->addComponent(std::make_shared<ecs::PositionComponent>(100,
-//     100));
-//     player->addComponent(std::make_shared<ecs::VelocityComponent>(0.0,
-//     0.0)); player->addComponent(std::make_shared<ecs::RenderComponent>(
-//         ecs::ObjectType::SPRITE, _refRender->getPlayerTexture()));
-//     player->getComponent<ecs::RenderComponent>()->getSprite()->setTextureRect(
-//         sf::Rect(66, 0, 33, 14));
-//     player->getComponent<ecs::RenderComponent>()->getSprite()->setScale(
-//         sf::Vector2f(3, 3));
-//     addEntity(player);
-// }
-
 // RenderClass *game::getRenderClass()
 // {
 //     return _refRender;
@@ -89,7 +71,26 @@
 #include "EngineECSManager.hpp"
 #include "Entity.hpp"
 #include "SFML/Graphics/Sprite.hpp"
+#include "SFML/Graphics/Texture.hpp"
 #include "game.hpp"
+
+void Game::createPlayer()
+{
+    auto &player = entityManager.createEntity();
+    auto &texture = assetManager.getAsset<sf::Texture>("playerTexture");
+    sf::Sprite sprite;
+
+    sprite.setTexture(texture);
+    sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
+    sprite.setScale(sf::Vector2f(3, 3));
+    player.addComponent(std::make_shared<ecs::PlayerComponent>());
+    player.addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
+    player.addComponent(std::make_shared<ecs::RenderComponent>(
+        ecs::RenderComponent::ObjectType::SPRITE));
+    player.addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
+    player.addComponent(
+        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 3.0, 3.0));
+}
 
 sf::RenderWindow &Game::getWindow()
 {
@@ -99,7 +100,8 @@ sf::RenderWindow &Game::getWindow()
 void Game::playerShoot(ecs::Entity &player)
 {
     std::stringstream ss;
-    auto &manager = refGameEngine.getFeature<Engine::Feature::ECSManager<Game>>();
+    auto &manager =
+        refGameEngine.getFeature<Engine::Feature::ECSManager<Game>>();
     auto bullet = manager.createEntity();
     auto positionComp = player.getComponent<ecs::PositionComponent>();
 

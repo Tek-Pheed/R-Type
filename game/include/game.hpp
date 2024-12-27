@@ -10,15 +10,11 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include <mutex>
-#include <typeindex>
-
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineECSManager.hpp"
 #include "Entity.hpp"
 #include "GameSystems.hpp"
-#include <unordered_map>
 
 class Game {
     /* data */
@@ -50,7 +46,10 @@ class Game {
     ecs::Entity &getLocalPlayer();
     size_t getPlayerId();
 
+    void gameUpdate(float deltaTime_sec);
     bool isServer() const;
+
+    void createPlayer();
 
     Engine::Core &refGameEngine;
     Engine::Feature::ECSManager<Game> &entityManager;
@@ -68,14 +67,7 @@ class Game {
     //     &tokens); void handleMechs(int code, std::vector<std::string>
     //     &tokens); void addEntity(ecs::Entity & entity);
 
-    //     std::vector<ecs::Entity &> &getEntities();
-    //     int getId();
-
     //     void setServerMode(bool mode);
-    //     bool isServer(void);
-
-    //     void updateLocalplayerPosition();
-    //     ecs::Entity & &getLocalPlayer();
 
     //     // These functions should be moved in a game Engine class
 

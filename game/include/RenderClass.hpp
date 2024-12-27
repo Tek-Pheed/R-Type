@@ -5,15 +5,12 @@
 ** RenderClass
 */
 
-
 #ifndef RENDERCLASS_HPP_
-    #define RENDERCLASS_HPP_
+#define RENDERCLASS_HPP_
 
 #include <SFML/Graphics.hpp>
-#include <memory>
 #include <string>
 #include "Entity.hpp"
-#include "game.hpp"
 
 class RenderClass {
   public:
@@ -27,8 +24,8 @@ class RenderClass {
     int getFrameRate() const;
     void setFrameRate(int frameRate);
 
-    void renderWindow(Game &client);
-    void playEvent(Game &client, std::vector<ecs::Entity> &entities);
+    // void renderWindow(Game &client);
+    // void playEvent(Game &client, std::vector<ecs::Entity> &entities);
     void playerAnimations(ecs::Entity &player, std::string direction);
     void backgroundAnimation(sf::Sprite *bg, sf::Clock *clock);
 

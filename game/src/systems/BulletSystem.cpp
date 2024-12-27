@@ -9,6 +9,8 @@
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "game.hpp"
 
+using namespace GameSystems;
+
 void BulletSystem::initSystem(Game &gameRef)
 {
     _game = &gameRef;

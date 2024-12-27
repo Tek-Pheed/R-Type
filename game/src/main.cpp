@@ -7,36 +7,17 @@
 
 #include <iostream>
 #include <memory>
-#include <utility>
 
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineECSManager.hpp"
 #include "EngineEvents.hpp"
+#include "GameSystems.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Texture.hpp"
 #include "SFML/Window/VideoMode.hpp"
-#include "Systems.hpp"
 #include "game.hpp"
 
-void Game::LoadTexture()
-{
-    static const char *files[] = {"assets/sprites/r-typesheet42.gif",
-        "assets/sprites/r-typesheet31.gif", "assets/sprites/r-typesheet1.gif",
-        "assets/background/background.png"};
-    static const char *names[] = {
-        "playerTexture", "enemyTexture", "bulletTexture", "backgroundTexture"};
-
-    for (size_t i = 0; i < sizeof(files) / sizeof(files[0]); i++) {
-        assetManager.loadAsset(
-            files[i], names[i], &sf::Texture::loadFromFile, sf::IntRect());
-    }
-    assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
-    assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
-    _backgroundSprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
-    _backgroundSprite.setTexture(
-        assetManager.getAsset<sf::Texture>("backgroundTexture"));
-}
 
 void Game::setupClient()
 {
@@ -49,6 +30,7 @@ void Game::setupClient()
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
     }
+    LoadTexture();
 }
 
 void Game::setupServer()
@@ -56,10 +38,21 @@ void Game::setupServer()
     _isServer = true;
 }
 
+static int print_help()
+{
+    std::cout << "USAGE: ./game {IP} {PORT TCP} {PORT UDP}" << std::endl;
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
+
+    if (argc == 1) {
+        print_help();
+        return (0);
+    }
 
     Engine::Core gameEngine;
     gameEngine.setTickRate(60);
@@ -79,7 +72,6 @@ int main(int argc, char **argv)
     std::cout << "Client mode" << std::endl;
 #endif
 
-    // auto &manager = gameEngine.getFeature<Engine::Feature::ECSManager>();
 
     /*manager.createSubsxxystem<ecs::BulletSystem>();
 
@@ -87,5 +79,5 @@ int main(int argc, char **argv)
     auto entity = manager.createEntity();
     // entity->addComponent((bulletSub));*/
 
-    // gameEngine.mainLoop();
+    gameEngine.mainLoop();
 }

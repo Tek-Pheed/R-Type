@@ -17,31 +17,38 @@
 
 class Game;
 
-class RenderSystem : public ecs::ISystem<Game> {
-  public:
-    void initSystem(Game &gameRef) override;
-    void update(std::vector<ecs::Entity> &entity, float deltaTime) override;
+namespace GameSystems
+{
+    class RenderSystem : public ecs::ISystem<Game> {
+      public:
+        void initSystem(Game &gameRef) override;
+        void update(
+            std::vector<ecs::Entity> &entity, float deltaTime) override;
 
-  protected:
-    Game *_game;
-};
+      protected:
+        Game *_game;
+    };
 
-class PositionSystem : public ecs::ISystem<Game> {
-  public:
-    void initSystem(Game &gameRef) override;
-    void update(std::vector<ecs::Entity> &entity, float deltaTime) override;
+    class PositionSystem : public ecs::ISystem<Game> {
+      public:
+        void initSystem(Game &gameRef) override;
+        void update(
+            std::vector<ecs::Entity> &entity, float deltaTime) override;
 
-  protected:
-    Game *_game;
-};
+      protected:
+        Game *_game;
+    };
 
-class BulletSystem : public ecs::ISystem<Game> {
-  public:
-    void initSystem(Game &gameRef) override;
-    void update(std::vector<ecs::Entity> &entity, float deltaTime) override;
+    class BulletSystem : public ecs::ISystem<Game> {
+      public:
+        void initSystem(Game &gameRef) override;
+        void update(
+            std::vector<ecs::Entity> &entity, float deltaTime) override;
 
-  protected:
-    Game *_game;
-};
+      protected:
+        Game *_game;
+    };
+
+} // namespace GameSystems
 
 #endif // R_TYPE_SYSTEMS_HPP

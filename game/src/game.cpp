@@ -5,84 +5,9 @@
 ** game
 */
 
-// #include <cstdint>
-// #include "Networking.hpp"
-// #include "Systems.hpp"
-// #if defined(WIN32)
-//     #define NOMINMAX
-// #endif
-
-// #include <ctime>
-// #include "RenderClass.hpp"
-// #include "game.hpp"
-// #include "server.hpp"
-// #include "system_network.hpp"
-
-// void game::setServerMode(bool mode)
-// {
-//     _isServer = mode;
-// }
-
-// bool game::isServer(void)
-// {
-//     return (_isServer);
-// }
-
-// int print_help()
-// {
-//     std::cout << "USAGE: ./game {IP} {PORT TCP} {PORT UDP}" << std::endl;
-//     return 0;
-// }
-
-// Networking &game::getNetworking()
-// {
-//     return (_refNetwork);
-// }
-
-// void game::gameUpdate(float deltaTime_sec)
-// {
-//     ecs::BulletSystem &bulletSystem = getSubSystem<ecs::BulletSystem>();
-//     ecs::PositionSystem &positionSystem =
-//     getSubSystem<ecs::PositionSystem>();
-
-//     bulletSystem.update(getEntities(), nullptr, deltaTime_sec, isServer());
-//     positionSystem.update(getEntities(), nullptr, deltaTime_sec,
-//     isServer());
-// }
-
-// int main(int argc, char **argv)
-// {
-//     System::Network::initNetwork();
-//     Networking net;
-//     game game(net);
-//     game.setServerMode(false);
-
-// #if defined(RTYPE_SERVER)
-//     game.setServerMode(true);
-// #endif
-//     if (argc != 4)
-//         return print_help();
-//     if (!atoi(argv[1]) || !atoi(argv[2]))
-//         return print_help();
-//     int portTCP = atoi(argv[2]);
-//     int portUDP = atoi(argv[3]);
-//     std::cout << "Connecting to: " << argv[1] << " on port " << portTCP << "
-//     "
-//               << portUDP << std::endl;
-
-//     if (game.isServer()) {
-//         net.setupServer((uint16_t) portTCP, (uint16_t) portUDP);
-//         serverLoop(net, game);
-//     } else {
-//         net.setupClient(
-//             (uint16_t) portTCP, (uint16_t) portUDP, std::string(argv[1]));
-//         RenderClass render(1280, 720, "R-Type", 60);
-//         game.setRenderClass(&render);
-//         std::cout << "game connected" << std::endl;
-//         game.createPlayer();
-//         game.getRenderClass()->renderWindow(game);
-//     }
-// }
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
 
 #include <iostream>
 #include <memory>
@@ -96,6 +21,37 @@
 #include "GameSystems.hpp"
 
 #include "game.hpp"
+
+// Networking &game::getNetworking()
+// {
+//     return (_refNetwork);
+// }
+
+void Game::LoadTexture()
+{
+    static const char *files[] = {"assets/sprites/r-typesheet42.gif",
+        "assets/sprites/r-typesheet31.gif", "assets/sprites/r-typesheet1.gif",
+        "assets/background/background.png"};
+    static const char *names[] = {
+        "playerTexture", "enemyTexture", "bulletTexture", "backgroundTexture"};
+
+    for (size_t i = 0; i < sizeof(files) / sizeof(files[0]); i++) {
+        assetManager.loadAsset(
+            files[i], names[i], &sf::Texture::loadFromFile, sf::IntRect());
+    }
+    assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
+    assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
+    _backgroundSprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
+    _backgroundSprite.setTexture(
+        assetManager.getAsset<sf::Texture>("backgroundTexture"));
+}
+
+void Game::gameUpdate(float deltaTime_sec)
+{
+    // System updates will be called automatically by the game engine.
+    (void) deltaTime_sec;
+    return;
+}
 
 Game::Game(Engine::Core &engineRef)
     : refGameEngine(engineRef),
@@ -158,9 +114,12 @@ void Game::updateLocalPlayerPosition()
 
 void Game::gameLoop(float deltaTime)
 {
-    auto &posSystem = entityManager.getSubsystem<PositionSystem>();
-    auto &renderSystem = entityManager.getSubsystem<RenderSystem>();
-    auto &bulletSystem = entityManager.getSubsystem<BulletSystem>();
+    auto &posSystem =
+        entityManager.getSubsystem<GameSystems::PositionSystem>();
+    auto &renderSystem =
+        entityManager.getSubsystem<GameSystems::RenderSystem>();
+    auto &bulletSystem =
+        entityManager.getSubsystem<GameSystems::BulletSystem>();
 
     (void) posSystem;
     (void) renderSystem;

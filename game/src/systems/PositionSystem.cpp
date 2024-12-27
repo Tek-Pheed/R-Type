@@ -9,6 +9,8 @@
 #include "GameSystems.hpp"
 #include "game.hpp"
 
+using namespace GameSystems;
+
 void PositionSystem::initSystem(Game &gameRef)
 {
     _game = &gameRef;
