@@ -14,6 +14,8 @@
 #include <typeindex>
 
 #include "Engine.hpp"
+#include "EngineAssetManager.hpp"
+#include "EngineECSManager.hpp"
 #include "Entity.hpp"
 #include "GameSystems.hpp"
 #include <unordered_map>
@@ -40,14 +42,14 @@ class Game {
     // Player Utilities
     void playEvent();
     void playerAnimations(
-        std::shared_ptr<ecs::Entity> player, std::string direction);
-    void playerShoot(std::shared_ptr<ecs::Entity> player);
+        ecs::Entity & player, std::string direction);
+    void playerShoot(ecs::Entity & player);
 
     std::vector<ecs::Entity> &getEntities();
     int manageBuffers();
-    void update_localplayer_position();
+    void updateLocalPlayerPosition();
     ecs::Entity &getLocalPlayer();
-    size_t getId();
+    size_t getPlayerId();
 
 
     //     int createConnection(const char *ip, int portTCP, int portUDP);
@@ -60,16 +62,16 @@ class Game {
     //     &tokens); void handleEnemy(int code, std::vector<std::string>
     //     &tokens); void handleTerrain(int code, std::vector<std::string>
     //     &tokens); void handleMechs(int code, std::vector<std::string>
-    //     &tokens); void addEntity(std::shared_ptr<ecs::Entity> entity);
+    //     &tokens); void addEntity(ecs::Entity & entity);
 
-    //     std::vector<std::shared_ptr<ecs::Entity>> &getEntities();
+    //     std::vector<ecs::Entity &> &getEntities();
     //     int getId();
 
     //     void setServerMode(bool mode);
     //     bool isServer(void);
 
     //     void updateLocalplayerPosition();
-    //     std::shared_ptr<ecs::Entity> &getLocalPlayer();
+    //     ecs::Entity & &getLocalPlayer();
 
     //     // These functions should be moved in a game Engine class
 
@@ -97,22 +99,20 @@ class Game {
     //     void enemyDamage(std::vector<std::string> &tokens);
 
   private:
-    size_t _ClientId;
+    size_t _PlayerId;
     bool _isServer;
+
     Engine::Core &_refGameEngine;
+    Engine::Feature::ECSManager &_entityManager;
+    Engine::Feature::AssetManager &_assetManager;
+    //Engine::Feature::Networking &_networkManager;
 
     std::unique_ptr<sf::RenderWindow> _window;
-
-    // Client textures
-    sf::Texture _playerTexture;
-    sf::Texture _enemyTexture;
-    sf::Texture _bulletTexture;
-    sf::Texture _backgroundTexture;
 
     // Client Sprites
     sf::Sprite _backgroundSprite;
 
-    //     std::vector<std::shared_ptr<ecs::Entity>> _entities;
+    //     std::vector<ecs::Entity &> _entities;
 
     //     // To move into game Engine
     //     std::unordered_map<std::type_index, ecs::ISystem> _subsystems;

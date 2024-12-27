@@ -5,9 +5,14 @@
 ** ecsManager
 */
 
-#include "EngineECSManager.hpp"
+#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
+#include <stdexcept>
+#include <vector>
+#include "EngineECSManager.hpp"
+#include "Entity.hpp"
 
 using namespace Engine::Feature;
 
@@ -32,58 +37,72 @@ bool ECSManager::destroyEntityById(size_t id)
 {
     if (!doesEntityExists(id))
         return (false);
-    _entities.erase(id);
+    for (size_t i = 0; i < _entities.size(); i++) {
+        if (_entities[i].getID() == id) {
+            _entities.erase(_entities.begin() + (long) i);
+            break;
+        }
+    }
     return (true);
 }
 
 bool ECSManager::doesEntityExists(size_t id) const
 {
-    if (_entities.find(id) != _entities.end())
-        return (true);
+    for (auto &entity : _entities) {
+        if (entity.getID() == id)
+            return (true);
+    }
     return (false);
 }
 
 bool ECSManager::changeEntityId(size_t oldId, size_t newId)
 {
-    std::shared_ptr<ecs::Entity> ent;
-
     if (!doesEntityExists(oldId))
         return (false);
-    ent = _entities[oldId];
+    ecs::Entity ent = getEntityById(oldId);
     destroyEntityById(oldId);
-    ent->setID(newId);
+    ent.setID(newId);
     addEntity(ent);
     return (true);
 }
 
-std::vector<std::shared_ptr<ecs::Entity>> ECSManager::getEntities(void)
+std::vector<std::reference_wrapper<ecs::Entity>> ECSManager::getEntities(void)
 {
-    std::vector<std::shared_ptr<ecs::Entity>> vect;
+    std::vector<std::reference_wrapper<ecs::Entity>> vect;
 
-    for (auto const &[id, entity] : _entities) {
+    for (auto &entity : _entities) {
         vect.emplace_back(entity);
     }
     return (vect);
 }
 
-std::shared_ptr<ecs::Entity> &ECSManager::getEntityById(size_t id)
+std::vector<ecs::Entity> &ECSManager::getEntitiesVect(void)
 {
-    return (_entities[id]);
+    return (_entities);
 }
 
-std::shared_ptr<ecs::Entity> &ECSManager::createEntity()
+ecs::Entity &ECSManager::getEntityById(size_t id)
+{
+    for (auto &entity : _entities) {
+        if (entity.getID() == id)
+            return (entity);
+    }
+    throw std::out_of_range("Id not found");
+}
+
+ecs::Entity &ECSManager::createEntity()
 {
     const size_t id = generateNewId();
 
-    _entities[id] = std::make_shared<ecs::Entity>(id);
+    _entities[id] = ecs::Entity(id);
     return (_entities[id]);
 }
 
-bool ECSManager::addEntity(std::shared_ptr<ecs::Entity> entity)
+bool ECSManager::addEntity(ecs::Entity &entity)
 {
-    if (_entities.contains(entity->getID()))
+    if (doesEntityExists(entity.getID()))
         return (false);
-    _entities[entity->getID()] = entity;
+    _entities[entity.getID()] = entity;
     return (true);
 }
 
@@ -93,22 +112,23 @@ std::vector<size_t> ECSManager::findEntitiesByComponent()
     std::vector<size_t> ent;
     std::shared_ptr<ComponentType> comp = nullptr;
 
-    for (auto const &[id, entity] : _entities) {
-        comp = entity->template getComponent<ComponentType>();
+    for (auto &entity : _entities) {
+        comp = entity.template getComponent<ComponentType>();
         if (comp != nullptr)
-            ent.emplace_back(id);
+            ent.emplace_back(entity.getID());
     }
     return (ent);
 }
 
 template <typename ComponentType>
-std::vector<std::shared_ptr<ecs::Entity>> ECSManager::findEntitiesByComponent()
+std::vector<std::reference_wrapper<ecs::Entity>>
+ECSManager::findEntitiesByComponent()
 {
-    std::vector<std::shared_ptr<ecs::Entity>> ent;
+    std::vector<std::reference_wrapper<ecs::Entity>> ent;
     std::shared_ptr<ComponentType> comp = nullptr;
 
-    for (auto const &[id, entity] : _entities) {
-        comp = entity->template getComponent<ComponentType>();
+    for (auto &entity : _entities) {
+        comp = entity.template getComponent<ComponentType>();
         if (comp != nullptr)
             ent.emplace_back(entity);
     }
@@ -124,16 +144,16 @@ void ECSManager::onTick(float deltaTimeSec)
 {
     (void) deltaTimeSec;
     // TODO: Replace SFML references in ECS
-    // use an initialiser function in ISystem to init all variables and references needed
-    // otherwise this will not work
+    // use an initialiser function in ISystem to init all variables and
+    // references needed otherwise this will not work
 
-    // for (auto const &[typeIndex, subsystem] : _systems) {
-    //     if (subsystem.update)
-    //         subsystem.sys->update(std::vector<std::shared_ptr<ecs::Entity>>
-    //         &entity, sf::RenderWindow *window, float deltaTime, bool
-    //         isServer)
-    // }
+    for (auto const &[typeIndex, subsystem] : _systems) {
+        if (subsystem.update)
+            subsystem.sys->update(
+                _entities, deltaTimeSec, false); // Change here isServer
+    }
 }
+
 void ECSManager::onStop()
 {
     return;

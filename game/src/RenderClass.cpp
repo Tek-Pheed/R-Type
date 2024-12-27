@@ -145,7 +145,7 @@ void RenderClass::renderWindow(Game &client)
         playEvent(client, client.getEntities());
         this->_window.draw(background_s);
         positionSystem.update(client.getEntities(), deltaTime, false);
-        client.update_localplayer_position();
+        client.updateLocalPlayerPosition();
         renderSystem.update(client.getEntities(), deltaTime, false);
         client.manageBuffers();
         bulletSystem.update(client.getEntities(), deltaTime, false);
@@ -195,7 +195,7 @@ void RenderClass::playEvent(Game &client, std::vector<ecs::Entity> &entities)
                 bullet.addComponent(
                     std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
                         sprite, 0, 0));
-                ss << "104 " << client.getId() << "\t\n";
+                ss << "104 " << client.getPlayerId() << "\t\n";
                 // client.writeToServer(ss.str(),
                 // System::Network::ISocket::UDP);
                 entities.push_back(bullet);

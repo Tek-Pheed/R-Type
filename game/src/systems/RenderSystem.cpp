@@ -8,7 +8,7 @@
 #include "Components.hpp"
 #include "GameSystems.hpp"
 
-void PositionSystem::initSystem(sf::RenderWindow *win)
+void RenderSystem::initSystem(sf::RenderWindow *win)
 {
     _win = win;
 }

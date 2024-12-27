@@ -87,14 +87,20 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <vector>
 
-#include "EngineECSManager.hpp"
 #include "Engine.hpp"
+#include "EngineAssetManager.hpp"
+#include "EngineECSManager.hpp"
+#include "Entity.hpp"
 #include "GameSystems.hpp"
 
 #include "game.hpp"
 
-Game::Game(Engine::Core &engineRef) : _refGameEngine(engineRef)
+Game::Game(Engine::Core &engineRef)
+    : _refGameEngine(engineRef),
+      _entityManager(engineRef.getFeature<Engine::Feature::ECSManager>()),
+      _assetManager(engineRef.getFeature<Engine::Feature::AssetManager>())
 {
 }
 
@@ -111,6 +117,38 @@ bool Game::getServerMode()
 void Game::setServerMode(bool mode)
 {
     _isServer = mode;
+}
+
+ecs::Entity &Game::getLocalPlayer()
+{
+    return (_entityManager.getEntityById(_PlayerId));
+}
+
+size_t Game::getPlayerId()
+{
+    return (_PlayerId);
+}
+
+int Game::manageBuffers()
+{
+    return 0;
+}
+
+void Game::updateLocalPlayerPosition()
+{
+    auto position = getLocalPlayer().getComponent<ecs::PositionComponent>();
+    if (position) {
+        float oldX = position->getOldX();
+        float oldY = position->getOldY();
+        float x = position->getX();
+        float y = position->getY();
+
+        if (oldX != x || oldY != y) {
+            std::stringstream ss;
+            ss << "102 " << _PlayerId << " " << x << " " << y << "\t\n";
+            //writeToServer(ss.str(), System::Network::ISocket::UDP);
+        }
+    }
 }
 
 void Game::gameLoop(float deltaTime)
@@ -144,13 +182,22 @@ void Game::gameLoop(float deltaTime)
     backgroundAnimation(&background_s, &clockAnim);*/
 }
 
+std::vector<ecs::Entity> &Game::getEntities()
+{
+    auto &manager =
+        this->_refGameEngine.getFeature<Engine::Feature::ECSManager>();
+
+    return (manager.getEntitiesVect());
+}
+
 void Game::playEvent()
 {
     sf::Event event;
     std::stringstream ss;
-    auto &ecsManager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
-    auto &player = ecsManager.getEntityById(_ClientId);
-    auto velocity = player->getComponent<ecs::VelocityComponent>();
+    auto &ecsManager =
+        _refGameEngine.getFeature<Engine::Feature::ECSManager>();
+    auto &player = ecsManager.getEntityById(_PlayerId);
+    auto velocity = player.getComponent<ecs::VelocityComponent>();
 
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {

@@ -23,7 +23,7 @@ lib.
 #include "Components.hpp"
 
 void ecs::RenderSystem::update(
-    std::vector<std::shared_ptr<ecs::Entity>> &entities,
+    std::vector<ecs::Entity &> &entities,
     sf::RenderWindow *window, float deltaTime)
 {
     (void) deltaTime;

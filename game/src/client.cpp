@@ -44,12 +44,12 @@
 //         _refRender->setBulletTexture(bulletTexture);
 // }
 
-// void game::addEntity(std::shared_ptr<ecs::Entity> entity)
+// void game::addEntity(ecs::Entity & entity)
 // {
 //     _entities.push_back(entity);
 // }
 
-// std::vector<std::shared_ptr<ecs::Entity>> &game::getEntities()
+// std::vector<ecs::Entity &> &game::getEntities()
 // {
 //     return _entities;
 // }
@@ -96,35 +96,34 @@ sf::RenderWindow &Game::getWindow()
     return *_window;
 }
 
-void Game::playerShoot(std::shared_ptr<ecs::Entity> player)
+void Game::playerShoot(ecs::Entity &player)
 {
     std::stringstream ss;
-    auto bullet = std::make_shared<ecs::Entity>(rand());
-    auto positionComp = player->getComponent<ecs::PositionComponent>();
+    auto &manager = _refGameEngine.getFeature<Engine::Feature::ECSManager>();
+    auto bullet = manager.createEntity();
+    auto positionComp = player.getComponent<ecs::PositionComponent>();
 
-    bullet->addComponent(std::make_shared<ecs::BulletComponent>(1));
-    bullet->addComponent(std::make_shared<ecs::PositionComponent>(
+    bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
+    bullet.addComponent(std::make_shared<ecs::PositionComponent>(
         positionComp->getX() + 100, positionComp->getY() + 25));
-    bullet->addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
-    bullet->addComponent(std::make_shared<ecs::RenderComponent>(
+    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+    bullet.addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::RenderComponent::ObjectType::SPRITE));
     sf::Sprite s;
-    bullet->addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-        s, 132, 33));
+    bullet.addComponent(
+        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
 
-    bullet->getComponent<ecs::SpriteComponent<sf::Sprite>>()
+    bullet.getComponent<ecs::SpriteComponent<sf::Sprite>>()
         ->getSprite()
         .setTextureRect(sf::Rect(137, 153, 64, 16));
-    ss << "104 " << _ClientId << "\t\n";
+    ss << "104 " << _PlayerId << "\t\n";
 
     // writeToServer(ss.str(), System::Network::ISocket::UDP);
-    _refGameEngine.getFeature<Engine::Feature::ECSManager>().addEntity(bullet);
 }
 
-void Game::playerAnimations(
-    std::shared_ptr<ecs::Entity> player, std::string direction)
+void Game::playerAnimations(ecs::Entity &player, std::string direction)
 {
-    auto renderComp = player->getComponent<ecs::SpriteComponent<sf::Sprite>>();
+    auto renderComp = player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
     if (direction == "top") {
         renderComp->getSprite().setTextureRect(sf::Rect(132, 0, 33, 14));
     } else if (direction == "down") {

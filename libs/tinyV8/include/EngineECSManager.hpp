@@ -9,6 +9,7 @@
 #define TINY_V8_ECS_MANAGER_HPP
 
 #include <cstddef>
+#include <functional>
 #include <vector>
 #include "Engine.hpp"
 
@@ -25,20 +26,21 @@ namespace Engine
             explicit ECSManager(Core &engineRef);
             ~ECSManager();
 
-            std::shared_ptr<ecs::Entity> &createEntity();
+            ecs::Entity &createEntity();
 
-            bool addEntity(std::shared_ptr<ecs::Entity> entity);
+            bool addEntity(ecs::Entity &entity);
             bool destroyEntityById(size_t id);
             bool doesEntityExists(size_t id) const;
-            std::shared_ptr<ecs::Entity> &getEntityById(size_t id);
+            ecs::Entity &getEntityById(size_t id);
 
-            std::vector<std::shared_ptr<ecs::Entity>> getEntities(void);
+            std::vector<std::reference_wrapper<ecs::Entity>> getEntities(void);
+            std::vector<ecs::Entity> &getEntitiesVect(void);
 
             template <typename ComponentType>
             std::vector<size_t> findEntitiesByComponent();
 
             template <typename ComponentType>
-            std::vector<std::shared_ptr<ecs::Entity>>
+            std::vector<std::reference_wrapper<ecs::Entity>>
             findEntitiesByComponent();
 
             bool changeEntityId(size_t oldId, size_t newId);
@@ -87,7 +89,7 @@ namespace Engine
                 bool update;
             };
 
-            std::unordered_map<size_t, std::shared_ptr<ecs::Entity>> _entities;
+            std::vector<ecs::Entity> _entities;
             std::map<std::type_index, SubSys_t> _systems;
         };
 

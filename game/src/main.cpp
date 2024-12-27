@@ -7,32 +7,35 @@
 
 #include <iostream>
 #include <memory>
+#include <utility>
 
-#include "EngineECSManager.hpp"
 #include "Engine.hpp"
+#include "EngineAssetManager.hpp"
+#include "EngineECSManager.hpp"
 #include "EngineEvents.hpp"
+#include "SFML/Graphics/Rect.hpp"
+#include "SFML/Graphics/Texture.hpp"
 #include "SFML/Window/VideoMode.hpp"
 #include "Systems.hpp"
 #include "game.hpp"
 
 void Game::LoadTexture()
 {
-    sf::Texture playerTexture;
-    sf::Texture enemyTexture;
-    sf::Texture bulletTexture;
-    sf::Texture backgroundTexture;
+    static const char *files[] = {"assets/sprites/r-typesheet42.gif",
+        "assets/sprites/r-typesheet31.gif", "assets/sprites/r-typesheet1.gif",
+        "assets/background/background.png"};
+    static const char *names[] = {
+        "playerTexture", "enemyTexture", "bulletTexture", "backgroundTexture"};
 
-    if (playerTexture.loadFromFile("assets/sprites/r-typesheet42.gif"))
-        _playerTexture = playerTexture;
-    if (enemyTexture.loadFromFile("assets/sprites/r-typesheet31.gif"))
-        _enemyTexture = enemyTexture;
-    if (bulletTexture.loadFromFile("assets/sprites/r-typesheet1.gif"))
-        _bulletTexture = bulletTexture;
-    if (backgroundTexture.loadFromFile("assets/background/background.png"))
-        _backgroundTexture = backgroundTexture;
-    _backgroundTexture.setRepeated(true);
+    for (size_t i = 0; i < sizeof(files) / sizeof(files[0]); i++) {
+        _assetManager.loadAsset(
+            files[i], names[i], &sf::Texture::loadFromFile, sf::IntRect());
+    }
+    _assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
+    _assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
     _backgroundSprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
-    _backgroundSprite.setTexture(_backgroundTexture);
+    _backgroundSprite.setTexture(
+        _assetManager.getAsset<sf::Texture>("backgroundTexture"));
 }
 
 void Game::setupClient()
@@ -59,6 +62,12 @@ int main(int argc, char **argv)
     (void) argv;
 
     Engine::Core gameEngine;
+    gameEngine.setTickRate(60);
+    gameEngine.loadFeature<Engine::Feature::ECSManager>();
+    gameEngine.loadFeature<Engine::Feature::EventManager>();
+    gameEngine.loadFeature<Engine::Feature::AssetManager>();
+    // gameEngine.loadFeature<Engine::Feature::Networking>();
+
     Game game(gameEngine);
 
 #if defined(RTYPE_SERVER)
@@ -69,11 +78,6 @@ int main(int argc, char **argv)
     game.setupClient();
     std::cout << "Client mode" << std::endl;
 #endif
-
-    gameEngine.setTickRate(60);
-    gameEngine.loadFeature<Engine::Feature::ECSManager>();
-    gameEngine.loadFeature<Engine::Feature::EventManager>();
-    // gameEngine.loadFeature<Engine::Feature::Networking>();
 
     // auto &manager = gameEngine.getFeature<Engine::Feature::ECSManager>();
 

@@ -11,7 +11,7 @@
 // #include "RenderClass.hpp"
 // #include "game.hpp"
 
-// std::shared_ptr<ecs::Entity> &game::getLocalPlayer()
+// ecs::Entity & &game::getLocalPlayer()
 // {
 //     return _player;
 // }
