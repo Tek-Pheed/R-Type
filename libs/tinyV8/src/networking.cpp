@@ -16,6 +16,7 @@
 // NetworkingManager::NetworkingManager(Core &engineRef)
 //     : AEngineFeature(engineRef)
 // {
+//      System::Network::initNetwork();
 // }
 
 // NetworkingManager::~NetworkingManager()

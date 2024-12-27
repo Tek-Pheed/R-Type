@@ -5,6 +5,10 @@
 ** Networking
 */
 
+/**
+ * @file: Built-in event manager of the game engine.
+ */
+
 #ifndef TINY_V8_EVENT
 #define TINY_V8_EVENT
 
