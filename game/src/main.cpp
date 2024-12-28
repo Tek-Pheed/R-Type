@@ -5,19 +5,20 @@
 ** main
 */
 
+#include <any>
 #include <iostream>
 #include <memory>
+#include <string>
 
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineECSManager.hpp"
-#include "EngineEvents.hpp"
+#include "GameEvents.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Texture.hpp"
 #include "SFML/Window/VideoMode.hpp"
 #include "game.hpp"
-
 
 void Game::setupClient()
 {
@@ -44,6 +45,16 @@ static int print_help()
     return 0;
 }
 
+void handleCustomEvent(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    int i = std::any_cast<int>(arg);
+
+    std::cout << "Triggered custom event " << event << " with data="<< i
+              << ", engine delta: " << std::to_string(core.getDeltaTime_Sec())
+              << std::endl;
+}
+
 int main(int argc, char **argv)
 {
     (void) argc;
@@ -57,7 +68,6 @@ int main(int argc, char **argv)
     Engine::Core gameEngine;
     gameEngine.setTickRate(60);
     gameEngine.loadFeature<Engine::Feature::ECSManager<Game>>();
-    gameEngine.loadFeature<Engine::Feature::EventManager>();
     gameEngine.loadFeature<Engine::Feature::AssetManager>();
     // gameEngine.loadFeature<Engine::Feature::Networking>();
 
@@ -72,12 +82,16 @@ int main(int argc, char **argv)
     std::cout << "Client mode" << std::endl;
 #endif
 
+    gameEngine.addEventBinding(GameEvents::ExempleEvent, handleCustomEvent);
+    gameEngine.addEventBinding<Game>(Engine::Events::OnTick, &Game::gameUpdate, game);
 
     /*manager.createSubsxxystem<ecs::BulletSystem>();
 
     auto &bulletSub = manager.getSubsystem<ecs::BulletSystem>();
     auto entity = manager.createEntity();
     // entity->addComponent((bulletSub));*/
+
+    gameEngine.triggerEvent(GameEvents::ExempleEvent, 36);
 
     gameEngine.mainLoop();
 }

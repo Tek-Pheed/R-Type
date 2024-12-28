@@ -46,7 +46,7 @@ class Game {
     ecs::Entity &getLocalPlayer();
     size_t getPlayerId();
 
-    void gameUpdate(float deltaTime_sec);
+    void gameUpdate(Engine::Events::EventType event, Engine::Core &core, std::any arg);
     bool isServer() const;
 
     void createPlayer();

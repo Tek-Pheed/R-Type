@@ -79,7 +79,6 @@ namespace ecs
         explicit EnemyComponent();
     };
 
-
     class RenderComponent : public Component {
       public:
         enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };
@@ -253,6 +252,21 @@ namespace ecs
       private:
         std::string _name;
     };
+
+    // class ReplicationComponent : public Component {
+    //     enum ReplicationMode { NO_REPLICATION, OTHER_ONLY, MULTICAST };
+    //     enum ReplicationMethod { FAST, RELIABLE };
+
+    //   public:
+    //     explicit ReplicationComponent(Entity &attachedEntity);
+
+    //     template<typename PropertyType, typename FuncSign>
+    //     void addPropertyReplication(std::function<FuncSign> getterFunction, )
+
+    //   private:
+    //     Entity &_attachedEntity;
+
+    // };
 } // namespace ecs
 
 #endif // R_TYPE_COMPONENT_HPP

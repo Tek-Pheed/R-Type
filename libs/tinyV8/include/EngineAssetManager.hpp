@@ -100,9 +100,9 @@ namespace Engine
             }
 
           protected:
-            void onStart(void) override;
-            void onTick(float deltaTimeSec) override;
-            void onStop(void) override;
+            void engineOnStart(void) override;
+            void engineOnTick(float deltaTimeSec) override;
+            void engineOnStop(void) override;
 
             std::unordered_map<std::type_index,
                 std::unordered_map<std::string, std::any>>

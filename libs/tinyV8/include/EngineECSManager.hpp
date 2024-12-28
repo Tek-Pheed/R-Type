@@ -285,9 +285,9 @@ namespace Engine
             }
 
           protected:
-            void onStart(void) override {};
-            void onStop(void) override {};
-            void onTick(float deltaTimeSec) override
+            void engineOnStart(void) override {};
+            void engineOnStop(void) override {};
+            void engineOnTick(float deltaTimeSec) override
             {
                 (void) deltaTimeSec;
 

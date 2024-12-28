@@ -14,10 +14,14 @@
 #ifndef TINY_V8_HPP
 #define TINY_V8_HPP
 
+#include <any>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <typeindex>
+#include <vector>
 
 #include <unordered_map>
 
@@ -31,6 +35,21 @@ namespace Engine
 {
     static constexpr uint16_t DEFAULT_TICK_RATE = 60;
     class Core;
+
+    /**
+     * @brief Namespace providing custom events
+     */
+    namespace Events
+    {
+        using EventType = std::string;
+        using EventHanlderType =
+            std::function<void(EventType, Core &, std::any)>;
+
+        inline constexpr EventType OnTick = {"onTick"};
+        inline constexpr EventType OnStart = {"onStart"};
+        inline constexpr EventType OnStop = {"onStop"};
+
+    }; // namespace Events
 
     /**
      * @brief Engine feature base class.
@@ -51,12 +70,12 @@ namespace Engine
         ~AEngineFeature() {};
 
         /**
-         * @brief The start event.
+         * @brief The engine start event.
 
          * This function will be called once the class was loaded into the game
          engine Core class.
          */
-        virtual void onStart(void) = 0;
+        virtual void engineOnStart(void) = 0;
 
         /**
          * @brief The tick event.
@@ -65,7 +84,7 @@ namespace Engine
          mainloop during a tick.
          * @param deltaTimeSec: Delta time between two ticks (in seconds).
          */
-        virtual void onTick(float deltaTimeSec) = 0;
+        virtual void engineOnTick(float deltaTimeSec) = 0;
 
         /**
          * @brief The stop event.
@@ -73,7 +92,7 @@ namespace Engine
          * This function will be called by the game engine Core class when the
          feature is from the engine unloaded.
          */
-        virtual void onStop(void) = 0;
+        virtual void engineOnStop(void) = 0;
 
       protected:
         // Reference to the engine Core class.
@@ -215,6 +234,13 @@ namespace Engine
         }
 
         /**
+         * @brief Return the last recorded delta time.
+
+         * @return float: Delta time in seconds.
+         */
+        float getDeltaTime_Sec(void);
+
+        /**
          * @brief The game engine main loop.
          * This loop will update all game engine features and subsystems with a
          * constant tick rate.
@@ -223,28 +249,78 @@ namespace Engine
          */
         void mainLoop(void);
 
+        /**
+         * @brief Create a new event binding.
+
+         * @param event: The event type.
+         * @param eventHandler: The callback function.
+         * @note: You can create multiple bindings for a single event type.
+         */
+        void addEventBinding(const Events::EventType &event,
+            Events::EventHanlderType eventHandler);
+
+        /**
+         * @brief Create a new event binding.
+
+         * @tparam T: The type of the class containing the event handler.
+         * @param event: The event type.
+         * @param eventHandler The callback function (class member function).
+         * @param classRef: Instance of the class containing the callback.
+         */
+        template <class T>
+        void addEventBinding(const Events::EventType &event,
+            std::function<void(T *ptr, Events::EventType, Core &, std::any)>
+                eventHandler,
+            T &classRef)
+        {
+            auto fnc =
+                std::bind(eventHandler, &classRef, std::placeholders::_1,
+                    std::placeholders::_2, std::placeholders::_3);
+
+            addEventBinding(event, fnc);
+        }
+
+        /**
+         * @brief Removes all event binding of type.
+
+         * @return true: The bindings were successfully removed.
+         * @return false: Unable to remove bindings.
+         */
+        bool clearEventBinding(const Events::EventType &event);
+
+        /**
+         * @brief Triggers the given event.
+
+         * @param event: The event to trigger.
+         * @param extraArg: An extra argument to pass to the callback function.
+         * @return true: The event was triggered successfully.
+         * @return false: The event could not be triggered.
+         */
+        bool triggerEvent(
+            const Events::EventType &event, std::any extraArg = {});
+
       protected:
         /**
-         * @brief Start event.
+         * @brief Built-In Start event.
 
          * This event is called when the mainloop starts.
          */
-        void onStart(void);
+        void engineOnStart(void);
 
         /**
-         * @brief Tick event.
+         * @brief Built-In Tick event.
 
          * This event is called every tick.
          * @param deltaTimeSec: Delta time between two ticks (in seconds).
          */
-        void onTick(float deltaTimeSec);
+        void engineOnTick(float deltaTimeSec);
 
         /**
-         * @brief Stop event.
+         * @brief Built-In Stop event.
 
          * This event is called when the mainloop stops.
          */
-        void onStop(void);
+        void engineOnStop(void);
 
         // Controls whether the mainloop can run
         bool _running = true;
@@ -258,10 +334,17 @@ namespace Engine
         // Global engine lock (mutex)
         std::mutex _engineLock;
 
+        // Map of custom events
+        std::unordered_map<Events::EventType,
+            std::vector<Events::EventHanlderType>>
+            _events;
+
       private:
         // Map of engine features
         std::unordered_map<std::type_index, std::unique_ptr<AEngineFeature>>
             _features;
+
+        float _currentDeltaTime = 0.0f;
     };
 
 } // namespace Engine

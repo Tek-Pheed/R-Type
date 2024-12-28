@@ -5,6 +5,8 @@
 ** game
 */
 
+#include <any>
+#include "GameEvents.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -46,10 +48,19 @@ void Game::LoadTexture()
         assetManager.getAsset<sf::Texture>("backgroundTexture"));
 }
 
-void Game::gameUpdate(float deltaTime_sec)
+void Game::gameUpdate(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
     // System updates will be called automatically by the game engine.
-    (void) deltaTime_sec;
+    (void) core;
+    float deltaTime_sec = std::any_cast<float>(arg);
+
+    std::cout << "Triggered game event " << event
+              << ", engine delta: " << std::to_string(deltaTime_sec)
+              << std::endl;
+    static int i = 0;
+    i++;
+    core.triggerEvent(GameEvents::ExempleEvent, i);
     return;
 }
 

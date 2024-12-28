@@ -17,18 +17,18 @@ AssetManager::~AssetManager()
 {
 }
 
-void AssetManager::onStart()
+void AssetManager::engineOnStart()
 {
     return;
 }
 
-void AssetManager::onTick(float deltaTimeSec)
+void AssetManager::engineOnTick(float deltaTimeSec)
 {
     (void) deltaTimeSec;
     return;
 }
 
-void AssetManager::onStop(void)
+void AssetManager::engineOnStop(void)
 {
     return;
 }
