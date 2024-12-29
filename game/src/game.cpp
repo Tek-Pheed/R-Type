@@ -6,6 +6,7 @@
 */
 
 #include <any>
+#include "EngineLevelManager.hpp"
 #include "GameEvents.hpp"
 #if defined(WIN32)
     #define NOMINMAX
@@ -66,7 +67,7 @@ void Game::gameUpdate(
 
 Game::Game(Engine::Core &engineRef)
     : refGameEngine(engineRef),
-      entityManager(engineRef.getFeature<Engine::Feature::ECSManager<Game>>()),
+      entityManager(engineRef.getFeature<Engine::Feature::LevelManager<Game>>()),
       assetManager(engineRef.getFeature<Engine::Feature::AssetManager>())
 {
 }
@@ -88,7 +89,7 @@ void Game::setServerMode(bool mode)
 
 ecs::Entity &Game::getLocalPlayer()
 {
-    return (entityManager.getEntityById(_PlayerId));
+    return (entityManager.getCurrentLevel().getEntityById(_PlayerId));
 }
 
 size_t Game::getPlayerId()
@@ -126,11 +127,11 @@ void Game::updateLocalPlayerPosition()
 void Game::gameLoop(float deltaTime)
 {
     auto &posSystem =
-        entityManager.getSubsystem<GameSystems::PositionSystem>();
+        entityManager.getCurrentLevel().getSubsystem<GameSystems::PositionSystem>();
     auto &renderSystem =
-        entityManager.getSubsystem<GameSystems::RenderSystem>();
+        entityManager.getCurrentLevel().getSubsystem<GameSystems::RenderSystem>();
     auto &bulletSystem =
-        entityManager.getSubsystem<GameSystems::BulletSystem>();
+        entityManager.getCurrentLevel().getSubsystem<GameSystems::BulletSystem>();
 
     (void) posSystem;
     (void) renderSystem;
@@ -158,14 +159,14 @@ void Game::gameLoop(float deltaTime)
 
 std::vector<ecs::Entity> &Game::getEntities()
 {
-    return (entityManager.getEntitiesVect());
+    return (entityManager.getCurrentLevel().getEntitiesVect());
 }
 
 void Game::playEvent()
 {
     sf::Event event;
     std::stringstream ss;
-    auto &player = entityManager.getEntityById(_PlayerId);
+    auto &player = entityManager.getCurrentLevel().getEntityById(_PlayerId);
     auto velocity = player.getComponent<ecs::VelocityComponent>();
 
     while (_window->pollEvent(event)) {

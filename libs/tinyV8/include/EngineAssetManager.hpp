@@ -28,6 +28,7 @@ namespace Engine
         class AssetManager : public AEngineFeature {
           public:
             explicit AssetManager(Core &engineRef);
+            AssetManager(AssetManager &&other) = default;
             ~AssetManager();
 
             /**

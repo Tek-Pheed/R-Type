@@ -76,7 +76,7 @@
 
 void Game::createPlayer()
 {
-    auto &player = entityManager.createEntity();
+    auto &player = entityManager.getCurrentLevel().createEntity();
     auto &texture = assetManager.getAsset<sf::Texture>("playerTexture");
     sf::Sprite sprite;
 

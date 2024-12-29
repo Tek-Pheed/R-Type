@@ -12,7 +12,7 @@
 #include <memory>
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
-#include "EngineECSManager.hpp"
+#include "EngineLevelManager.hpp"
 #include "Entity.hpp"
 #include "GameSystems.hpp"
 
@@ -52,7 +52,7 @@ class Game {
     void createPlayer();
 
     Engine::Core &refGameEngine;
-    Engine::Feature::ECSManager<Game> &entityManager;
+    Engine::Feature::LevelManager<Game> &entityManager;
     Engine::Feature::AssetManager &assetManager;
 
     //     int createConnection(const char *ip, int portTCP, int portUDP);

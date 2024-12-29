@@ -68,6 +68,8 @@ namespace Engine
       public:
         explicit AEngineFeature(Core &engineRef) : _engineRef(engineRef) {};
         ~AEngineFeature() {};
+        explicit AEngineFeature(AEngineFeature &&other)
+            : _engineRef(other._engineRef) {};
 
         /**
          * @brief The engine start event.

@@ -10,12 +10,14 @@
 #include <memory>
 #include <string>
 
+#include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
-#include "EngineECSManager.hpp"
+#include "EngineLevelManager.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Graphics/Rect.hpp"
+#include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Texture.hpp"
 #include "SFML/Window/VideoMode.hpp"
 #include "game.hpp"
@@ -50,7 +52,7 @@ void handleCustomEvent(
 {
     int i = std::any_cast<int>(arg);
 
-    std::cout << "Triggered custom event " << event << " with data="<< i
+    std::cout << "Triggered custom event " << event << " with data=" << i
               << ", engine delta: " << std::to_string(core.getDeltaTime_Sec())
               << std::endl;
 }
@@ -67,7 +69,7 @@ int main(int argc, char **argv)
 
     Engine::Core gameEngine;
     gameEngine.setTickRate(60);
-    gameEngine.loadFeature<Engine::Feature::ECSManager<Game>>();
+    gameEngine.loadFeature<Engine::Feature::LevelManager<Game>>();
     gameEngine.loadFeature<Engine::Feature::AssetManager>();
     // gameEngine.loadFeature<Engine::Feature::Networking>();
 
@@ -83,7 +85,8 @@ int main(int argc, char **argv)
 #endif
 
     gameEngine.addEventBinding(GameEvents::ExempleEvent, handleCustomEvent);
-    gameEngine.addEventBinding<Game>(Engine::Events::OnTick, &Game::gameUpdate, game);
+    gameEngine.addEventBinding<Game>(
+        Engine::Events::OnTick, &Game::gameUpdate, game);
 
     /*manager.createSubsxxystem<ecs::BulletSystem>();
 
@@ -91,7 +94,45 @@ int main(int argc, char **argv)
     auto entity = manager.createEntity();
     // entity->addComponent((bulletSub));*/
 
-    gameEngine.triggerEvent(GameEvents::ExempleEvent, 36);
+    auto &levelMan =
+        gameEngine.getFeature<Engine::Feature::LevelManager<Game>>();
+
+    (void) levelMan;
+
+    levelMan.createNewLevel("levelTest");
+    levelMan.createNewLevel("finalLevel");
+
+    levelMan.switchLevel("levelTest", false);
+
+    auto &ent = levelMan.getCurrentLevel().createEntity();
+    ent.addComponent(std::make_shared<ecs::PositionComponent>());
+
+    auto &enta = levelMan.getSpecificLevel("finalLevel").createEntity();
+    // enta.addComponent(std::make_shared<ecs::NameComponent>("toto"));
+    enta.addComponent(std::make_shared<ecs::PositionComponent>(50, 50));
+    enta.addComponent(std::make_shared<ecs::BulletComponent>(false));
+    enta.addComponent(
+        std::make_shared<ecs::RenderComponent>(ecs::RenderComponent::SPRITE));
+    auto texture = sf::Texture();
+    texture.loadFromFile("assets/sprites/r-typesheet1.gif");
+    auto sprite = sf::Sprite(texture);
+    enta.addComponent(
+        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 100, 100));
+
+    // enta.addComponent(std::make_shared<ecs::VelocityComponent>(1,1));
+    levelMan.getSpecificLevel("finalLevel")
+        .createSubsystem<GameSystems::PositionSystem>()
+        .initSystem(game);
+    levelMan.getSpecificLevel("finalLevel")
+        .createSubsystem<GameSystems::BulletSystem>()
+        .initSystem(game);
+    levelMan.getSpecificLevel("finalLevel")
+        .createSubsystem<GameSystems::RenderSystem>()
+        .initSystem(game);
+
+    levelMan.switchLevel("finalLevel");
+
+    // gameEngine.triggerEvent(GameEvents::ExempleEvent, 36);
 
     gameEngine.mainLoop();
 }

@@ -5,6 +5,7 @@
 ** RenderSystem.cpp
 */
 
+#include <iostream>
 #include "Components.hpp"
 #include "GameSystems.hpp"
 #include "game.hpp"
@@ -20,6 +21,7 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
 {
     (void) deltaTime;
 
+    _game->getWindow().clear();
     for (auto &entity : entities) {
         auto renderComponent = entity.getComponent<ecs::RenderComponent>();
         auto position = entity.getComponent<ecs::PositionComponent>();
@@ -52,4 +54,5 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             _game->getWindow().draw(circle->getCircle());
         }
     }
+    _game->getWindow().display();
 }

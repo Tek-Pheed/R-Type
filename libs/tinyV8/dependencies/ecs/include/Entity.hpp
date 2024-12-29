@@ -7,8 +7,6 @@
 #ifndef R_TYPE_ENTITY_HPP
 #define R_TYPE_ENTITY_HPP
 
-#include <iostream>
-#include <map>
 #include <memory>
 #include <typeindex>
 #include <vector>

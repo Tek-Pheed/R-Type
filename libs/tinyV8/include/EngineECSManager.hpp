@@ -46,10 +46,11 @@ namespace Engine
           public:
             explicit ECSManager(Core &engineRef)
                 : AEngineFeature(engineRef) {};
+            ECSManager(ECSManager &&other) = default;
             ~ECSManager() {};
 
             /**
-             * @brief Create a new Entity
+             * @brief Create a new Entity.
 
              * This functions constructs an Entity object owned by this class.
              * @return ecs::Entity&: A reference to the constructed object.
@@ -58,8 +59,7 @@ namespace Engine
             {
                 const size_t id = generateNewId();
 
-                _entities[id] = ecs::Entity(id);
-                return (_entities[id]);
+                return (_entities.emplace_back(ecs::Entity(id)));
             }
 
             /**
@@ -75,12 +75,12 @@ namespace Engine
             {
                 if (doesEntityExists(entity.getID()))
                     return (false);
-                _entities[entity.getID()] = entity;
+                _entities.emplace_back(std::move(entity));
                 return (true);
             }
 
             /**
-             * @brief Destroy en entity owned by the manager
+             * @brief Destroy en entity owned by the manager.
 
              * @param id The ID of the entity to detroy.
              * @return true: The entity was successfully deleted.
@@ -97,6 +97,14 @@ namespace Engine
                     }
                 }
                 return (true);
+            }
+
+            /**
+             * @brief Delete all entities owned by the manager.
+             */
+            void clearEntities(void)
+            {
+                _entities.clear();
             }
 
             /**
@@ -225,7 +233,7 @@ namespace Engine
             }
 
             /**
-             * @brief Create a Subsystem object
+             * @brief Create a Subsystem object.
 
              + This function created a System object derived from ecs::ISystem.
              * @tparam SubSystem: A class derived from ecs::ISystem
@@ -269,7 +277,7 @@ namespace Engine
             }
 
             /**
-             * @brief Destroy a system
+             * @brief Destroy a system.
 
              * @tparam SubSystem: A class derived from ecs::ISystem.
              * @return true: The system was successfully destroyed.
@@ -301,6 +309,7 @@ namespace Engine
                 explicit SubSys_t(
                     std::unique_ptr<ecs::ISystem<GameClass>> s, bool updt)
                     : sys(std::move(s)), update(updt) {};
+                explicit SubSys_t(SubSys_t &&other) : sys(std::move(other.sys)), update(other.update) {};
 
                 std::unique_ptr<ecs::ISystem<GameClass>> sys;
                 bool update;
