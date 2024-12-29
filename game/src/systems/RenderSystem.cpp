@@ -5,6 +5,10 @@
 ** RenderSystem.cpp
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <iostream>
 #include "Components.hpp"
 #include "GameSystems.hpp"

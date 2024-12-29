@@ -5,8 +5,12 @@
 // ** player
 // */
 
-// #include <sstream>
 
+// #if defined(WIN32)
+//     #define NOMINMAX
+// #endif
+
+// #include <sstream>
 // #include "Components.hpp"
 // #include "RenderClass.hpp"
 // #include "Game.hpp"

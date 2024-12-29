@@ -8,6 +8,10 @@
 #ifndef RENDERCLASS_HPP_
 #define RENDERCLASS_HPP_
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "Entity.hpp"

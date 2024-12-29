@@ -5,6 +5,10 @@
 ** BulletSystem.cpp
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "GameSystems.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "Game.hpp"

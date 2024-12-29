@@ -8,6 +8,10 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <SFML/Graphics.hpp>
 #include <cstdint>
 #include <memory>

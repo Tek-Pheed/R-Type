@@ -8,6 +8,10 @@
 #ifndef GAME_SERVER_HPP
 #define GAME_SERVER_HPP
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "EngineNetworking.hpp"
 #include "Game.hpp"
 

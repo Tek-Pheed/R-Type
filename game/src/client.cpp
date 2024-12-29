@@ -5,6 +5,10 @@
 // ** client
 // */
 
+// #if defined(WIN32)
+//     #define NOMINMAX
+// #endif
+
 // #include <ctime>
 // #include <memory>
 // #include <vector>

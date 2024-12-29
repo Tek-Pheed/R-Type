@@ -5,6 +5,10 @@
 ** Config
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "Config.hpp"
 #include <vector>
 #include "ErrorClass.hpp"

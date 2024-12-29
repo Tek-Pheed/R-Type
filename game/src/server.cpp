@@ -5,6 +5,10 @@
 ** server specific functions
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <cstddef>
 #include "GameProtocol.hpp"
 #include "GamerServer.hpp"

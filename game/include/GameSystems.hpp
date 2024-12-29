@@ -8,6 +8,10 @@
 #ifndef R_TYPE_SYSTEMS_HPP
 #define R_TYPE_SYSTEMS_HPP
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>

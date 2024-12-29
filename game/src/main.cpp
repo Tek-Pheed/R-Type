@@ -5,6 +5,10 @@
 ** main
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <cstdint>
 #include <iostream>
 #include <memory>

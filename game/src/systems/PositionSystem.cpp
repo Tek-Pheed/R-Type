@@ -5,6 +5,10 @@
 ** PositionSystem
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "Components.hpp"
 #include "GameSystems.hpp"
 #include "Game.hpp"

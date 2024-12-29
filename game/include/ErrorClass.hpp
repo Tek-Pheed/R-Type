@@ -8,6 +8,10 @@
 #ifndef ERRORCLASS_HPP_
 #define ERRORCLASS_HPP_
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <stdexcept>
 #include <string>
 

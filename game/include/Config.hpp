@@ -8,6 +8,10 @@
 #ifndef CONFIGCLASS_HPP_
 #define CONFIGCLASS_HPP_
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <fstream>
 #include <iostream>
 #include <map>
