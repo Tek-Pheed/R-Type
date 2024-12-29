@@ -1,147 +1,212 @@
-// /*
-// ** EPITECH PROJECT, 2024
-// ** R-Type
-// ** File description:
-// ** Networking
-// */
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description:
+** Networking
+*/
 
-// /**
-//  * @file Warning: This library is not ready yet. Do not use it yet, it's API will change.
-//  */
+/**
+ * @file Warning: This library is not ready yet. Do not use it yet, it's API
+ * will change.
+ */
 
-// #ifndef TINY_V8_NETWORKING
-// #define TINY_V8_NETWORKING
+#ifndef TINY_V8_NETWORKING
+#define TINY_V8_NETWORKING
 
-// #include "Engine.hpp"
+#include <cstddef>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
+#include "Engine.hpp"
+#include "system_network.hpp"
+#include "system_tcp.hpp"
+#include "system_udp.hpp"
+#include <condition_variable>
+#include <unordered_map>
 
-// #include <cstddef>
-// #include <mutex>
-// #include <string>
-// #include <vector>
-// #include "system_network.hpp"
-// #include "system_tcp.hpp"
-// #include "system_udp.hpp"
-// #include <condition_variable>
-// #include <unordered_map>
+template <typename T> std::string getString(T arg)
+{
+    return (std::to_string(arg));
+}
 
+template <> inline std::string getString(const char *arg)
+{
+    return (std::string(arg));
+}
 
-// template <typename T> std::string getString(T arg)
-// {
-//     return (std::to_string(arg));
-// }
+template <> inline std::string getString(const std::string &arg)
+{
+    return (arg);
+}
 
-// template <> inline std::string getString(const char *arg)
-// {
-//     return (std::string(arg));
-// }
+template <> inline std::string getString(std::string &arg)
+{
+    return (arg);
+}
 
-// template <> inline std::string getString(const std::string &arg)
-// {
-//     return (arg);
-// }
+template <> inline std::string getString(std::string arg)
+{
+    return (arg);
+}
 
-// template <> inline std::string getString(std::string &arg)
-// {
-//     return (arg);
-// }
+namespace Engine
+{
+    namespace Events
+    {
+        // Event when as a client you are connecting to the server, no
+        // arguments
+        constexpr auto EVENT_ConnectedToServer{"onConnectedToServer"};
 
-// template <> inline std::string getString(std::string arg)
-// {
-//     return (arg);
-// }
+        // Event when as a client you lost the connection to the server, no
+        // arguments
+        constexpr auto EVENT_DisconnectedFromServer{"onDisconnectedToServer"};
 
-// namespace Engine
-// {
-//     namespace Feature
-//     {
-//         class NetworkingManager : public AEngineFeature {
-//             static size_t constexpr DEFAULT_TCP_PORT = 8081;
-//             static size_t constexpr DEFAULT_UDP_PORT = 8082;
-//             struct NetClient {
-//               public:
-//                 System::Network::TCPSocket tcpSocket;
-//                 std::string ip;
-//                 uint16_t port;
-//                 std::vector<std::string> readBufferTCP;
-//                 std::string writeBufferTCP;
-//                 std::vector<std::string> readBufferUDP;
-//                 std::string writeBufferUDP;
-//                 bool isReady;
-//                 bool isDisconnected;
+        // Event when as a server you get a new connection, no argument
+        constexpr auto EVENT_OnServerNewClient{"onServerNewClient"};
 
-//                 NetClient()
-//                     : tcpSocket(System::Network::TCPSocket()),
-//                       port(uint16_t()),
-//                       readBufferTCP(std::vector<std::string>()),
-//                       writeBufferTCP(std::string()),
-//                       readBufferUDP(std::vector<std::string>()),
-//                       writeBufferUDP(std::string()), isReady(false),
-//                       isDisconnected(false) {};
-//             };
+        // Event when as a server a client disconnects, ARG: ssize_t (client
+        // ID)
+        constexpr auto EVENT_OnServerLostClient{"onServerNewClient"};
 
-//           public:
-//             explicit NetworkingManager(Core &engineRef);
-//             ~NetworkingManager();
+    }; // namespace Events
 
-//             void setTCPPort(size_t port);
-//             void setUDPPort(size_t port);
-//             size_t getTCPPort(void);
-//             size_t getUDPPort(void);
+    // Implement protocol specific functions
+    class IPacketManager {
+      public:
+        virtual ~IPacketManager() = default;
+        virtual std::vector<std::string> splitPackets(
+            const System::Network::byteArray &bytes,
+            size_t &resultIndexEnd) = 0;
+        virtual ssize_t identifyClient(
+            const System::Network::byteArray &bytes) = 0;
+        virtual void serializeString(
+            const std::string &str, std::ostream &out) = 0;
+    };
+    namespace Feature
+    {
+        class NetworkingManager : public AEngineFeature {
+            static size_t constexpr DEFAULT_TCP_PORT = 8081;
+            static size_t constexpr DEFAULT_UDP_PORT = 8082;
+            struct NetClient {
+              public:
+                System::Network::TCPSocket tcpSocket;
+                std::string ip;
+                uint16_t port;
+                System::Network::byteArray readBufferTCP;
+                System::Network::byteArray writeBufferTCP;
+                System::Network::byteArray readBufferUDP;
+                System::Network::byteArray writeBufferUDP;
+                bool isReady;
+                bool isDisconnected;
 
-//             void setupServer(uint16_t TCP_port, uint16_t UDP_port);
-//             void setupClient(
-//                 uint16_t TCP_port, uint16_t UDP_port, const std::string &ip);
-//             void setClientID(size_t id); //TO Change
-//             std::string readUDPBuffer();
-//             std::string readTCPBuffer();
-//             void sendToAll(System::Network::ISocket::Type socketType,
-//                 const std::string &buffer);
-//             void sendToOne(size_t id,
-//                 System::Network::ISocket::Type socketType,
-//                 const std::string &buffer);
-//             void sendToOthers(size_t except_id,
-//                 System::Network::ISocket::Type socketType,
-//                 const std::string &buffer);
+                NetClient()
+                    : tcpSocket(System::Network::TCPSocket()),
+                      port(uint16_t()),
+                      readBufferTCP(System::Network::byteArray()),
+                      writeBufferTCP(System::Network::byteArray()),
+                      readBufferUDP(System::Network::byteArray()),
+                      writeBufferUDP(System::Network::byteArray()),
+                      isReady(false), isDisconnected(false) {};
+            };
 
-//           protected:
-//             void onStart(void) override;
-//             void onTick(float deltaTimeSec) override;
-//             void onStop(void) override;
+          public:
+            explicit NetworkingManager(Core &engineRef);
+            ~NetworkingManager();
 
-//             NetClient &addClient(const NetClient &client);
-//             NetClient &getClient(size_t id);
-//             void removeClient(size_t id);
+            void setTCPPort(size_t port);
+            void setUDPPort(size_t port);
+            size_t getTCPPort(void);
+            size_t getUDPPort(void);
 
-//             ssize_t identifyClient(const System::Network::ISocket &socket);
-//             ssize_t identifyClient(
-//                 const std::string &ip, const std::string &port);
+            template <class PacketManager>
+            void setupServer(uint16_t TCP_port, uint16_t UDP_port)
+            {
+                _pacMan = std::make_unique<PacketManager>();
+                _isServer = true;
+                _SocketTCP.initSocket(
+                    TCP_port, System::Network::ISocket::SERVE);
+                _SocketUDP.initSocket(UDP_port);
+                std::cout << "ENGINE: Running server on port TCP:"
+                          << std::to_string(TCP_port)
+                          << ", UDP:" << std::to_string(UDP_port) << std::endl;
 
-//             void writeToClient(NetClient &client, const std::string &data,
-//                 System::Network::ISocket::Type socketType);
+                std::thread(&NetworkingManager::runReadThread, this).detach();
+                std::thread(&NetworkingManager::runWriteThread, this).detach();
+                std::thread(&NetworkingManager::runConnectThread, this)
+                    .detach();
+            }
 
-//             // This function should be handeled by the game
-//             ssize_t authenticateUDPClient(
-//                 const System::Network::byteArray &packet);
+            template <class PacketManager>
+            void setupClient(
+                uint16_t TCP_port, uint16_t UDP_port, const std::string &ip)
+            {
+                _pacMan = std::make_unique<PacketManager>();
+                _isServer = false;
+                std::cout << "ENGINE: Connecting to server on port TCP:"
+                          << std::to_string(TCP_port)
+                          << ", UDP:" << std::to_string(UDP_port)
+                          << ", Address: " << ip << std::endl;
+                _SocketUDP.initSocket(static_cast<uint16_t>(UDP_port),
+                    System::Network::ISocket::CONNECT, ip);
+                NetClient cli;
+                cli.tcpSocket.initSocket(
+                    TCP_port, System::Network::ISocket::SERVE);
+                addClient(cli);
+                std::thread(&NetworkingManager::runReadThread, this).detach();
+                std::thread(&NetworkingManager::runWriteThread, this).detach();
+            }
 
-//             void runReadThread();
-//             void runWriteThread();
-//             void runConnectThread();
+            void setClientID(size_t id);
+            std::vector<std::string> readAllPackets();
+            std::vector<std::string>  readClientPackets(NetworkingManager::NetClient &cli);
 
-//             bool _isServer = false;
-//             size_t _tcpPort = DEFAULT_TCP_PORT;
-//             size_t _updPort = DEFAULT_UDP_PORT;
-//             std::mutex _globalMutex;
-//             std::condition_variable _writeCondition;
-//             std::mutex _writeMutex;
-//             size_t _clientCounter;
-//             size_t _clientID;
-//             std::unordered_map<size_t, NetClient> _clients;
-//             System::Network::TCPSocket _SocketTCP;
-//             System::Network::UDPSocket _SocketUDP;
-//         };
+            void sendToAll(System::Network::ISocket::Type socketType,
+                const std::string &buffer);
+            void sendToOne(size_t id,
+                System::Network::ISocket::Type socketType,
+                const std::string &buffer);
+            void sendToOthers(size_t except_id,
+                System::Network::ISocket::Type socketType,
+                const std::string &buffer);
 
-//     } // namespace Feature
+          protected:
+            void engineOnStart(void) override;
+            void engineOnTick(float deltaTimeSec) override;
+            void engineOnStop(void) override;
 
-// } // namespace Engine
+            NetClient &addClient(const NetClient &client);
+            NetClient &getClient(size_t id);
+            void removeClient(size_t id);
 
-// #endif /* TINY_V8_NETWORKING */
+            ssize_t identifyClient(const System::Network::ISocket &socket);
+            ssize_t identifyClient(
+                const std::string &ip, const std::string &port);
+
+            void writeToClient(NetClient &client, const std::string &data,
+                System::Network::ISocket::Type socketType);
+
+            void runReadThread();
+            void runWriteThread();
+            void runConnectThread();
+
+            std::unique_ptr<IPacketManager> _pacMan;
+            bool _isServer = false;
+            size_t _tcpPort = DEFAULT_TCP_PORT;
+            size_t _updPort = DEFAULT_UDP_PORT;
+            std::mutex _globalMutex;
+            std::condition_variable _writeCondition;
+            std::mutex _writeMutex;
+            size_t _clientCounter;
+            size_t _clientID;
+            std::unordered_map<size_t, NetClient> _clients;
+            System::Network::TCPSocket _SocketTCP;
+            System::Network::UDPSocket _SocketUDP;
+        };
+
+    } // namespace Feature
+
+} // namespace Engine
+
+#endif /* TINY_V8_NETWORKING */

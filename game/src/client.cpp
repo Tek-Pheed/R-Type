@@ -11,7 +11,7 @@
 // #include "Entity.hpp"
 // #include "Networking.hpp"
 // #include "RenderClass.hpp"
-// #include "game.hpp"
+// #include "Game.hpp"
 // #include "system_network.hpp"
 
 // game::game(Networking &net)
@@ -72,9 +72,11 @@
 #include "Entity.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Texture.hpp"
-#include "game.hpp"
+#include "Game.hpp"
 
-void Game::createPlayer()
+using namespace RType;
+
+void GameInstance::createPlayer()
 {
     auto &player = entityManager.getCurrentLevel().createEntity();
     auto &texture = assetManager.getAsset<sf::Texture>("playerTexture");
@@ -92,16 +94,16 @@ void Game::createPlayer()
         std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 3.0, 3.0));
 }
 
-sf::RenderWindow &Game::getWindow()
+sf::RenderWindow &GameInstance::getWindow()
 {
     return *_window;
 }
 
-void Game::playerShoot(ecs::Entity &player)
+void GameInstance::playerShoot(ecs::Entity &player)
 {
     std::stringstream ss;
     auto &manager =
-        refGameEngine.getFeature<Engine::Feature::ECSManager<Game>>();
+        refGameEngine.getFeature<Engine::Feature::ECSManager<GameInstance>>();
     auto bullet = manager.createEntity();
     auto positionComp = player.getComponent<ecs::PositionComponent>();
 
@@ -123,7 +125,7 @@ void Game::playerShoot(ecs::Entity &player)
     // writeToServer(ss.str(), System::Network::ISocket::UDP);
 }
 
-void Game::playerAnimations(ecs::Entity &player, std::string direction)
+void GameInstance::playerAnimations(ecs::Entity &player, std::string direction)
 {
     auto renderComp = player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
     if (direction == "top") {

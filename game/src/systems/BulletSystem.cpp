@@ -7,11 +7,12 @@
 
 #include "GameSystems.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
-#include "game.hpp"
+#include "Game.hpp"
 
+using namespace RType;
 using namespace GameSystems;
 
-void BulletSystem::initSystem(Game &gameRef)
+void BulletSystem::initSystem(GameInstance &gameRef)
 {
     _game = &gameRef;
 }

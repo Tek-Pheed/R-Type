@@ -16,40 +16,44 @@
 #include "SFML/Window/Window.hpp"
 #include "Systems.hpp"
 
-class Game;
-
-namespace GameSystems
+namespace RType
 {
-    class RenderSystem : public ecs::ISystem<Game> {
-      public:
-        void initSystem(Game &gameRef) override;
-        void update(
-            std::vector<ecs::Entity> &entity, float deltaTime) override;
+    class GameInstance;
 
-      protected:
-        Game *_game;
-    };
+    namespace GameSystems
+    {
+        class RenderSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
 
-    class PositionSystem : public ecs::ISystem<Game> {
-      public:
-        void initSystem(Game &gameRef) override;
-        void update(
-            std::vector<ecs::Entity> &entity, float deltaTime) override;
+          protected:
+            GameInstance *_game;
+        };
 
-      protected:
-        Game *_game;
-    };
+        class PositionSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
 
-    class BulletSystem : public ecs::ISystem<Game> {
-      public:
-        void initSystem(Game &gameRef) override;
-        void update(
-            std::vector<ecs::Entity> &entity, float deltaTime) override;
+          protected:
+            GameInstance *_game;
+        };
 
-      protected:
-        Game *_game;
-    };
+        class BulletSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
 
-} // namespace GameSystems
+          protected:
+            GameInstance *_game;
+        };
+
+    } // namespace GameSystems
+
+} // namespace RType
 
 #endif // R_TYPE_SYSTEMS_HPP

@@ -5,32 +5,40 @@
 ** game
 */
 
-#include <any>
-#include "EngineLevelManager.hpp"
-#include "GameEvents.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include <any>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <vector>
-
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
-#include "EngineECSManager.hpp"
+#include "EngineLevelManager.hpp"
+#include "EngineNetworking.hpp"
 #include "Entity.hpp"
+
+#include "GameEvents.hpp"
 #include "GameSystems.hpp"
+#include "Game.hpp"
 
-#include "game.hpp"
+using namespace RType;
 
-// Networking &game::getNetworking()
+// void handleCustomEvent(
+//     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 // {
-//     return (_refNetwork);
+//     auto i = std::any_cast<std::string>(arg);
+
+//     std::cout << "Triggered custom event " << event << " with data=" << i
+//               << ", engine delta: " <<
+//               std::to_string(core.getDeltaTime_Sec())
+//               << std::endl;
 // }
 
-void Game::LoadTexture()
+
+void GameInstance::loadTexture()
 {
     static const char *files[] = {"assets/sprites/r-typesheet42.gif",
         "assets/sprites/r-typesheet31.gif", "assets/sprites/r-typesheet1.gif",
@@ -49,14 +57,14 @@ void Game::LoadTexture()
         assetManager.getAsset<sf::Texture>("backgroundTexture"));
 }
 
-void Game::gameUpdate(
+void GameInstance::gameUpdate(
     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
     // System updates will be called automatically by the game engine.
     (void) core;
     float deltaTime_sec = std::any_cast<float>(arg);
 
-    std::cout << "Triggered game event " << event
+    std::cout << "Triggered game update " << event
               << ", engine delta: " << std::to_string(deltaTime_sec)
               << std::endl;
     static int i = 0;
@@ -65,49 +73,47 @@ void Game::gameUpdate(
     return;
 }
 
-Game::Game(Engine::Core &engineRef)
+GameInstance::GameInstance(Engine::Core &engineRef)
     : refGameEngine(engineRef),
-      entityManager(engineRef.getFeature<Engine::Feature::LevelManager<Game>>()),
-      assetManager(engineRef.getFeature<Engine::Feature::AssetManager>())
+      entityManager(
+          engineRef.getFeature<Engine::Feature::LevelManager<GameInstance>>()),
+      assetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
+      networkManager(
+          engineRef.getFeature<Engine::Feature::NetworkingManager>())
 {
 }
 
-Game::~Game()
+GameInstance::~GameInstance()
 {
     refGameEngine.stop();
 }
 
-bool Game::getServerMode()
+bool GameInstance::getServerMode()
 {
     return _isServer;
 }
 
-void Game::setServerMode(bool mode)
-{
-    _isServer = mode;
-}
-
-ecs::Entity &Game::getLocalPlayer()
+ecs::Entity &GameInstance::getLocalPlayer()
 {
     return (entityManager.getCurrentLevel().getEntityById(_PlayerId));
 }
 
-size_t Game::getPlayerId()
+size_t GameInstance::getPlayerId()
 {
     return (_PlayerId);
 }
 
-int Game::manageBuffers()
+int GameInstance::manageBuffers()
 {
     return 0;
 }
 
-bool Game::isServer() const
+bool GameInstance::isServer() const
 {
     return (_isServer);
 }
 
-void Game::updateLocalPlayerPosition()
+void GameInstance::updateLocalPlayerPosition()
 {
     auto position = getLocalPlayer().getComponent<ecs::PositionComponent>();
     if (position) {
@@ -124,14 +130,14 @@ void Game::updateLocalPlayerPosition()
     }
 }
 
-void Game::gameLoop(float deltaTime)
+void GameInstance::gameLoop(float deltaTime)
 {
-    auto &posSystem =
-        entityManager.getCurrentLevel().getSubsystem<GameSystems::PositionSystem>();
-    auto &renderSystem =
-        entityManager.getCurrentLevel().getSubsystem<GameSystems::RenderSystem>();
-    auto &bulletSystem =
-        entityManager.getCurrentLevel().getSubsystem<GameSystems::BulletSystem>();
+    auto &posSystem = entityManager.getCurrentLevel()
+                          .getSubsystem<GameSystems::PositionSystem>();
+    auto &renderSystem = entityManager.getCurrentLevel()
+                             .getSubsystem<GameSystems::RenderSystem>();
+    auto &bulletSystem = entityManager.getCurrentLevel()
+                             .getSubsystem<GameSystems::BulletSystem>();
 
     (void) posSystem;
     (void) renderSystem;
@@ -157,12 +163,12 @@ void Game::gameLoop(float deltaTime)
     backgroundAnimation(&background_s, &clockAnim);*/
 }
 
-std::vector<ecs::Entity> &Game::getEntities()
+std::vector<ecs::Entity> &RType::GameInstance::getEntities()
 {
     return (entityManager.getCurrentLevel().getEntitiesVect());
 }
 
-void Game::playEvent()
+void GameInstance::playEvent()
 {
     sf::Event event;
     std::stringstream ss;

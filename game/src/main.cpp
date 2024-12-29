@@ -5,26 +5,25 @@
 ** main
 */
 
-#include <any>
+#include <cstdint>
 #include <iostream>
 #include <memory>
-#include <string>
-
-#include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
+#include "EngineNetworking.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
-#include "SFML/Graphics/Rect.hpp"
-#include "SFML/Graphics/Sprite.hpp"
-#include "SFML/Graphics/Texture.hpp"
 #include "SFML/Window/VideoMode.hpp"
-#include "game.hpp"
+#include "Game.hpp"
 
-void Game::setupClient()
+void RType::GameInstance::setupClient(
+    const std::string &ip, uint16_t tcpPort, uint16_t udpPort)
 {
     _isServer = false;
+    _ip = ip;
+    _tcpPort = tcpPort;
+    _udpPort = udpPort;
     _window = std::make_unique<sf::RenderWindow>();
     sf::VideoMode videoMode(
         1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);
@@ -33,107 +32,75 @@ void Game::setupClient()
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
     }
-    LoadTexture();
+    loadTexture();
 }
 
-void Game::setupServer()
+static int printServerHelp()
 {
-    _isServer = true;
+    std::cout << "USAGE: ./server [PORT TCP] [PORT UDP]" << std::endl;
+    return (84);
 }
 
-static int print_help()
+static int printClientHelp()
 {
-    std::cout << "USAGE: ./game {IP} {PORT TCP} {PORT UDP}" << std::endl;
-    return 0;
+    std::cout << "USAGE: ./client [IP] [PORT TCP] [PORT UDP]" << std::endl;
+    return (84);
 }
 
-void handleCustomEvent(
-    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+static int prepareGame(int argc, const char *argv[],
+    RType::GameInstance &gameInstance, bool server)
 {
-    auto i = std::any_cast<std::string>(arg);
-
-    std::cout << "Triggered custom event " << event << " with data=" << i
-              << ", engine delta: " << std::to_string(core.getDeltaTime_Sec())
-              << std::endl;
-}
-
-int main(int argc, char **argv)
-{
-    (void) argc;
-    (void) argv;
-
-    if (argc == 1) {
-        print_help();
-        return (0);
+    if (server) {
+        if (argc == 1) {
+            gameInstance.setupServer();
+        } else {
+            if (argc != 3)
+                return (printServerHelp());
+            if (!atoi(argv[1]) || !atoi(argv[2]))
+                return (printClientHelp());
+            uint16_t portTCP = (uint16_t) atoi(argv[1]);
+            uint16_t portUDP = (uint16_t) atoi(argv[2]);
+            gameInstance.setupServer(portTCP, portUDP);
+        }
+        std::cout << "R-Type running as server" << std::endl;
+    } else {
+        if (argc == 1) {
+            gameInstance.setupClient();
+        } else {
+            if (argc != 4)
+                return (printClientHelp());
+            if (!atoi(argv[2]) || !atoi(argv[3]))
+                return (printClientHelp());
+            uint16_t portTCP = (uint16_t) atoi(argv[2]);
+            uint16_t portUDP = (uint16_t) atoi(argv[3]);
+            gameInstance.setupClient(std::string(argv[1]), portTCP, portUDP);
+        }
+        std::cout << "R-Type running as client" << std::endl;
     }
+    return (0);
+}
 
+int main(int argc, const char *argv[])
+{
     Engine::Core gameEngine;
-    gameEngine.setTickRate(60);
-    gameEngine.loadFeature<Engine::Feature::LevelManager<Game>>();
+    gameEngine.setTickRate(RType::GameInstance::REFRESH_RATE);
+    gameEngine.loadFeature<Engine::Feature::LevelManager<RType::GameInstance>>();
     gameEngine.loadFeature<Engine::Feature::AssetManager>();
-    // gameEngine.loadFeature<Engine::Feature::Networking>();
+    gameEngine.loadFeature<Engine::Feature::NetworkingManager>();
 
-    Game game(gameEngine);
+    RType::GameInstance gameInstance(gameEngine);
 
+    int result = 0;
 #if defined(RTYPE_SERVER)
-    game.setupServer();
-    std::cout << "Server mode" << std::endl;
+    result = prepareGame(argc, argv, gameInstance, true);
+#else
+    result = prepareGame(argc, argv, gameInstance, false);
 #endif
-#ifndef RTYPE_SERVER
-    game.setupClient();
-    std::cout << "Client mode" << std::endl;
-#endif
-
-    gameEngine.addEventBinding(Engine::Events::EVENT_OnLevelSwitch, handleCustomEvent);
-    //gameEngine.addEventBinding(GameEvents::EVENT_ExempleEvent, handleCustomEvent);
-    //gameEngine.addEventBinding<Game>(
-    //    Engine::Events::EVENT_OnTick, &Game::gameUpdate, game);
-
-    /*manager.createSubsxxystem<ecs::BulletSystem>();
-
-    auto &bulletSub = manager.getSubsystem<ecs::BulletSystem>();
-    auto entity = manager.createEntity();
-    // entity->addComponent((bulletSub));*/
-
-    auto &levelMan =
-        gameEngine.getFeature<Engine::Feature::LevelManager<Game>>();
-
-    (void) levelMan;
-
-    levelMan.createNewLevel("levelTest");
-    levelMan.createNewLevel("finalLevel");
-
-    levelMan.switchLevel("levelTest", false);
-
-    auto &ent = levelMan.getCurrentLevel().createEntity();
-    ent.addComponent(std::make_shared<ecs::PositionComponent>());
-
-    auto &enta = levelMan.getSpecificLevel("finalLevel").createEntity();
-    // enta.addComponent(std::make_shared<ecs::NameComponent>("toto"));
-    enta.addComponent(std::make_shared<ecs::PositionComponent>(50, 50));
-    enta.addComponent(std::make_shared<ecs::BulletComponent>(false));
-    enta.addComponent(
-        std::make_shared<ecs::RenderComponent>(ecs::RenderComponent::SPRITE));
-    auto texture = sf::Texture();
-    texture.loadFromFile("assets/sprites/r-typesheet1.gif");
-    auto sprite = sf::Sprite(texture);
-    enta.addComponent(
-        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 100, 100));
-
-    // enta.addComponent(std::make_shared<ecs::VelocityComponent>(1,1));
-    levelMan.getSpecificLevel("finalLevel")
-        .createSubsystem<GameSystems::PositionSystem>()
-        .initSystem(game);
-    levelMan.getSpecificLevel("finalLevel")
-        .createSubsystem<GameSystems::BulletSystem>()
-        .initSystem(game);
-    levelMan.getSpecificLevel("finalLevel")
-        .createSubsystem<GameSystems::RenderSystem>()
-        .initSystem(game);
-
-    levelMan.switchLevel("finalLevel");
-
-    // gameEngine.triggerEvent(GameEvents::ExempleEvent, 36);
-
+    if (result != 0)
+        return (result);
+    gameEngine.addEventBinding<RType::GameInstance>(
+        Engine::Events::EVENT_OnTick, &RType::GameInstance::gameUpdate,
+        gameInstance);
     gameEngine.mainLoop();
+    return (0);
 }

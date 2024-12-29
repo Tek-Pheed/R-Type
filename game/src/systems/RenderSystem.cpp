@@ -8,11 +8,12 @@
 #include <iostream>
 #include "Components.hpp"
 #include "GameSystems.hpp"
-#include "game.hpp"
+#include "Game.hpp"
 
+using namespace RType;
 using namespace GameSystems;
 
-void RenderSystem::initSystem(Game &gameRef)
+void RenderSystem::initSystem(GameInstance &gameRef)
 {
     _game = &gameRef;
 }

@@ -7,11 +7,12 @@
 
 #include "Components.hpp"
 #include "GameSystems.hpp"
-#include "game.hpp"
+#include "Game.hpp"
 
+using namespace RType;
 using namespace GameSystems;
 
-void PositionSystem::initSystem(Game &gameRef)
+void PositionSystem::initSystem(GameInstance &gameRef)
 {
     _game = &gameRef;
 }

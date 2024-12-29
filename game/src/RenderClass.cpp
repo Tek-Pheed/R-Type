@@ -15,7 +15,7 @@
 #include "Components.hpp"
 #include "ErrorClass.hpp"
 #include "GameSystems.hpp"
-#include "game.hpp"
+#include "Game.hpp"
 
 RenderClass::RenderClass(
     int width, int height, const std::string &title, int frameRate)

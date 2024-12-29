@@ -9,7 +9,7 @@
 
 // #include "Components.hpp"
 // #include "RenderClass.hpp"
-// #include "game.hpp"
+// #include "Game.hpp"
 
 // ecs::Entity & &game::getLocalPlayer()
 // {

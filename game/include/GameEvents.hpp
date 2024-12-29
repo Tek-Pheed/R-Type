@@ -10,12 +10,17 @@
 
 #include "Engine.hpp"
 
-class Game;
+namespace RType
+{
 
-namespace GameEvents {
+    class GameInstance;
 
-    constexpr auto EVENT_ExempleEvent{"exampleEvent"};
+    namespace GameEvents
+    {
 
-}
+        constexpr auto EVENT_ExempleEvent{"exampleEvent"};
+
+    }
+}; // namespace RType
 
 #endif
