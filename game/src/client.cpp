@@ -69,33 +69,42 @@
 // }
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 #include <sstream>
-
 #include "Components.hpp"
 #include "EngineECSManager.hpp"
 #include "Entity.hpp"
+#include "Game.hpp"
+#include "GameBuilder.hpp"
+#include "GamerServer.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Texture.hpp"
-#include "Game.hpp"
+#include "SFML/Window/VideoMode.hpp"
 
 using namespace RType;
 
-void GameInstance::createPlayer()
+void RType::GameInstance::setupClient(
+    const std::string &ip, uint16_t tcpPort, uint16_t udpPort)
 {
-    auto &player = entityManager.getCurrentLevel().createEntity();
-    auto &texture = assetManager.getAsset<sf::Texture>("playerTexture");
-    sf::Sprite sprite;
+    _isServer = false;
+    _ip = ip;
+    _tcpPort = tcpPort;
+    _udpPort = udpPort;
+    _window = std::make_unique<sf::RenderWindow>();
+    sf::VideoMode videoMode(
+        1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);
+    _window->create(videoMode, "R-Type");
+    _window->setFramerateLimit(refGameEngine.getTickRate());
+    if (!_window->isOpen()) {
+        throw std::runtime_error("Failed to create the SFML window.");
+    }
+    loadTexture();
+    RType::createPersistentLevel(*this);
+    RType::buildMainMenu(*this);
 
-    sprite.setTexture(texture);
-    sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
-    sprite.setScale(sf::Vector2f(3, 3));
-    player.addComponent(std::make_shared<ecs::PlayerComponent>());
-    player.addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
-    player.addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::RenderComponent::ObjectType::SPRITE));
-    player.addComponent(std::make_shared<ecs::VelocityComponent>(0.0, 0.0));
-    player.addComponent(
-        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 3.0, 3.0));
+    // Connect to server only when player select a game
+    // networkManager.setupClient<RType::PacketHandler>(_tcpPort, _udpPort,
+    // _ip);
 }
 
 sf::RenderWindow &GameInstance::getWindow()

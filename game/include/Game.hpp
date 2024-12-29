@@ -34,7 +34,6 @@ namespace RType
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
-        void gameLoop(float deltaTime);
 
         bool getServerMode();
 
@@ -57,15 +56,15 @@ namespace RType
 
         std::vector<ecs::Entity> &getEntities();
         int manageBuffers();
+        bool hasPlayer(void) const;
         void updateLocalPlayerPosition();
         ecs::Entity &getLocalPlayer();
-        size_t getPlayerId();
+        int getPlayerId(void) const;
+        void setPlayerId(int id);
 
         void gameUpdate(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         bool isServer() const;
-
-        void createPlayer();
 
         Engine::Core &refGameEngine;
         Engine::Feature::LevelManager<GameInstance> &entityManager;
@@ -112,7 +111,7 @@ namespace RType
         //     void enemyDamage(std::vector<std::string> &tokens);
 
       private:
-        size_t _PlayerId;
+        int _PlayerId = -1;
         bool _isServer;
         uint16_t _udpPort = DEFAULT_UDP_PORT;
         uint16_t _tcpPort = DEFAULT_TCP_PORT;
@@ -120,14 +119,11 @@ namespace RType
 
         std::unique_ptr<sf::RenderWindow> _window;
 
-        // Client Sprites
-        sf::Sprite _backgroundSprite;
-
         //     std::vector<ecs::Entity &> _entities;
 
         //     // To move into game Engine
         //     std::unordered_map<std::type_index, ecs::ISystem> _subsystems;
     };
-}; // namespace Game
+}; // namespace RType
 
-#endif /*game_HPP*/
+#endif /* GAME_HPP */

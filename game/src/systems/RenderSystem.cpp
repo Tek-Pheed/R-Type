@@ -11,8 +11,8 @@
 
 #include <iostream>
 #include "Components.hpp"
-#include "GameSystems.hpp"
 #include "Game.hpp"
+#include "GameSystems.hpp"
 
 using namespace RType;
 using namespace GameSystems;
@@ -31,8 +31,9 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         auto renderComponent = entity.getComponent<ecs::RenderComponent>();
         auto position = entity.getComponent<ecs::PositionComponent>();
 
-        if (renderComponent->getObjectType()
-            == ecs::RenderComponent::ObjectType::SPRITE) {
+        if (renderComponent != nullptr && position != nullptr
+            && renderComponent->getObjectType()
+                == ecs::RenderComponent::ObjectType::SPRITE) {
             auto sprite =
                 entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
             sprite->getSprite().setPosition(

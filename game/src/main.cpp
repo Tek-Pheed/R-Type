@@ -10,34 +10,15 @@
 #endif
 
 #include <cstdint>
+#include <exception>
 #include <iostream>
-#include <memory>
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
+#include "Game.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
-#include "SFML/Window/VideoMode.hpp"
-#include "Game.hpp"
-
-void RType::GameInstance::setupClient(
-    const std::string &ip, uint16_t tcpPort, uint16_t udpPort)
-{
-    _isServer = false;
-    _ip = ip;
-    _tcpPort = tcpPort;
-    _udpPort = udpPort;
-    _window = std::make_unique<sf::RenderWindow>();
-    sf::VideoMode videoMode(
-        1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);
-    _window->create(videoMode, "R-Type");
-    _window->setFramerateLimit(refGameEngine.getTickRate());
-    if (!_window->isOpen()) {
-        throw std::runtime_error("Failed to create the SFML window.");
-    }
-    loadTexture();
-}
 
 static int printServerHelp()
 {
@@ -88,23 +69,32 @@ int main(int argc, const char *argv[])
 {
     Engine::Core gameEngine;
     gameEngine.setTickRate(RType::GameInstance::REFRESH_RATE);
-    gameEngine.loadFeature<Engine::Feature::LevelManager<RType::GameInstance>>();
+    gameEngine
+        .loadFeature<Engine::Feature::LevelManager<RType::GameInstance>>();
     gameEngine.loadFeature<Engine::Feature::AssetManager>();
     gameEngine.loadFeature<Engine::Feature::NetworkingManager>();
 
     RType::GameInstance gameInstance(gameEngine);
 
-    int result = 0;
+    try {
+        int result = 0;
 #if defined(RTYPE_SERVER)
-    result = prepareGame(argc, argv, gameInstance, true);
+        result = prepareGame(argc, argv, gameInstance, true);
 #else
-    result = prepareGame(argc, argv, gameInstance, false);
+        result = prepareGame(argc, argv, gameInstance, false);
 #endif
-    if (result != 0)
-        return (result);
-    gameEngine.addEventBinding<RType::GameInstance>(
-        Engine::Events::EVENT_OnTick, &RType::GameInstance::gameUpdate,
-        gameInstance);
-    gameEngine.mainLoop();
+        if (result != 0)
+            return (result);
+        gameEngine.addEventBinding<RType::GameInstance>(
+            Engine::Events::EVENT_OnTick, &RType::GameInstance::gameUpdate,
+            gameInstance);
+        gameEngine.mainLoop();
+    } catch (const std::exception &e) {
+        std::cout << "We are sorry, but an unhandled exception occured during "
+                     "runtime: "
+                  << std::endl
+                  << e.what() << std::endl;
+        return (84);
+    }
     return (0);
 }

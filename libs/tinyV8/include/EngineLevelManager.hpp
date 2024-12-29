@@ -147,7 +147,7 @@ namespace Engine
              * @return ECSManager<GameClass>&: A reference to the persistent
              level object.
              */
-            ECSManager<GameClass> &getPersistentLevel() const
+            ECSManager<GameClass> &getPersistentLevel()
             {
                 return (_persistentLevel);
             }

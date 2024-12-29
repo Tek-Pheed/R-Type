@@ -231,7 +231,7 @@ namespace Engine
                     System::Network::ISocket::CONNECT, ip);
                 NetClient cli;
                 cli.tcpSocket.initSocket(
-                    TCP_port, System::Network::ISocket::SERVE);
+                    TCP_port, System::Network::ISocket::CONNECT, ip);
                 addClient(cli);
                 std::thread(&NetworkingManager::runReadThread, this).detach();
                 std::thread(&NetworkingManager::runWriteThread, this).detach();

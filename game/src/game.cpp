@@ -9,7 +9,9 @@
     #define NOMINMAX
 #endif
 
+#include "Game.hpp"
 #include <any>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -19,48 +21,52 @@
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
-
+#include "ErrorClass.hpp"
+#include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
-#include "Game.hpp"
+#include "SFML/Graphics/Texture.hpp"
 
 using namespace RType;
 
-// void handleCustomEvent(
-//     Engine::Events::EventType event, Engine::Core &core, std::any arg)
-// {
-//     auto i = std::any_cast<std::string>(arg);
+const std::vector<const Asset::AssetStore *> getAllAsset()
+{
+    std::vector<const Asset::AssetStore *> vect;
 
-//     std::cout << "Triggered custom event " << event << " with data=" << i
-//               << ", engine delta: " <<
-//               std::to_string(core.getDeltaTime_Sec())
-//               << std::endl;
-// }
+    for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
+        i++) {
+        vect.emplace_back(&Asset::assets[i]);
+    }
+    return (vect);
+}
 
+void handleCustomEvent(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    auto i = std::any_cast<std::string>(arg);
+
+    std::cout << "Triggered custom event " << event << " with data=" << i
+              << ", engine delta: " << std::to_string(core.getDeltaTime_Sec())
+              << std::endl;
+}
 
 void GameInstance::loadTexture()
 {
-    static const char *files[] = {"assets/sprites/r-typesheet42.gif",
-        "assets/sprites/r-typesheet31.gif", "assets/sprites/r-typesheet1.gif",
-        "assets/background/background.png"};
-    static const char *names[] = {
-        "playerTexture", "enemyTexture", "bulletTexture", "backgroundTexture"};
-
-    for (size_t i = 0; i < sizeof(files) / sizeof(files[0]); i++) {
-        assetManager.loadAsset(
-            files[i], names[i], &sf::Texture::loadFromFile, sf::IntRect());
+    for (const auto asset : Asset::getAllAssetsOfType<sf::Texture>()) {
+        try {
+            assetManager.loadAsset(asset->path, asset->identifier,
+                &sf::Texture::loadFromFile, sf::IntRect());
+        } catch (const std::exception &e) {
+            std::cout << "Failed to load asset " << asset->identifier
+                      << " with error: " << e.what() << std::endl;
+        }
     }
-    assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
-    assetManager.getAsset<sf::Texture>("backgroundTexture").setRepeated(true);
-    _backgroundSprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
-    _backgroundSprite.setTexture(
-        assetManager.getAsset<sf::Texture>("backgroundTexture"));
 }
 
 void GameInstance::gameUpdate(
     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
-    // System updates will be called automatically by the game engine.
+    // System updates are called automatically by the game engine.
     (void) core;
     float deltaTime_sec = std::any_cast<float>(arg);
 
@@ -70,7 +76,12 @@ void GameInstance::gameUpdate(
     static int i = 0;
     i++;
     core.triggerEvent(GameEvents::EVENT_ExempleEvent, i);
-    return;
+    if (!_isServer) {
+        playEvent();
+        updateLocalPlayerPosition();
+        // backgroundAnimation(&background_s, &clockAnim);
+    }
+    manageBuffers();
 }
 
 GameInstance::GameInstance(Engine::Core &engineRef)
@@ -95,12 +106,19 @@ bool GameInstance::getServerMode()
 
 ecs::Entity &GameInstance::getLocalPlayer()
 {
-    return (entityManager.getCurrentLevel().getEntityById(_PlayerId));
+    if (!hasPlayer())
+        throw ErrorClass("No player was attached to the client");
+    return (entityManager.getCurrentLevel().getEntityById((size_t) _PlayerId));
 }
 
-size_t GameInstance::getPlayerId()
+int GameInstance::getPlayerId() const
 {
     return (_PlayerId);
+}
+
+void GameInstance::setPlayerId(int id)
+{
+    _PlayerId = id;
 }
 
 int GameInstance::manageBuffers()
@@ -113,8 +131,18 @@ bool GameInstance::isServer() const
     return (_isServer);
 }
 
+bool GameInstance::hasPlayer(void) const
+{
+    if (_PlayerId == -1) {
+        return (false);
+    }
+    return (true);
+}
+
 void GameInstance::updateLocalPlayerPosition()
 {
+    if (!hasPlayer())
+        return;
     auto position = getLocalPlayer().getComponent<ecs::PositionComponent>();
     if (position) {
         float oldX = position->getOldX();
@@ -130,39 +158,6 @@ void GameInstance::updateLocalPlayerPosition()
     }
 }
 
-void GameInstance::gameLoop(float deltaTime)
-{
-    auto &posSystem = entityManager.getCurrentLevel()
-                          .getSubsystem<GameSystems::PositionSystem>();
-    auto &renderSystem = entityManager.getCurrentLevel()
-                             .getSubsystem<GameSystems::RenderSystem>();
-    auto &bulletSystem = entityManager.getCurrentLevel()
-                             .getSubsystem<GameSystems::BulletSystem>();
-
-    (void) posSystem;
-    (void) renderSystem;
-    (void) bulletSystem;
-    (void) deltaTime;
-
-    if (!_isServer) {
-        _window->clear();
-        playEvent();
-        _window->draw(_backgroundSprite);
-        // clientLoop();
-    }
-    /*    .this->_window.clear();
-    playEvent(game, game.getEntities());
-    this->_window.draw(background_s);
-    positionSystem.update(
-        game.getEntities(), &this->_window, deltaTime, false);
-    game.updateLocalplayerPosition();
-    renderSystem.update(game.getEntities(), &this->_window, deltaTime, false);
-    game.manageBuffers();
-    bulletSystem.update(game.getEntities(),
-    &this->_window, deltaTime, false); this->_window.display();
-    backgroundAnimation(&background_s, &clockAnim);*/
-}
-
 std::vector<ecs::Entity> &RType::GameInstance::getEntities()
 {
     return (entityManager.getCurrentLevel().getEntitiesVect());
@@ -172,14 +167,15 @@ void GameInstance::playEvent()
 {
     sf::Event event;
     std::stringstream ss;
-    auto &player = entityManager.getCurrentLevel().getEntityById(_PlayerId);
-    auto velocity = player.getComponent<ecs::VelocityComponent>();
 
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             this->_window->close();
+            refGameEngine.stop();
         }
-        if (event.type == sf::Event::KeyPressed) {
+        if (hasPlayer() && event.type == sf::Event::KeyPressed) {
+            auto &player = getLocalPlayer();
+            auto velocity = player.getComponent<ecs::VelocityComponent>();
             if (event.key.code == sf::Keyboard::Up) {
                 velocity->setVy(-200.0f);
                 this->playerAnimations(player, "top");
@@ -196,8 +192,10 @@ void GameInstance::playEvent()
                 playerShoot(player);
             }
         }
-        if (event.type == sf::Event::KeyReleased) {
-            this->playerAnimations(player, "none");
+        if (hasPlayer() && event.type == sf::Event::KeyReleased) {
+            auto &player = getLocalPlayer();
+            auto velocity = player.getComponent<ecs::VelocityComponent>();
+            this->playerAnimations(getLocalPlayer(), "none");
             if (event.key.code == sf::Keyboard::Up
                 || event.key.code == sf::Keyboard::Down) {
                 velocity->setVy(0.0f);
