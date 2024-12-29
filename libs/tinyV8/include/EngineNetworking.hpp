@@ -6,8 +6,7 @@
 */
 
 /**
- * @file Warning: This library is not ready yet. Do not use it yet, it's API
- * will change.
+ * @file Game engine networking classes.
  */
 
 #ifndef TINY_V8_NETWORKING
@@ -72,15 +71,51 @@ namespace Engine
 
     }; // namespace Events
 
-    // Implement protocol specific functions
+    /**
+     * @brief Interface for implementing packet-specific operations.
+
+     * The functions in this interface should be defined by the user by
+     creating a derived class.
+     * This class is used for separaring/extracting packets, according to your
+     protocol needs.
+     * This class should also provide a function to identify clients when they
+     connect to the server.
+     */
     class IPacketManager {
       public:
         virtual ~IPacketManager() = default;
+
+        /**
+         * @brief Extracts all packets from the given buffer.
+
+         * This functions splits all packets from a buffer of bytes, and sets
+         the resultIndexEnd to the index of end the last whole packet parsed.
+         * @param bytes: A sequence of byte read from a socket.
+         * @param resultIndexEnd: You should set this to the index of the last
+         complete packet parsed.
+         * @return std::vector<std::string>: A vector of decoded packets.
+         */
         virtual std::vector<std::string> splitPackets(
             const System::Network::byteArray &bytes,
             size_t &resultIndexEnd) = 0;
+
+        /**
+         * @brief Identifies a client give a received buffer.
+
+         * This function should extract the client ID from the stream of byte.
+         * @param bytes: A sequence of byte read from a socket.
+         * @return ssize_t: The client ID, -1 if undefined.
+         */
         virtual ssize_t identifyClient(
             const System::Network::byteArray &bytes) = 0;
+
+        /**
+         * @brief Serialize a string
+
+         * Serialize a string for sending it through a socket.
+         * @param str: The string to serialize.
+         * @param out: The output buffer.
+         */
         virtual void serializeString(
             const std::string &str, std::ostream &out) = 0;
     };
@@ -115,11 +150,46 @@ namespace Engine
             explicit NetworkingManager(Core &engineRef);
             ~NetworkingManager();
 
-            void setTCPPort(size_t port);
-            void setUDPPort(size_t port);
-            size_t getTCPPort(void);
-            size_t getUDPPort(void);
+            /**
+             * @brief Sets the TCP port which the class will use.
 
+             * @note: Calling this after setupClient or setupServer will have
+             no effect.
+             * @param port: The port to use.
+             */
+            void setTCPPort(size_t port);
+
+            /**
+             * @brief Sets the UDP port which the class will use.
+
+             * @note: Calling this after setupClient or setupServer will have
+             no effect.
+             * @param port: The port to use.
+            */
+            void setUDPPort(size_t port);
+
+            /**
+             * @brief Returnn defined TCP port.
+
+             * @return size_t: TCP port.
+             */
+            size_t getTCPPort(void) const;
+
+            /**
+             * @brief Returnn defined UDP port.
+
+             * @return size_t: UDP port.
+            */
+            size_t getUDPPort(void) const;
+
+            /**
+             * @brief Setup a server, create all necessary sockets and threads.
+
+             * @tparam PacketManager: A packetManager class. (Should be derived
+             from IPacketManager).
+             * @param TCP_port: TCP socket port.
+             * @param UDP_port: UDP socket port.
+             */
             template <class PacketManager>
             void setupServer(uint16_t TCP_port, uint16_t UDP_port)
             {
@@ -138,6 +208,15 @@ namespace Engine
                     .detach();
             }
 
+            /**
+             * @brief Setup a client, connects to a given ip and port.
+
+             * @tparam PacketManager: A packetManager class. (Should be derived
+             from IPacketManager).
+             * @param TCP_port: TCP socket port.
+             * @param UDP_port: UDP socket port.
+             * @param ip: Server IP address.
+             */
             template <class PacketManager>
             void setupClient(
                 uint16_t TCP_port, uint16_t UDP_port, const std::string &ip)
@@ -158,15 +237,65 @@ namespace Engine
                 std::thread(&NetworkingManager::runWriteThread, this).detach();
             }
 
-            void setClientID(size_t id);
-            std::vector<std::string> readAllPackets();
-            std::vector<std::string>  readClientPackets(NetworkingManager::NetClient &cli);
+            /**
+             * @brief Set the Client ID.
 
+             * This function should be used by the user for storing an unique
+             ID that can identify this client.
+             * @param id: An ID
+             */
+            void setClientID(size_t id);
+
+            /**
+             * @brief Get the Client ID
+
+             * @return size_t: The client ID
+             */
+            size_t getClientID(void) const;
+
+            /**
+             * @brief Read all received packets on both UDP and TCP sockets.
+             * The PacketManager will be used to extract all complete packets.
+             * @return std::vector<std::string>: A vector of packets.
+             */
+            std::vector<std::string> readAllPackets();
+
+            /**
+             * @brief Read all received packets on both UDP and TCP sockets for
+             * a specific client.
+             * @param cli: The client to read from.
+             * @return std::vector<std::string>: A vector of packets.
+             */
+            std::vector<std::string> readClientPackets(
+                NetworkingManager::NetClient &cli);
+
+            /**
+             * @brief Send a packet to all connected clients.
+
+             * @param socketType: The type of socket to use: TCP or UDP.
+             * @param buffer: The buffer of data to send.
+             */
             void sendToAll(System::Network::ISocket::Type socketType,
                 const std::string &buffer);
+
+            /**
+             * @brief Send a packet to one specific client.
+
+             * @param id: The id of the client.
+             * @param socketType: The type of socket to use: TCP or UDP.
+             * @param buffer: The buffer of data to send.
+             */
             void sendToOne(size_t id,
                 System::Network::ISocket::Type socketType,
                 const std::string &buffer);
+
+            /**
+             * @brief Send a packet all clients except one.
+
+             * @param except_id: The id of the client exception.
+             * @param socketType: The type of socket to use: TCP or UDP.
+             * @param buffer: The buffer of data to send.
+             */
             void sendToOthers(size_t except_id,
                 System::Network::ISocket::Type socketType,
                 const std::string &buffer);
@@ -198,8 +327,8 @@ namespace Engine
             std::mutex _globalMutex;
             std::condition_variable _writeCondition;
             std::mutex _writeMutex;
-            size_t _clientCounter;
-            size_t _clientID;
+            size_t _clientCounter = 0;
+            size_t _clientID = 0;
             std::unordered_map<size_t, NetClient> _clients;
             System::Network::TCPSocket _SocketTCP;
             System::Network::UDPSocket _SocketUDP;

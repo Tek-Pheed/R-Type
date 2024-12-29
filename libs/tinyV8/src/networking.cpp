@@ -51,12 +51,12 @@ void NetworkingManager::setUDPPort(size_t port)
     _updPort = port;
 }
 
-size_t NetworkingManager::getTCPPort(void)
+size_t NetworkingManager::getTCPPort(void) const
 {
     return (_tcpPort);
 }
 
-size_t NetworkingManager::getUDPPort(void)
+size_t NetworkingManager::getUDPPort(void) const
 {
     return (_updPort);
 }
@@ -64,6 +64,11 @@ size_t NetworkingManager::getUDPPort(void)
 void NetworkingManager::setClientID(size_t id)
 {
     _clientID = id;
+}
+
+size_t NetworkingManager::getClientID(void) const
+{
+    return (_clientID);
 }
 
 std::vector<std::string> NetworkingManager::readClientPackets(
