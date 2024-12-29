@@ -14,7 +14,7 @@ class Game;
 
 namespace GameEvents {
 
-    constexpr Engine::Events::EventType ExempleEvent{"exampleEvent"};
+    constexpr auto ExempleEvent{"exampleEvent"};
 
 }
 
