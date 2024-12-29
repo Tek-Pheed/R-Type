@@ -19,6 +19,28 @@
 
 namespace Engine
 {
+
+    /**
+     * @brief Namespace providing events for level operations.
+     */
+    namespace Events
+    {
+        // Event level starts, ARG: std::string (level name)
+        constexpr auto EVENT_OnLevelStart{"onLevelStart"};
+
+        // Event level ends, ARG: std::string (level name)
+        constexpr auto EVENT_OnLevelEnd{"onLevelEnd"};
+
+        // Event level created, ARG: std::string (level name)
+        constexpr auto EVENT_OnLevelCreated{"onLevelCreated"};
+
+        // Event level destroyed, ARG: std::string (level name)
+        constexpr auto EVENT_OnLevelDestroyed{"onLevelDestroyed"};
+
+        // Event switch level, ARG: std::string (new level)
+        constexpr auto EVENT_OnLevelSwitch{"onLevelSwitch"};
+    }; // namespace Events
+
     /**
      * @brief A level class.
 
@@ -36,10 +58,17 @@ namespace Engine
     class Level : public Feature::ECSManager<GameClass> {
       public:
         explicit Level(Core &engineRef, const std::string &levelName)
-            : Feature::ECSManager<GameClass>(engineRef),
-              _levelName(levelName) {};
+            : Feature::ECSManager<GameClass>(engineRef), _levelName(levelName)
+        {
+            Feature::ECSManager<GameClass>::_engineRef.triggerEvent(
+                Events::EVENT_OnLevelCreated, std::string(_levelName));
+        };
         Level(Level &&other) = default;
-        ~Level() {};
+        ~Level()
+        {
+            Feature::ECSManager<GameClass>::_engineRef.triggerEvent(
+                Events::EVENT_OnLevelDestroyed, std::string(_levelName));
+        };
 
         /**
          * @brief Returns the name of the level.
@@ -59,6 +88,8 @@ namespace Engine
         void startLevel(void)
         {
             _updateLevel = true;
+            Feature::ECSManager<GameClass>::_engineRef.triggerEvent(
+                Events::EVENT_OnLevelStart, std::string(_levelName));
         }
 
         /**
@@ -69,6 +100,8 @@ namespace Engine
         void stopLevel(void)
         {
             _updateLevel = false;
+            Feature::ECSManager<GameClass>::_engineRef.triggerEvent(
+                Events::EVENT_OnLevelEnd, std::string(_levelName));
         }
 
         // Do not call this function manually unless you have a good reason
@@ -230,6 +263,8 @@ namespace Engine
                     throw std::range_error(
                         "No level was loaded, or the level does not exists !");
                 }
+                AEngineFeature::_engineRef.triggerEvent(
+                    Events::EVENT_OnLevelSwitch, std::string(levelName));
                 _currentLevel = levelName;
                 if (prev != "") {
                     _levels.at(prev).stopLevel();

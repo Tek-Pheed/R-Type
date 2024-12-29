@@ -45,9 +45,14 @@ namespace Engine
         using EventHanlderType =
             std::function<void(EventType, Core &, std::any)>;
 
-        constexpr auto OnTick{"onTick"};
-        constexpr auto OnStart{"onStart"};
-        constexpr auto OnStop{"onStop"};
+        // Event engine ticks, ARG: float (delta time in seconds)
+        constexpr auto EVENT_OnTick{"onTick"};
+
+        // Event mainloop starts, no arguments
+        constexpr auto EVENT_OnStart{"onStart"};
+
+        // Event mainloop stops, no arguments
+        constexpr auto EVENT_OnStop{"onStop"};
 
     }; // namespace Events
 
@@ -240,7 +245,7 @@ namespace Engine
 
          * @return float: Delta time in seconds.
          */
-        float getDeltaTime_Sec(void);
+        float getDeltaTime_Sec(void) const;
 
         /**
          * @brief The game engine main loop.

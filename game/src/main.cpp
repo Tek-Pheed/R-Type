@@ -50,7 +50,7 @@ static int print_help()
 void handleCustomEvent(
     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
-    int i = std::any_cast<int>(arg);
+    auto i = std::any_cast<std::string>(arg);
 
     std::cout << "Triggered custom event " << event << " with data=" << i
               << ", engine delta: " << std::to_string(core.getDeltaTime_Sec())
@@ -84,9 +84,10 @@ int main(int argc, char **argv)
     std::cout << "Client mode" << std::endl;
 #endif
 
-    gameEngine.addEventBinding(GameEvents::ExempleEvent, handleCustomEvent);
-    gameEngine.addEventBinding<Game>(
-        Engine::Events::OnTick, &Game::gameUpdate, game);
+    gameEngine.addEventBinding(Engine::Events::EVENT_OnLevelSwitch, handleCustomEvent);
+    //gameEngine.addEventBinding(GameEvents::EVENT_ExempleEvent, handleCustomEvent);
+    //gameEngine.addEventBinding<Game>(
+    //    Engine::Events::EVENT_OnTick, &Game::gameUpdate, game);
 
     /*manager.createSubsxxystem<ecs::BulletSystem>();
 

@@ -19,6 +19,15 @@
 
 namespace Engine
 {
+    namespace Events
+    {
+        // Event asset loaded, ARG: std::string (asset name)
+        constexpr auto EVENT_OnAssetLoaded{"onAssetLoaded"};
+
+        // Event asset unloaded, ARG: std::string (asset name)
+        constexpr auto EVENT_OnAssetUnloaded{"onAssetUnloaded"};
+    }; // namespace Events
+
     namespace Feature
     {
 
@@ -63,6 +72,8 @@ namespace Engine
                 BackendType *object = std::any_cast<BackendType>(
                     &(_assets[typeid(BackendType)].at(identifier)));
                 ((object)->*function)(path, extraArgs...);
+                AEngineFeature::_engineRef.triggerEvent(
+                    Events::EVENT_OnAssetLoaded, std::string(identifier));
                 return (*object);
             }
 
@@ -97,6 +108,8 @@ namespace Engine
                     return (false);
                 }
                 _assets[typeid(BackendType)].erase(identifier);
+                AEngineFeature::_engineRef.triggerEvent(
+                    Events::EVENT_OnAssetUnloaded, std::string(identifier));
                 return (true);
             }
 

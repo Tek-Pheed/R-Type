@@ -23,7 +23,7 @@ Core::~Core()
 
 void Core::engineOnStart(void)
 {
-    triggerEvent(Engine::Events::OnStart);
+    triggerEvent(Engine::Events::EVENT_OnStart);
 }
 
 void Core::engineOnTick(float deltaTimeSec)
@@ -35,7 +35,7 @@ void Core::engineOnTick(float deltaTimeSec)
 
 void Core::engineOnStop(void)
 {
-    triggerEvent(Engine::Events::OnStop);
+    triggerEvent(Engine::Events::EVENT_OnStop);
 }
 
 void Core::mainLoop(void)
@@ -57,7 +57,7 @@ void Core::mainLoop(void)
                 .count();
         _currentDeltaTime = (float) deltaTimeUs / 1000000.0f;
         this->engineOnTick(_currentDeltaTime);
-        triggerEvent(Engine::Events::OnTick, _currentDeltaTime);
+        triggerEvent(Engine::Events::EVENT_OnTick, _currentDeltaTime);
         last = now;
         if (_updateMode == LOCKED)
             std::this_thread::sleep_until(next);
@@ -95,7 +95,7 @@ void Core::setTickRate(uint16_t tickRateHZ)
     _tickRate = tickRateHZ;
 }
 
-float Core::getDeltaTime_Sec(void)
+float Core::getDeltaTime_Sec(void) const
 {
     return (_currentDeltaTime);
 }

@@ -61,7 +61,7 @@ void Game::gameUpdate(
               << std::endl;
     static int i = 0;
     i++;
-    core.triggerEvent(GameEvents::ExempleEvent, i);
+    core.triggerEvent(GameEvents::EVENT_ExempleEvent, i);
     return;
 }
 

@@ -14,7 +14,7 @@ class Game;
 
 namespace GameEvents {
 
-    constexpr auto ExempleEvent{"exampleEvent"};
+    constexpr auto EVENT_ExempleEvent{"exampleEvent"};
 
 }
 
