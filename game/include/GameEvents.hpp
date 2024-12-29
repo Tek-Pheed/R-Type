@@ -14,7 +14,7 @@ class Game;
 
 namespace GameEvents {
 
-    inline constexpr Engine::Events::EventType ExempleEvent = {"exampleEvent"};
+    constexpr Engine::Events::EventType ExempleEvent{"exampleEvent"};
 
 }
 

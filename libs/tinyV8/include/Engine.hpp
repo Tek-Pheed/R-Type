@@ -45,9 +45,9 @@ namespace Engine
         using EventHanlderType =
             std::function<void(EventType, Core &, std::any)>;
 
-        inline constexpr EventType OnTick = {"onTick"};
-        inline constexpr EventType OnStart = {"onStart"};
-        inline constexpr EventType OnStop = {"onStop"};
+        constexpr EventType OnTick{"onTick"};
+        constexpr EventType OnStart{"onStart"};
+        constexpr EventType OnStop{"onStop"};
 
     }; // namespace Events
 
