@@ -67,7 +67,7 @@ namespace Engine
 
         // Event when as a server a client disconnects, ARG: ssize_t (client
         // ID)
-        constexpr auto EVENT_OnServerLostClient{"onServerNewClient"};
+        constexpr auto EVENT_OnServerLostClient{"onServerLostClient"};
 
         // Event network data received on a socket, no argument
         constexpr auto EVENT_OnDataReceived {"onDataReceived"};

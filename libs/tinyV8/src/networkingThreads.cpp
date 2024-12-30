@@ -31,8 +31,6 @@ void NetworkingManager::runConnectThread()
         NetClient cl;
         cl.tcpSocket = System::Network::accept(_SocketTCP);
         addClient(cl);
-        AEngineFeature::_engineRef.triggerEvent(
-            Events::EVENT_OnServerNewClient);
     }
 }
 

@@ -137,12 +137,12 @@ NetworkingManager::NetClient &NetworkingManager::addClient(
     const NetClient &client)
 {
     std::unique_lock lock(_globalMutex);
-
     _clientCounter++;
     _clients[_clientCounter] = client;
     std::cout << "ENGINE: Created a new client ("
               << std::to_string(_clientCounter) << ") on the server."
               << std::endl;
+    AEngineFeature::_engineRef.triggerEvent(Events::EVENT_OnServerNewClient);
     return (_clients[_clientCounter]);
 }
 

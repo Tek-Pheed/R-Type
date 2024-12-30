@@ -5,6 +5,8 @@
 ** server specific functions
 */
 
+#include "EngineNetworking.hpp"
+#include "Game.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -71,10 +73,44 @@ void PacketHandler::serializeString(const std::string &str, std::ostream &out)
     out.write(str.data(), static_cast<std::streamsize>(size));
 }
 
+void GameInstance::serverEventNewConn(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    (void) arg;
+    (void) core;
+    std::cout << "Server received event: " << event << std::endl;
+}
+
+void GameInstance::serverEventClosedConn(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    (void) arg;
+    (void) core;
+    std::cout << "Server received event: " << event << std::endl;
+}
+
+void GameInstance::serverEventPackets(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    (void) arg;
+    (void) core;
+    std::cout << "Server received event: " << event << std::endl;
+}
+
 void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
 {
     _isServer = true;
     _tcpPort = tcpPort;
     _udpPort = udpPort;
     refNetworkManager.setupServer<PacketHandler>(_tcpPort, _udpPort);
+
+    refGameEngine.addEventBinding<GameInstance>(
+        Engine::Events::EVENT_OnDataReceived,
+        &GameInstance::serverEventPackets, *this);
+    refGameEngine.addEventBinding<GameInstance>(
+        Engine::Events::EVENT_OnServerNewClient,
+        &GameInstance::serverEventNewConn, *this);
+    refGameEngine.addEventBinding<GameInstance>(
+        Engine::Events::EVENT_OnServerLostClient,
+        &GameInstance::serverEventClosedConn, *this);
 }
