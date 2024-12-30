@@ -8,6 +8,10 @@
 #ifndef GAME_ASSETS_HPP
 #define GAME_ASSETS_HPP
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <array>
 #include <cstddef>
 #include <typeindex>

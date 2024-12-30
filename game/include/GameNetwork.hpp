@@ -13,7 +13,6 @@
 #endif
 
 #include "EngineNetworking.hpp"
-#include "Game.hpp"
 
 namespace RType
 {

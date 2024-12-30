@@ -5,12 +5,12 @@
 ** server specific functions
 */
 
-#include "EngineNetworking.hpp"
-#include "Game.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "EngineNetworking.hpp"
+#include "Game.hpp"
 #include <cstddef>
 #include "GameNetwork.hpp"
 #include "GameProtocol.hpp"

@@ -5,12 +5,12 @@
 ** client
 */
 
-#include "Engine.hpp"
-#include "GameSystems.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "Engine.hpp"
+#include "GameSystems.hpp"
 #include <exception>
 #include <iostream>
 #include <memory>

@@ -9,7 +9,6 @@
     #define NOMINMAX
 #endif
 
-#include <iostream>
 #include "Components.hpp"
 #include "Game.hpp"
 #include "GameSystems.hpp"

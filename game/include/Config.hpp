@@ -12,8 +12,7 @@
     #define NOMINMAX
 #endif
 
-#include <fstream>
-#include <iostream>
+#include <string>
 #include <map>
 
 class Config {

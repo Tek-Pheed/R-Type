@@ -10,6 +10,8 @@
 #endif
 
 #include "Config.hpp"
+#include <fstream>
+#include <iostream>
 #include <vector>
 #include "ErrorClass.hpp"
 

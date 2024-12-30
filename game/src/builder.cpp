@@ -5,6 +5,10 @@
 ** GameBuilder
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include <memory>
 #include "Components.hpp"
 #include "Game.hpp"

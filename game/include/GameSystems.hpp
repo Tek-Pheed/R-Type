@@ -13,11 +13,8 @@
 #endif
 
 #include <SFML/Graphics.hpp>
-#include <memory>
 #include <vector>
 #include "Entity.hpp"
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "SFML/Window/Window.hpp"
 #include "Systems.hpp"
 
 namespace RType
