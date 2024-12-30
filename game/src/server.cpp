@@ -10,8 +10,8 @@
 #endif
 
 #include <cstddef>
+#include "GameNetwork.hpp"
 #include "GameProtocol.hpp"
-#include "GamerServer.hpp"
 #include "system_network.hpp"
 
 using namespace RType;
