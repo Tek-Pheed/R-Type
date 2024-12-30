@@ -5,6 +5,8 @@
 ** client
 */
 
+#include <cstdlib>
+#include "Components.hpp"
 #include "GameProtocol.hpp"
 #include "system_network.hpp"
 #include "system_udp.hpp"
@@ -43,7 +45,8 @@ void RType::GameInstance::clientHandlerConnection(
         case Protocol::C_AUTH: {
             if (tokens.size() >= 1) {
                 if (tokens[0].starts_with("OK") && _netClientID >= 0) {
-                    // We can create the player here, or wait and create it later
+                    // We can create the player here, or wait and create it
+                    // later
 
                     std::cout << "Build player" << std::endl;
                     buildPlayer(true, (size_t) _netClientID);
@@ -54,6 +57,24 @@ void RType::GameInstance::clientHandlerConnection(
             break;
         }
 
+        default: break;
+    }
+}
+
+void RType::GameInstance::clientHandlePlayer(
+    int code, const std::vector<std::string> &tokens)
+{
+    switch (code) {
+        case Protocol::P_CONN: {
+            if (tokens.size() >= 3) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                auto &pl = buildPlayer(false, id);
+                auto pos = pl.getComponent<ecs::PositionComponent>();
+                pos->setX((float) std::atoi(tokens[1].c_str()));
+                pos->setY((float) std::atoi(tokens[2].c_str()));
+            }
+            break;
+        }
         default: break;
     }
 }
@@ -83,7 +104,7 @@ int RType::GameInstance::clientManageBuffers()
             tokens.push_back(token);
         }
         switch (code_int) {
-            // case 0: handlePlayer(code, tokens); break;
+            case 0: clientHandlePlayer(code, tokens); break;
             // case 1: handle_enemy(code, tokens); break;
             // case 2: handle_terrain(code, tokens); break;
             // case 3: handle_mechs(code, tokens); break;

@@ -44,11 +44,18 @@ ecs::Entity &RType::GameInstance::buildPlayer(bool isLocalPlayer, size_t id)
     if (isLocalPlayer) {
         _playerEntityID = (int) player.getID();
     }
-    if (isLocalPlayer || _isServer) {
+    if ((isLocalPlayer && _isConnectedToServer) || _isServer) {
         auto pos = player.getComponent<ecs::PositionComponent>();
         if (pos) {
-            refNetworkManager.sendToAll(System::Network::ISocket::Type::TCP,
-                playerConnection(id, pos->getX(), pos->getY()));
+            if (!isServer()) {
+                refNetworkManager.sendToAll(
+                    System::Network::ISocket::Type::TCP,
+                    playerConnection(id, pos->getX(), pos->getY()));
+            } else {
+                refNetworkManager.sendToOthers(id,
+                    System::Network::ISocket::Type::TCP,
+                    playerConnection(id, pos->getX(), pos->getY()));
+            }
         }
     }
     return (player);

@@ -47,14 +47,16 @@ void NetworkingManager::runWriteThread()
                 _writeCondition.wait(lock);
             }
             writefds.clear();
-            writefds.emplace_back(&_SocketUDP);
+            bool shouldMonitor = false;
             for (auto &pair : _clients) {
                 NetClient &ref = pair.second;
-                if ((ref.writeBufferTCP.size() > 0
-                        || ref.writeBufferUDP.size() > 0)
-                    && !ref.isDisconnected)
+                if (ref.writeBufferUDP.size() > 0 && !ref.isDisconnected)
+                    shouldMonitor = true;
+                if ((ref.writeBufferTCP.size() > 0) && !ref.isDisconnected)
                     writefds.emplace_back(&ref.tcpSocket);
             }
+            if (shouldMonitor)
+                writefds.emplace_back(&_SocketUDP);
             System::Network::select(nullptr, &writefds, nullptr, tv);
             shouldWait = true;
             if (writefds.size() == 0)
@@ -220,9 +222,13 @@ void NetworkingManager::runReadThread()
                             if (client.isDisconnected)
                                 continue;
                             vect = sock->receive();
-                            std::cout << "ENGINE: [Read Thread] Received TCP: "
-                                      << System::Network::decodeString(vect)
-                                      << std::endl;
+                            std::cout
+                                << "ENGINE: [Read Thread] Message received "
+                                   "on TCP ("
+                                << std::to_string(sock->getUID())
+                                << ") for client (" << std::to_string(id)
+                                << "): " << System::Network::decodeString(vect)
+                                << std::endl;
                             _globalMutex.lock();
                             client.readBufferTCP.insert(
                                 client.readBufferTCP.end(), vect.begin(),

@@ -5,6 +5,7 @@
 ** server specific functions
 */
 
+#include <cstdlib>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -49,6 +50,23 @@ void GameInstance::serverEventPackets(
     // socketType, const std::string &buffer)
 }
 
+void RType::GameInstance::serverHandlePlayer(
+    int code, const std::vector<std::string> &tokens)
+{
+    switch (code) {
+        case P_CONN: {
+            if (tokens.size() >= 3) {
+                auto &pl = buildPlayer(true, (size_t) std::atoi(tokens[0].c_str()));
+                auto pos = pl.getComponent<ecs::PositionComponent>();
+                pos->setX((float) std::atoi(tokens[1].c_str()));
+                pos->setX((float) std::atoi(tokens[2].c_str()));
+            }
+            break;
+        }
+        default: break;
+    }
+}
+
 void RType::GameInstance::serverHanlderValidateConnection(
     int code, const std::vector<std::string> &tokens)
 {
@@ -60,15 +78,15 @@ void RType::GameInstance::serverHanlderValidateConnection(
             for (auto &p : getAllPlayers()) {
                 auto pos = p.get().getComponent<ecs::PositionComponent>();
                 auto pl = p.get().getComponent<ecs::PlayerComponent>();
-                if (!pl || !pos)
+                if (!pl || !pos) {
+                    std::cout << "can't get player" << std::endl;
                     continue;
+                }
                 refNetworkManager.sendToOne((size_t) netClientID,
                     System::Network::ISocket::Type::TCP,
                     playerConnection(
                         pl->getPlayerID(), pos->getX(), pos->getY()));
             }
-//            buildPlayer(true, playerIndex);
-//            playerIndex++;
         } else {
             std::cout << "Could not read client ID" << std::endl;
         }
@@ -98,7 +116,7 @@ int RType::GameInstance::serverManageBuffers()
             tokens.push_back(token);
         }
         switch (code_int) {
-            // case 0: handlePlayer(code, tokens); break;
+            case 0: serverHandlePlayer(code, tokens); break;
             // case 1: handle_enemy(code, tokens); break;
             // case 2: handle_terrain(code, tokens); break;
             // case 3: handle_mechs(code, tokens); break;

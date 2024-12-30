@@ -75,7 +75,12 @@ namespace RType
         void connectToGame();
         void clientHandlerConnection(
             int code, const std::vector<std::string> &tokens);
-        void serverHanlderValidateConnection(int code, const std::vector<std::string> &tokens);
+        void clientHandlePlayer(
+            int code, const std::vector<std::string> &tokens);
+        void serverHandlePlayer(
+            int code, const std::vector<std::string> &tokens);
+        void serverHanlderValidateConnection(
+            int code, const std::vector<std::string> &tokens);
 
         // Server Only Events
         void serverEventNewConn(
