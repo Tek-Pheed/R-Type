@@ -55,11 +55,11 @@ namespace Engine
     namespace Events
     {
         // Event when as a client you are connecting to the server, no
-        // arguments
+        // argument
         constexpr auto EVENT_ConnectedToServer{"onConnectedToServer"};
 
         // Event when as a client you lost the connection to the server, no
-        // arguments
+        // argument
         constexpr auto EVENT_DisconnectedFromServer{"onDisconnectedToServer"};
 
         // Event when as a server you get a new connection, no argument
@@ -68,6 +68,9 @@ namespace Engine
         // Event when as a server a client disconnects, ARG: ssize_t (client
         // ID)
         constexpr auto EVENT_OnServerLostClient{"onServerNewClient"};
+
+        // Event network data received on a socket, no argument
+        constexpr auto EVENT_OnDataReceived {"onDataReceived"};
 
     }; // namespace Events
 

@@ -224,6 +224,8 @@ void NetworkingManager::runReadThread()
                                 client.readBufferTCP.end(), vect.begin(),
                                 vect.end());
                             _globalMutex.unlock();
+                            AEngineFeature::_engineRef.triggerEvent(
+                                Events::EVENT_OnDataReceived);
                         }
                         break;
                     }
@@ -279,6 +281,8 @@ void NetworkingManager::runReadThread()
                         client.readBufferUDP.insert(client.readBufferTCP.end(),
                             vect.begin(), vect.end());
                         _globalMutex.unlock();
+                        AEngineFeature::_engineRef.triggerEvent(
+                            Events::EVENT_OnDataReceived);
                         break;
                     }
                     default: {
