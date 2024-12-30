@@ -28,9 +28,11 @@ void Core::engineOnStart(void)
 
 void Core::engineOnTick(float deltaTimeSec)
 {
+    triggerEvent(Events::EVENT_BeforeTick, deltaTimeSec);
     for (const auto &sys : _features) {
         sys.second->engineOnTick(deltaTimeSec);
     }
+    triggerEvent(Events::EVENT_PostTick, deltaTimeSec);
 }
 
 void Core::engineOnStop(void)

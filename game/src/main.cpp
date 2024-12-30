@@ -85,9 +85,6 @@ int main(int argc, const char *argv[])
 #endif
         if (result != 0)
             return (result);
-        gameEngine.addEventBinding<RType::GameInstance>(
-            Engine::Events::EVENT_OnTick, &RType::GameInstance::gameUpdate,
-            gameInstance);
         gameEngine.mainLoop();
     } catch (const std::exception &e) {
         std::cout << "We are sorry, but an unhandled exception occured during "

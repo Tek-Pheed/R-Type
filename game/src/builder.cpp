@@ -19,6 +19,7 @@ void RType::GameInstance::createPersistentLevel()
         buildBackground();
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
 }
 
 ecs::Entity &RType::GameInstance::buildBackground()
@@ -29,22 +30,7 @@ ecs::Entity &RType::GameInstance::buildBackground()
     sf::Sprite sprite;
 
     texture.setRepeated(true);
-    sprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
     sprite.setTexture(texture);
-    bg.addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::RenderComponent::ObjectType::SPRITE));
-    bg.addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
-    bg.addComponent(
-        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 3.0, 3.0));
-    return (bg);
-}
-
-void RType::GameInstance::levelMainMenu()
-{
-    auto &level = refEntityManager.createNewLevel("mainMenu");
-    auto &bg = level.createEntity();
-
-    sf::Sprite sprite;
     sprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
     sprite.setTexture(
         refAssetManager.getAsset<sf::Texture>(Asset::BACKGROUND_TEXTURE));
@@ -54,10 +40,15 @@ void RType::GameInstance::levelMainMenu()
         std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 3.0, 3.0));
     bg.addComponent(std::make_shared<ecs::PositionComponent>(0, 0));
     bg.addComponent(std::make_shared<ecs::BackgroundComponent>(0.01f));
+    return (bg);
+}
+
+void RType::GameInstance::levelMainMenu()
+{
+    auto &level = refEntityManager.createNewLevel("mainMenu");
 
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
-    level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
     refEntityManager.switchLevel("mainMenu");
 
     // To change later since this is supposed to be the main menu and not

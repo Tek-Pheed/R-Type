@@ -66,7 +66,18 @@ void GameInstance::loadTexture()
     }
 }
 
-void GameInstance::gameUpdate(
+void GameInstance::gamePreTick(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    (void) event;
+    (void) core;
+    (void) arg;
+    if (!isServer()) {
+        getWindow().clear();
+    }
+}
+
+void GameInstance::gameTick(
     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
     // System updates are called automatically by the game engine.
@@ -79,6 +90,17 @@ void GameInstance::gameUpdate(
         playEvent();
         updateLocalPlayerPosition();
         clientManageBuffers();
+    }
+}
+
+void GameInstance::gamePostTick(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    (void) event;
+    (void) core;
+    (void) arg;
+    if (!isServer()) {
+        getWindow().display();
     }
 }
 

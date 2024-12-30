@@ -19,7 +19,6 @@
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <optional>
 #include <typeindex>
 #include <vector>
 
@@ -45,6 +44,9 @@ namespace Engine
         using EventHanlderType =
             std::function<void(EventType, Core &, std::any)>;
 
+        // Event engine before tick, ARG: float (delta time in seconds)
+        constexpr auto EVENT_BeforeTick{"onBeforeTick"};
+
         // Event engine ticks, ARG: float (delta time in seconds)
         constexpr auto EVENT_OnTick{"onTick"};
 
@@ -53,6 +55,9 @@ namespace Engine
 
         // Event mainloop stops, no arguments
         constexpr auto EVENT_OnStop{"onStop"};
+
+        // Event engine after tick, ARG: float (delta time in seconds)
+        constexpr auto EVENT_PostTick{"onPostTick"};
 
     }; // namespace Events
 

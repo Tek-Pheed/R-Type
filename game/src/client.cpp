@@ -5,6 +5,8 @@
 ** client
 */
 
+#include "Engine.hpp"
+#include "GameSystems.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -56,17 +58,28 @@ int RType::GameInstance::clientManageBuffers()
 
 void RType::GameInstance::connectToGame()
 {
-    // Connect to server only when player select a game
     if (_isConnectedToServer)
         return;
+    auto currentLevel = refEntityManager.getCurrentLevelName();
     try {
         refNetworkManager.setupClient<RType::PacketHandler>(
             _tcpPort, _udpPort, _ip);
+
+        // Prepare level
+        auto &level = refEntityManager.createNewLevel("mainRemoteLevel");
+        level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
+        level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+        level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
+            *this);
+        level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+        refEntityManager.switchLevel("mainRemoteLevel", false);
+        _playerEntityID = -1;
         _isConnectedToServer = true;
     } catch (const std::exception &e) {
         std::cout << "Failed to connect to server: IP=" << _ip
                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
                   << " with error: " << e.what() << std::endl;
+        refEntityManager.switchLevel(currentLevel);
     }
 }
 
@@ -85,6 +98,14 @@ void RType::GameInstance::setupClient(
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
     }
+    refGameEngine.addEventBinding<RType::GameInstance>(
+        Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);
+    refGameEngine.addEventBinding<RType::GameInstance>(
+        Engine::Events::EVENT_BeforeTick, &RType::GameInstance::gamePreTick,
+        *this);
+    refGameEngine.addEventBinding<RType::GameInstance>(
+        Engine::Events::EVENT_PostTick, &RType::GameInstance::gamePostTick,
+        *this);
     loadTexture();
     createPersistentLevel();
     levelMainMenu();

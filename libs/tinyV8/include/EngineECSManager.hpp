@@ -292,9 +292,6 @@ namespace Engine
                 return (false);
             }
 
-          protected:
-            void engineOnStart(void) override {};
-            void engineOnStop(void) override {};
             void engineOnTick(float deltaTimeSec) override
             {
                 (void) deltaTimeSec;
@@ -305,11 +302,16 @@ namespace Engine
                 }
             }
 
+          protected:
+            void engineOnStart(void) override {};
+            void engineOnStop(void) override {};
+
             struct SubSys_t {
                 explicit SubSys_t(
                     std::unique_ptr<ecs::ISystem<GameClass>> s, bool updt)
                     : sys(std::move(s)), update(updt) {};
-                explicit SubSys_t(SubSys_t &&other) : sys(std::move(other.sys)), update(other.update) {};
+                explicit SubSys_t(SubSys_t &&other)
+                    : sys(std::move(other.sys)), update(other.update) {};
 
                 std::unique_ptr<ecs::ISystem<GameClass>> sys;
                 bool update;

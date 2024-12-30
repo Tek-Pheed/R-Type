@@ -73,11 +73,18 @@ namespace RType
         void connectToGame();
 
         // Server Only Events
-        void serverEventNewConn(Engine::Events::EventType event, Engine::Core &core, std::any arg);
-        void serverEventClosedConn(Engine::Events::EventType event, Engine::Core &core, std::any arg);
-        void serverEventPackets(Engine::Events::EventType event, Engine::Core &core, std::any arg);
+        void serverEventNewConn(
+            Engine::Events::EventType event, Engine::Core &core, std::any arg);
+        void serverEventClosedConn(
+            Engine::Events::EventType event, Engine::Core &core, std::any arg);
+        void serverEventPackets(
+            Engine::Events::EventType event, Engine::Core &core, std::any arg);
 
-        void gameUpdate(
+        void gamePreTick(
+            Engine::Events::EventType event, Engine::Core &core, std::any arg);
+        void gameTick(
+            Engine::Events::EventType event, Engine::Core &core, std::any arg);
+        void gamePostTick(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         bool isServer() const;
 
