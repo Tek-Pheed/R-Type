@@ -9,9 +9,9 @@
     #define NOMINMAX
 #endif
 
-#include <cstdlib>
 #include <any>
 #include <cstddef>
+#include <cstdlib>
 #include <sstream>
 #include "Components.hpp"
 #include "EngineNetworking.hpp"
@@ -56,10 +56,29 @@ void RType::GameInstance::serverHandlePlayer(
     switch (code) {
         case P_CONN: {
             if (tokens.size() >= 3) {
-                auto &pl = buildPlayer(true, (size_t) std::atoi(tokens[0].c_str()));
+                auto &pl =
+                    buildPlayer(true, (size_t) std::atoi(tokens[0].c_str()));
                 auto pos = pl.getComponent<ecs::PositionComponent>();
                 pos->setX((float) std::atoi(tokens[1].c_str()));
-                pos->setX((float) std::atoi(tokens[2].c_str()));
+                pos->setY((float) std::atoi(tokens[2].c_str()));
+            }
+            break;
+        }
+        case P_POS: {
+            if (tokens.size() >= 3) {
+                auto &player =
+                    getPlayerById((size_t) std::atoi(tokens[0].c_str()));
+                auto pos = player.getComponent<ecs::PositionComponent>();
+                pos->setX((float) std::atof(tokens[1].c_str()));
+                pos->setY((float) std::atof(tokens[2].c_str()));
+                std::stringstream ss;
+                ss << "102 "
+                   << player.getComponent<ecs::PlayerComponent>()
+                          ->getPlayerID()
+                   << " " << pos->getX() << " " << pos->getY() << "\t\n";
+                refNetworkManager.sendToOthers(
+                    (size_t) std::atoi(tokens[0].c_str()),
+                    System::Network::ISocket::Type::UDP, ss.str());
             }
             break;
         }

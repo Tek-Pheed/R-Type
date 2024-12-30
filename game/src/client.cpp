@@ -47,7 +47,8 @@ void RType::GameInstance::clientHandlerConnection(
                     // We can create the player here, or wait and create it
                     // later
 
-                    std::cout << "Build player" << std::endl;
+                    std::cout << "Build player with id:" << _netClientID
+                              << std::endl;
                     buildPlayer(true, (size_t) _netClientID);
                 } else {
                     std::cout << "The connection failed." << std::endl;
@@ -71,6 +72,21 @@ void RType::GameInstance::clientHandlePlayer(
                 auto pos = pl.getComponent<ecs::PositionComponent>();
                 pos->setX((float) std::atoi(tokens[1].c_str()));
                 pos->setY((float) std::atoi(tokens[2].c_str()));
+            }
+            break;
+        }
+        case Protocol::P_POS: {
+            if (tokens.size() >= 3) {
+                auto &player =
+                    getPlayerById((size_t) std::atoi(tokens[0].c_str()));
+                auto pos = player.getComponent<ecs::PositionComponent>();
+                pos->setX((float) std::atof(tokens[1].c_str()));
+                pos->setY((float) std::atof(tokens[2].c_str()));
+                std::stringstream ss;
+                ss << "102 "
+                   << player.getComponent<ecs::PlayerComponent>()
+                          ->getPlayerID()
+                   << " " << pos->getX() << " " << pos->getY() << "\t\n";
             }
             break;
         }

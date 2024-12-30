@@ -62,6 +62,7 @@ namespace RType
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
         bool hasLocalPlayer(void) const;
         ecs::Entity &getLocalPlayer();
+        ecs::Entity &getPlayerById(size_t id);
         void updateLocalPlayerPosition();
         void playerAnimations(ecs::Entity &player, std::string direction);
         void playerShoot(ecs::Entity &player);

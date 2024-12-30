@@ -5,6 +5,9 @@
 ** player
 */
 
+#include <string>
+#include "Entity.hpp"
+#include "system_network.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -83,11 +86,23 @@ std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
             .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
+ecs::Entity &GameInstance::getPlayerById(size_t id)
+{
+    auto players = getAllPlayers();
+
+    for (auto &pl : players) {
+        if (pl.get().getComponent<ecs::PlayerComponent>()->getPlayerID() == id)
+            return (pl.get());
+    }
+    throw ErrorClass("Player not found id=" + std::to_string(id));
+}
+
 void GameInstance::updateLocalPlayerPosition()
 {
     if (!hasLocalPlayer())
         return;
-    auto position = getLocalPlayer().getComponent<ecs::PositionComponent>();
+    auto &player = getLocalPlayer();
+    auto position = player.getComponent<ecs::PositionComponent>();
     if (position) {
         float oldX = position->getOldX();
         float oldY = position->getOldY();
@@ -96,8 +111,8 @@ void GameInstance::updateLocalPlayerPosition()
 
         if (oldX != x || oldY != y) {
             std::stringstream ss;
-            ss << "102 " << _playerEntityID << " " << x << " " << y << "\t\n";
-            // writeToServer(ss.str(), System::Network::ISocket::UDP);
+            ss << "102 " << player.getComponent<ecs::PlayerComponent>()->getPlayerID() << " " << x << " " << y << "\t\n";
+            refNetworkManager.sendToAll(System::Network::ISocket::Type::UDP, ss.str());
         }
     }
 }

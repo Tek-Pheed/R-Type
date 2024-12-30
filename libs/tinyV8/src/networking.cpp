@@ -197,7 +197,7 @@ ssize_t NetworkingManager::identifyClient(
     std::unique_lock lock(_globalMutex);
 
     for (const auto &pair : _clients) {
-        if (pair.second.ip == ip || std::to_string(pair.second.port) == port)
+        if (pair.second.ip == ip && std::to_string(pair.second.port) == port)
             return (ssize_t) pair.first;
     }
     return -1;
@@ -206,7 +206,7 @@ ssize_t NetworkingManager::identifyClient(
 void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
     const std::string &data, System::Network::ISocket::Type socketType)
 {
-    std::unique_lock lock(_writeMutex);
+    _writeMutex.lock();
     std::ostringstream out;
     _pacMan->serializeString(data, out);
     std::string serializedData = out.str();
@@ -220,5 +220,6 @@ void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
         client.writeBufferUDP.insert(
             client.writeBufferUDP.begin(), encoded.begin(), encoded.end());
     }
-    _writeCondition.notify_one();
+    _writeMutex.unlock();
+    _writeCondition.notify_all();
 }
