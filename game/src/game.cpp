@@ -13,10 +13,7 @@
 #include <any>
 #include <exception>
 #include <iostream>
-#include <memory>
-#include <sstream>
 #include <vector>
-#include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
@@ -24,10 +21,26 @@
 #include "Entity.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
+#include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Graphics/Texture.hpp"
 
 using namespace RType;
+
+int GameInstance::is_code_valid(int code)
+{
+    if (code >= P_CONN && code <= P_DISCONN)
+        return 0;
+    if (code >= E_SPAWN && code <= E_DMG)
+        return 1;
+    if (code >= T_SPAWN && code <= T_DEAD)
+        return 2;
+    if (code >= M_WAVE && code <= M_GOVER)
+        return 3;
+    if (code >= C_INIT_UDP && code <= C_AUTH)
+        return 9;
+    return -1;
+}
 
 const std::vector<const Asset::AssetStore *> getAllAsset()
 {
@@ -38,16 +51,6 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
-}
-
-void handleCustomEvent(
-    Engine::Events::EventType event, Engine::Core &core, std::any arg)
-{
-    auto i = std::any_cast<std::string>(arg);
-
-    std::cout << "Triggered custom event " << event << " with data=" << i
-              << ", engine delta: " << std::to_string(core.getDeltaTime_Sec())
-              << std::endl;
 }
 
 void GameInstance::loadTexture()
@@ -68,20 +71,15 @@ void GameInstance::gameUpdate(
 {
     // System updates are called automatically by the game engine.
     (void) core;
+    (void) event;
     float deltaTime_sec = std::any_cast<float>(arg);
+    (void) deltaTime_sec;
 
-    std::cout << "Triggered game update " << event
-              << ", engine delta: " << std::to_string(deltaTime_sec)
-              << std::endl;
-    static int i = 0;
-    i++;
-    core.triggerEvent(GameEvents::EVENT_ExempleEvent, i);
     if (!_isServer) {
         playEvent();
         updateLocalPlayerPosition();
-        // backgroundAnimation(&background_s, &clockAnim);
+        clientManageBuffers();
     }
-    manageBuffers();
 }
 
 GameInstance::GameInstance(Engine::Core &engineRef)
@@ -104,11 +102,6 @@ bool GameInstance::getServerMode()
     return _isServer;
 }
 
-int GameInstance::manageBuffers()
-{
-    return 0;
-}
-
 bool GameInstance::isServer() const
 {
     return (_isServer);
@@ -117,49 +110,4 @@ bool GameInstance::isServer() const
 std::vector<ecs::Entity> &RType::GameInstance::getEntities()
 {
     return (refEntityManager.getCurrentLevel().getEntitiesVect());
-}
-
-void GameInstance::playEvent()
-{
-    sf::Event event;
-    std::stringstream ss;
-
-    while (_window->pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
-            this->_window->close();
-            refGameEngine.stop();
-        }
-        if (hasLocalPlayer() && event.type == sf::Event::KeyPressed) {
-            auto &player = getLocalPlayer();
-            auto velocity = player.getComponent<ecs::VelocityComponent>();
-            if (event.key.code == sf::Keyboard::Up) {
-                velocity->setVy(-200.0f);
-                this->playerAnimations(player, "top");
-            } else if (event.key.code == sf::Keyboard::Down) {
-                velocity->setVy(200.0f);
-                this->playerAnimations(player, "down");
-            } else if (event.key.code == sf::Keyboard::Right) {
-                velocity->setVx(200.0f);
-                this->playerAnimations(player, "right");
-            } else if (event.key.code == sf::Keyboard::Left) {
-                velocity->setVx(-200.0f);
-                this->playerAnimations(player, "left");
-            } else if (event.key.code == sf::Keyboard::Space) {
-                playerShoot(player);
-            }
-        }
-        if (hasLocalPlayer() && event.type == sf::Event::KeyReleased) {
-            auto &player = getLocalPlayer();
-            auto velocity = player.getComponent<ecs::VelocityComponent>();
-            this->playerAnimations(getLocalPlayer(), "none");
-            if (event.key.code == sf::Keyboard::Up
-                || event.key.code == sf::Keyboard::Down) {
-                velocity->setVy(0.0f);
-            }
-            if (event.key.code == sf::Keyboard::Left
-                || event.key.code == sf::Keyboard::Right) {
-                velocity->setVx(0.0f);
-            }
-        }
-    }
 }

@@ -66,7 +66,11 @@ namespace RType
         void playerShoot(ecs::Entity &player);
 
         std::vector<ecs::Entity> &getEntities();
-        int manageBuffers();
+
+        // Networking
+        int is_code_valid(int code);
+        int clientManageBuffers();
+        void connectToGame();
 
         void gameUpdate(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
@@ -95,7 +99,6 @@ namespace RType
 
         //     // --
 
-
         //     // Player Management
         //     void createNewPlayer(std::vector<std::string> &tokens);
         //     void setNewPosition(std::vector<std::string> &tokens);
@@ -113,6 +116,7 @@ namespace RType
       private:
         int _playerEntityID = -1;
         bool _isServer;
+        bool _isConnectedToServer = false;
         uint16_t _udpPort = DEFAULT_UDP_PORT;
         uint16_t _tcpPort = DEFAULT_TCP_PORT;
         std::string _ip = DEFAULT_IP;
