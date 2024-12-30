@@ -10,8 +10,8 @@
 #endif
 
 #include "Components.hpp"
-#include "GameSystems.hpp"
 #include "Game.hpp"
+#include "GameSystems.hpp"
 
 using namespace RType;
 using namespace GameSystems;

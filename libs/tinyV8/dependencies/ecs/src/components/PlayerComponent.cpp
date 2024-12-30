@@ -9,7 +9,18 @@
 
 namespace ecs
 {
-    PlayerComponent::PlayerComponent()
+    PlayerComponent::PlayerComponent(size_t playerID) : _playerID(playerID)
     {
     }
+
+    size_t PlayerComponent::getPlayerID() const
+    {
+        return (_playerID);
+    }
+
+    void PlayerComponent::setPlayerID(size_t playerID)
+    {
+        _playerID = playerID;
+    }
+
 } // namespace ecs

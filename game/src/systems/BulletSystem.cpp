@@ -42,6 +42,6 @@ void BulletSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         }
     }
     for (auto &bullet : bulletToRemove) {
-        _game->entityManager.getCurrentLevel().destroyEntityById(bullet.getID());
+        _game->refEntityManager.getCurrentLevel().destroyEntityById(bullet.getID());
     }
 }

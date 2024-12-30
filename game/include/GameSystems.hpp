@@ -56,6 +56,16 @@ namespace RType
             GameInstance *_game;
         };
 
+        class BackgroundSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
+
+          protected:
+            GameInstance *_game;
+        };
+
     } // namespace GameSystems
 
 } // namespace RType

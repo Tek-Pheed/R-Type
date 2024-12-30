@@ -31,7 +31,7 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         auto renderComponent = entity.getComponent<ecs::RenderComponent>();
         auto position = entity.getComponent<ecs::PositionComponent>();
 
-        if (renderComponent != nullptr && position != nullptr
+        if (renderComponent && position
             && renderComponent->getObjectType()
                 == ecs::RenderComponent::ObjectType::SPRITE) {
             auto sprite =

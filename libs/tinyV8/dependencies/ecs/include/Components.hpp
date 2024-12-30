@@ -39,7 +39,13 @@ namespace ecs
 
     class PlayerComponent : public Component {
       public:
-        PlayerComponent();
+        PlayerComponent(size_t playerID);
+
+        size_t getPlayerID() const;
+        void setPlayerID(size_t playerID);
+
+      private:
+        size_t _playerID;
     };
 
     class VelocityComponent : public Component {
@@ -89,6 +95,19 @@ namespace ecs
 
       private:
         ObjectType _type;
+    };
+
+    class BackgroundComponent : public Component {
+      public:
+        explicit BackgroundComponent(float moveDelta = 0.1f);
+
+        float getClock(void) const;
+        float setClock(float delta);
+        bool isTimeToMove(void);
+
+      private:
+        float _deltaCounter;
+        const float _moveDelta;
     };
 
     template <typename spriteType> class SpriteComponent : public Component {

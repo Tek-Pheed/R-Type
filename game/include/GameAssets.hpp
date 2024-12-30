@@ -29,6 +29,7 @@ namespace RType
         constexpr auto PLAYER_TEXTURE = "playerTexture";
         constexpr auto ENEMY_TEXTURE = "enemyTexture";
         constexpr auto BACKGROUND_TEXTURE = "backgroundTexture";
+        constexpr auto BULLET_TEXTURE = "bulletTexture";
 
         static const AssetStore assets[] = {
             {PLAYER_TEXTURE, "assets/sprites/r-typesheet42.gif",
@@ -36,6 +37,8 @@ namespace RType
             {ENEMY_TEXTURE, "assets/sprites/r-typesheet31.gif",
                 typeid(sf::Texture)},
             {BACKGROUND_TEXTURE, "assets/background/background.png",
+                typeid(sf::Texture)},
+            {BULLET_TEXTURE, "./assets/sprites/r-typesheet1.gif",
                 typeid(sf::Texture)}};
 
         template <typename Type>

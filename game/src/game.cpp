@@ -5,11 +5,11 @@
 ** game
 */
 
+#include "Components.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
-#include "Game.hpp"
 #include <any>
 #include <exception>
 #include <iostream>
@@ -22,6 +22,7 @@
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
@@ -54,7 +55,7 @@ void GameInstance::loadTexture()
 {
     for (const auto asset : Asset::getAllAssetsOfType<sf::Texture>()) {
         try {
-            assetManager.loadAsset(asset->path, asset->identifier,
+            refAssetManager.loadAsset(asset->path, asset->identifier,
                 &sf::Texture::loadFromFile, sf::IntRect());
         } catch (const std::exception &e) {
             std::cout << "Failed to load asset " << asset->identifier
@@ -86,10 +87,10 @@ void GameInstance::gameUpdate(
 
 GameInstance::GameInstance(Engine::Core &engineRef)
     : refGameEngine(engineRef),
-      entityManager(
+      refEntityManager(
           engineRef.getFeature<Engine::Feature::LevelManager<GameInstance>>()),
-      assetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
-      networkManager(
+      refAssetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
+      refNetworkManager(
           engineRef.getFeature<Engine::Feature::NetworkingManager>())
 {
 }
@@ -104,23 +105,6 @@ bool GameInstance::getServerMode()
     return _isServer;
 }
 
-ecs::Entity &GameInstance::getLocalPlayer()
-{
-    if (!hasPlayer())
-        throw ErrorClass("No player was attached to the client");
-    return (entityManager.getCurrentLevel().getEntityById((size_t) _PlayerId));
-}
-
-int GameInstance::getPlayerId() const
-{
-    return (_PlayerId);
-}
-
-void GameInstance::setPlayerId(int id)
-{
-    _PlayerId = id;
-}
-
 int GameInstance::manageBuffers()
 {
     return 0;
@@ -131,36 +115,9 @@ bool GameInstance::isServer() const
     return (_isServer);
 }
 
-bool GameInstance::hasPlayer(void) const
-{
-    if (_PlayerId == -1) {
-        return (false);
-    }
-    return (true);
-}
-
-void GameInstance::updateLocalPlayerPosition()
-{
-    if (!hasPlayer())
-        return;
-    auto position = getLocalPlayer().getComponent<ecs::PositionComponent>();
-    if (position) {
-        float oldX = position->getOldX();
-        float oldY = position->getOldY();
-        float x = position->getX();
-        float y = position->getY();
-
-        if (oldX != x || oldY != y) {
-            std::stringstream ss;
-            ss << "102 " << _PlayerId << " " << x << " " << y << "\t\n";
-            // writeToServer(ss.str(), System::Network::ISocket::UDP);
-        }
-    }
-}
-
 std::vector<ecs::Entity> &RType::GameInstance::getEntities()
 {
-    return (entityManager.getCurrentLevel().getEntitiesVect());
+    return (refEntityManager.getCurrentLevel().getEntitiesVect());
 }
 
 void GameInstance::playEvent()
@@ -173,7 +130,7 @@ void GameInstance::playEvent()
             this->_window->close();
             refGameEngine.stop();
         }
-        if (hasPlayer() && event.type == sf::Event::KeyPressed) {
+        if (hasLocalPlayer() && event.type == sf::Event::KeyPressed) {
             auto &player = getLocalPlayer();
             auto velocity = player.getComponent<ecs::VelocityComponent>();
             if (event.key.code == sf::Keyboard::Up) {
@@ -192,7 +149,7 @@ void GameInstance::playEvent()
                 playerShoot(player);
             }
         }
-        if (hasPlayer() && event.type == sf::Event::KeyReleased) {
+        if (hasLocalPlayer() && event.type == sf::Event::KeyReleased) {
             auto &player = getLocalPlayer();
             auto velocity = player.getComponent<ecs::VelocityComponent>();
             this->playerAnimations(getLocalPlayer(), "none");

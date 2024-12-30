@@ -14,7 +14,9 @@
 
 #include <SFML/Graphics.hpp>
 #include <cstdint>
+#include <functional>
 #include <memory>
+#include <vector>
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
@@ -45,31 +47,35 @@ namespace RType
 
         // Window Utilities
         sf::RenderWindow &getWindow();
+        void playEvent();
 
         // Texture Utilities
         void loadTexture();
 
-        // Player Utilities
-        void playEvent();
+        ecs::Entity &buildBackground(void);
+        void levelMainMenu(void);
+        void createPersistentLevel(void);
+
+        // Player functions and utilities
         void playerAnimations(ecs::Entity &player, std::string direction);
         void playerShoot(ecs::Entity &player);
+        ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
+        bool hasLocalPlayer(void) const;
+        void updateLocalPlayerPosition();
+        ecs::Entity &getLocalPlayer();
+        std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
 
         std::vector<ecs::Entity> &getEntities();
         int manageBuffers();
-        bool hasPlayer(void) const;
-        void updateLocalPlayerPosition();
-        ecs::Entity &getLocalPlayer();
-        int getPlayerId(void) const;
-        void setPlayerId(int id);
 
         void gameUpdate(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         bool isServer() const;
 
         Engine::Core &refGameEngine;
-        Engine::Feature::LevelManager<GameInstance> &entityManager;
-        Engine::Feature::AssetManager &assetManager;
-        Engine::Feature::NetworkingManager &networkManager;
+        Engine::Feature::LevelManager<GameInstance> &refEntityManager;
+        Engine::Feature::AssetManager &refAssetManager;
+        Engine::Feature::NetworkingManager &refNetworkManager;
 
         //     int createConnection(const char *ip, int portTCP, int portUDP);
         //     void writeToServer(
@@ -111,7 +117,7 @@ namespace RType
         //     void enemyDamage(std::vector<std::string> &tokens);
 
       private:
-        int _PlayerId = -1;
+        int _playerEntityID = -1;
         bool _isServer;
         uint16_t _udpPort = DEFAULT_UDP_PORT;
         uint16_t _tcpPort = DEFAULT_TCP_PORT;

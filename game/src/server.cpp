@@ -76,5 +76,5 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     _isServer = true;
     _tcpPort = tcpPort;
     _udpPort = udpPort;
-    networkManager.setupServer<PacketHandler>(_tcpPort, _udpPort);
+    refNetworkManager.setupServer<PacketHandler>(_tcpPort, _udpPort);
 }
