@@ -5,11 +5,11 @@
 ** player
 */
 
-#include "GameProtocol.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "GameProtocol.hpp"
 #include <sstream>
 #include "Components.hpp"
 #include "ErrorClass.hpp"

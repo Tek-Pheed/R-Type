@@ -5,11 +5,11 @@
 ** server specific functions
 */
 
-#include <cstdlib>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include <cstdlib>
 #include <any>
 #include <cstddef>
 #include <sstream>

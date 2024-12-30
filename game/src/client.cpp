@@ -5,23 +5,22 @@
 ** client
 */
 
-#include <cstdlib>
-#include "Components.hpp"
-#include "GameProtocol.hpp"
-#include "system_network.hpp"
-#include "system_udp.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include "Components.hpp"
 #include "Engine.hpp"
 #include "Game.hpp"
+#include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
+#include "system_network.hpp"
 
 using namespace RType;
 
