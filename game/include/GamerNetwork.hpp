@@ -5,8 +5,8 @@
 ** server
 */
 
-#ifndef GAME_SERVER_HPP
-#define GAME_SERVER_HPP
+#ifndef GAME_NETWORK_HPP
+#define GAME_NETWORK_HPP
 
 #if defined(WIN32)
     #define NOMINMAX
@@ -33,4 +33,4 @@ namespace RType
 
 } // namespace RType
 
-#endif /* GAME_SERVER_HPP */
+#endif /* GAME_NETWORK_HPP */

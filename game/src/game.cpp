@@ -5,24 +5,23 @@
 ** game
 */
 
-#include "Components.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "Game.hpp"
 #include <any>
 #include <exception>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <vector>
+#include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
-#include "ErrorClass.hpp"
-#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"

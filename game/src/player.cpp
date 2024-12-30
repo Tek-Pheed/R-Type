@@ -81,3 +81,44 @@ void GameInstance::updateLocalPlayerPosition()
         }
     }
 }
+
+void GameInstance::playerShoot(ecs::Entity &player)
+{
+    if (!hasLocalPlayer())
+        return;
+
+    std::stringstream ss;
+    auto positionComp = player.getComponent<ecs::PositionComponent>();
+    auto &bullet = refEntityManager.getCurrentLevel().createEntity();
+    if (!positionComp)
+        return;
+    auto &texture =
+        refAssetManager.getAsset<sf::Texture>(Asset::BULLET_TEXTURE);
+    bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
+    bullet.addComponent(std::make_shared<ecs::PositionComponent>(
+        positionComp->getX() + 100, positionComp->getY() + 25));
+    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+    bullet.addComponent(std::make_shared<ecs::RenderComponent>(
+        ecs::RenderComponent::ObjectType::SPRITE));
+    sf::Sprite s;
+    s.setTexture(texture);
+    s.setTextureRect(sf::Rect(137, 153, 64, 16));
+    bullet.addComponent(
+        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
+
+    // ss << "104 " << _playerEntityID << "\t\n";
+
+    // writeToServer(ss.str(), System::Network::ISocket::UDP);
+}
+
+void GameInstance::playerAnimations(ecs::Entity &player, std::string direction)
+{
+    auto renderComp = player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
+    if (direction == "top") {
+        renderComp->getSprite().setTextureRect(sf::Rect(132, 0, 33, 14));
+    } else if (direction == "down") {
+        renderComp->getSprite().setTextureRect(sf::Rect(0, 0, 33, 14));
+    } else {
+        renderComp->getSprite().setTextureRect(sf::Rect(66, 0, 33, 14));
+    }
+}

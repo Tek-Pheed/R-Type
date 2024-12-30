@@ -57,13 +57,13 @@ namespace RType
         void createPersistentLevel(void);
 
         // Player functions and utilities
+        ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
+        std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
+        bool hasLocalPlayer(void) const;
+        ecs::Entity &getLocalPlayer();
+        void updateLocalPlayerPosition();
         void playerAnimations(ecs::Entity &player, std::string direction);
         void playerShoot(ecs::Entity &player);
-        ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
-        bool hasLocalPlayer(void) const;
-        void updateLocalPlayerPosition();
-        ecs::Entity &getLocalPlayer();
-        std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
 
         std::vector<ecs::Entity> &getEntities();
         int manageBuffers();
@@ -95,14 +95,8 @@ namespace RType
 
         //     // --
 
-        //     // Client Management
-        //     void setRenderClass(RenderClass *refRender);
-        //     RenderClass *getRenderClass();
-        //     void loadTexture();
-        //     void createPlayer();
 
         //     // Player Management
-        //     void handlePlayer(int code, std::vector<std::string> &tokens);
         //     void createNewPlayer(std::vector<std::string> &tokens);
         //     void setNewPosition(std::vector<std::string> &tokens);
         //     void playerDead(std::vector<std::string> &tokens);
