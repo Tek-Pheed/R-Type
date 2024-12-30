@@ -68,7 +68,6 @@ static int prepareGame(int argc, const char *argv[],
 int main(int argc, const char *argv[])
 {
     Engine::Core gameEngine;
-    gameEngine.setTickRate(RType::GameInstance::REFRESH_RATE);
     gameEngine
         .loadFeature<Engine::Feature::LevelManager<RType::GameInstance>>();
     gameEngine.loadFeature<Engine::Feature::AssetManager>();

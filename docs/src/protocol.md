@@ -33,7 +33,7 @@ The format for the instuctions will always be the following
 
 CODE "SPACE" [ARGS] "HLTF"
 
-i.e. "901 1\t\n" 
+i.e. "901 1\t\n"
 
 --- middle
 
@@ -70,10 +70,10 @@ The protocol used (TPC/UDP) will be explicitly precised, and the way the paquet 
 
 This process is done when a new player connect. The process is made so the server can identify which client is associated to which UDP socket.
 
-TCP Server--901-ClientId-->Client 
-                           
+TCP Server--901-ClientId-->Client
+
 UDP Server<--902-ClientId--Client
-                           
+
 TCP Server---903-OK/KO---->Client
 
 # Connection Management (900)
@@ -82,7 +82,7 @@ The instructions used regarding the connection of the client and server are
 
 - Init UDP Connection (clientID) - 901 -> TCP
 
-This is the first isntruction sent to the server, its used so the client knows its id.
+This is the first instruction sent to the server, its used so the client knows its id. (The server is free to resend this packet multiple times if it did not receive any response on it's UDP socket.)
 
 - Start UDP (clientId) - 902 <- UDP
 
@@ -95,7 +95,7 @@ As seen in the handshake, this instructions is used to associate a UDP socket to
 
 The following isntructions are the one used to manage players
 
-- Player connection (clientId, name, x, y) - 101 <-> UDP
+- Player connection (clientId, x, y) - 101 <-> TCP
 
 This is sent to all the clients when a new player join the game.
 
@@ -103,7 +103,7 @@ This is sent to all the clients when a new player join the game.
 
 This instructions is sent by both the server and the client to update the position of a specific player.
 
-- Player killed (id) - 103 -> UDP
+- Player killed (id) - 103 -> TCP
 
 Used when a player die, so it can be removed from the clients and server.
 
@@ -115,7 +115,7 @@ Allow the server to process the shoot and its collision, and the client to creat
 
 Set the player health.
 
-- Player disconnection (id) - 106 <-> UDP
+- Player disconnection (id) - 106 <-> TCP
 
 Used when a player disconnect, has the same behaviour as the instruction 103.
 
@@ -123,7 +123,7 @@ Used when a player disconnect, has the same behaviour as the instruction 103.
 
 This are the instructions used to manage the enemies
 
-- Enemy spawn (id, x, y) - 111 -> UDP
+- Enemy spawn (id, x, y) - 111 -> TCP
 
 Sent by the server to all the clients to spawn an enemy at a specific position.
 
@@ -155,8 +155,8 @@ Removed a terrain, if its has been destroyed or went off the screen.
 
 # Game Mechanics (130)
 
-- New wave (waveNb) - 131 -> UDP
-- Wave over (waveNb) - 132 -> UDP
-- Win - 133 -> UDP
-- Lose - 134 -> UDP
-- Game Over - 135 -> UDP
+- New wave (waveNb) - 131 -> TCP
+- Wave over (waveNb) - 132 -> TCP
+- Win - 133 -> TCP
+- Lose - 134 -> TCP
+- Game Over - 135 -> TCP

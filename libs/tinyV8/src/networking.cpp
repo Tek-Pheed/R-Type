@@ -71,6 +71,16 @@ size_t NetworkingManager::getClientID(void) const
     return (_clientID);
 }
 
+std::vector<size_t> NetworkingManager::getAllClientsId(void)
+{
+    std::vector<size_t> vect;
+
+    for (const auto &[key, val] : _clients) {
+        vect.emplace_back(key);
+    }
+    return (vect);
+}
+
 std::vector<std::string> NetworkingManager::readClientPackets(
     NetworkingManager::NetClient &cli)
 {
@@ -87,6 +97,8 @@ std::vector<std::string> NetworkingManager::readClientPackets(
     bytes = cli.readBufferUDP;
     auto udpPackets = _pacMan->splitPackets(bytes, endIndex);
     packets.insert(packets.end(), udpPackets.begin(), udpPackets.end());
+    cli.readBufferUDP.erase(cli.readBufferUDP.begin(),
+        cli.readBufferUDP.begin() + (ssize_t) endIndex);
     return (packets);
 }
 
@@ -97,12 +109,16 @@ std::vector<std::string> NetworkingManager::readAllPackets()
     if (_isServer) {
         for (auto &client : _clients) {
             auto packs = readClientPackets(client.second);
+            _globalMutex.lock();
             packets.insert(packets.end(), packs.begin(), packs.end());
+            _globalMutex.unlock();
         }
     } else {
         NetworkingManager::NetClient &cli = getClient(1);
         auto packs = readClientPackets(cli);
+        _globalMutex.lock();
         packets.insert(packets.end(), packs.begin(), packs.end());
+        _globalMutex.unlock();
     }
     return (packets);
 }
@@ -142,7 +158,8 @@ NetworkingManager::NetClient &NetworkingManager::addClient(
     std::cout << "ENGINE: Created a new client ("
               << std::to_string(_clientCounter) << ") on the server."
               << std::endl;
-    AEngineFeature::_engineRef.triggerEvent(Events::EVENT_OnServerNewClient);
+    AEngineFeature::_engineRef.triggerEvent(
+        Events::EVENT_OnServerNewClient, _clientCounter);
     return (_clients[_clientCounter]);
 }
 
@@ -158,8 +175,8 @@ void NetworkingManager::removeClient(size_t id)
     std::unique_lock lock(_globalMutex);
 
     _clients.at(id).isDisconnected = true;
-    std::cout << "ENGINE: Removed a client (" << std::to_string(_clientCounter)
-              << ") from the server." << std::endl;
+    std::cout << "ENGINE: Removed a client (" << id << ") from the server."
+              << std::endl;
 }
 
 ssize_t NetworkingManager::identifyClient(
@@ -180,7 +197,7 @@ ssize_t NetworkingManager::identifyClient(
     std::unique_lock lock(_globalMutex);
 
     for (const auto &pair : _clients) {
-        if (pair.second.ip == ip && std::to_string(pair.second.port) == port)
+        if (pair.second.ip == ip || std::to_string(pair.second.port) == port)
             return (ssize_t) pair.first;
     }
     return -1;
@@ -189,10 +206,10 @@ ssize_t NetworkingManager::identifyClient(
 void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
     const std::string &data, System::Network::ISocket::Type socketType)
 {
+    std::unique_lock lock(_writeMutex);
     std::ostringstream out;
     _pacMan->serializeString(data, out);
     std::string serializedData = out.str();
-    std::unique_lock lock(_writeMutex);
     auto encoded = System::Network::encodeString(serializedData);
 
     if (socketType == System::Network::ISocket::TCP) {

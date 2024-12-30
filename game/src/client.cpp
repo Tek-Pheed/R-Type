@@ -5,21 +5,58 @@
 ** client
 */
 
+#include "GameProtocol.hpp"
+#include "system_network.hpp"
+#include "system_udp.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
-#include "Engine.hpp"
-#include "GameSystems.hpp"
 #include <exception>
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include "Engine.hpp"
 #include "Game.hpp"
-#include "GameNetwork.hpp"
+#include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
 
 using namespace RType;
+
+void RType::GameInstance::clientHandlerConnection(
+    int code, const std::vector<std::string> &tokens)
+{
+    switch (code) {
+        case Protocol::C_INIT_UDP: {
+            if (tokens.size() >= 1) {
+                _netClientID = (ssize_t) atoi(tokens[0].c_str());
+                if (_netClientID >= 0) {
+                    refNetworkManager.sendToAll(
+                        System::Network::ISocket::Type::UDP,
+                        clientStartUDP((size_t) _netClientID));
+                } else {
+                    std::cout << "Could not read client ID" << std::endl;
+                }
+            }
+            break;
+        }
+        case Protocol::C_AUTH: {
+            if (tokens.size() >= 1) {
+                if (tokens[0].starts_with("OK") && _netClientID >= 0) {
+                    // We can create the player here, or wait and create it later
+
+                    std::cout << "Build player" << std::endl;
+                    buildPlayer(true, (size_t) _netClientID);
+                } else {
+                    std::cout << "The connection failed." << std::endl;
+                }
+            }
+            break;
+        }
+
+        default: break;
+    }
+}
 
 int RType::GameInstance::clientManageBuffers()
 {
@@ -29,8 +66,9 @@ int RType::GameInstance::clientManageBuffers()
     auto packets = refNetworkManager.readAllPackets();
     if (packets.size() == 0)
         return 0;
-    for (auto buffer : packets) {
-        std::string codeStr = std::string(buffer).substr(0, 3);
+    for (auto &buff : packets) {
+        std::string buffer = buff;
+        std::string codeStr = buffer.substr(0, 3);
         int code = atoi(codeStr.c_str());
         int code_int = is_code_valid(code);
         std::vector<std::string> tokens;
@@ -40,18 +78,18 @@ int RType::GameInstance::clientManageBuffers()
         std::string str = buffer.substr(4, buffer.size() - 4);
         std::istringstream ss(str);
         std::string token;
-        std::cout << "Buffer: " << buffer << std::endl;
+        std::cout << "Managing buffer: " << buffer << std::endl;
         while (std::getline(ss, token, ' ')) {
             tokens.push_back(token);
         }
-        // switch (code_int) {
-        //     case 0: handlePlayer(code, tokens); break;
-        //     case 1: handle_enemy(code, tokens); break;
-        //     case 2: handle_terrain(code, tokens); break;
-        //     case 3: handle_mechs(code, tokens); break;
-        //     case 9: handle_connection(code, tokens); break;
-        //     default: break;
-        // }
+        switch (code_int) {
+            // case 0: handlePlayer(code, tokens); break;
+            // case 1: handle_enemy(code, tokens); break;
+            // case 2: handle_terrain(code, tokens); break;
+            // case 3: handle_mechs(code, tokens); break;
+            case 9: clientHandlerConnection(code, tokens); break;
+            default: break;
+        }
     }
     return 0;
 }
@@ -90,6 +128,7 @@ void RType::GameInstance::setupClient(
     _ip = ip;
     _tcpPort = tcpPort;
     _udpPort = udpPort;
+    refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
     sf::VideoMode videoMode(
         1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);

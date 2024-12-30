@@ -9,76 +9,25 @@
     #define NOMINMAX
 #endif
 
+#include <any>
+#include <cstddef>
+#include <sstream>
+#include "Components.hpp"
 #include "EngineNetworking.hpp"
 #include "Game.hpp"
-#include <cstddef>
-#include "GameNetwork.hpp"
 #include "GameProtocol.hpp"
 #include "system_network.hpp"
 
 using namespace RType;
 
-PacketHandler::PacketHandler()
-{
-}
-
-PacketHandler::~PacketHandler()
-{
-}
-
-// This will need to be more robust
-std::vector<std::string> PacketHandler::splitPackets(
-    const System::Network::byteArray &bytes, size_t &resultIndexEnd)
-{
-    std::vector<std::string> out;
-    size_t start = 0;
-
-    if (bytes.size() > 1) {
-        std::string buffer = System::Network::decodeString(bytes);
-
-        for (size_t i = 1; i < buffer.size(); i++) {
-            if (buffer[i - 1] == PACKET_END[0] && buffer[i] == PACKET_END[1]) {
-                out.emplace_back(buffer.substr(start, i));
-                start = i + 1;
-            }
-        }
-    }
-    resultIndexEnd = start;
-    return (out);
-}
-
-// This will need to be more robust
-ssize_t PacketHandler::identifyClient(const System::Network::byteArray &bytes)
-{
-    size_t end = 0;
-    std::vector<std::string> packets = splitPackets(bytes, end);
-
-    for (const auto &decoded : packets) {
-        if (decoded.starts_with(std::to_string(C_START_UDP))) {
-            std::string::size_type p = decoded.find(' ');
-            auto id = std::strtol(&decoded[p], nullptr, 10);
-            if (id == LLONG_MAX || id == LLONG_MIN)
-                return (-1);
-            return (id);
-        }
-    }
-    return (-1);
-}
-
-// This will need to reworked
-void PacketHandler::serializeString(const std::string &str, std::ostream &out)
-{
-    size_t size = str.size();
-    out.write(reinterpret_cast<const char *>(&size), sizeof(size));
-    out.write(str.data(), static_cast<std::streamsize>(size));
-}
-
 void GameInstance::serverEventNewConn(
     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
-    (void) arg;
     (void) core;
-    std::cout << "Server received event: " << event << std::endl;
+    size_t newID = std::any_cast<size_t>(arg);
+    std::cout << "Server wakeup on event: " << event << std::endl;
+    refNetworkManager.sendToOne(
+        newID, System::Network::ISocket::TCP, serverInitUDP(newID));
 }
 
 void GameInstance::serverEventClosedConn(
@@ -86,7 +35,7 @@ void GameInstance::serverEventClosedConn(
 {
     (void) arg;
     (void) core;
-    std::cout << "Server received event: " << event << std::endl;
+    std::cout << "Server wakeup on event: " << event << std::endl;
 }
 
 void GameInstance::serverEventPackets(
@@ -94,7 +43,71 @@ void GameInstance::serverEventPackets(
 {
     (void) arg;
     (void) core;
-    std::cout << "Server received event: " << event << std::endl;
+    std::cout << "Server wakeup on event: " << event << std::endl;
+    serverManageBuffers();
+    // refNetworkManager.sendToOne(size_t id, System::Network::ISocket::Type
+    // socketType, const std::string &buffer)
+}
+
+void RType::GameInstance::serverHanlderValidateConnection(
+    int code, const std::vector<std::string> &tokens)
+{
+    if (code == Protocol::C_START_UDP && tokens.size() >= 1) {
+        ssize_t netClientID = (ssize_t) atoi(tokens[0].c_str());
+        if (netClientID >= 0) {
+            refNetworkManager.sendToOne((size_t) netClientID,
+                System::Network::ISocket::Type::TCP, serverConfirmUDP(true));
+            for (auto &p : getAllPlayers()) {
+                auto pos = p.get().getComponent<ecs::PositionComponent>();
+                auto pl = p.get().getComponent<ecs::PlayerComponent>();
+                if (!pl || !pos)
+                    continue;
+                refNetworkManager.sendToOne((size_t) netClientID,
+                    System::Network::ISocket::Type::TCP,
+                    playerConnection(
+                        pl->getPlayerID(), pos->getX(), pos->getY()));
+            }
+//            buildPlayer(true, playerIndex);
+//            playerIndex++;
+        } else {
+            std::cout << "Could not read client ID" << std::endl;
+        }
+    }
+}
+
+int RType::GameInstance::serverManageBuffers()
+{
+    auto packets = refNetworkManager.readAllPackets();
+    if (packets.size() == 0)
+        return 0;
+
+    for (auto &buff : packets) {
+        std::string buffer = buff;
+        std::string codeStr = buffer.substr(0, 3);
+        int code = atoi(codeStr.c_str());
+        int code_int = is_code_valid(code);
+        std::vector<std::string> tokens;
+        if (code_int == -1) {
+            return -1;
+        }
+        std::string str = buffer.substr(4, buffer.size() - 4);
+        std::istringstream ss(str);
+        std::string token;
+        std::cout << "Managing Buffer: " << buffer << std::endl;
+        while (std::getline(ss, token, ' ')) {
+            tokens.push_back(token);
+        }
+        switch (code_int) {
+            // case 0: handlePlayer(code, tokens); break;
+            // case 1: handle_enemy(code, tokens); break;
+            // case 2: handle_terrain(code, tokens); break;
+            // case 3: handle_mechs(code, tokens); break;
+            case 9: serverHanlderValidateConnection(code, tokens); break;
+
+            default: break;
+        }
+    }
+    return 0;
 }
 
 void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
@@ -103,7 +116,7 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     _tcpPort = tcpPort;
     _udpPort = udpPort;
     refNetworkManager.setupServer<PacketHandler>(_tcpPort, _udpPort);
-
+    refGameEngine.setTickRate(SERVER_REFRESH_RATE);
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnDataReceived,
         &GameInstance::serverEventPackets, *this);
@@ -113,4 +126,8 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnServerLostClient,
         &GameInstance::serverEventClosedConn, *this);
+    auto &level = refEntityManager.createNewLevel("mainLevel");
+    level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+    refEntityManager.switchLevel("mainLevel");
 }

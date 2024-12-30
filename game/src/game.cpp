@@ -27,21 +27,6 @@
 
 using namespace RType;
 
-int GameInstance::is_code_valid(int code)
-{
-    if (code >= P_CONN && code <= P_DISCONN)
-        return 0;
-    if (code >= E_SPAWN && code <= E_DMG)
-        return 1;
-    if (code >= T_SPAWN && code <= T_DEAD)
-        return 2;
-    if (code >= M_WAVE && code <= M_GOVER)
-        return 3;
-    if (code >= C_INIT_UDP && code <= C_AUTH)
-        return 9;
-    return -1;
-}
-
 const std::vector<const Asset::AssetStore *> getAllAsset()
 {
     std::vector<const Asset::AssetStore *> vect;

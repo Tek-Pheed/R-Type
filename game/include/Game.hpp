@@ -29,7 +29,8 @@ namespace RType
 
     class GameInstance {
       public:
-        static constexpr uint16_t REFRESH_RATE = 60U;
+        static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
+        static constexpr uint16_t SERVER_REFRESH_RATE = 30U;
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
@@ -70,7 +71,11 @@ namespace RType
         // Networking
         int is_code_valid(int code);
         int clientManageBuffers();
+        int serverManageBuffers();
         void connectToGame();
+        void clientHandlerConnection(
+            int code, const std::vector<std::string> &tokens);
+        void serverHanlderValidateConnection(int code, const std::vector<std::string> &tokens);
 
         // Server Only Events
         void serverEventNewConn(
@@ -105,12 +110,6 @@ namespace RType
         //     &tokens); void handleMechs(int code, std::vector<std::string>
         //     &tokens); void addEntity(ecs::Entity & entity);
 
-        //     void setServerMode(bool mode);
-
-        //     // These functions should be moved in a game Engine class
-
-        //     // --
-
         //     // Player Management
         //     void createNewPlayer(std::vector<std::string> &tokens);
         //     void setNewPosition(std::vector<std::string> &tokens);
@@ -127,6 +126,7 @@ namespace RType
 
       private:
         int _playerEntityID = -1;
+        ssize_t _netClientID = -1;
         bool _isServer;
         bool _isConnectedToServer = false;
         uint16_t _udpPort = DEFAULT_UDP_PORT;
@@ -134,11 +134,6 @@ namespace RType
         std::string _ip = DEFAULT_IP;
 
         std::unique_ptr<sf::RenderWindow> _window;
-
-        //     std::vector<ecs::Entity &> _entities;
-
-        //     // To move into game Engine
-        //     std::unordered_map<std::type_index, ecs::ISystem> _subsystems;
     };
 }; // namespace RType
 

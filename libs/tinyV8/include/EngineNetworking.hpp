@@ -62,15 +62,15 @@ namespace Engine
         // argument
         constexpr auto EVENT_DisconnectedFromServer{"onDisconnectedToServer"};
 
-        // Event when as a server you get a new connection, no argument
+        // Event when as a server you get a new connection, ARG: size_t
+        // (clientID)
         constexpr auto EVENT_OnServerNewClient{"onServerNewClient"};
 
-        // Event when as a server a client disconnects, ARG: ssize_t (client
-        // ID)
+        // Event when as a server a client disconnects, ARG: ssize_t (clientID)
         constexpr auto EVENT_OnServerLostClient{"onServerLostClient"};
 
         // Event network data received on a socket, no argument
-        constexpr auto EVENT_OnDataReceived {"onDataReceived"};
+        constexpr auto EVENT_OnDataReceived{"onDataReceived"};
 
     }; // namespace Events
 
@@ -121,6 +121,15 @@ namespace Engine
          */
         virtual void serializeString(
             const std::string &str, std::ostream &out) = 0;
+
+        /**
+         * @brief Deserialize a string
+
+         * @param in: The buffer to deserialize.
+         * @param out: The output string.
+         */
+        virtual void deserializeString(
+            const std::ostream &in, std::string &out) = 0;
     };
     namespace Feature
     {
@@ -255,6 +264,13 @@ namespace Engine
              * @return size_t: The client ID
              */
             size_t getClientID(void) const;
+
+            /**
+             * @brief Return the list of all client IDs stored in the server.
+
+             * @return std::vector<size_t>: A vector of client IDs.
+             */
+            std::vector<size_t> getAllClientsId(void);
 
             /**
              * @brief Read all received packets on both UDP and TCP sockets.

@@ -67,10 +67,9 @@ void NetworkingManager::runWriteThread()
                     case System::Network::ISocket::TCP: {
                         ssize_t id = this->identifyClient(*sock);
                         if (id == -1)
-                            std::cout
-                                << "ENGINE: Unable to idendify client (TCP - "
-                                   "write thread)"
-                                << std::endl;
+                            std::cout << "ENGINE: [Write Thread] Unable to "
+                                         "idendify client"
+                                      << std::endl;
                         NetClient &client = this->getClient((size_t) id);
                         if (client.isDisconnected) {
                             removeID = (int) id;
@@ -96,6 +95,7 @@ void NetworkingManager::runWriteThread()
                                       << ") on TCP connection ("
                                       << std::to_string(sock->getUID()) << ")"
                                       << std::endl;
+                            std::unique_lock lock(_writeMutex);
                             if ((size_t) len < client.writeBufferTCP.size())
                                 shouldWait = false;
                             client.writeBufferTCP.erase(
@@ -115,11 +115,16 @@ void NetworkingManager::runWriteThread()
                                         && cli.writeBufferUDP.size() == 0)
                                         can_remove = true;
                                 }
-                                if (cli.port == 0 || cli.ip.empty()
-                                    || cli.writeBufferUDP.size() == 0)
-                                    continue;
-                                len = _SocketUDP.sendDataTo(
-                                    cli.writeBufferUDP, cli.ip, cli.port);
+                                if (_isServer) {
+                                    if (cli.port == 0 || cli.ip.empty()
+                                        || cli.writeBufferUDP.size() == 0)
+                                        continue;
+                                    len = _SocketUDP.sendDataTo(
+                                        cli.writeBufferUDP, cli.ip, cli.port);
+                                } else {
+                                    len = _SocketUDP.sendData(
+                                        cli.writeBufferUDP);
+                                }
                                 std::cout
                                     << "ENGINE: [Write Thread] Sending: "
                                     << System::Network::decodeString(
@@ -129,11 +134,12 @@ void NetworkingManager::runWriteThread()
                                     << ") on UDP connection ("
                                     << std::to_string(sock->getUID()) << ")"
                                     << std::endl;
+                                std::unique_lock lock(_writeMutex);
                                 if ((size_t) len < cli.writeBufferUDP.size())
                                     shouldWait = false;
                                 cli.writeBufferUDP.erase(
-                                    cli.writeBufferTCP.begin(),
-                                    cli.writeBufferTCP.begin() + len);
+                                    cli.writeBufferUDP.begin(),
+                                    cli.writeBufferUDP.begin() + len);
                             }
                         }
                     }
@@ -182,17 +188,16 @@ void NetworkingManager::runReadThread()
             if (readfds.size() == 0)
                 continue;
             for (auto sock : readfds) {
-                vect.clear();
-                arr.clear();
                 switch (sock->getType()) {
                     case System::Network::ISocket::TCP: {
+                        vect.clear();
+                        arr.clear();
                         ssize_t id = 1;
                         if (_isServer) {
                             id = identifyClient(*sock);
                             if (id == -1)
-                                std::cout << "ENGINE: Unable to idendify "
-                                             "client (TCP - "
-                                             "read thread)"
+                                std::cout << "ENGINE: [Read Thread] Unable to "
+                                             "idendify client"
                                           << std::endl;
                         }
                         if (!sock->isOpen()) {
@@ -208,13 +213,14 @@ void NetworkingManager::runReadThread()
                             } else {
                                 AEngineFeature::_engineRef.triggerEvent(
                                     Events::EVENT_DisconnectedFromServer);
+                                getClient(1).isDisconnected = true;
                             }
                         } else {
                             NetClient &client = this->getClient((size_t) id);
                             if (client.isDisconnected)
                                 continue;
                             vect = sock->receive();
-                            std::cout << "ENGINE: Received TCP: "
+                            std::cout << "ENGINE: [Read Thread] Received TCP: "
                                       << System::Network::decodeString(vect)
                                       << std::endl;
                             _globalMutex.lock();
@@ -228,6 +234,8 @@ void NetworkingManager::runReadThread()
                         break;
                     }
                     case System::Network::ISocket::UDP: {
+                        vect.clear();
+                        arr.clear();
                         std::string addr;
                         uint16_t port;
                         System::Network::UDPSocket *s =
@@ -264,6 +272,9 @@ void NetworkingManager::runReadThread()
                                 client.ip = addr;
                                 client.port = port;
                             }
+                        } else {
+                            getClient((size_t) id).ip = addr;
+                            getClient((size_t) id).port = port;
                         }
                         NetClient &client = getClient((size_t) id);
                         if (client.isDisconnected)
@@ -276,7 +287,7 @@ void NetworkingManager::runReadThread()
                             << "): " << System::Network::decodeString(vect)
                             << std::endl;
                         _globalMutex.lock();
-                        client.readBufferUDP.insert(client.readBufferTCP.end(),
+                        client.readBufferUDP.insert(client.readBufferUDP.end(),
                             vect.begin(), vect.end());
                         _globalMutex.unlock();
                         AEngineFeature::_engineRef.triggerEvent(
