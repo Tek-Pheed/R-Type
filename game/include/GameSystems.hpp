@@ -19,6 +19,8 @@
 
 namespace RType
 {
+    size_t getNewId();
+
     class GameInstance;
 
     namespace GameSystems

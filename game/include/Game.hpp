@@ -65,10 +65,14 @@ namespace RType
         ecs::Entity &getPlayerById(size_t id);
         void updatePlayerPosition(size_t playerID, float newX, float newY);
         void sendPlayerPosition(size_t playerID);
+        void deletePlayer(size_t playerID);
         void playerAnimations(ecs::Entity &player);
-        void playerShoot(ecs::Entity &player);
+        void playerShoot(size_t playerID);
 
         std::vector<ecs::Entity> &getEntities();
+
+        // Enemies
+        ecs::Entity &buildEnemy(size_t id, float posX, float posY, float health);
 
         // Networking
         int is_code_valid(int code);

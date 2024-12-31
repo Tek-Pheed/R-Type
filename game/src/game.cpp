@@ -28,6 +28,13 @@
 
 using namespace RType;
 
+size_t getNewId() {
+    static size_t id = 0;
+
+    id++;
+    return (id);
+}
+
 const std::vector<const Asset::AssetStore *> getAllAsset()
 {
     std::vector<const Asset::AssetStore *> vect;
@@ -75,11 +82,6 @@ void GameInstance::gameTick(
     if (!_isServer) {
         playEvent();
         clientManageBuffers();
-        if (_isConnectedToServer && hasLocalPlayer()) {
-            auto pos = getLocalPlayer().getComponent<ecs::PositionComponent>();
-            if (pos->getOldX() != pos->getX() || pos->getOldY() != pos->getY())
-                sendPlayerPosition((size_t) _netClientID);
-        }
         for (auto &pl : getAllPlayers()) {
             playerAnimations(pl.get());
         }

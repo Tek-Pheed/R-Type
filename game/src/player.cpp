@@ -108,6 +108,22 @@ void GameInstance::handleNetworkPlayers(
             }
             break;
         }
+        case Protocol::P_DEAD: {
+            if (_isServer)
+                return;
+            if (tokens.size() >= 1) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                deletePlayer(id);
+            }
+            break;
+        }
+        case Protocol::P_SHOOT: {
+            if (tokens.size() >= 1) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                playerShoot(id);
+                break;
+            }
+        }
         default: break;
     }
 }
@@ -145,12 +161,29 @@ ecs::Entity &GameInstance::getPlayerById(size_t id)
     throw ErrorClass("Player not found id=" + std::to_string(id));
 }
 
+void GameInstance::deletePlayer(size_t playerID)
+{
+    if (isServer() || _isConnectedToServer) {
+        auto &pl = getPlayerById(playerID);
+        refEntityManager.getCurrentLevel().destroyEntityById(pl.getID());
+        std::stringstream ss;
+        ss << P_DEAD << " " << playerID << " " << PACKET_END;
+        if (isServer()) {
+            refNetworkManager.sendToOthers(
+                playerID, System::Network::ISocket::Type::TCP, ss.str());
+        } else {
+            refNetworkManager.sendToAll(
+                System::Network::ISocket::Type::TCP, ss.str());
+        }
+    }
+}
+
+// transform to set send entity position
 void GameInstance::sendPlayerPosition(size_t playerID)
 {
-    auto &player = getPlayerById(playerID);
-    auto position = player.getComponent<ecs::PositionComponent>();
-
     if (isServer() || _isConnectedToServer) {
+        auto &player = getPlayerById(playerID);
+        auto position = player.getComponent<ecs::PositionComponent>();
         std::stringstream ss;
         ss << P_POS << " "
            << player.getComponent<ecs::PlayerComponent>()->getPlayerID() << " "
@@ -188,33 +221,37 @@ void GameInstance::updatePlayerPosition(
     }
 }
 
-void GameInstance::playerShoot(ecs::Entity &player)
+void GameInstance::playerShoot(size_t playerID)
 {
-    if (!hasLocalPlayer())
-        return;
-
-    std::stringstream ss;
+    auto player = getPlayerById(playerID);
     auto positionComp = player.getComponent<ecs::PositionComponent>();
-    auto &bullet = refEntityManager.getCurrentLevel().createEntity();
     if (!positionComp)
         return;
-    auto &texture =
-        refAssetManager.getAsset<sf::Texture>(Asset::BULLET_TEXTURE);
+    auto &bullet = refEntityManager.getCurrentLevel().createEntity();
     bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
+    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
         positionComp->getX() + 100, positionComp->getY() + 25));
-    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
-    bullet.addComponent(std::make_shared<ecs::RenderComponent>(
-        ecs::RenderComponent::ObjectType::SPRITE));
-    sf::Sprite s;
-    s.setTexture(texture);
-    s.setTextureRect(sf::Rect(137, 153, 64, 16));
-    bullet.addComponent(
-        std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
 
-    // ss << "104 " << _playerEntityID << "\t\n";
-
-    // writeToServer(ss.str(), System::Network::ISocket::UDP);
+    std::stringstream ss;
+    ss << P_SHOOT << " " << playerID << " " << PACKET_END;
+    if (isServer()) {
+        refNetworkManager.sendToOthers(
+            playerID, System::Network::ISocket::Type::UDP, ss.str());
+    } else {
+        auto &texture =
+            refAssetManager.getAsset<sf::Texture>(Asset::BULLET_TEXTURE);
+        bullet.addComponent(std::make_shared<ecs::RenderComponent>(
+            ecs::RenderComponent::ObjectType::SPRITE));
+        sf::Sprite s;
+        s.setTexture(texture);
+        s.setTextureRect(sf::Rect(137, 153, 64, 16));
+        bullet.addComponent(
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
+        if (playerID == (size_t) _netClientID)
+            refNetworkManager.sendToAll(
+                System::Network::ISocket::Type::UDP, ss.str());
+    }
 }
 
 void GameInstance::playerAnimations(ecs::Entity &player)

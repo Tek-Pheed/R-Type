@@ -36,9 +36,13 @@ void GameInstance::serverEventNewConn(
 void GameInstance::serverEventClosedConn(
     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
-    (void) arg;
     (void) core;
+    ssize_t id = std::any_cast<ssize_t>(arg);
     std::cout << "Server wakeup on event: " << event << std::endl;
+    std::stringstream ss;
+    if (id >= 0) {
+        deletePlayer((size_t) id);
+    }
 }
 
 void GameInstance::serverEventPackets(
@@ -48,8 +52,6 @@ void GameInstance::serverEventPackets(
     (void) core;
     std::cout << "Server wakeup on event: " << event << std::endl;
     serverManageBuffers();
-    // refNetworkManager.sendToOne(size_t id, System::Network::ISocket::Type
-    // socketType, const std::string &buffer)
 }
 
 void RType::GameInstance::serverHanlderValidateConnection(

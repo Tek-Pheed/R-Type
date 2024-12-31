@@ -182,7 +182,8 @@ void GameInstance::playEvent()
                 } else if (event.key.code == sf::Keyboard::Left) {
                     velocity->setVx(-200.0f);
                 } else if (event.key.code == sf::Keyboard::Space) {
-                    playerShoot(player);
+                    if (_netClientID >= 0)
+                        playerShoot((size_t) _netClientID);
                 }
             }
             if (event.key.code == sf::Keyboard::Enter) {

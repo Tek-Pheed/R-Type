@@ -57,6 +57,6 @@ void RType::GameInstance::levelMainMenu()
 
     // To change later since this is supposed to be the main menu and not
     // contain any player
-    level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
-    buildPlayer(true, 0);
+    //level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+    //buildPlayer(true, 0);
 }
