@@ -9,7 +9,18 @@
 
 namespace ecs
 {
-    EnemyComponent::EnemyComponent()
+    EnemyComponent::EnemyComponent(size_t enemyID) : _enemyID(enemyID)
     {
     }
+
+    size_t EnemyComponent::getEnemyID() const
+    {
+        return (_enemyID);
+    }
+
+    void EnemyComponent::setEnemyID(size_t enemyID)
+    {
+        _enemyID = enemyID;
+    }
+
 } // namespace ecs

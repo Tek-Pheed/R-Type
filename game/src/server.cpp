@@ -27,16 +27,22 @@ void GameInstance::serverEventNewConn(
     (void) core;
     size_t newID = std::any_cast<size_t>(arg);
     std::cout << "Server wakeup on event: " << event << std::endl;
+    std::stringstream ss;
+    ss << C_INIT_UDP << " " << newID << PACKET_END;
     refNetworkManager.sendToOne(
-        newID, System::Network::ISocket::TCP, serverInitUDP(newID));
+        newID, System::Network::ISocket::TCP, ss.str());
 }
 
 void GameInstance::serverEventClosedConn(
     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
-    (void) arg;
     (void) core;
+    ssize_t id = std::any_cast<ssize_t>(arg);
     std::cout << "Server wakeup on event: " << event << std::endl;
+    std::stringstream ss;
+    if (id >= 0) {
+        deletePlayer((size_t) id);
+    }
 }
 
 void GameInstance::serverEventPackets(
@@ -45,45 +51,7 @@ void GameInstance::serverEventPackets(
     (void) arg;
     (void) core;
     std::cout << "Server wakeup on event: " << event << std::endl;
-    serverManageBuffers();
-    // refNetworkManager.sendToOne(size_t id, System::Network::ISocket::Type
-    // socketType, const std::string &buffer)
-}
-
-void RType::GameInstance::serverHandlePlayer(
-    int code, const std::vector<std::string> &tokens)
-{
-    switch (code) {
-        case P_CONN: {
-            if (tokens.size() >= 3) {
-                auto &pl =
-                    buildPlayer(true, (size_t) std::atoi(tokens[0].c_str()));
-                auto pos = pl.getComponent<ecs::PositionComponent>();
-                pos->setX((float) std::atoi(tokens[1].c_str()));
-                pos->setY((float) std::atoi(tokens[2].c_str()));
-            }
-            break;
-        }
-        case P_POS: {
-            if (tokens.size() >= 3) {
-                auto &player =
-                    getPlayerById((size_t) std::atoi(tokens[0].c_str()));
-                auto pos = player.getComponent<ecs::PositionComponent>();
-                pos->setX((float) std::atof(tokens[1].c_str()));
-                pos->setY((float) std::atof(tokens[2].c_str()));
-                std::stringstream ss;
-                ss << "102 "
-                   << player.getComponent<ecs::PlayerComponent>()
-                          ->getPlayerID()
-                   << " " << pos->getX() << " " << pos->getY() << "\t\n";
-                refNetworkManager.sendToOthers(
-                    (size_t) std::atoi(tokens[0].c_str()),
-                    System::Network::ISocket::Type::UDP, ss.str());
-            }
-            break;
-        }
-        default: break;
-    }
+    manageBuffers();
 }
 
 void RType::GameInstance::serverHanlderValidateConnection(
@@ -92,8 +60,10 @@ void RType::GameInstance::serverHanlderValidateConnection(
     if (code == Protocol::C_START_UDP && tokens.size() >= 1) {
         ssize_t netClientID = (ssize_t) atoi(tokens[0].c_str());
         if (netClientID >= 0) {
+            std::stringstream ss;
+            ss << C_AUTH << " OK" << PACKET_END;
             refNetworkManager.sendToOne((size_t) netClientID,
-                System::Network::ISocket::Type::TCP, serverConfirmUDP(true));
+                System::Network::ISocket::Type::TCP, ss.str());
             for (auto &p : getAllPlayers()) {
                 auto pos = p.get().getComponent<ecs::PositionComponent>();
                 auto pl = p.get().getComponent<ecs::PlayerComponent>();
@@ -101,50 +71,16 @@ void RType::GameInstance::serverHanlderValidateConnection(
                     std::cout << "can't get player" << std::endl;
                     continue;
                 }
+                std::stringstream sss;
+                sss << P_CONN << " " << pl->getPlayerID() << " " << pos->getX()
+                    << " " << pos->getY() << PACKET_END;
                 refNetworkManager.sendToOne((size_t) netClientID,
-                    System::Network::ISocket::Type::TCP,
-                    playerConnection(
-                        pl->getPlayerID(), pos->getX(), pos->getY()));
+                    System::Network::ISocket::Type::TCP, sss.str());
             }
         } else {
             std::cout << "Could not read client ID" << std::endl;
         }
     }
-}
-
-int RType::GameInstance::serverManageBuffers()
-{
-    auto packets = refNetworkManager.readAllPackets();
-    if (packets.size() == 0)
-        return 0;
-
-    for (auto &buff : packets) {
-        std::string buffer = buff;
-        std::string codeStr = buffer.substr(0, 3);
-        int code = atoi(codeStr.c_str());
-        int code_int = is_code_valid(code);
-        std::vector<std::string> tokens;
-        if (code_int == -1) {
-            return -1;
-        }
-        std::string str = buffer.substr(4, buffer.size() - 4);
-        std::istringstream ss(str);
-        std::string token;
-        std::cout << "Managing Buffer: " << buffer << std::endl;
-        while (std::getline(ss, token, ' ')) {
-            tokens.push_back(token);
-        }
-        switch (code_int) {
-            case 0: serverHandlePlayer(code, tokens); break;
-            // case 1: handle_enemy(code, tokens); break;
-            // case 2: handle_terrain(code, tokens); break;
-            // case 3: handle_mechs(code, tokens); break;
-            case 9: serverHanlderValidateConnection(code, tokens); break;
-
-            default: break;
-        }
-    }
-    return 0;
 }
 
 void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)

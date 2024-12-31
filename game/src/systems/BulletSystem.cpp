@@ -9,12 +9,14 @@
     #define NOMINMAX
 #endif
 
+#include "Game.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
-#include "Game.hpp"
 
 using namespace RType;
 using namespace GameSystems;
+
+constexpr auto bulletMaxTravel = 1500U;
 
 void BulletSystem::initSystem(GameInstance &gameRef)
 {
@@ -33,15 +35,26 @@ void BulletSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             continue;
         position->setX(position->getX() + velocity->getVx() * deltaTime);
         position->setY(position->getY() + velocity->getVy() * deltaTime);
-        if (position->getX() >= (float) _game->getWindow().getSize().x
-            || position->getX() < 0
-            || position->getY() >= (float) _game->getWindow().getSize().y
-            || position->getY() < 0) {
-            bulletToRemove.push_back(entity);
-            continue;
+        if (_game->isServer()) {
+            if (position->getX() >= (float) bulletMaxTravel
+                || position->getX() < 0
+                || position->getY() >= (float) bulletMaxTravel
+                || position->getY() < 0) {
+                bulletToRemove.push_back(entity);
+                continue;
+            }
+        } else {
+            if (position->getX() >= (float) _game->getWindow().getSize().x
+                || position->getX() < 0
+                || position->getY() >= (float) _game->getWindow().getSize().y
+                || position->getY() < 0) {
+                bulletToRemove.push_back(entity);
+                continue;
+            }
         }
     }
-    for (auto &bullet : bulletToRemove) {
-        _game->refEntityManager.getCurrentLevel().destroyEntityById(bullet.getID());
+    for (auto &bl : bulletToRemove) {
+        _game->refEntityManager.getCurrentLevel().destroyEntityById(
+            bl.getID());
     }
 }

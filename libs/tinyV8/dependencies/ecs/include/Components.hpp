@@ -82,7 +82,13 @@ namespace ecs
 
     class EnemyComponent : public Component {
       public:
-        explicit EnemyComponent();
+        explicit EnemyComponent(size_t enemyID);
+
+        size_t getEnemyID() const;
+        void setEnemyID(size_t enemyID);
+
+      private:
+        size_t _enemyID;
     };
 
     class RenderComponent : public Component {
@@ -280,7 +286,8 @@ namespace ecs
     //     explicit ReplicationComponent(Entity &attachedEntity);
 
     //     template<typename PropertyType, typename FuncSign>
-    //     void addPropertyReplication(std::function<FuncSign> getterFunction, )
+    //     void addPropertyReplication(std::function<FuncSign> getterFunction,
+    //     )
 
     //   private:
     //     Entity &_attachedEntity;

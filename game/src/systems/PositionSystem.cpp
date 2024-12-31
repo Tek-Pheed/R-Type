@@ -34,10 +34,16 @@ void PositionSystem::update(
                 + static_cast<float>(velocityComponent->getVx()) * deltaTime;
             float newY = static_cast<float>(positionComponent->getY())
                 + static_cast<float>(velocityComponent->getVy()) * deltaTime;
-
             positionComponent->setX(newX);
             positionComponent->setY(newY);
 
+            auto player = entity.getComponent<ecs::PlayerComponent>();
+            if (player
+                && (positionComponent->getOldX() != positionComponent->getX()
+                    || positionComponent->getOldY()
+                        != positionComponent->getY())) {
+                _game->sendPlayerPosition(player->getPlayerID());
+            }
             if (!this->_game->isServer()) {
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();

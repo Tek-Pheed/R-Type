@@ -63,24 +63,26 @@ namespace RType
         bool hasLocalPlayer(void) const;
         ecs::Entity &getLocalPlayer();
         ecs::Entity &getPlayerById(size_t id);
-        void updateLocalPlayerPosition();
-        void playerAnimations(ecs::Entity &player, std::string direction);
-        void playerShoot(ecs::Entity &player);
+        void updatePlayerPosition(size_t playerID, float newX, float newY);
+        void sendPlayerPosition(size_t playerID);
+        void deletePlayer(size_t playerID);
+        void playerAnimations(ecs::Entity &player);
+        void playerShoot(size_t playerID);
 
         std::vector<ecs::Entity> &getEntities();
 
+        // Enemies
+        ecs::Entity &buildEnemy(size_t id, float posX, float posY, float health);
+
         // Networking
         int is_code_valid(int code);
-        int clientManageBuffers();
-        int serverManageBuffers();
+        int manageBuffers();
         void connectToGame();
         void clientHandlerConnection(
             int code, const std::vector<std::string> &tokens);
-        void clientHandlePlayer(
-            int code, const std::vector<std::string> &tokens);
-        void serverHandlePlayer(
-            int code, const std::vector<std::string> &tokens);
         void serverHanlderValidateConnection(
+            int code, const std::vector<std::string> &tokens);
+        void handleNetworkPlayers(
             int code, const std::vector<std::string> &tokens);
 
         // Server Only Events
