@@ -76,10 +76,6 @@ namespace RType
             const std::ostream &in, std::string &out) override;
     };
 
-    std::string serverInitUDP(size_t id);
-    std::string clientStartUDP(size_t id);
-    std::string serverConfirmUDP(bool isOk);
-    std::string playerConnection(size_t playerID, float x, float y);
 } // namespace RType
 
 #endif /* SERVER_HPP */

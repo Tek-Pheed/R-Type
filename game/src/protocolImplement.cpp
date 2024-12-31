@@ -104,25 +104,3 @@ template <> std::string RType::makePacket(int protocolCode)
     pack += PACKET_END;
     return (pack);
 }
-
-std::string RType::serverInitUDP(size_t id)
-{
-    return (makePacket(C_INIT_UDP, id));
-}
-
-std::string RType::clientStartUDP(size_t id)
-{
-    return (makePacket(C_START_UDP, id));
-}
-
-std::string RType::serverConfirmUDP(bool isOk)
-{
-    if (isOk)
-        return (makePacket(C_AUTH, "OK"));
-    return (makePacket(C_AUTH, "KO"));
-}
-
-std::string RType::playerConnection(size_t playerID, float x, float y)
-{
-    return (makePacket(P_CONN, (int) playerID, (int) x, (int) y));
-}
