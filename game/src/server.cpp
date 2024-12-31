@@ -51,7 +51,7 @@ void GameInstance::serverEventPackets(
     (void) arg;
     (void) core;
     std::cout << "Server wakeup on event: " << event << std::endl;
-    serverManageBuffers();
+    manageBuffers();
 }
 
 void RType::GameInstance::serverHanlderValidateConnection(
@@ -81,41 +81,6 @@ void RType::GameInstance::serverHanlderValidateConnection(
             std::cout << "Could not read client ID" << std::endl;
         }
     }
-}
-
-int RType::GameInstance::serverManageBuffers()
-{
-    auto packets = refNetworkManager.readAllPackets();
-    if (packets.size() == 0)
-        return 0;
-
-    for (auto &buff : packets) {
-        std::string buffer = buff;
-        std::string codeStr = buffer.substr(0, 3);
-        int code = atoi(codeStr.c_str());
-        int code_int = is_code_valid(code);
-        std::vector<std::string> tokens;
-        if (code_int == -1) {
-            return -1;
-        }
-        std::string str = buffer.substr(4, buffer.size() - 4);
-        std::istringstream ss(str);
-        std::string token;
-        std::cout << "Managing Buffer: " << buffer << std::endl;
-        while (std::getline(ss, token, ' ')) {
-            tokens.push_back(token);
-        }
-        switch (code_int) {
-            case 0: handleNetworkPlayers(code, tokens); break;
-            // case 1: handle_enemy(code, tokens); break;
-            // case 2: handle_terrain(code, tokens); break;
-            // case 3: handle_mechs(code, tokens); break;
-            case 9: serverHanlderValidateConnection(code, tokens); break;
-
-            default: break;
-        }
-    }
-    return 0;
 }
 
 void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)

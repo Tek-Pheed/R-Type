@@ -76,8 +76,7 @@ namespace RType
 
         // Networking
         int is_code_valid(int code);
-        int clientManageBuffers();
-        int serverManageBuffers();
+        int manageBuffers();
         void connectToGame();
         void clientHandlerConnection(
             int code, const std::vector<std::string> &tokens);
