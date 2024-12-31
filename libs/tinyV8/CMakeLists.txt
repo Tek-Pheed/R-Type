@@ -35,6 +35,7 @@ if(WIN32)
 else()
     add_definitions(-DLINUX)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3 -ggdb")
+    target_link_libraries(${PROJECT_NAME} PUBLIC pthread)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror
         -Wswitch-default -Wcast-align -Wpointer-arith -Wundef -Wcast-qual
         -Wshadow -Wwrite-strings -Wconversion -Wunreachable-code -Wunused-macros
