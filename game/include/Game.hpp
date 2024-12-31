@@ -8,6 +8,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <mutex>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -72,7 +73,13 @@ namespace RType
         std::vector<ecs::Entity> &getEntities();
 
         // Enemies
-        ecs::Entity &buildEnemy(size_t id, float posX, float posY, float health);
+        ecs::Entity &buildEnemy(
+            size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &getEnemyById(size_t enemyID);
+        void sendEnemyPosition(size_t enemyID);
+        void deleteEnemy(size_t playerID);
+        void handleNetworkEnemies(
+            int code, const std::vector<std::string> &tokens);
 
         // Networking
         int is_code_valid(int code);
@@ -142,6 +149,7 @@ namespace RType
         std::string _ip = DEFAULT_IP;
 
         std::unique_ptr<sf::RenderWindow> _window;
+        std::recursive_mutex _serverLock;
     };
 }; // namespace RType
 

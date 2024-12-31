@@ -136,6 +136,10 @@ namespace Engine
         class NetworkingManager : public AEngineFeature {
             static size_t constexpr DEFAULT_TCP_PORT = 8081;
             static size_t constexpr DEFAULT_UDP_PORT = 8082;
+            static size_t constexpr UDP_PACKET_MAX_SIZE = 1400U;
+            static size_t constexpr UDP_BUFFER_MAX_QUEUED_PACKETS = 128;
+
+          public:
             struct NetClient {
               public:
                 System::Network::TCPSocket tcpSocket;
@@ -158,7 +162,6 @@ namespace Engine
                       isReady(false), isDisconnected(false) {};
             };
 
-          public:
             explicit NetworkingManager(Core &engineRef);
             ~NetworkingManager();
 
@@ -319,6 +322,15 @@ namespace Engine
                 System::Network::ISocket::Type socketType,
                 const std::string &buffer);
 
+            /**
+             * @brief Checks if a client is still present.
+
+             * @param id: The id of the client.
+             * @return true: The client exists.
+             * @return false: The client does not exists.
+             */
+            bool hasClient(size_t id);
+
           protected:
             void engineOnStart(void) override;
             void engineOnTick(float deltaTimeSec) override;
@@ -343,8 +355,10 @@ namespace Engine
             bool _isServer = false;
             size_t _tcpPort = DEFAULT_TCP_PORT;
             size_t _updPort = DEFAULT_UDP_PORT;
-            std::mutex _globalMutex;
+            std::recursive_mutex _globalMutex;
+            std::mutex _writeFinished;
             std::condition_variable _writeCondition;
+            std::condition_variable _writeFinishedCond;
             std::mutex _writeMutex;
             size_t _clientCounter = 0;
             size_t _clientID = 0;

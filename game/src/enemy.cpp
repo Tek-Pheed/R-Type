@@ -15,6 +15,7 @@
 #include "Components.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
+#include "ErrorClass.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
@@ -59,4 +60,85 @@ ecs::Entity &RType::GameInstance::buildEnemy(
         }
     }
     return (enemy);
+}
+
+ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
+{
+    auto enemies = refEntityManager.getCurrentLevel()
+                       .findEntitiesByComponent<ecs::EnemyComponent>();
+
+    for (auto &pl : enemies) {
+        if (pl.get().getComponent<ecs::EnemyComponent>()->getEnemyID()
+            == enemyID)
+            return (pl.get());
+    }
+    throw ErrorClass("Enemy not found id=" + std::to_string(enemyID));
+}
+
+void GameInstance::sendEnemyPosition(size_t enemyID)
+{
+    if (isServer()) {
+        auto &ene = getEnemyById(enemyID);
+        auto position = ene.getComponent<ecs::PositionComponent>();
+        std::stringstream ss;
+        ss << E_POS << " " << enemyID << " " << position->getX() << " "
+           << position->getY() << PACKET_END;
+
+        refNetworkManager.sendToAll(
+            System::Network::ISocket::Type::UDP, ss.str());
+    }
+}
+
+void GameInstance::deleteEnemy(size_t enemyID)
+{
+    if (isServer() || _isConnectedToServer) {
+        auto &ene = getEnemyById(enemyID);
+        refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
+        if (isServer()) {
+            std::stringstream ss;
+            ss << E_DEAD << " " << enemyID << " " << PACKET_END;
+            refNetworkManager.sendToAll(
+                System::Network::ISocket::Type::TCP, ss.str());
+        }
+    }
+}
+
+void GameInstance::handleNetworkEnemies(
+    int code, const std::vector<std::string> &tokens)
+{
+    switch (code) {
+        case Protocol::E_SPAWN: {
+            if (tokens.size() >= 3) {
+                if (!isServer()) {
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    std::shared_ptr<ecs::PositionComponent> pos;
+                    buildEnemy(id, (float) std::atof(tokens[1].c_str()),
+                        (float) std::atof(tokens[2].c_str()));
+                }
+            }
+            break;
+        }
+        case Protocol::E_POS: {
+            if (tokens.size() >= 3) {
+                if (!isServer()) {
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    auto &ene = getEnemyById(id);
+                    auto pos = ene.getComponent<ecs::PositionComponent>();
+                    pos->setX((float) std::atof(tokens[1].c_str()));
+                    pos->setY((float) std::atof(tokens[2].c_str()));
+                }
+            }
+            break;
+        }
+        case Protocol::E_DEAD: {
+            if (_isServer)
+                return;
+            if (tokens.size() >= 1) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                deleteEnemy(id);
+            }
+            break;
+        }
+        default: break;
+    }
 }

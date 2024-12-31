@@ -73,6 +73,15 @@ void PositionSystem::update(
                 if (positionComponent->getY() > maxY) {
                     positionComponent->setY(maxY);
                 }
+            } else {
+                auto enemy = entity.getComponent<ecs::EnemyComponent>();
+                if (enemy
+                    && (positionComponent->getOldX()
+                            != positionComponent->getX()
+                        || positionComponent->getOldY()
+                            != positionComponent->getY())) {
+                    _game->sendEnemyPosition(enemy->getEnemyID());
+                }
             }
         }
     }

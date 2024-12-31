@@ -178,16 +178,14 @@ void GameInstance::deletePlayer(size_t playerID)
     }
 }
 
-// transform to set send entity position
 void GameInstance::sendPlayerPosition(size_t playerID)
 {
     if (isServer() || _isConnectedToServer) {
         auto &player = getPlayerById(playerID);
         auto position = player.getComponent<ecs::PositionComponent>();
         std::stringstream ss;
-        ss << P_POS << " "
-           << player.getComponent<ecs::PlayerComponent>()->getPlayerID() << " "
-           << position->getX() << " " << position->getY() << PACKET_END;
+        ss << P_POS << " " << playerID << " " << position->getX() << " "
+           << position->getY() << PACKET_END;
         if (isServer()) {
             refNetworkManager.sendToOthers(
                 playerID, System::Network::ISocket::Type::UDP, ss.str());

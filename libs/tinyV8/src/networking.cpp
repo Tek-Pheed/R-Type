@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include "EngineNetworking.hpp"
 #include "system_network.hpp"
+#include <condition_variable>
 
 using namespace Engine::Feature;
 
@@ -74,6 +75,7 @@ size_t NetworkingManager::getClientID(void) const
 std::vector<size_t> NetworkingManager::getAllClientsId(void)
 {
     std::vector<size_t> vect;
+    std::unique_lock lock(_globalMutex);
 
     for (const auto &[key, val] : _clients) {
         vect.emplace_back(key);
@@ -105,20 +107,17 @@ std::vector<std::string> NetworkingManager::readClientPackets(
 std::vector<std::string> NetworkingManager::readAllPackets()
 {
     std::vector<std::string> packets;
+    std::unique_lock lock(_globalMutex);
 
     if (_isServer) {
         for (auto &client : _clients) {
             auto packs = readClientPackets(client.second);
-            _globalMutex.lock();
             packets.insert(packets.end(), packs.begin(), packs.end());
-            _globalMutex.unlock();
         }
     } else {
         NetworkingManager::NetClient &cli = getClient(1);
         auto packs = readClientPackets(cli);
-        _globalMutex.lock();
         packets.insert(packets.end(), packs.begin(), packs.end());
-        _globalMutex.unlock();
     }
     return (packets);
 }
@@ -126,6 +125,7 @@ std::vector<std::string> NetworkingManager::readAllPackets()
 void NetworkingManager::sendToAll(
     System::Network::ISocket::Type socketType, const std::string &buffer)
 {
+    std::unique_lock lock(_globalMutex);
     for (auto &client : _clients) {
         writeToClient(client.second, buffer, socketType);
     }
@@ -134,6 +134,7 @@ void NetworkingManager::sendToAll(
 void NetworkingManager::sendToOthers(size_t except_id,
     System::Network::ISocket::Type socketType, const std::string &buffer)
 {
+    std::unique_lock lock(_globalMutex);
     for (auto &client : _clients) {
         if (client.first != except_id)
             writeToClient(client.second, buffer, socketType);
@@ -143,6 +144,7 @@ void NetworkingManager::sendToOthers(size_t except_id,
 void NetworkingManager::sendToOne(size_t id,
     System::Network::ISocket::Type socketType, const std::string &buffer)
 {
+    std::unique_lock lock(_globalMutex);
     for (auto &client : _clients) {
         if (client.first == id)
             writeToClient(client.second, buffer, socketType);
@@ -163,6 +165,13 @@ NetworkingManager::NetClient &NetworkingManager::addClient(
     return (_clients[_clientCounter]);
 }
 
+bool NetworkingManager::hasClient(size_t id)
+{
+    std::unique_lock lock(_globalMutex);
+
+    return (_clients.contains(id));
+}
+
 NetworkingManager::NetClient &NetworkingManager::getClient(size_t id)
 {
     std::unique_lock lock(_globalMutex);
@@ -175,6 +184,7 @@ void NetworkingManager::removeClient(size_t id)
     std::unique_lock lock(_globalMutex);
 
     _clients.at(id).isDisconnected = true;
+    _writeFinishedCond.notify_all();
     std::cout << "ENGINE: Removed a client (" << id << ") from the server."
               << std::endl;
 }
@@ -211,12 +221,26 @@ void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
     _pacMan->serializeString(data, out);
     std::string serializedData = out.str();
     auto encoded = System::Network::encodeString(serializedData);
+    ssize_t clID = identifyClient(client.tcpSocket);
 
     if (socketType == System::Network::ISocket::TCP) {
         client.writeBufferTCP.insert(
             client.writeBufferTCP.end(), encoded.begin(), encoded.end());
     }
     if (socketType == System::Network::ISocket::UDP) {
+        if (client.writeBufferUDP.size() + encoded.size()
+                >= UDP_PACKET_MAX_SIZE
+            && hasClient((size_t) clID)) {
+            std::cout << "ENGINE: Buffer full for client (" << clID
+                      << "), waiting..." << std::endl;
+            _writeMutex.unlock();
+            _writeCondition.notify_all();
+            std::unique_lock lc(_writeFinished);
+            _writeCondition.wait(lc);
+            if (!hasClient((size_t) clID))
+                return;
+            _writeMutex.lock();
+        }
         client.writeBufferUDP.insert(
             client.writeBufferUDP.begin(), encoded.begin(), encoded.end());
     }
