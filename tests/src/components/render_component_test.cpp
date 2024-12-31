@@ -12,26 +12,26 @@
 
 Test(components, render_constructor)
 {
-    ecs::RenderComponent render(ecs::ObjectType::RECTANGLE);
+    ecs::RenderComponent render(ecs::RenderComponent::ObjectType::RECTANGLE);
 
-    cr_assert_eq(render.getType(), ecs::ObjectType::RECTANGLE, "Expected type Rectangle, but got %d",
+    cr_assert_eq(render.getType(), ecs::RenderComponent::ObjectType::RECTANGLE, "Expected type Rectangle, but got %d",
         render.getType());
 }
 
 Test(components, render_getter)
 {
-    ecs::RenderComponent render(ecs::ObjectType::SPRITE);
+    ecs::RenderComponent render(ecs::RenderComponent::ObjectType::SPRITE);
 
-    cr_assert_eq(render.getType(), ecs::ObjectType::SPRITE, "Expected type Sprite, but got %d",
+    cr_assert_eq(render.getType(), ecs::RenderComponent::ObjectType::SPRITE, "Expected type Sprite, but got %d",
         render.getType());
 }
 
 Test(components, render_setter)
 {
-    ecs::RenderComponent render(ecs::ObjectType::SPRITE);
+    ecs::RenderComponent render(ecs::RenderComponent::ObjectType::SPRITE);
 
-    render.setType(ecs::ObjectType::CIRCLE);
+    render.setType(ecs::RenderComponent::ObjectType::CIRCLE);
 
-    cr_assert_eq(render.getType(), ecs::ObjectType::CIRCLE, "Expected type Circle, but got %d",
+    cr_assert_eq(render.getType(), ecs::RenderComponent::ObjectType::CIRCLE, "Expected type Circle, but got %d",
         render.getType());
 }
