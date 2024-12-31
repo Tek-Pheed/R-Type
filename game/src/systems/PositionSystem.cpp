@@ -34,8 +34,6 @@ void PositionSystem::update(
                 + static_cast<float>(velocityComponent->getVx()) * deltaTime;
             float newY = static_cast<float>(positionComponent->getY())
                 + static_cast<float>(velocityComponent->getVy()) * deltaTime;
-            positionComponent->setOldX(positionComponent->getX());
-            positionComponent->setOldY(positionComponent->getY());
             positionComponent->setX(newX);
             positionComponent->setY(newY);
 
