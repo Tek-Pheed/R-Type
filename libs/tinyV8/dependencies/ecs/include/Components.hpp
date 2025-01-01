@@ -93,7 +93,7 @@ namespace ecs
 
     class RenderComponent : public Component {
       public:
-        enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };
+        enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT, SPRITEANDTEXT };
         explicit RenderComponent(ObjectType type);
 
         ObjectType getObjectType() const;
