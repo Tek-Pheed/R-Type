@@ -5,11 +5,11 @@
 ** game
 */
 
-#include "SFML/Graphics/Font.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "SFML/Graphics/Font.hpp"
 #include <any>
 #include <exception>
 #include <iostream>
