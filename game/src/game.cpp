@@ -9,7 +9,7 @@
     #define NOMINMAX
 #endif
 
-#include "Game.hpp"
+#include "SFML/Graphics/Font.hpp"
 #include <any>
 #include <exception>
 #include <iostream>
@@ -21,6 +21,7 @@
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameProtocol.hpp"
@@ -48,16 +49,20 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     return (vect);
 }
 
-void GameInstance::loadTexture()
+void GameInstance::loadAssets()
 {
-    for (const auto asset : Asset::getAllAssetsOfType<sf::Texture>()) {
-        try {
+    try {
+        for (const auto asset : Asset::getAllAssetsOfType<sf::Texture>()) {
             refAssetManager.loadAsset(asset->path, asset->identifier,
                 &sf::Texture::loadFromFile, sf::IntRect());
-        } catch (const std::exception &e) {
-            std::cout << "Failed to load asset " << asset->identifier
-                      << " with error: " << e.what() << std::endl;
         }
+        for (const auto asset : Asset::getAllAssetsOfType<sf::Font>()) {
+            refAssetManager.loadAsset(
+                asset->path, asset->identifier, &sf::Font::loadFromFile);
+        }
+    } catch (const std::exception &e) {
+        std::cout << "Failed to an load asset with error: " << e.what()
+                  << std::endl;
     }
 }
 

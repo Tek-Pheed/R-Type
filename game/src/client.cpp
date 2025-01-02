@@ -113,7 +113,7 @@ void RType::GameInstance::setupClient(
     refGameEngine.addEventBinding<RType::GameInstance>(
         Engine::Events::EVENT_PostTick, &RType::GameInstance::gamePostTick,
         *this);
-    loadTexture();
+    loadAssets();
     createPersistentLevel();
     levelMainMenu();
 }

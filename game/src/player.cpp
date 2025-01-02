@@ -37,14 +37,23 @@ ecs::Entity &RType::GameInstance::buildPlayer(bool isLocalPlayer, size_t id)
     if (!_isServer) {
         auto &texture =
             refAssetManager.getAsset<sf::Texture>(Asset::PLAYER_TEXTURE);
+        auto &font = refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
+
         sf::Sprite sprite;
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
         sprite.setScale(sf::Vector2f(3, 3));
         player.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::SPRITE));
+            ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
         player.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
             sprite, 3.0, 3.0));
+
+        sf::Text text;
+        text.setFont(font);
+        text.setCharacterSize(10);
+        text.setString("Samy");
+        player.addComponent(
+            std::make_shared<ecs::TextComponent<sf::Text>>(text, "Samy"));
     }
     if (isLocalPlayer) {
         _playerEntityID = (int) player.getID();

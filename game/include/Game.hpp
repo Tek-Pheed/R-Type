@@ -51,7 +51,7 @@ namespace RType
         void playEvent();
 
         // Texture Utilities
-        void loadTexture();
+        void loadAssets();
 
         ecs::Entity &buildBackground(void);
         void levelMainMenu(void);

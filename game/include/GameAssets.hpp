@@ -34,6 +34,7 @@ namespace RType
         constexpr auto ENEMY_TEXTURE = "enemyTexture";
         constexpr auto BACKGROUND_TEXTURE = "backgroundTexture";
         constexpr auto BULLET_TEXTURE = "bulletTexture";
+        constexpr auto R_TYPE_FONT = "rTypeFont";
 
         static const AssetStore assets[] = {
             {PLAYER_TEXTURE, "assets/sprites/r-typesheet42.gif",
@@ -43,7 +44,8 @@ namespace RType
             {BACKGROUND_TEXTURE, "assets/background/background.png",
                 typeid(sf::Texture)},
             {BULLET_TEXTURE, "./assets/sprites/r-typesheet1.gif",
-                typeid(sf::Texture)}};
+                typeid(sf::Texture)},
+            {R_TYPE_FONT, "./assets/font/r-type.ttf", typeid(sf::Font)}};
 
         template <typename Type>
         const std::vector<const AssetStore *> getAllAssetsOfType()
