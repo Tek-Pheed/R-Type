@@ -14,6 +14,11 @@
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameSystems.hpp"
+#include "EngineNetworking.hpp"
+#include "Entity.hpp"
+#include "ErrorClass.hpp"
+#include "GameProtocol.hpp"
+#include "system_network.hpp"
 
 void RType::GameInstance::createPersistentLevel()
 {
@@ -59,4 +64,31 @@ void RType::GameInstance::levelMainMenu()
     // contain any player
     //level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
     //buildPlayer(true, 0);
+
+    auto &nicknameInput = refEntityManager.getCurrentLevel().createEntity();
+    nicknameInput.addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
+    nicknameInput.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
+
+    if (!_isServer) {
+        sf::RectangleShape rect;
+        rect.setSize(sf::Vector2f(300, 50));
+        rect.setFillColor(sf::Color::White);
+        rect.setOutlineColor(sf::Color::Black);
+        rect.setOutlineThickness(2);
+
+        sf::Text text;
+        sf::Font font;
+        font.loadFromFile("assets/font/arial.ttf");
+        text.setFont(font);
+        text.setCharacterSize(24);
+        text.setFillColor(sf::Color::Black);
+        text.setPosition(110, 110);
+
+        nicknameInput.addComponent(std::make_shared<ecs::RectangleComponent<sf::RectangleShape>>(rect, 300, 50));
+        nicknameInput.addComponent(std::make_shared<ecs::TextComponent<sf::Text>>(text, ""));
+        nicknameInput.addComponent(std::make_shared<ecs::RenderComponent>(
+            ecs::RenderComponent::ObjectType::RECTANGLE));
+    }
+    
+
 }

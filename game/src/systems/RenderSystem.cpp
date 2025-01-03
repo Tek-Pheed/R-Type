@@ -54,7 +54,6 @@ void renderRectangle(ecs::Entity &entity, sf::RenderWindow &window)
     auto position = entity.getComponent<ecs::PositionComponent>();
 
     rectangle->getRectangle().setPosition(position->getX(), position->getY());
-    rectangle->getRectangle().setFillColor(sf::Color::Red);
     rectangle->getRectangle().setSize(sf::Vector2f(
         (float) rectangle->getSizeX(), (float) rectangle->getSizeY()));
     window.draw(rectangle->getRectangle());

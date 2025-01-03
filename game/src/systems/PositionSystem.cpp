@@ -48,8 +48,8 @@ void PositionSystem::update(
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
-                float maxX = 0;
-                float maxY = 0;
+                float maxX = (float)this->_game->getWindow().getSize().x;
+                float maxY = (float)this->_game->getWindow().getSize().y;
 
                 if (sprite) {
                     maxX = (float) _game->getWindow().getSize().x
