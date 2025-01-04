@@ -54,6 +54,7 @@ namespace RType
         void loadAssets();
 
         ecs::Entity &buildBackground(void);
+        ecs::Entity &buildButton(std::string text, int buttonNb);
         void levelMainMenu(void);
         void createPersistentLevel(void);
 

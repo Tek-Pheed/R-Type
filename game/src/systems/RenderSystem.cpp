@@ -76,6 +76,7 @@ void renderText(ecs::Entity &entity, sf::RenderWindow &window)
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
     text->getText().setPosition(position->getX(), position->getY());
+    text->getText().setString(text->getStr());
     window.draw(text->getText());
 }
 

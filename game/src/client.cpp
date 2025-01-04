@@ -21,6 +21,7 @@
 #include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
 #include "system_network.hpp"
+#include "Event.hpp"
 
 using namespace RType;
 
@@ -99,8 +100,8 @@ void RType::GameInstance::setupClient(
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
     sf::VideoMode videoMode(
-        1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);
-    _window->create(videoMode, "R-Type");
+        sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, sf::VideoMode::getDesktopMode().bitsPerPixel);
+    _window->create(videoMode, "R-Type", sf::Style::Fullscreen);
     _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
@@ -123,9 +124,15 @@ sf::RenderWindow &GameInstance::getWindow()
     return *_window;
 }
 
+constexpr unsigned int str2int(const char* str, int h = 0)
+{
+    return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
+}
+
 void GameInstance::playEvent()
 {
     sf::Event event;
+    //Event evt;
     std::stringstream ss;
 
     while (_window->pollEvent(event)) {
@@ -150,9 +157,6 @@ void GameInstance::playEvent()
                         playerShoot((size_t) _netClientID);
                 }
             }
-            if (event.key.code == sf::Keyboard::Enter) {
-                connectToGame();
-            }
         }
         if (hasLocalPlayer() && event.type == sf::Event::KeyReleased) {
             auto &player = getLocalPlayer();
@@ -164,6 +168,33 @@ void GameInstance::playEvent()
             if (event.key.code == sf::Keyboard::Left
                 || event.key.code == sf::Keyboard::Right) {
                 velocity->setVx(0.0f);
+            }
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed) {
+            //evt.mouseClicked();
+            for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
+                auto button = entity.get().getComponent<ecs::RenderComponent>();
+                if (button->getObjectType() == ecs::RenderComponent::ObjectType::BUTTON) {
+                    sf::Mouse mouse;
+                    auto rectangle = entity.get().getComponent<ecs::RectangleComponent<sf::RectangleShape>>();
+                    if (rectangle) {
+                        sf::FloatRect currentHover = rectangle->getRectangle().getGlobalBounds();
+                        if (currentHover.contains((float) mouse.getPosition().x, (float) mouse.getPosition().y)) {
+                            auto text = entity.get().getComponent<ecs::TextComponent<sf::Text>>();
+                            switch (str2int(text->getStr().c_str())) {
+                                case str2int("Play"):
+                                    connectToGame();
+                                    break;
+                                case str2int("Exit"):
+                                    _window->close();
+                                    refGameEngine.stop();
+                                    break;
+                                default: break;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
