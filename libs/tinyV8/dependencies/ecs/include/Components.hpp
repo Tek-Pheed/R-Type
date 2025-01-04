@@ -99,7 +99,8 @@ namespace ecs
             SPRITE,
             TEXT,
             SPRITEANDTEXT,
-            BUTTON
+            BUTTON,
+            INPUT
         };
         explicit RenderComponent(ObjectType type);
 

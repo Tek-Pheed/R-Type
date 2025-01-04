@@ -71,23 +71,19 @@ void RType::GameInstance::levelMainMenu()
 
     if (!_isServer) {
         sf::RectangleShape rect;
-        rect.setSize(sf::Vector2f(300, 50));
         rect.setFillColor(sf::Color::White);
-        rect.setOutlineColor(sf::Color::Black);
+        rect.setOutlineColor(sf::Color::Red);
         rect.setOutlineThickness(2);
 
         sf::Text text;
-        sf::Font font;
-        font.loadFromFile("assets/font/arial.ttf");
-        text.setFont(font);
+        text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
         text.setCharacterSize(24);
         text.setFillColor(sf::Color::Black);
-        text.setPosition(110, 110);
 
         nicknameInput.addComponent(std::make_shared<ecs::RectangleComponent<sf::RectangleShape>>(rect, 300, 50));
         nicknameInput.addComponent(std::make_shared<ecs::TextComponent<sf::Text>>(text, ""));
         nicknameInput.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::RECTANGLE));
+            ecs::RenderComponent::ObjectType::INPUT));
     }
     
 
