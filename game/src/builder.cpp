@@ -116,6 +116,30 @@ ecs::Entity &RType::GameInstance::buildButton(std::string str, int buttonID)
     return button;
 }
 
+ecs::Entity &RType::GameInstance::buildInput(std::string str, int buttonID)
+{
+    auto &input = refEntityManager.getCurrentLevel().createEntity();
+
+    sf::RectangleShape rect;
+    rect.setFillColor(sf::Color::White);
+    rect.setOutlineColor(sf::Color::Blue);
+    rect.setOutlineThickness(2);
+    rect.setSize(sf::Vector2f(700, 50));
+
+    sf::Text text;
+    text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
+    text.setCharacterSize(40);
+    text.setFillColor(sf::Color::Black);
+    text.setString(str);
+
+    input.addComponent(std::make_shared<ecs::PositionComponent>((float) this->_window->getSize().x / 2 - (float) rect.getSize().x / 2,(float) this->_window->getSize().y / 2 - (float) rect.getSize().y / 2 - (float) 75 * (float) buttonID));
+    input.addComponent(std::make_shared<ecs::RectangleComponent<sf::RectangleShape>>(rect, rect.getSize().x, rect.getSize().y));
+    input.addComponent(std::make_shared<ecs::TextComponent<sf::Text>>(text, str));
+    input.addComponent(std::make_shared<ecs::RenderComponent>(ecs::RenderComponent::ObjectType::INPUT));
+
+    return input;
+}
+
 void RType::GameInstance::levelMainMenu()
 {
     auto &level = refEntityManager.createNewLevel("mainMenu");
@@ -143,9 +167,10 @@ void RType::GameInstance::levelMainMenu()
         title.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
         title.addComponent(std::make_shared<ecs::TextComponent<sf::Text>>(text, "F Type V8"));
 
-        buildButton("PLAY", 1);
-        buildButton("SETTINGS", 0);
-        buildButton("EXIT", -1);
+        buildInput("NICKNAME", 1);
+        buildButton("PLAY", 0);
+        buildButton("SETTINGS", -1);
+        buildButton("EXIT", -2);
     }
 }
 
@@ -194,21 +219,33 @@ void RType::GameInstance::levelSettingsMenu()
         if (equalPosUp != std::string::npos) {
             std::string beforeUpEqual = "Move up";
             std::string afterUpEqual = moveUpAction.substr(equalPosUp + 1);
-            endUpMove = beforeUpEqual + " : " + afterUpEqual;
+            size_t firstdoublepoint = afterUpEqual.find("::");
+            std::string afterfirstdoublepoint = afterUpEqual.substr(firstdoublepoint + 2);
+            size_t seconddoublepoint = afterfirstdoublepoint.find("::");
+            std::string aftersedoublepoint = afterfirstdoublepoint.substr(seconddoublepoint + 2);
+            endUpMove = beforeUpEqual + " : " + aftersedoublepoint;
         }
 
         size_t equalPosRight = moveRightAction.find("=");
         if (equalPosRight != std::string::npos) {
             std::string beforeRightEqual = "Move right";
             std::string afterRightEqual = moveRightAction.substr(equalPosRight + 1);
-            endRightMove = beforeRightEqual + " : " + afterRightEqual;
+            size_t firstdoublepoint = afterRightEqual.find("::");
+            std::string afterfirstdoublepoint = afterRightEqual.substr(firstdoublepoint + 2);
+            size_t seconddoublepoint = afterfirstdoublepoint.find("::");
+            std::string aftersedoublepoint = afterfirstdoublepoint.substr(seconddoublepoint + 2);
+            endRightMove = beforeRightEqual + " : " + aftersedoublepoint;
         }
 
         size_t equalPosLeft = moveLeftAction.find("=");
         if (equalPosLeft != std::string::npos) {
             std::string beforeLeftEqual = "Move left";
             std::string afterLeftEqual = moveLeftAction.substr(equalPosLeft + 1);
-            endLeftMove = beforeLeftEqual + " : " + afterLeftEqual;
+            size_t firstdoublepoint = afterLeftEqual.find("::");
+            std::string afterfirstdoublepoint = afterLeftEqual.substr(firstdoublepoint + 2);
+            size_t seconddoublepoint = afterfirstdoublepoint.find("::");
+            std::string aftersedoublepoint = afterfirstdoublepoint.substr(seconddoublepoint + 2);
+            endLeftMove = beforeLeftEqual + " : " + aftersedoublepoint;
         }
 
         size_t equalPosDown = moveDownAction.find("=");
@@ -246,6 +283,39 @@ void RType::GameInstance::handleAutoFireButton(std::string newAutoFireValue, ecs
     config.saveConfig();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
     text->setStr("Auto fire : " + value);
+}
+
+void RType::GameInstance::handleNicknameButton(const std::vector<sf::Keyboard::Key>& keys)
+{
+    std::string nickname;
+    const size_t maxNicknameLength = 8;
+
+    for (auto key : keys) {
+        std::string keyStr = getKeyString(key);
+        if (key == sf::Keyboard::BackSpace && !nickname.empty()) {
+            nickname.pop_back();
+        }
+        else if (key != sf::Keyboard::BackSpace && keyStr.size() == 1 && std::isalpha(keyStr[0])) {
+            if (nickname.size() < maxNicknameLength) {
+                nickname += keyStr;
+            }
+        }
+    }
+
+    if (!_nicknameInputEntity) {
+        _nicknameInputEntity = &buildInput(nickname, 1);
+    } else {
+        auto textComponent = _nicknameInputEntity->getComponent<ecs::TextComponent<sf::Text>>();
+        if (textComponent) {
+            if (!nickname.empty()) {
+                textComponent->_text.setString(nickname);
+            } else {
+                textComponent->_text.setString("");
+            }
+        }
+    }
+
+    buildInput(nickname, 1);
 }
 
 void RType::GameInstance::handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType)

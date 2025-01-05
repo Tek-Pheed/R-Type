@@ -55,11 +55,13 @@ namespace RType
 
         ecs::Entity &buildBackground(void);
         ecs::Entity &buildButton(std::string text, int buttonNb);
+        ecs::Entity &buildInput(std::string str, int buttonID);
         void levelMainMenu(void);
         void createPersistentLevel(void);
         void levelSettingsMenu(void);
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(std::string newAutoFireValue, ecs::Entity &entity);
+        void handleNicknameButton(const std::vector<sf::Keyboard::Key> &keys);
 
         // Player functions and utilities
         ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
@@ -140,6 +142,10 @@ namespace RType
         bool _isSettingsRightButtonClicked = false;
         bool _isSettingsLeftButtonClicked = false;
         bool _isSettingsDownButtonClicked = false;
+
+        bool _isSettingsNicknameButtonClicked = false;
+        std::vector<sf::Keyboard::Key> _nicknameKeys;
+        ecs::Entity* _nicknameInputEntity = nullptr;
 
       private:
         int _playerEntityID = -1;

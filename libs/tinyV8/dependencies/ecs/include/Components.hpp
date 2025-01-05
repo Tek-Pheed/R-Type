@@ -257,8 +257,9 @@ namespace ecs
             this->_str = str;
         }
 
-      private:
         textType _text;
+
+      private:
         std::string _str;
     };
 

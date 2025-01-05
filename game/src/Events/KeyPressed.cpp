@@ -14,6 +14,7 @@ namespace RType {
         Config config("config.cfg");
         Utils utils;
         sf::Keyboard::Key keyPressed = sf::Keyboard::Unknown;
+        const size_t maxNicknameLength = 8;
 
         std::string moveUpKeyString = config.getKeyFromConfig("MOVE_UP");
         std::string moveRightKeyString = config.getKeyFromConfig("MOVE_RIGHT");
@@ -26,23 +27,39 @@ namespace RType {
         sf::Keyboard::Key moveDownKey = utils.getKeyFromString(moveDownKeyString);
 
         if (_game->_isSettingsUpButtonClicked) {
-                keyPressed = event.key.code;
-                _game->handleConfigButtons(keyPressed, 0);
-                _game->_isSettingsUpButtonClicked = false;
-            } else if (_game->_isSettingsRightButtonClicked) {
-                keyPressed = event.key.code;
-                _game->handleConfigButtons(keyPressed, -1);
-                _game->_isSettingsRightButtonClicked = false;
-            } else if (_game->_isSettingsLeftButtonClicked) {
-                keyPressed = event.key.code;
-                _game->handleConfigButtons(keyPressed, -2);
-                _game->_isSettingsLeftButtonClicked = false;
-            } else if (_game->_isSettingsDownButtonClicked) {
-                keyPressed = event.key.code;
-                _game->handleConfigButtons(keyPressed, -3);
-                _game->_isSettingsDownButtonClicked = false;
+            keyPressed = event.key.code;
+            _game->handleConfigButtons(keyPressed, 0);
+            _game->_isSettingsUpButtonClicked = false;
+        } else if (_game->_isSettingsRightButtonClicked) {
+            keyPressed = event.key.code;
+            _game->handleConfigButtons(keyPressed, -1);
+            _game->_isSettingsRightButtonClicked = false;
+        } else if (_game->_isSettingsLeftButtonClicked) {
+            keyPressed = event.key.code;
+            _game->handleConfigButtons(keyPressed, -2);
+            _game->_isSettingsLeftButtonClicked = false;
+        } else if (_game->_isSettingsDownButtonClicked) {
+            keyPressed = event.key.code;
+            _game->handleConfigButtons(keyPressed, -3);
+            _game->_isSettingsDownButtonClicked = false;
+        } else if (_game->_isSettingsNicknameButtonClicked) {
+            keyPressed = event.key.code;
+            if (keyPressed == sf::Keyboard::Enter) {
+                _game->handleNicknameButton(_game->_nicknameKeys);
+                _game->_nicknameKeys.clear();
+                _game->_isSettingsNicknameButtonClicked = false;
             }
-
+            else if (keyPressed == sf::Keyboard::Backspace && !_game->_nicknameKeys.empty()) {
+                _game->_nicknameKeys.pop_back();
+                _game->handleNicknameButton(_game->_nicknameKeys);
+            }
+            else if (keyPressed >= sf::Keyboard::A && keyPressed <= sf::Keyboard::Z) {
+                if (_game->_nicknameKeys.size() < maxNicknameLength) { 
+                    _game->_nicknameKeys.push_back(keyPressed);
+                    _game->handleNicknameButton(_game->_nicknameKeys);
+                }
+            }
+        }
         if (_game->hasLocalPlayer()) {
             auto &player = _game->getLocalPlayer();
             auto velocity = player.getComponent<ecs::VelocityComponent>();
