@@ -136,13 +136,12 @@ void GameInstance::playEvent()
     std::stringstream ss;
     Config config("config.cfg");
     EventManager event_manager(this);
-    /*sf::Keyboard::Key keyPressed = sf::Keyboard::Unknown;*/
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
-    if (autoFireEnabled && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
+    if (hasLocalPlayer() && autoFireEnabled && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
         if (_netClientID >= 0) {
-            playerShoot((size_t)_netClientID);
+            playerShoot((size_t) _netClientID);
             this->_autoFireClock.restart();
         }
     }
