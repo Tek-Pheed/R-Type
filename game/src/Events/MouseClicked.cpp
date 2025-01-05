@@ -49,15 +49,15 @@ namespace RType {
                             _game->levelMainMenu();
                             break;
                         default:
-                            /*if (text->getStr().find("MOVE_UP") == 0) {
-                                this->_isSettingsUpButtonClicked = true;
-                            } else if (text->getStr().find("MOVE_RIGHT") == 0) {
-                                this->_isSettingsRightButtonClicked = true;
-                            } else if (text->getStr().find("MOVE_LEFT") == 0) {
-                                this->_isSettingsLeftButtonClicked = true;
-                            } else  if (text->getStr().find("MOVE_DOWN") == 0) {
-                                this->_isSettingsDownButtonClicked = true;
-                            } else*/ if (text->getStr().find("Auto fire") == 0) {
+                            if (text->getStr().find("Move up") == 0) {
+                                _game->_isSettingsUpButtonClicked = true;
+                            } else if (text->getStr().find("Move right") == 0) {
+                                _game->_isSettingsRightButtonClicked = true;
+                            } else if (text->getStr().find("Move left") == 0) {
+                                _game->_isSettingsLeftButtonClicked = true;
+                            } else  if (text->getStr().find("Move down") == 0) {
+                                _game->_isSettingsDownButtonClicked = true;
+                            } else if (text->getStr().find("Auto fire") == 0) {
                                 bool currentAutoFireValue = config.getAutoFireConfig();
                                 std::string newAutoFireValue = currentAutoFireValue ? "false" : "true";
                                 _game->handleAutoFireButton(newAutoFireValue, entity);

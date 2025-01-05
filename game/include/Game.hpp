@@ -58,7 +58,7 @@ namespace RType
         void levelMainMenu(void);
         void createPersistentLevel(void);
         void levelSettingsMenu(void);
-        void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType, ecs::Entity &entity);
+        void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(std::string newAutoFireValue, ecs::Entity &entity);
 
         // Player functions and utilities
@@ -136,6 +136,11 @@ namespace RType
         //     void enemyShoot(std::vector<std::string> &tokens);
         //     void enemyDamage(std::vector<std::string> &tokens);
 
+        bool _isSettingsUpButtonClicked = false;
+        bool _isSettingsRightButtonClicked = false;
+        bool _isSettingsLeftButtonClicked = false;
+        bool _isSettingsDownButtonClicked = false;
+
       private:
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
@@ -146,11 +151,6 @@ namespace RType
         std::string _ip = DEFAULT_IP;
 
         std::unique_ptr<sf::RenderWindow> _window;
-
-        bool _isSettingsUpButtonClicked = false;
-        bool _isSettingsRightButtonClicked = false;
-        bool _isSettingsLeftButtonClicked = false;
-        bool _isSettingsDownButtonClicked = false;
 
         sf::Clock _autoFireClock;
     };

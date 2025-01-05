@@ -192,30 +192,34 @@ void RType::GameInstance::levelSettingsMenu()
 
         size_t equalPosUp = moveUpAction.find("=");
         if (equalPosUp != std::string::npos) {
-            std::string beforeUpEqual = moveUpAction.substr(0, equalPosUp);
+            std::string beforeUpEqual = "Move up";
             std::string afterUpEqual = moveUpAction.substr(equalPosUp + 1);
             endUpMove = beforeUpEqual + " : " + afterUpEqual;
         }
 
         size_t equalPosRight = moveRightAction.find("=");
         if (equalPosRight != std::string::npos) {
-            std::string beforeRightEqual = moveRightAction.substr(0, equalPosRight);
+            std::string beforeRightEqual = "Move right";
             std::string afterRightEqual = moveRightAction.substr(equalPosRight + 1);
             endRightMove = beforeRightEqual + " : " + afterRightEqual;
         }
 
         size_t equalPosLeft = moveLeftAction.find("=");
         if (equalPosLeft != std::string::npos) {
-            std::string beforeLeftEqual = moveLeftAction.substr(0, equalPosLeft);
+            std::string beforeLeftEqual = "Move left";
             std::string afterLeftEqual = moveLeftAction.substr(equalPosLeft + 1);
             endLeftMove = beforeLeftEqual + " : " + afterLeftEqual;
         }
 
         size_t equalPosDown = moveDownAction.find("=");
         if (equalPosDown != std::string::npos) {
-            std::string beforeDownEqual = moveDownAction.substr(0, equalPosDown);
+            std::string beforeDownEqual = "Move down";
             std::string afterDownEqual = moveDownAction.substr(equalPosDown + 1);
-            endDownMove = beforeDownEqual + " : " + afterDownEqual;
+            size_t firstdoublepoint = afterDownEqual.find("::");
+            std::string afterfirstdoublepoint = afterDownEqual.substr(firstdoublepoint + 2);
+            size_t seconddoublepoint = afterfirstdoublepoint.find("::");
+            std::string aftersedoublepoint = afterfirstdoublepoint.substr(seconddoublepoint + 2);
+            endDownMove = beforeDownEqual + " : " + aftersedoublepoint;
         }
 
         size_t equalPosAutoFire = autoFireAction.find("=");
@@ -244,7 +248,7 @@ void RType::GameInstance::handleAutoFireButton(std::string newAutoFireValue, ecs
     text->setStr("Auto fire : " + value);
 }
 
-void RType::GameInstance::handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType, ecs::Entity &entity)
+void RType::GameInstance::handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType)
 {
     if (!isServer()) {
         Config config("config.cfg");
@@ -259,8 +263,7 @@ void RType::GameInstance::handleConfigButtons(sf::Keyboard::Key pressedKey, int 
                     moveUpAction = moveUpAction.substr(equalPosUp + 1);
                 }
                 config.updateConfigValue("MOVE_UP=", newValue);
-                auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
-                text->setStr("MOVE_UP :" +  pressedKeyString);
+                buildButton("Move up : " + pressedKeyString, 2);
                 break;
             }
             case -1: {
@@ -270,8 +273,7 @@ void RType::GameInstance::handleConfigButtons(sf::Keyboard::Key pressedKey, int 
                     moveRightAction = moveRightAction.substr(equalPosRight + 1);
                 }
                 config.updateConfigValue("MOVE_RIGHT=", newValue);
-                auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
-                text->setStr("MOVE_RIGHT :" +  pressedKeyString);
+                buildButton("Move right : " + pressedKeyString, 1);
                 break;
             }
             case -2: {
@@ -281,8 +283,7 @@ void RType::GameInstance::handleConfigButtons(sf::Keyboard::Key pressedKey, int 
                     moveLeftAction = moveLeftAction.substr(equalPosLeft + 1);
                 }
                 config.updateConfigValue("MOVE_LEFT=", newValue);
-                auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
-                text->setStr("MOVE_LEFT :" +  pressedKeyString);
+                buildButton("Move left : " + pressedKeyString, 0);
                 break;
             }
             case -3: {
@@ -292,8 +293,7 @@ void RType::GameInstance::handleConfigButtons(sf::Keyboard::Key pressedKey, int 
                     moveDownAction = moveDownAction.substr(equalPosDown + 1);
                 }
                 config.updateConfigValue("MOVE_DOWN=", newValue);
-                auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
-                text->setStr("MOVE_DOWN :" +  pressedKeyString);
+                buildButton("Move down : " + pressedKeyString, -1);
                 break;
             }
             default:

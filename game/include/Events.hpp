@@ -19,7 +19,7 @@
 namespace RType {
     class EventManager {
         public:
-            EventManager(GameInstance *gameInstance);
+            explicit EventManager(GameInstance *gameInstance);
 
             void keyPressed(sf::Event &event);
             void keyReleased(sf::Event &event);
@@ -27,6 +27,7 @@ namespace RType {
 
         protected:
             GameInstance *_game;
+            ecs::Entity *_entity;
     };
 
 }

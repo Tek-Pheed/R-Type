@@ -8,7 +8,6 @@
 #include "Events.hpp"
 
 namespace RType {
-    EventManager::EventManager(GameInstance *gameInstance) {
-        this->_game = gameInstance;
+    EventManager::EventManager(GameInstance *gameInstance): _game(gameInstance), _entity(new ecs::Entity(0)) {
     }
 }
