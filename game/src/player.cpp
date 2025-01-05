@@ -50,8 +50,7 @@ ecs::Entity &RType::GameInstance::buildPlayer(bool isLocalPlayer, size_t id)
 
         sf::Text text;
         text.setFont(font);
-        text.setCharacterSize(10);
-        text.setString("Samy");
+        text.setCharacterSize(20);
         player.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "Samy"));
     }

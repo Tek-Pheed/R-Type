@@ -58,8 +58,8 @@ namespace RType
         void levelMainMenu(void);
         void createPersistentLevel(void);
         void levelSettingsMenu(void);
-        void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
-        void handleAutoFireButton(std::string newAutoFireValue);
+        void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType, ecs::Entity &entity);
+        void handleAutoFireButton(std::string newAutoFireValue, ecs::Entity &entity);
 
         // Player functions and utilities
         ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
