@@ -57,6 +57,9 @@ namespace RType
         ecs::Entity &buildButton(std::string text, int buttonNb);
         void levelMainMenu(void);
         void createPersistentLevel(void);
+        void levelSettingsMenu(void);
+        void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
+        void handleAutoFireButton(std::string newAutoFireValue);
 
         // Player functions and utilities
         ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
@@ -143,6 +146,13 @@ namespace RType
         std::string _ip = DEFAULT_IP;
 
         std::unique_ptr<sf::RenderWindow> _window;
+
+        bool _isSettingsUpButtonClicked = false;
+        bool _isSettingsRightButtonClicked = false;
+        bool _isSettingsLeftButtonClicked = false;
+        bool _isSettingsDownButtonClicked = false;
+
+        sf::Clock _autoFireClock;
     };
 }; // namespace RType
 
