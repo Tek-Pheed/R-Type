@@ -92,11 +92,9 @@ void NetworkingManager::runWriteThread()
                         if (client.writeBufferTCP.size() > 0) {
                             std::unique_lock lock(_writeMutex);
                             len = sock->sendData(client.writeBufferTCP);
-                            std::cout << "ENGINE: [Write Thread] Sending: "
-                                      << System::Network::decodeString(
-                                             client.writeBufferTCP)
-                                             .substr(0, (size_t) len)
-                                      << "to client (" << std::to_string(id)
+                            std::cout << "ENGINE: [Write Thread] Sending: to "
+                                         "client ("
+                                      << std::to_string(id)
                                       << ") on TCP connection ("
                                       << std::to_string(sock->getUID())
                                       << ") [" << len << "/"
@@ -135,10 +133,7 @@ void NetworkingManager::runWriteThread()
                                 }
                                 std::unique_lock lock(_writeMutex);
                                 std::cout
-                                    << "ENGINE: [Write Thread] Sending: "
-                                    << System::Network::decodeString(
-                                           cli.writeBufferUDP)
-                                           .substr(0, (size_t) len)
+                                    << "ENGINE: [Write Thread] Sending "
                                     << "to client (" << std::to_string(index)
                                     << ") on UDP connection ("
                                     << std::to_string(sock->getUID()) << ") ["
@@ -234,8 +229,7 @@ void NetworkingManager::runReadThread()
                                    "on TCP ("
                                 << std::to_string(sock->getUID())
                                 << ") for client (" << std::to_string(id)
-                                << "): " << System::Network::decodeString(vect)
-                                << std::endl;
+                                << ") with len: " << vect.size() << std::endl;
                             _globalMutex.lock();
                             client.readBufferTCP.insert(
                                 client.readBufferTCP.end(), vect.begin(),
@@ -262,14 +256,11 @@ void NetworkingManager::runReadThread()
                         if (id == -1) {
                             id = _pacMan->identifyClient(vect);
                             if (id == -1) {
-                                std::cout
-                                    << "ENGINE: [Read Thread] Failed to "
-                                       "identify "
-                                       "client on UDP ("
-                                    << std::to_string(sock->getUID())
-                                    << ") with packet: "
-                                    << System::Network::decodeString(vect)
-                                    << std::endl;
+                                std::cout << "ENGINE: [Read Thread] Failed to "
+                                             "identify "
+                                             "client on UDP ("
+                                          << std::to_string(sock->getUID())
+                                          << ")" << std::endl;
                                 continue;
                             } else {
                                 std::cout
@@ -292,13 +283,12 @@ void NetworkingManager::runReadThread()
                         NetClient &client = getClient((size_t) id);
                         if (client.isDisconnected)
                             continue;
-                        std::cout
-                            << "ENGINE: [Read Thread] Message received "
-                               "on UDP ("
-                            << std::to_string(sock->getUID())
-                            << ") for client (" << std::to_string(id)
-                            << "): " << System::Network::decodeString(vect)
-                            << std::endl;
+                        std::cout << "ENGINE: [Read Thread] Message received "
+                                     "on UDP ("
+                                  << std::to_string(sock->getUID())
+                                  << ") for client (" << std::to_string(id)
+                                  << ") with len: " << vect.size()
+                                  << std::endl;
                         _globalMutex.lock();
                         if (!(client.readBufferUDP.size()
                                 >= UDP_PACKET_MAX_SIZE

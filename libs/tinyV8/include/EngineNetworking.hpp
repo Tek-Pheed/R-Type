@@ -121,7 +121,7 @@ namespace Engine
          * @param out: The output buffer.
          */
         virtual void serializeString(
-            const std::string &str, std::ostream &out) = 0;
+            const std::string &str, std::ostream &out, char key) = 0;
 
         /**
          * @brief Deserialize a string
@@ -129,8 +129,10 @@ namespace Engine
          * @param in: The buffer to deserialize.
          * @param out: The output string.
          */
-        virtual void deserializeString(
-            const std::ostream &in, std::string &out) = 0;
+        virtual std::string deserializeString(
+            std::istream &in, char key, size_t size) = 0;
+
+        virtual char getKey(void) const = 0;
     };
     namespace Feature
     {
@@ -160,7 +162,7 @@ namespace Engine
                       writeBufferTCP(System::Network::byteArray()),
                       readBufferUDP(System::Network::byteArray()),
                       writeBufferUDP(System::Network::byteArray()),
-                      isReady(false), isDisconnected(false) {};
+                      isReady(false), isDisconnected(false){};
             };
 
             explicit NetworkingManager(Core &engineRef);

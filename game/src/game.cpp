@@ -21,6 +21,7 @@
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
+
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
@@ -44,7 +45,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-        i++) {
+         i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -161,6 +162,7 @@ int RType::GameInstance::manageBuffers()
                 break;
             }
         }
+        ss.clear();
     }
     return 0;
 }
