@@ -50,6 +50,10 @@ namespace RType
         sf::RenderWindow &getWindow();
         void playEvent();
 
+        // Server state
+        bool isConnectedToServer();
+        ssize_t getNetClientID();
+
         // Texture Utilities
         void loadAssets();
 
@@ -74,11 +78,13 @@ namespace RType
         void deletePlayer(size_t playerID);
         void playerAnimations(ecs::Entity &player);
         void playerShoot(size_t playerID);
+        void setPlayerEntityID(int id);
 
         std::vector<ecs::Entity> &getEntities();
 
         // Enemies
-        ecs::Entity &buildEnemy(size_t id, float posX, float posY, float health);
+        ecs::Entity &buildEnemy(
+            size_t id, float posX, float posY, float health);
 
         //Boss
         ecs::Entity &buildBoss(size_t id, float posX, float posY, float health);

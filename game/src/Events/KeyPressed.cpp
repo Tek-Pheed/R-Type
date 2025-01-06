@@ -5,14 +5,20 @@
 ** KeyPressed.cpp
 */
 
-#include "Events.hpp"
 #include "Config.hpp"
+#include "Events.hpp"
+#include "Factory.hpp"
 #include "Utils.hpp"
 
-namespace RType {
-    void EventManager::keyPressed(sf::Event &event) {
+namespace RType
+{
+    void EventManager::keyPressed(sf::Event &event)
+    {
         Config config("config.cfg");
         Utils utils;
+        Factory factory(_game);
+
+        bool autoFireEnabled = config.getAutoFireConfig();
         sf::Keyboard::Key keyPressed = sf::Keyboard::Unknown;
         const size_t maxNicknameLength = 8;
 
@@ -22,9 +28,12 @@ namespace RType {
         std::string moveDownKeyString = config.getKeyFromConfig("MOVE_DOWN");
 
         sf::Keyboard::Key moveUpKey = utils.getKeyFromString(moveUpKeyString);
-        sf::Keyboard::Key moveRightKey = utils.getKeyFromString(moveRightKeyString);
-        sf::Keyboard::Key moveLeftKey = utils.getKeyFromString(moveLeftKeyString);
-        sf::Keyboard::Key moveDownKey = utils.getKeyFromString(moveDownKeyString);
+        sf::Keyboard::Key moveRightKey =
+            utils.getKeyFromString(moveRightKeyString);
+        sf::Keyboard::Key moveLeftKey =
+            utils.getKeyFromString(moveLeftKeyString);
+        sf::Keyboard::Key moveDownKey =
+            utils.getKeyFromString(moveDownKeyString);
 
         if (_game->_isSettingsUpButtonClicked) {
             keyPressed = event.key.code;
@@ -42,6 +51,8 @@ namespace RType {
             keyPressed = event.key.code;
             _game->handleConfigButtons(keyPressed, -3);
             _game->_isSettingsDownButtonClicked = false;
+        }
+
         } else if (_game->_isSettingsNicknameButtonClicked) {
             keyPressed = event.key.code;
             if (keyPressed == sf::Keyboard::Enter) {
@@ -72,6 +83,12 @@ namespace RType {
             } else if (event.key.code == moveLeftKey) {
                 velocity->setVx(-200.0f);
             }
+
+            if (!autoFireEnabled && event.key.code == sf::Keyboard::Space) {
+                if (_game->getNetClientID() >= 0)
+                    factory.buildBulletFromPlayer(
+                        (size_t) _game->getNetClientID());
+            }
         }
     }
-}
+} // namespace RType
