@@ -159,6 +159,7 @@ void GameInstance::sendPlayerPosition(size_t playerID)
 void GameInstance::updatePlayerPosition(
     size_t playerID, float newX, float newY)
 {
+    std::unique_lock lock(_serverLock);
     auto &player = getPlayerById(playerID);
     auto position = player.getComponent<ecs::PositionComponent>();
 
@@ -181,6 +182,7 @@ void GameInstance::updatePlayerPosition(
 
 void GameInstance::playerShoot(size_t playerID)
 {
+    std::unique_lock lock(_serverLock);
     auto player = getPlayerById(playerID);
     auto positionComp = player.getComponent<ecs::PositionComponent>();
     if (!positionComp)

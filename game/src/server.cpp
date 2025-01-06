@@ -76,7 +76,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         auto pos = e.get().getComponent<ecs::PositionComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
         if (!ec || !pos) {
-            std::cout << "Failed to get player" << std::endl;
+            std::cout << "Failed to get enemy" << std::endl;
             continue;
         }
         std::stringstream sss;

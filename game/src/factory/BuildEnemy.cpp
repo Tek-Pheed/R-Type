@@ -9,6 +9,8 @@
     #define NOMINMAX
 #endif
 
+#include <memory>
+#include <mutex>
 #include <sstream>
 #include "Factory.hpp"
 #include "ErrorClass.hpp"
@@ -54,6 +56,7 @@ ecs::Entity &RType::Factory::buildEnemy(
 
 ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
 {
+    std::unique_lock lock(_serverLock);
     auto enemies = refEntityManager.getCurrentLevel()
                        .findEntitiesByComponent<ecs::EnemyComponent>();
 
@@ -68,6 +71,7 @@ ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
 void GameInstance::sendEnemyPosition(size_t enemyID)
 {
     if (isServer()) {
+        std::unique_lock lock(_serverLock);
         auto &ene = getEnemyById(enemyID);
         auto position = ene.getComponent<ecs::PositionComponent>();
         std::stringstream ss;
@@ -82,6 +86,7 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 void GameInstance::deleteEnemy(size_t enemyID)
 {
     if (isServer() || _isConnectedToServer) {
+        std::unique_lock lock(_serverLock);
         auto &ene = getEnemyById(enemyID);
         refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
         if (isServer()) {
