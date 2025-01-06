@@ -12,8 +12,8 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
-#include "Factory.hpp"
 #include "ErrorClass.hpp"
+#include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 
@@ -85,18 +85,16 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 
 void GameInstance::deleteEnemy(size_t enemyID)
 {
-    //if (isServer()) {
-        std::unique_lock lock(_serverLock);
-        std::cout << "Deleting enemy" << std::endl;
-        auto &ene = getEnemyById(enemyID);
-        refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
-        if (isServer()) {
-            std::stringstream ss;
-            ss << E_DEAD << " " << enemyID << " " << PACKET_END;
-            refNetworkManager.sendToAll(
-                System::Network::ISocket::Type::TCP, ss.str());
-        }
-    //}
+    std::unique_lock lock(_serverLock);
+    std::cout << "Deleting enemy" << std::endl;
+    auto &ene = getEnemyById(enemyID);
+    refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
+    if (isServer()) {
+        std::stringstream ss;
+        ss << E_DEAD << " " << enemyID << " " << PACKET_END;
+        refNetworkManager.sendToAll(
+            System::Network::ISocket::Type::TCP, ss.str());
+    }
 }
 
 void GameInstance::handleNetworkEnemies(
@@ -108,7 +106,8 @@ void GameInstance::handleNetworkEnemies(
                 if (!isServer()) {
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
-                    _factory.buildEnemy(id, (float) std::atof(tokens[1].c_str()),
+                    _factory.buildEnemy(id,
+                        (float) std::atof(tokens[1].c_str()),
                         (float) std::atof(tokens[2].c_str()));
                 }
             }
