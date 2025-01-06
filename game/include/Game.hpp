@@ -70,6 +70,7 @@ namespace RType
             std::string newAutoFireValue, ecs::Entity &entity);
 
         // Player functions and utilities
+        ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0, const std::string &name = "Anonymous Player");
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
         bool hasLocalPlayer(void) const;
         ecs::Entity &getLocalPlayer();
@@ -100,9 +101,11 @@ namespace RType
             int code, const std::vector<std::string> &tokens);
         void serverHanlderValidateConnection(
             int code, const std::vector<std::string> &tokens);
+        void serverCreateLoby();
         void handleNetworkPlayers(
             int code, const std::vector<std::string> &tokens);
         void serverSendGameState(size_t clientID);
+        void handleLoby(int code, const std::vector<std::string> &tokens);
 
         // Server Only Events
         void serverEventNewConn(
@@ -161,6 +164,7 @@ namespace RType
         ssize_t _netClientID = -1;
         bool _isServer;
         bool _isConnectedToServer = false;
+        bool _gameStarted = false;
         uint16_t _udpPort = DEFAULT_UDP_PORT;
         uint16_t _tcpPort = DEFAULT_TCP_PORT;
         std::string _ip = DEFAULT_IP;

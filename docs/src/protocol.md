@@ -124,6 +124,9 @@ Set the player health.
 
 Used when a player disconnect, has the same behaviour as the instruction 103.
 
+- Player Set Name (id, name) - 107 <- TCP
+Sets the name of a player.
+
 # Enemy Management (110)
 
 This are the instructions used to manage the enemies
@@ -165,3 +168,17 @@ Removed a terrain, if its has been destroyed or went off the screen.
 - Win - 133 -> TCP
 - Lose - 134 -> TCP
 - Game Over - 135 -> TCP
+
+# Game Management (140)
+
+When in loby, launch the game. (Only the first connected player can send this, then the server replicates it to all connected clients).
+- Launch Game - 141 (id) <-> TCP
+
+Set max players.
+- Set max player 142 (id, max) - <- TCP
+
+Lists all players in game
+- List Game Players 143 (id, 'player1' 'player2' 'player3' 'player4') -> TCP
+
+Quit the current loby
+- Quit loby 144 (id) <-> TCP

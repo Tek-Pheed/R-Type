@@ -150,6 +150,7 @@ int RType::GameInstance::manageBuffers()
             case 1: handleNetworkEnemies(code, tokens); break;
             // case 2: handle_terrain(code, tokens); break;
             // case 3: handle_mechs(code, tokens); break;
+            case 4: handleLoby(code, tokens); break;
             case 9:
                 if (isServer()) {
                     serverHanlderValidateConnection(code, tokens);

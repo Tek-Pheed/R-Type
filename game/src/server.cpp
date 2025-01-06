@@ -46,16 +46,6 @@ void GameInstance::serverEventClosedConn(
     }
 }
 
-// void GameInstance::serverEventPackets(
-//     Engine::Events::EventType event, Engine::Core &core, std::any arg)
-// {
-//     (void) arg;
-//     (void) core;
-
-//     std::cout << "Server wakeup on event: " << event << std::endl;
-//     manageBuffers();
-// }
-
 void RType::GameInstance::serverSendGameState(size_t clientID)
 {
     for (auto &p : getAllPlayers()) {
@@ -85,6 +75,14 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
+}
+
+void RType::GameInstance::serverCreateLoby()
+{
+    auto &level = refEntityManager.createNewLevel("mainLoby");
+    level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+    refEntityManager.switchLevel("mainLoby");
 }
 
 void RType::GameInstance::serverHanlderValidateConnection(
@@ -121,13 +119,7 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnServerLostClient,
         &GameInstance::serverEventClosedConn, *this);
-    refGameEngine.addEventBinding<RType::GameInstance>(
-        Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);
-    auto &level = refEntityManager.createNewLevel("mainLevel");
-    level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
-    level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
-    level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
-    refEntityManager.switchLevel("mainLevel");
+    serverCreateLoby();
 }
 
 bool GameInstance::isConnectedToServer()

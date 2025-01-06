@@ -23,7 +23,7 @@ using namespace RType;
 
 int GameInstance::is_code_valid(int code)
 {
-    if (code >= P_CONN && code <= P_DISCONN)
+    if (code >= P_CONN && code <= P_NAME)
         return 0;
     if (code >= E_SPAWN && code <= E_DMG)
         return 1;
@@ -31,6 +31,8 @@ int GameInstance::is_code_valid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
+    if (code >= L_STARTGAME && code <= L_QUITLOBY)
+        return 4;
     if (code >= C_INIT_UDP && code <= C_AUTH)
         return 9;
     return -1;

@@ -28,6 +28,7 @@ namespace RType
         P_SHOOT = 104,
         P_DMG = 105,
         P_DISCONN = 106,
+        P_NAME = 107,
 
         // Enemy
         E_SPAWN = 111,
@@ -46,6 +47,12 @@ namespace RType
         M_WIN = 133,
         M_LOSE = 134,
         M_GOVER = 135,
+
+        // Loby
+        L_STARTGAME = 141,
+        L_SETMAXPLAYRS = 142,
+        L_LISTPLAYERS = 143,
+        L_QUITLOBY = 144
     };
 
     template <typename... Args>

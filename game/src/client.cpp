@@ -66,6 +66,33 @@ void RType::GameInstance::clientHandlerConnection(
     }
 }
 
+// void RType::GameInstance::connectToGame()
+// {
+//     if (_isConnectedToServer)
+//         return;
+//     auto currentLevel = refEntityManager.getCurrentLevelName();
+//     try {
+//         refNetworkManager.setupClient<RType::PacketHandler>(
+//             _tcpPort, _udpPort, _ip);
+
+//         // Prepare level
+//         auto &level = refEntityManager.createNewLevel("mainRemoteLevel");
+//         level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
+//         level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+//         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
+//             *this);
+//         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+//         refEntityManager.switchLevel("mainRemoteLevel", false);
+//         _playerEntityID = -1;
+//         _isConnectedToServer = true;
+//     } catch (const std::exception &e) {
+//         std::cout << "Failed to connect to server: IP=" << _ip
+//                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
+//                   << " with error: " << e.what() << std::endl;
+//         refEntityManager.switchLevel(currentLevel);
+//     }
+// }
+
 void RType::GameInstance::connectToGame()
 {
     if (_isConnectedToServer)
@@ -76,13 +103,13 @@ void RType::GameInstance::connectToGame()
             _tcpPort, _udpPort, _ip);
 
         // Prepare level
-        auto &level = refEntityManager.createNewLevel("mainRemoteLevel");
+        auto &level = refEntityManager.createNewLevel("mainLoby");
         level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
             *this);
-        level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
-        refEntityManager.switchLevel("mainRemoteLevel", false);
+        //level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+        refEntityManager.switchLevel("mainLoby", false);
         _playerEntityID = -1;
         _isConnectedToServer = true;
     } catch (const std::exception &e) {
