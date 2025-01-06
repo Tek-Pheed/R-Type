@@ -8,6 +8,7 @@
 #define R_TYPE_COMPONENT_HPP
 
 #include <string>
+#include <SFML/Audio.hpp>
 
 namespace ecs
 {
@@ -93,7 +94,7 @@ namespace ecs
         void setEnemyID(size_t enemyID);
 
       private:
-        size_t _bossID;
+        size_t _enemyID;
     };
 
     class RenderComponent : public Component {

@@ -19,6 +19,7 @@
 #include "Entity.hpp"
 #include "Game.hpp"
 #include "SFML/Graphics/Texture.hpp"
+#include "SFML/Audio.hpp"
 
 namespace RType
 {
@@ -35,6 +36,7 @@ namespace RType
         constexpr auto BOSS_TEXTURE = "bossTexture";
         constexpr auto BACKGROUND_TEXTURE = "backgroundTexture";
         constexpr auto BULLET_TEXTURE = "bulletTexture";
+        constexpr auto BULLET_SOUND = "bulletSound";
         constexpr auto R_TYPE_FONT = "rTypeFont";
 
         static const AssetStore assets[] = {
@@ -48,6 +50,7 @@ namespace RType
                 typeid(sf::Texture)},
             {BULLET_TEXTURE, "./assets/sprites/r-typesheet1.gif",
                 typeid(sf::Texture)},
+            {BULLET_SOUND, "./assets/sounds/bullet.ogg", typeid(sf::SoundBuffer)},
             {R_TYPE_FONT, "./assets/font/r-type.ttf", typeid(sf::Font)}};
 
         template <typename Type>

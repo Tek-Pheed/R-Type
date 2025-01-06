@@ -60,6 +60,10 @@ void GameInstance::loadAssets()
             refAssetManager.loadAsset(
                 asset->path, asset->identifier, &sf::Font::loadFromFile);
         }
+        for (const auto asset : Asset::getAllAssetsOfType<sf::SoundBuffer>()) {
+            refAssetManager.loadAsset(
+                asset->path, asset->identifier, &sf::SoundBuffer::loadFromFile);
+        }
     } catch (const std::exception &e) {
         std::cout << "Failed to an load asset with error: " << e.what()
                   << std::endl;

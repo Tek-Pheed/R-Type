@@ -15,13 +15,13 @@ file(GLOB_RECURSE APP "./include/*.hpp")
 
 add_executable(client ${SRC} ${APP})
 target_include_directories(client PRIVATE include)
-target_link_libraries(client sfml-system sfml-window sfml-graphics)
+target_link_libraries(client sfml-system sfml-window sfml-graphics sfml-audio)
 target_link_libraries(client tinyV8)
 
 add_executable(server ${SRC} ${APP})
 target_include_directories(server PRIVATE include)
 target_link_libraries(server tinyV8)
-target_link_libraries(client sfml-system sfml-window sfml-graphics)
+target_link_libraries(client sfml-system sfml-window sfml-graphics sfml-audio)
 
 set_target_properties(client PROPERTIES
 INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>

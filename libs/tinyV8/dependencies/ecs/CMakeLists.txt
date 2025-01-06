@@ -18,7 +18,7 @@ file(GLOB_RECURSE APP "./include/*.hpp")
 add_library(${PROJECT_NAME} STATIC ${SRC} ${APP})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
-target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics)
+target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-audio)
 
 # set_target_properties(${PROJECT_NAME} PROPERTIES
 # INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>

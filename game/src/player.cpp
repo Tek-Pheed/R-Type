@@ -256,6 +256,11 @@ void GameInstance::playerShoot(size_t playerID)
         s.setTextureRect(sf::Rect(137, 153, 64, 16));
         bullet.addComponent(
             std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
+        auto &bulletSound = refAssetManager.getAsset<sf::SoundBuffer>(Asset::BULLET_SOUND);
+        static sf::Sound sound;
+        sound.setBuffer(bulletSound);
+        sound.setVolume(25.0f);
+        sound.play();
         if (playerID == (size_t) _netClientID)
             refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::UDP, ss.str());
