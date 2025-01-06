@@ -158,8 +158,12 @@ namespace RType
         std::vector<sf::Keyboard::Key> _nicknameKeys;
         ecs::Entity *_nicknameInputEntity = nullptr;
 
+        // MENU
         std::vector<ecs::Entity> _buttonList;
         size_t _lastButtonIdClicked;
+
+        std::vector<ecs::Entity> _inputList;
+        size_t _lastInputIdClicked;
 
       private:
         int _playerEntityID = -1;

@@ -125,6 +125,8 @@ ecs::Entity &RType::GameInstance::buildInput(std::string str, int buttonID)
     input.addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::RenderComponent::ObjectType::INPUT));
 
+    _inputList.push_back(input);
+
     return input;
 }
 
@@ -310,21 +312,18 @@ void RType::GameInstance::handleNicknameButton(
         }
     }
 
-    if (!_nicknameInputEntity) {
-        _nicknameInputEntity = &buildInput(nickname, 1);
-    } else {
-        auto textComponent =
-            _nicknameInputEntity->getComponent<ecs::TextComponent<sf::Text>>();
-        if (textComponent) {
-            if (!nickname.empty()) {
-                textComponent->_text.setString(nickname);
+    for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
+        auto text = entity.get().getComponent<ecs::TextComponent<sf::Text>>();
+
+        if (text && entity.get().getID() == _lastInputIdClicked) {
+            if (nickname.empty()) {
+                text->setStr("");
             } else {
-                textComponent->_text.setString("");
+                text->setStr(nickname);
             }
+            break;
         }
     }
-
-    buildInput(nickname, 1);
 }
 
 void RType::GameInstance::handleConfigButtons(

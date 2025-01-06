@@ -72,6 +72,7 @@ namespace RType
                             _game->_lastButtonIdClicked = entity.get().getID();
                         } else if (text->getStr().find("NICKNAME") == 0) {
                             _game->_isSettingsNicknameButtonClicked = true;
+                            _game->_lastInputIdClicked = entity.get().getID();
                         } else if (text->getStr().find("Auto fire") == 0) {
                             bool currentAutoFireValue =
                                 config.getAutoFireConfig();
