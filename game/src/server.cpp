@@ -72,7 +72,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
     for (auto &e : refEntityManager.getCurrentLevel()
-             .findEntitiesByComponent<ecs::EnemyComponent>()) {
+                       .findEntitiesByComponent<ecs::EnemyComponent>()) {
         auto pos = e.get().getComponent<ecs::PositionComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
         if (!ec || !pos) {
@@ -126,6 +126,7 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     auto &level = refEntityManager.createNewLevel("mainLevel");
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
     refEntityManager.switchLevel("mainLevel");
 }
 

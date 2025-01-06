@@ -61,6 +61,7 @@ void RType::GameInstance::createPersistentLevel()
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
 }
 
 ecs::Entity &RType::GameInstance::buildButton(std::string str, int buttonID)

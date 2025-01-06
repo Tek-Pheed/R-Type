@@ -12,6 +12,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include "Components.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
 #include "GameAssets.hpp"
@@ -29,6 +30,8 @@ ecs::Entity &RType::Factory::buildEnemy(
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(
         std::make_shared<ecs::VelocityComponent>(-200.0f, 0.0f));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(32.0f, 32.0f));
+
     if (!_game.isServer()) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::ENEMY_TEXTURE);

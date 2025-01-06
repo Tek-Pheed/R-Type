@@ -192,6 +192,7 @@ void GameInstance::playerShoot(size_t playerID)
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
         positionComp->getX() + 100, positionComp->getY() + 25));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(10.0f, 10.0f));
 
     std::stringstream ss;
     ss << P_SHOOT << " " << playerID << " " << PACKET_END;

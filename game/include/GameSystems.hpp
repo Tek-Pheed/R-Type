@@ -50,12 +50,23 @@ namespace RType
             void initSystem(GameInstance &gameRef) override;
             void update(
                 std::vector<ecs::Entity> &entity, float deltaTime) override;
+            void collision(ecs::Entity &bullet);
 
           protected:
             GameInstance *_game;
         };
 
         class BackgroundSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
+
+          protected:
+            GameInstance *_game;
+        };
+
+        class HealthSystem : public ecs::ISystem<GameInstance> {
           public:
             void initSystem(GameInstance &gameRef) override;
             void update(

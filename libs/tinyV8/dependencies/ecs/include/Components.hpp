@@ -264,7 +264,6 @@ namespace ecs
 
     class BulletComponent : public Component {
       public:
-        BulletComponent();
         explicit BulletComponent(bool isFromPlayer);
 
         bool getIsFromPlayer();
@@ -283,6 +282,21 @@ namespace ecs
 
       private:
         std::string _name;
+    };
+
+    class HitboxComponent : public Component {
+      public:
+        explicit HitboxComponent(float height, float width);
+
+        float getHeight() const;
+        float getWidth() const;
+
+        void setHeight(float height);
+        void setWidth(float width);
+
+      private:
+        float _height;
+        float _width;
     };
 
     // class ReplicationComponent : public Component {
