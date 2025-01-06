@@ -47,9 +47,13 @@ namespace RType
 
                 switch (clickableType->getClickableType()) {
                     case ecs::ClickableType::MULTIPLAYER:
+                        _game->_buttonList.clear();
+                        _game->_inputList.clear();
                         _game->levelContinueMenu();
                         break;
                     case ecs::ClickableType::LAUNCH:
+                        _game->_buttonList.clear();
+                        _game->_inputList.clear();
                         _game->connectToGame();
                         break;
                     case ecs::ClickableType::EXIT:
@@ -57,6 +61,8 @@ namespace RType
                         _game->refGameEngine.stop();
                         break;
                     case ecs::ClickableType::SETTINGS:
+                        _game->_buttonList.clear();
+                        _game->_inputList.clear();
                         _game->levelSettingsMenu();
                         break;
                     case ecs::ClickableType::AUTO_FIRE:
@@ -64,6 +70,8 @@ namespace RType
                             currentAutoFireValue ? "false" : "true", entity);
                         break;
                     case ecs::ClickableType::BACK:
+                        _game->_buttonList.clear();
+                        _game->_inputList.clear();
                         _game->levelMainMenu();
                         break;
                     case ecs::ClickableType::MOVE_UP:
