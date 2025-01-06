@@ -64,7 +64,8 @@ namespace RType
         void createPersistentLevel(void);
         void levelSettingsMenu(void);
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
-        void handleAutoFireButton(std::string newAutoFireValue, ecs::Entity &entity);
+        void handleAutoFireButton(
+            std::string newAutoFireValue, ecs::Entity &entity);
         void handleNicknameButton(const std::vector<sf::Keyboard::Key> &keys);
 
         // Player functions and utilities
@@ -86,8 +87,9 @@ namespace RType
         ecs::Entity &buildEnemy(
             size_t id, float posX, float posY, float health);
 
-        //Boss
-        ecs::Entity &buildBoss(size_t id, float posX, float posY, float health);
+        // Boss
+        ecs::Entity &buildBoss(
+            size_t id, float posX, float posY, float health);
 
         // Networking
         int is_code_valid(int code);
@@ -154,7 +156,10 @@ namespace RType
 
         bool _isSettingsNicknameButtonClicked = false;
         std::vector<sf::Keyboard::Key> _nicknameKeys;
-        ecs::Entity* _nicknameInputEntity = nullptr;
+        ecs::Entity *_nicknameInputEntity = nullptr;
+
+        std::vector<ecs::Entity> _buttonList;
+        size_t _lastButtonIdClicked;
 
       private:
         int _playerEntityID = -1;
