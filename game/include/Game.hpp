@@ -16,21 +16,25 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <vector>
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
+#include "Factory.hpp"
 #include "GameSystems.hpp"
 
 namespace RType
 {
 
+    class Factory;
+
     class GameInstance {
       public:
         static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
-        static constexpr uint16_t SERVER_REFRESH_RATE = 30U;
+        static constexpr uint16_t SERVER_REFRESH_RATE = 60U;
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
@@ -50,15 +54,22 @@ namespace RType
         sf::RenderWindow &getWindow();
         void playEvent();
 
+        // Server state
+        bool isConnectedToServer();
+
         // Texture Utilities
         void loadAssets();
 
         ecs::Entity &buildBackground(void);
+        ecs::Entity &buildButton(std::string text, int buttonNb);
         void levelMainMenu(void);
         void createPersistentLevel(void);
+        void levelSettingsMenu(void);
+        void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
+        void handleAutoFireButton(
+            std::string newAutoFireValue, ecs::Entity &entity);
 
         // Player functions and utilities
-        ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
         bool hasLocalPlayer(void) const;
         ecs::Entity &getLocalPlayer();
@@ -68,11 +79,18 @@ namespace RType
         void deletePlayer(size_t playerID);
         void playerAnimations(ecs::Entity &player);
         void playerShoot(size_t playerID);
+        void setPlayerEntityID(int id);
 
         std::vector<ecs::Entity> &getEntities();
 
         // Enemies
-        ecs::Entity &buildEnemy(size_t id, float posX, float posY, float health);
+        ecs::Entity &buildEnemy(
+            size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &getEnemyById(size_t enemyID);
+        void sendEnemyPosition(size_t enemyID);
+        void deleteEnemy(size_t playerID);
+        void handleNetworkEnemies(
+            int code, const std::vector<std::string> &tokens);
 
         // Networking
         int is_code_valid(int code);
@@ -84,6 +102,7 @@ namespace RType
             int code, const std::vector<std::string> &tokens);
         void handleNetworkPlayers(
             int code, const std::vector<std::string> &tokens);
+        void serverSendGameState(size_t clientID);
 
         // Server Only Events
         void serverEventNewConn(
@@ -132,6 +151,11 @@ namespace RType
         //     void enemyShoot(std::vector<std::string> &tokens);
         //     void enemyDamage(std::vector<std::string> &tokens);
 
+        bool _isSettingsUpButtonClicked = false;
+        bool _isSettingsRightButtonClicked = false;
+        bool _isSettingsLeftButtonClicked = false;
+        bool _isSettingsDownButtonClicked = false;
+
       private:
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
@@ -141,7 +165,12 @@ namespace RType
         uint16_t _tcpPort = DEFAULT_TCP_PORT;
         std::string _ip = DEFAULT_IP;
 
+        Factory _factory;
+
         std::unique_ptr<sf::RenderWindow> _window;
+        std::recursive_mutex _serverLock;
+
+        sf::Clock _autoFireClock;
     };
 }; // namespace RType
 

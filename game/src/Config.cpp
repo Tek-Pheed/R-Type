@@ -138,10 +138,31 @@ void Config::updateConfigValue(
     const std::string &key, const std::string &newValue)
 {
     for (auto &line : _configData) {
-        if (line.second.find(key + "=") == 0) {
-            line.second = key + "=" + newValue;
+        if (line.second.find(key) == 0) {
+            line.second = key + newValue;
             return;
         }
     }
     throw ErrorClass("RTC009 : Invalid config: key not found.");
+}
+
+std::string Config::getKeyFromConfig(const std::string &key)
+{
+    for (const auto &line : _configData) {
+        if (line.second.find(key) == 0) {
+            return line.second.substr(key.size() + 1);
+        }
+    }
+    throw ErrorClass("RTC009 : Invalid config: key not found.");
+}
+
+bool Config::getAutoFireConfig()
+{
+    std::string autoFire = getKeyFromConfig("AUTO_FIRE");
+
+    if (autoFire == "true") {
+        return true;
+    } else {
+        return false;
+    }
 }

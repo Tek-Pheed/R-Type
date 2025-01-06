@@ -48,8 +48,8 @@ void PositionSystem::update(
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
-                float maxX = 0;
-                float maxY = 0;
+                float maxX = (float)this->_game->getWindow().getSize().x;
+                float maxY = (float)this->_game->getWindow().getSize().y;
 
                 if (sprite) {
                     maxX = (float) _game->getWindow().getSize().x
@@ -72,6 +72,18 @@ void PositionSystem::update(
                 }
                 if (positionComponent->getY() > maxY) {
                     positionComponent->setY(maxY);
+                }
+            } else {
+                auto enemy = entity.getComponent<ecs::EnemyComponent>();
+                if (enemy
+                    && (positionComponent->getOldX()
+                            != positionComponent->getX()
+                        || positionComponent->getOldY()
+                            != positionComponent->getY())) {
+                    _game->sendEnemyPosition(enemy->getEnemyID());
+                }
+                if (enemy && (positionComponent->getX() < 0.0f || positionComponent->getY() < 0.0f)) {
+                    _game->deleteEnemy(enemy->getEnemyID());
                 }
             }
         }

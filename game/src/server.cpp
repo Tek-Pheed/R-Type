@@ -5,6 +5,7 @@
 ** server specific functions
 */
 
+#include <mutex>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -45,18 +46,51 @@ void GameInstance::serverEventClosedConn(
     }
 }
 
-void GameInstance::serverEventPackets(
-    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+// void GameInstance::serverEventPackets(
+//     Engine::Events::EventType event, Engine::Core &core, std::any arg)
+// {
+//     (void) arg;
+//     (void) core;
+
+//     std::cout << "Server wakeup on event: " << event << std::endl;
+//     manageBuffers();
+// }
+
+void RType::GameInstance::serverSendGameState(size_t clientID)
 {
-    (void) arg;
-    (void) core;
-    std::cout << "Server wakeup on event: " << event << std::endl;
-    manageBuffers();
+    for (auto &p : getAllPlayers()) {
+        auto pos = p.get().getComponent<ecs::PositionComponent>();
+        auto pl = p.get().getComponent<ecs::PlayerComponent>();
+        if (!pl || !pos) {
+            std::cout << "Failed to get player" << std::endl;
+            continue;
+        }
+        std::stringstream sss;
+        sss << P_CONN << " " << pl->getPlayerID() << " " << pos->getX() << " "
+            << pos->getY() << PACKET_END;
+        refNetworkManager.sendToOne(
+            clientID, System::Network::ISocket::Type::TCP, sss.str());
+    }
+    for (auto &e : refEntityManager.getCurrentLevel()
+             .findEntitiesByComponent<ecs::EnemyComponent>()) {
+        auto pos = e.get().getComponent<ecs::PositionComponent>();
+        auto ec = e.get().getComponent<ecs::EnemyComponent>();
+        if (!ec || !pos) {
+            std::cout << "Failed to get enemy" << std::endl;
+            continue;
+        }
+        std::stringstream sss;
+        sss << E_SPAWN << " " << ec->getEnemyID() << " " << pos->getX() << " "
+            << pos->getY() << PACKET_END;
+        refNetworkManager.sendToOne(
+            clientID, System::Network::ISocket::Type::TCP, sss.str());
+    }
 }
 
 void RType::GameInstance::serverHanlderValidateConnection(
     int code, const std::vector<std::string> &tokens)
 {
+    std::unique_lock lock(_serverLock);
     if (code == Protocol::C_START_UDP && tokens.size() >= 1) {
         ssize_t netClientID = (ssize_t) atoi(tokens[0].c_str());
         if (netClientID >= 0) {
@@ -64,19 +98,7 @@ void RType::GameInstance::serverHanlderValidateConnection(
             ss << C_AUTH << " OK" << PACKET_END;
             refNetworkManager.sendToOne((size_t) netClientID,
                 System::Network::ISocket::Type::TCP, ss.str());
-            for (auto &p : getAllPlayers()) {
-                auto pos = p.get().getComponent<ecs::PositionComponent>();
-                auto pl = p.get().getComponent<ecs::PlayerComponent>();
-                if (!pl || !pos) {
-                    std::cout << "can't get player" << std::endl;
-                    continue;
-                }
-                std::stringstream sss;
-                sss << P_CONN << " " << pl->getPlayerID() << " " << pos->getX()
-                    << " " << pos->getY() << PACKET_END;
-                refNetworkManager.sendToOne((size_t) netClientID,
-                    System::Network::ISocket::Type::TCP, sss.str());
-            }
+            serverSendGameState((size_t) netClientID);
         } else {
             std::cout << "Could not read client ID" << std::endl;
         }
@@ -90,17 +112,24 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     _udpPort = udpPort;
     refNetworkManager.setupServer<PacketHandler>(_tcpPort, _udpPort);
     refGameEngine.setTickRate(SERVER_REFRESH_RATE);
-    refGameEngine.addEventBinding<GameInstance>(
-        Engine::Events::EVENT_OnDataReceived,
-        &GameInstance::serverEventPackets, *this);
+    // refGameEngine.addEventBinding<GameInstance>(
+    //     Engine::Events::EVENT_OnDataReceived,
+    //     &GameInstance::serverEventPackets, *this);
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnServerNewClient,
         &GameInstance::serverEventNewConn, *this);
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnServerLostClient,
         &GameInstance::serverEventClosedConn, *this);
+    refGameEngine.addEventBinding<RType::GameInstance>(
+        Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);
     auto &level = refEntityManager.createNewLevel("mainLevel");
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
     refEntityManager.switchLevel("mainLevel");
+}
+
+bool GameInstance::isConnectedToServer()
+{
+    return this->_isConnectedToServer;
 }
