@@ -4,8 +4,8 @@
 
 R-Type                                                      R. Scandella
 Internet-Draft     F-TYPE V8 444 CH, 0-100 km/h 3.7s, TOP SPEED 300 km/h
-Intended status: Informational                          18 December 2024
-Expires: 21 June 2025
+Intended status: Informational                            6 January 2025
+Expires: 10 July 2025
 
 
                         RFC999 - R-Type Protocol
@@ -38,11 +38,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 June 2025.
+   This Internet-Draft will expire on 10 July 2025.
 
 Copyright Notice
 
-   Copyright (c) 2024 IETF Trust and the persons identified as the
+   Copyright (c) 2025 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Scandella                 Expires 21 June 2025                  [Page 1]
+Scandella                 Expires 10 July 2025                  [Page 1]
 
-Internet-Draft               R-Type Protocol               December 2024
+Internet-Draft               R-Type Protocol                January 2025
 
 
    extracted from this document must include Revised BSD License text as
@@ -68,7 +68,7 @@ Table of Contents
    2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   3
    3.  Connection handshake  . . . . . . . . . . . . . . . . . . . .   3
    4.  Connection Management (900) . . . . . . . . . . . . . . . . .   3
-   5.  Player Management (100) . . . . . . . . . . . . . . . . . . .   3
+   5.  Player Management (100) . . . . . . . . . . . . . . . . . . .   4
    6.  Enemy Management (110)  . . . . . . . . . . . . . . . . . . .   4
    7.  Terrain management (120)  . . . . . . . . . . . . . . . . . .   5
    8.  Game Mechanics (130)  . . . . . . . . . . . . . . . . . . . .   5
@@ -109,12 +109,18 @@ Table of Contents
 
 
 
-Scandella                 Expires 21 June 2025                  [Page 2]
+Scandella                 Expires 10 July 2025                  [Page 2]
 
-Internet-Draft               R-Type Protocol               December 2024
+Internet-Draft               R-Type Protocol                January 2025
 
 
    *  <-> From Both
+
+   All of the communication betweet the server and clients will be
+   obsufcated, meaning that an XOR operation will be applied on the
+   string using a secret key, shared by both the client and server.
+
+   i.e. "901 4\t\n" -> "\a\000\000\000\000\000\000\000#*+:+\023\020"
 
 2.  Conventions and Definitions
 
@@ -143,8 +149,10 @@ Internet-Draft               R-Type Protocol               December 2024
 
    *  Init UDP Connection (clientID) - 901 -> TCP
 
-   This is the first isntruction sent to the server, its used so the
-   client knows its id.
+   This is the first instruction sent to the server, its used so the
+   client knows its id.  (The server is free to resend this packet
+   multiple times if it did not receive any response on it's UDP
+   socket.)
 
    *  Start UDP (clientId) - 902 <- UDP
 
@@ -153,27 +161,29 @@ Internet-Draft               R-Type Protocol               December 2024
 
    *  Authenticated client (OK/KO) - 903 -> TCP
 
+
+
+
+
+Scandella                 Expires 10 July 2025                  [Page 3]
+
+Internet-Draft               R-Type Protocol                January 2025
+
+
 5.  Player Management (100)
 
    The following isntructions are the one used to manage players
 
-   *  Player connection (clientId, name, x, y) - 101 <-> UDP
+   *  Player connection (clientId, x, y) - 101 <-> TCP
 
    This is sent to all the clients when a new player join the game.
 
    *  Player change position(clientId, x, y) - 102 <-> UDP
 
-
-
-Scandella                 Expires 21 June 2025                  [Page 3]
-
-Internet-Draft               R-Type Protocol               December 2024
-
-
    This instructions is sent by both the server and the client to update
    the position of a specific player.
 
-   *  Player killed (id) - 103 -> UDP
+   *  Player killed (id) - 103 -> TCP
 
    Used when a player die, so it can be removed from the clients and
    server.
@@ -187,7 +197,7 @@ Internet-Draft               R-Type Protocol               December 2024
 
    Set the player health.
 
-   *  Player disconnection (id) - 106 <-> UDP
+   *  Player disconnection (id) - 106 <-> TCP
 
    Used when a player disconnect, has the same behaviour as the
    instruction 103.
@@ -196,7 +206,7 @@ Internet-Draft               R-Type Protocol               December 2024
 
    This are the instructions used to manage the enemies
 
-   *  Enemy spawn (id, x, y) - 111 -> UDP
+   *  Enemy spawn (id, x, y) - 111 -> TCP
 
    Sent by the server to all the clients to spawn an enemy at a specific
    position.
@@ -208,6 +218,14 @@ Internet-Draft               R-Type Protocol               December 2024
    Remove an enemy if it has been shot down or if it reach the border of
    the screen.
 
+
+
+
+Scandella                 Expires 10 July 2025                  [Page 4]
+
+Internet-Draft               R-Type Protocol                January 2025
+
+
    *  Enemy shooting (id) - 114 -> UDP
 
    Create a projectile from an enemy position.  It allows the client to
@@ -216,15 +234,6 @@ Internet-Draft               R-Type Protocol               December 2024
    *  Enemy damage (id, new_health) - 115 -> UDP
 
    Set the health of an enemy.
-
-
-
-
-
-Scandella                 Expires 21 June 2025                  [Page 4]
-
-Internet-Draft               R-Type Protocol               December 2024
-
 
 7.  Terrain management (120)
 
@@ -240,15 +249,15 @@ Internet-Draft               R-Type Protocol               December 2024
 
 8.  Game Mechanics (130)
 
-   *  New wave (waveNb) - 131 -> UDP
+   *  New wave (waveNb) - 131 -> TCP
 
-   *  Wave over (waveNb) - 132 -> UDP
+   *  Wave over (waveNb) - 132 -> TCP
 
-   *  Win - 133 -> UDP
+   *  Win - 133 -> TCP
 
-   *  Lose - 134 -> UDP
+   *  Lose - 134 -> TCP
 
-   *  Game Over - 135 -> UDP
+   *  Game Over - 135 -> TCP
 
 9.  Normative References
 
@@ -265,6 +274,14 @@ Author's Address
 
    Raphael Scandella
    F-TYPE V8 444 CH, 0-100 km/h 3.7s, TOP SPEED 300 km/h
+
+
+
+Scandella                 Expires 10 July 2025                  [Page 5]
+
+Internet-Draft               R-Type Protocol                January 2025
+
+
    Email: raphael.scandella@epitech.eu
 
 
@@ -277,4 +294,43 @@ Author's Address
 
 
 
-Scandella                 Expires 21 June 2025                  [Page 5]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Scandella                 Expires 10 July 2025                  [Page 6]

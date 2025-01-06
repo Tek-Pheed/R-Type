@@ -14,8 +14,12 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <string>
 #include "Components.hpp"
+#include "Config.hpp"
 #include "Engine.hpp"
+#include "Events.hpp"
+#include "Factory.hpp"
 #include "Game.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
@@ -50,7 +54,7 @@ void RType::GameInstance::clientHandlerConnection(
 
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
-                    buildPlayer(true, (size_t) _netClientID);
+                    _factory.buildPlayer(true, (size_t) _netClientID);
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }
@@ -98,9 +102,10 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
-    sf::VideoMode videoMode(
-        1280, 720, sf::VideoMode::getDesktopMode().bitsPerPixel);
-    _window->create(videoMode, "R-Type");
+    sf::VideoMode videoMode(sf::VideoMode::getDesktopMode().width,
+        sf::VideoMode::getDesktopMode().height,
+        sf::VideoMode::getDesktopMode().bitsPerPixel);
+    _window->create(videoMode, "R-Type", sf::Style::Fullscreen);
     _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
@@ -123,10 +128,26 @@ sf::RenderWindow &GameInstance::getWindow()
     return *_window;
 }
 
+constexpr unsigned int str2int(const char *str, int h = 0)
+{
+    return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
+}
 void GameInstance::playEvent()
 {
     sf::Event event;
     std::stringstream ss;
+    Config config("config.cfg");
+    EventManager event_manager(this);
+
+    bool autoFireEnabled = config.getAutoFireConfig();
+
+    if (hasLocalPlayer() && autoFireEnabled
+        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
+        if (_netClientID >= 0) {
+            playerShoot((size_t) _netClientID);
+            this->_autoFireClock.restart();
+        }
+    }
 
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -134,37 +155,39 @@ void GameInstance::playEvent()
             refGameEngine.stop();
         }
         if (event.type == sf::Event::KeyPressed) {
+            event_manager.keyPressed(event);
+            /*if (this->_isSettingsUpButtonClicked) {
+                keyPressed = event.key.code;
+                handleConfigButtons(keyPressed, 0);
+                this->_isSettingsUpButtonClicked = false;
+            } else if (this->_isSettingsRightButtonClicked) {
+                keyPressed = event.key.code;
+                handleConfigButtons(keyPressed, -1);
+                this->_isSettingsRightButtonClicked = false;
+            } else if (this->_isSettingsLeftButtonClicked) {
+                keyPressed = event.key.code;
+                handleConfigButtons(keyPressed, -2);
+                this->_isSettingsLeftButtonClicked = false;
+            } else if (this->_isSettingsDownButtonClicked) {
+                keyPressed = event.key.code;
+                handleConfigButtons(keyPressed, -3);
+                this->_isSettingsDownButtonClicked = false;
+            }*/
             if (hasLocalPlayer()) {
                 auto &player = getLocalPlayer();
                 auto velocity = player.getComponent<ecs::VelocityComponent>();
-                if (event.key.code == sf::Keyboard::Up) {
-                    velocity->setVy(-200.0f);
-                } else if (event.key.code == sf::Keyboard::Down) {
-                    velocity->setVy(200.0f);
-                } else if (event.key.code == sf::Keyboard::Right) {
-                    velocity->setVx(200.0f);
-                } else if (event.key.code == sf::Keyboard::Left) {
-                    velocity->setVx(-200.0f);
-                } else if (event.key.code == sf::Keyboard::Space) {
+                if (!autoFireEnabled
+                    && event.key.code == sf::Keyboard::Space) {
                     if (_netClientID >= 0)
                         playerShoot((size_t) _netClientID);
                 }
             }
-            if (event.key.code == sf::Keyboard::Enter) {
-                connectToGame();
-            }
         }
         if (hasLocalPlayer() && event.type == sf::Event::KeyReleased) {
-            auto &player = getLocalPlayer();
-            auto velocity = player.getComponent<ecs::VelocityComponent>();
-            if (event.key.code == sf::Keyboard::Up
-                || event.key.code == sf::Keyboard::Down) {
-                velocity->setVy(0.0f);
-            }
-            if (event.key.code == sf::Keyboard::Left
-                || event.key.code == sf::Keyboard::Right) {
-                velocity->setVx(0.0f);
-            }
+            event_manager.keyReleased(event);
+        }
+        if (event.type == sf::Event::MouseButtonPressed) {
+            event_manager.mouseClicked();
         }
     }
 }

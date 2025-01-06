@@ -9,11 +9,6 @@
 
 namespace ecs
 {
-    BulletComponent::BulletComponent()
-    {
-        this->_isFromPlayer = false;
-    }
-
     BulletComponent::BulletComponent(bool isFromPlayer)
     {
         this->_isFromPlayer = isFromPlayer;

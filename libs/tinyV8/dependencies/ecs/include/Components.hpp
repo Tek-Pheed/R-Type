@@ -7,7 +7,6 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
-#include <SFML/Graphics.hpp>
 #include <string>
 
 namespace ecs
@@ -93,7 +92,15 @@ namespace ecs
 
     class RenderComponent : public Component {
       public:
-        enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT, SPRITEANDTEXT };
+        enum ObjectType {
+            CIRCLE,
+            RECTANGLE,
+            SPRITE,
+            TEXT,
+            SPRITEANDTEXT,
+            BUTTON,
+            INPUT
+        };
         explicit RenderComponent(ObjectType type);
 
         ObjectType getObjectType() const;
@@ -257,7 +264,6 @@ namespace ecs
 
     class BulletComponent : public Component {
       public:
-        BulletComponent();
         explicit BulletComponent(bool isFromPlayer);
 
         bool getIsFromPlayer();
@@ -276,6 +282,21 @@ namespace ecs
 
       private:
         std::string _name;
+    };
+
+    class HitboxComponent : public Component {
+      public:
+        explicit HitboxComponent(float height, float width);
+
+        float getHeight() const;
+        float getWidth() const;
+
+        void setHeight(float height);
+        void setWidth(float width);
+
+      private:
+        float _height;
+        float _width;
     };
 
     // class ReplicationComponent : public Component {
