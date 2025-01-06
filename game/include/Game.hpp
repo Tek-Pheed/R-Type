@@ -57,12 +57,13 @@ namespace RType
         // Texture Utilities
         void loadAssets();
 
-        ecs::Entity &buildBackground(void);
+        ecs::Entity &buildBackground();
         ecs::Entity &buildButton(std::string text, int buttonNb);
         ecs::Entity &buildInput(std::string str, int buttonID);
-        void levelMainMenu(void);
-        void createPersistentLevel(void);
-        void levelSettingsMenu(void);
+        void levelMainMenu();
+        void createPersistentLevel();
+        void levelSettingsMenu();
+        void levelContinueMenu();
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);

@@ -145,7 +145,7 @@ void RType::GameInstance::levelMainMenu()
         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
         text.setCharacterSize(100);
         text.setFillColor(sf::Color::White);
-        text.setString("F Type V8");
+        text.setString("F TYPE V8");
 
         float textWidth = text.getLocalBounds().width;
         float windowWidth = (float) this->_window->getSize().x;
@@ -160,10 +160,48 @@ void RType::GameInstance::levelMainMenu()
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F Type V8"));
 
-        buildInput("NICKNAME", 1);
         buildButton("PLAY", 0);
         buildButton("SETTINGS", -1);
         buildButton("EXIT", -2);
+    }
+}
+
+void RType::GameInstance::levelContinueMenu()
+{
+    auto &level = refEntityManager.createNewLevel("continueMenu");
+
+    level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+    refEntityManager.switchLevel("continueMenu");
+
+    if (!isServer()) {
+        auto &title = refEntityManager.getCurrentLevel().createEntity();
+
+        sf::Text text;
+        text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
+        text.setCharacterSize(100);
+        text.setFillColor(sf::Color::White);
+        text.setString("CONNECTION TO SERVER");
+
+        float textWidth = text.getLocalBounds().width;
+        float windowWidth = (float) this->_window->getSize().x;
+
+        float posX = (windowWidth - textWidth) / 2;
+        float posY = (float) this->_window->getSize().y / 4;
+
+        title.addComponent(std::make_shared<ecs::RenderComponent>(
+            ecs::RenderComponent::ObjectType::TEXT));
+        title.addComponent(
+            std::make_shared<ecs::PositionComponent>(posX, posY));
+        title.addComponent(
+            std::make_shared<ecs::TextComponent<sf::Text>>(text, "CONNECTION TO SERVER"));
+
+        buildInput("NICKNAME", 0);
+        buildInput("IP ADRESS", -1);
+        buildInput("TCP PORT", -2);
+        buildInput("UDP PORT", -3);
+        buildButton("PLAY GAME", -4);
+        buildButton("BACK", -6);
     }
 }
 
@@ -194,7 +232,7 @@ void RType::GameInstance::levelSettingsMenu()
         title.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));
         title.addComponent(
-            std::make_shared<ecs::PositionComponent>(posX, posY));
+            std::make_shared<ecs::PositionComponent>(posX, posY - 50));
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "SETTINGS"));
 
@@ -287,11 +325,11 @@ void RType::GameInstance::handleAutoFireButton(
     std::string newAutoFireValue, ecs::Entity &entity)
 {
     Config config("config.cfg");
-    std::string value = (newAutoFireValue == "true" ? "Yes" : "No");
+    std::string value = (newAutoFireValue == "true" ? "YES" : "NO");
     config.updateConfigValue("AUTO_FIRE=", newAutoFireValue);
     config.saveConfig();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
-    text->setStr("Auto fire : " + value);
+    text->setStr("AUTO FIRE : " + value);
 }
 
 void RType::GameInstance::handleNicknameButton(
@@ -348,7 +386,7 @@ void RType::GameInstance::handleConfigButtons(
                         auto text =
                             entity.get()
                                 .getComponent<ecs::TextComponent<sf::Text>>();
-                        text->setStr("Move up : " + pressedKeyString);
+                        text->setStr("MOVE UP : " + pressedKeyString);
                         break;
                     }
                 }
@@ -368,7 +406,7 @@ void RType::GameInstance::handleConfigButtons(
                         auto text =
                             entity.get()
                                 .getComponent<ecs::TextComponent<sf::Text>>();
-                        text->setStr("Move right : " + pressedKeyString);
+                        text->setStr("MOVE RIGHT : " + pressedKeyString);
                         break;
                     }
                 }
@@ -387,7 +425,7 @@ void RType::GameInstance::handleConfigButtons(
                         auto text =
                             entity.get()
                                 .getComponent<ecs::TextComponent<sf::Text>>();
-                        text->setStr("Move left : " + pressedKeyString);
+                        text->setStr("MOVE LEFT : " + pressedKeyString);
                         break;
                     }
                 }
@@ -406,7 +444,7 @@ void RType::GameInstance::handleConfigButtons(
                         auto text =
                             entity.get()
                                 .getComponent<ecs::TextComponent<sf::Text>>();
-                        text->setStr("Move down : " + pressedKeyString);
+                        text->setStr("MOVE DOWN : " + pressedKeyString);
                         break;
                     }
                 }

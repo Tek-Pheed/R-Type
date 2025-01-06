@@ -48,13 +48,18 @@ namespace RType
                     continue;
 
                 switch (str2int(text->getStr().c_str())) {
-                    case str2int("PLAY"): _game->connectToGame(); break;
+                    case str2int("PLAY"):
+                        _game->levelContinueMenu();
+                        break;
                     case str2int("EXIT"):
                         _game->getWindow().close();
                         _game->refGameEngine.stop();
                         break;
                     case str2int("SETTINGS"):
                         _game->levelSettingsMenu();
+                        break;
+                    case str2int("PLAY GAME"):
+                        _game->connectToGame();
                         break;
                     case str2int("BACK"): _game->levelMainMenu(); break;
                     default:
