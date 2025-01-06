@@ -12,11 +12,6 @@
 
 namespace RType
 {
-    constexpr unsigned int str2int(const char *str, int h = 0)
-    {
-        return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
-    }
-
     void EventManager::mouseClicked()
     {
         Config config("config.cfg");
@@ -51,8 +46,11 @@ namespace RType
                     continue;
 
                 switch (clickableType->getClickableType()) {
-                    case ecs::ClickableType::PLAY:
+                    case ecs::ClickableType::MULTIPLAYER:
                         _game->levelContinueMenu();
+                        break;
+                    case ecs::ClickableType::LAUNCH:
+                        _game->connectToGame();
                         break;
                     case ecs::ClickableType::EXIT:
                         _game->getWindow().close();
@@ -64,6 +62,25 @@ namespace RType
                     case ecs::ClickableType::AUTO_FIRE:
                         _game->handleAutoFireButton(
                             currentAutoFireValue ? "false" : "true", entity);
+                        break;
+                    case ecs::ClickableType::BACK:
+                        _game->levelMainMenu();
+                        break;
+                    case ecs::ClickableType::MOVE_UP:
+                        _game->_isSettingsUpButtonClicked = true;
+                        _game->_lastButtonIdClicked = entity.get().getID();
+                        break;
+                    case ecs::ClickableType::MOVE_DOWN:
+                        _game->_isSettingsDownButtonClicked = true;
+                        _game->_lastButtonIdClicked = entity.get().getID();
+                        break;
+                    case ecs::ClickableType::MOVE_LEFT:
+                        _game->_isSettingsLeftButtonClicked = true;
+                        _game->_lastButtonIdClicked = entity.get().getID();
+                        break;
+                    case ecs::ClickableType::MOVE_RIGHT:
+                        _game->_isSettingsRightButtonClicked = true;
+                        _game->_lastButtonIdClicked = entity.get().getID();
                         break;
                     case ecs::ClickableType::INPUT:
                         _game->_isSettingsNicknameButtonClicked = true;

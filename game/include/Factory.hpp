@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include "Entity.hpp"
 #include "Game.hpp"
+#include "components/ClickableComponent.hpp"
 
 namespace RType
 {
@@ -21,7 +22,8 @@ namespace RType
             sf::Color fillColor = sf::Color::White,
             sf::Color outlineColor = sf::Color::Blue,
             const std::string &str = "", unsigned int characterSize = 40,
-            sf::Color textColor = sf::Color::Black);
+            sf::Color textColor = sf::Color::Black,
+            ecs::ClickableType type = ecs::ClickableType::LAUNCH);
         ecs::Entity &buildPlayer(bool isLocalPlayer, size_t id);
         ecs::Entity &buildBackground();
         void buildBulletFromPlayer(size_t playerID);

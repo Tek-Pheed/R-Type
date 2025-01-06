@@ -12,7 +12,8 @@
 namespace ecs
 {
     enum ClickableType {
-        PLAY,
+        MULTIPLAYER,
+        LAUNCH,
         SETTINGS,
         EXIT,
         INPUT,
@@ -20,7 +21,8 @@ namespace ecs
         MOVE_DOWN,
         MOVE_RIGHT,
         MOVE_LEFT,
-        AUTO_FIRE
+        AUTO_FIRE,
+        BACK
     };
 
     class ClickableComponent : public Component {
