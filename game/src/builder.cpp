@@ -21,6 +21,7 @@
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameSystems.hpp"
+#include "components/ClickableComponent.hpp"
 
 std::string getKeyString(sf::Keyboard::Key key)
 {
@@ -91,6 +92,8 @@ ecs::Entity &RType::GameInstance::buildButton(std::string str, int buttonID)
         std::make_shared<ecs::TextComponent<sf::Text>>(text, str));
     button.addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::RenderComponent::ObjectType::BUTTON));
+    button.addComponent(
+        std::make_shared<ecs::ClickableComponent>(ecs::ClickableType::PLAY));
 
     _buttonList.push_back(button);
 
@@ -124,6 +127,8 @@ ecs::Entity &RType::GameInstance::buildInput(std::string str, int buttonID)
         std::make_shared<ecs::TextComponent<sf::Text>>(text, str));
     input.addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::RenderComponent::ObjectType::INPUT));
+    input.addComponent(
+        std::make_shared<ecs::ClickableComponent>(ecs::ClickableType::INPUT));
 
     _inputList.push_back(input);
 
@@ -193,8 +198,8 @@ void RType::GameInstance::levelContinueMenu()
             ecs::RenderComponent::ObjectType::TEXT));
         title.addComponent(
             std::make_shared<ecs::PositionComponent>(posX, posY));
-        title.addComponent(
-            std::make_shared<ecs::TextComponent<sf::Text>>(text, "CONNECTION TO SERVER"));
+        title.addComponent(std::make_shared<ecs::TextComponent<sf::Text>>(
+            text, "CONNECTION TO SERVER"));
 
         buildInput("NICKNAME", 0);
         buildInput("IP ADRESS", -1);

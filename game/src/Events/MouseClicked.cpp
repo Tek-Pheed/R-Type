@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include "Config.hpp"
 #include "Events.hpp"
+#include "components/ClickableComponent.hpp"
 
 namespace RType
 {
@@ -21,6 +22,7 @@ namespace RType
         Config config("config.cfg");
         sf::Vector2f mousePos = _game->getWindow().mapPixelToCoords(
             sf::Mouse::getPosition(_game->getWindow()));
+        bool currentAutoFireValue = config.getAutoFireConfig();
 
         for (auto &entity :
             _game->refEntityManager.getCurrentLevel().getEntities()) {
@@ -42,12 +44,36 @@ namespace RType
             sf::FloatRect currentHover =
                 rectangle->getRectangle().getGlobalBounds();
             if (currentHover.contains(mousePos)) {
-                auto text =
-                    entity.get().getComponent<ecs::TextComponent<sf::Text>>();
-                if (!text)
+                auto clickableType =
+                    entity.get().getComponent<ecs::ClickableComponent>();
+
+                if (!clickableType)
                     continue;
 
-                switch (str2int(text->getStr().c_str())) {
+                switch (clickableType->getClickableType()) {
+                    case ecs::ClickableType::PLAY:
+                        _game->levelContinueMenu();
+                        break;
+                    case ecs::ClickableType::EXIT:
+                        _game->getWindow().close();
+                        _game->refGameEngine.stop();
+                        break;
+                    case ecs::ClickableType::SETTINGS:
+                        _game->levelSettingsMenu();
+                        break;
+                    case ecs::ClickableType::AUTO_FIRE:
+                        _game->handleAutoFireButton(
+                            currentAutoFireValue ? "false" : "true", entity);
+                        break;
+                    case ecs::ClickableType::INPUT:
+                        _game->_isSettingsNicknameButtonClicked = true;
+                        _game->_lastInputIdClicked = entity.get().getID();
+                        _game->_nicknameKeys.clear();
+                        break;
+                    default: break;
+                }
+
+                /*switch (str2int(text->getStr().c_str())) {
                     case str2int("PLAY"):
                         _game->levelContinueMenu();
                         break;
@@ -87,7 +113,7 @@ namespace RType
                                 newAutoFireValue, entity);
                         }
                         break;
-                }
+                }*/
             }
         }
     }
