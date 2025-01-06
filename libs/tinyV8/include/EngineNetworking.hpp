@@ -131,6 +131,8 @@ namespace Engine
          */
         virtual std::string deserializeString(
             std::istream &in, char key, size_t size) = 0;
+
+        virtual char getKey(void) const = 0;
     };
     namespace Feature
     {

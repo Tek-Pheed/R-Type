@@ -50,7 +50,6 @@ std::vector<std::string> PacketHandler::splitPackets(
 {
     std::vector<std::string> out;
     size_t start = 0;
-    char key = 0x1A;
 
     if (bytes.size() > 1) {
         std::string buffer = System::Network::decodeString(bytes);
@@ -58,7 +57,8 @@ std::vector<std::string> PacketHandler::splitPackets(
 
         while (in) {
             try {
-                std::string packet = deserializeString(in, key, buffer.size());
+                std::string packet =
+                    deserializeString(in, getKey(), buffer.size());
                 if (!packet.empty()) {
                     std::cout << "Deserialized: " << packet << std::endl;
                     out.push_back(packet);
@@ -146,4 +146,9 @@ template <> std::string RType::makePacket(int protocolCode)
 
     pack += PACKET_END;
     return (pack);
+}
+
+char PacketHandler::getKey(void) const
+{
+    return 0x1A;
 }

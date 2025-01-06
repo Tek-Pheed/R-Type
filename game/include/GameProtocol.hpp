@@ -75,6 +75,7 @@ namespace RType
             const std::string &str, std::ostream &out, char key) override;
         std::string deserializeString(
             std::istream &in, char key, size_t size) override;
+        char getKey(void) const override;
     };
 
 } // namespace RType

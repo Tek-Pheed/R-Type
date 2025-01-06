@@ -229,7 +229,7 @@ void NetworkingManager::runReadThread()
                                    "on TCP ("
                                 << std::to_string(sock->getUID())
                                 << ") for client (" << std::to_string(id)
-                                << "): " << std::endl;
+                                << ") with len: " << vect.size() << std::endl;
                             _globalMutex.lock();
                             client.readBufferTCP.insert(
                                 client.readBufferTCP.end(), vect.begin(),
@@ -287,7 +287,8 @@ void NetworkingManager::runReadThread()
                                      "on UDP ("
                                   << std::to_string(sock->getUID())
                                   << ") for client (" << std::to_string(id)
-                                  << ")" << std::endl;
+                                  << ") with len: " << vect.size()
+                                  << std::endl;
                         _globalMutex.lock();
                         if (!(client.readBufferUDP.size()
                                 >= UDP_PACKET_MAX_SIZE
