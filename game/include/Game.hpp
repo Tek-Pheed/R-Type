@@ -34,7 +34,7 @@ namespace RType
     class GameInstance {
       public:
         static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
-        static constexpr uint16_t SERVER_REFRESH_RATE = 30U;
+        static constexpr uint16_t SERVER_REFRESH_RATE = 60U;
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";

@@ -81,25 +81,29 @@ void GameInstance::gamePreTick(
 void GameInstance::gameTick(
     Engine::Events::EventType event, Engine::Core &core, std::any arg)
 {
-    // System updates are called automatically by the game engine.
     (void) core;
     (void) event;
     float deltaTime_sec = std::any_cast<float>(arg);
 
-    manageBuffers();
-    if (!_isServer) {
-        playEvent();
-        for (auto &pl : getAllPlayers()) {
-            playerAnimations(pl.get());
-        }
-    } else {
-        static float time = 15.0f;
+    try {
+        manageBuffers();
+        if (!_isServer) {
+            playEvent();
+            for (auto &pl : getAllPlayers()) {
+                playerAnimations(pl.get());
+            }
+        } else {
+            static float time = 15.0f;
 
-        time += deltaTime_sec;
-        if (time >= 30.0f) {
-            _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
-            time = 0.0f;
+            time += deltaTime_sec;
+            if (time >= 30.0f) {
+                _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
+                time = 0.0f;
+            }
         }
+    } catch (const std::exception &e) {
+        std::cout << "An error occured while playing: " << e.what()
+                  << std::endl;
     }
 }
 
@@ -130,8 +134,7 @@ int RType::GameInstance::manageBuffers()
         int code_int = is_code_valid(code);
         std::vector<std::string> tokens;
         if (code_int == -1) {
-            std::cout << "Stop: Invalid packet: " << buffer << std::endl;
-            exit(1);
+            std::cout << "Invalid packet: " << buffer << std::endl;
             return -1;
         }
         std::string str = buffer.substr(4, buffer.size() - 4);
@@ -154,8 +157,7 @@ int RType::GameInstance::manageBuffers()
                 }
                 break;
             default: {
-                std::cout << "Stop: Invalid packet: " << buffer << std::endl;
-                exit(1);
+                std::cout << "Invalid packet: " << buffer << std::endl;
                 break;
             }
         }
