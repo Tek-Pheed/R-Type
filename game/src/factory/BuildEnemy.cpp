@@ -87,6 +87,7 @@ void GameInstance::deleteEnemy(size_t enemyID)
 {
     if (isServer() || _isConnectedToServer) {
         std::unique_lock lock(_serverLock);
+        std::cout << "Deleting enemy" << std::endl;
         auto &ene = getEnemyById(enemyID);
         refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
         if (isServer()) {
