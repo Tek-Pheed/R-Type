@@ -16,20 +16,23 @@
 #include <sstream>
 #include <string>
 #include "Components.hpp"
+#include "Config.hpp"
 #include "Engine.hpp"
+#include "Events.hpp"
+#include "Factory.hpp"
 #include "Game.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
 #include "system_network.hpp"
-#include "Events.hpp"
-#include "Config.hpp"
 
 using namespace RType;
 
 void RType::GameInstance::clientHandlerConnection(
     int code, const std::vector<std::string> &tokens)
 {
+    Factory factory;
+
     switch (code) {
         case Protocol::C_INIT_UDP: {
             if (tokens.size() >= 1) {
@@ -53,7 +56,7 @@ void RType::GameInstance::clientHandlerConnection(
 
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
-                    buildPlayer(true, (size_t) _netClientID);
+                    factory.buildPlayer(true, (size_t) _netClientID);
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }
@@ -101,8 +104,9 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
-    sf::VideoMode videoMode(
-        sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, sf::VideoMode::getDesktopMode().bitsPerPixel);
+    sf::VideoMode videoMode(sf::VideoMode::getDesktopMode().width,
+        sf::VideoMode::getDesktopMode().height,
+        sf::VideoMode::getDesktopMode().bitsPerPixel);
     _window->create(videoMode, "R-Type", sf::Style::Fullscreen);
     _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
@@ -126,9 +130,9 @@ sf::RenderWindow &GameInstance::getWindow()
     return *_window;
 }
 
-constexpr unsigned int str2int(const char* str, int h = 0)
+constexpr unsigned int str2int(const char *str, int h = 0)
 {
-    return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
+    return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
 }
 void GameInstance::playEvent()
 {
@@ -139,7 +143,8 @@ void GameInstance::playEvent()
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
-    if (hasLocalPlayer() && autoFireEnabled && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
+    if (hasLocalPlayer() && autoFireEnabled
+        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
         if (_netClientID >= 0) {
             playerShoot((size_t) _netClientID);
             this->_autoFireClock.restart();
@@ -173,7 +178,8 @@ void GameInstance::playEvent()
             if (hasLocalPlayer()) {
                 auto &player = getLocalPlayer();
                 auto velocity = player.getComponent<ecs::VelocityComponent>();
-                if (!autoFireEnabled && event.key.code == sf::Keyboard::Space) {
+                if (!autoFireEnabled
+                    && event.key.code == sf::Keyboard::Space) {
                     if (_netClientID >= 0)
                         playerShoot((size_t) _netClientID);
                 }
