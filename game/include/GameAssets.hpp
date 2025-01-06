@@ -37,6 +37,7 @@ namespace RType
         constexpr auto BACKGROUND_TEXTURE = "backgroundTexture";
         constexpr auto BULLET_TEXTURE = "bulletTexture";
         constexpr auto BULLET_SOUND = "bulletSound";
+        constexpr auto MENU_SONG = "menuSong";
         constexpr auto R_TYPE_FONT = "rTypeFont";
 
         static const AssetStore assets[] = {
@@ -51,6 +52,7 @@ namespace RType
             {BULLET_TEXTURE, "./assets/sprites/r-typesheet1.gif",
                 typeid(sf::Texture)},
             {BULLET_SOUND, "./assets/sounds/bullet.ogg", typeid(sf::SoundBuffer)},
+            {MENU_SONG, "./assets/sounds/lobbyMusic.ogg", typeid(sf::SoundBuffer)},
             {R_TYPE_FONT, "./assets/font/r-type.ttf", typeid(sf::Font)}};
 
         template <typename Type>

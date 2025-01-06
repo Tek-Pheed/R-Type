@@ -67,7 +67,7 @@ namespace RType
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
-        void handleNicknameButton(const std::vector<sf::Keyboard::Key> &keys);
+        void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         // Player functions and utilities
         ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);

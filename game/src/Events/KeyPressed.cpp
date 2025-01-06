@@ -20,7 +20,7 @@ namespace RType
 
         bool autoFireEnabled = config.getAutoFireConfig();
         sf::Keyboard::Key keyPressed = sf::Keyboard::Unknown;
-        const size_t maxNicknameLength = 8;
+        const size_t maxInputLenght = 16;
 
         std::string moveUpKeyString = config.getKeyFromConfig("MOVE_UP");
         std::string moveRightKeyString = config.getKeyFromConfig("MOVE_RIGHT");
@@ -54,18 +54,21 @@ namespace RType
         } else if (_game->_isSettingsNicknameButtonClicked) {
             keyPressed = event.key.code;
             if (keyPressed == sf::Keyboard::Enter) {
-                _game->handleNicknameButton(_game->_nicknameKeys);
+                _game->handleInputButtons(_game->_nicknameKeys);
                 _game->_nicknameKeys.clear();
                 _game->_isSettingsNicknameButtonClicked = false;
             } else if (keyPressed == sf::Keyboard::Backspace
                 && !_game->_nicknameKeys.empty()) {
                 _game->_nicknameKeys.pop_back();
-                _game->handleNicknameButton(_game->_nicknameKeys);
-            } else if (keyPressed >= sf::Keyboard::A
-                && keyPressed <= sf::Keyboard::Z) {
-                if (_game->_nicknameKeys.size() < maxNicknameLength) {
+                _game->handleInputButtons(_game->_nicknameKeys);
+            } else if ((keyPressed >= sf::Keyboard::A
+                && keyPressed <= sf::Keyboard::Z) || (keyPressed >= sf::Keyboard::Num0
+                && keyPressed <= sf::Keyboard::Num9) || (keyPressed >= sf::Keyboard::Numpad0
+                && keyPressed <= sf::Keyboard::Numpad9)
+                || keyPressed == sf::Keyboard::Period) {
+                if (_game->_nicknameKeys.size() < maxInputLenght) {
                     _game->_nicknameKeys.push_back(keyPressed);
-                    _game->handleNicknameButton(_game->_nicknameKeys);
+                    _game->handleInputButtons(_game->_nicknameKeys);
                 }
             }
         }
@@ -83,9 +86,9 @@ namespace RType
             }
 
             if (!autoFireEnabled && event.key.code == sf::Keyboard::Space) {
-                if (_game->getNetClientID() >= 0)
-                    factory.buildBulletFromPlayer(
-                        (size_t) _game->getNetClientID());
+                if (_game->getNetClientID() >= 0) {
+                    factory.buildBulletFromPlayer((size_t) _game->getNetClientID());
+                }
             }
         }
     }

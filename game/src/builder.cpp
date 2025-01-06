@@ -33,7 +33,7 @@ std::string getKeyString(sf::Keyboard::Key key)
         {sf::Keyboard::BackSpace, "BackSpace"},
         {sf::Keyboard::Delete, "Delete"}, {sf::Keyboard::Home, "Home"},
         {sf::Keyboard::End, "End"}, {sf::Keyboard::PageUp, "PageUp"},
-        {sf::Keyboard::PageDown, "PageDown"}};
+        {sf::Keyboard::PageDown, "PageDown"}, {sf::Keyboard::Period, "."}};
 
     auto it = specialKeys.find(key);
 
@@ -46,6 +46,9 @@ std::string getKeyString(sf::Keyboard::Key key)
     }
     if (key >= sf::Keyboard::Num0 && key <= sf::Keyboard::Num9) {
         return std::to_string(key - sf::Keyboard::Num0);
+    }
+    if (key >= sf::Keyboard::Numpad0 && key <= sf::Keyboard::Numpad9) {
+        return std::to_string(key - sf::Keyboard::Numpad0);
     }
     if (key >= sf::Keyboard::F1 && key <= sf::Keyboard::F15) {
         return std::to_string(1 + (key - sf::Keyboard::F1));
@@ -146,6 +149,11 @@ void RType::GameInstance::levelMainMenu()
 
     if (!isServer()) {
         auto &title = refEntityManager.getCurrentLevel().createEntity();
+        auto &musicSong = factory._game->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
+        static sf::Sound music;
+        music.setBuffer(musicSong);
+        music.setVolume(25.0f);
+        music.play();
 
         sf::Text text;
         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
@@ -211,7 +219,7 @@ void RType::GameInstance::levelContinueMenu()
         float windowWidth = (float) this->_window->getSize().x;
 
         float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 4;
+        float posY = (float) this->_window->getSize().y / 5;
 
         title.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));
@@ -285,7 +293,7 @@ void RType::GameInstance::levelSettingsMenu()
 
         size_t equalPosUp = moveUpAction.find("=");
         if (equalPosUp != std::string::npos) {
-            std::string beforeUpEqual = "Move up";
+            std::string beforeUpEqual = "MOVE UP";
             std::string afterUpEqual = moveUpAction.substr(equalPosUp + 1);
             size_t firstdoublepoint = afterUpEqual.find("::");
             std::string afterfirstdoublepoint =
@@ -298,7 +306,7 @@ void RType::GameInstance::levelSettingsMenu()
 
         size_t equalPosRight = moveRightAction.find("=");
         if (equalPosRight != std::string::npos) {
-            std::string beforeRightEqual = "Move right";
+            std::string beforeRightEqual = "MOVE RIGHT";
             std::string afterRightEqual =
                 moveRightAction.substr(equalPosRight + 1);
             size_t firstdoublepoint = afterRightEqual.find("::");
@@ -312,7 +320,7 @@ void RType::GameInstance::levelSettingsMenu()
 
         size_t equalPosLeft = moveLeftAction.find("=");
         if (equalPosLeft != std::string::npos) {
-            std::string beforeLeftEqual = "Move left";
+            std::string beforeLeftEqual = "MOVE LEFT";
             std::string afterLeftEqual =
                 moveLeftAction.substr(equalPosLeft + 1);
             size_t firstdoublepoint = afterLeftEqual.find("::");
@@ -326,7 +334,7 @@ void RType::GameInstance::levelSettingsMenu()
 
         size_t equalPosDown = moveDownAction.find("=");
         if (equalPosDown != std::string::npos) {
-            std::string beforeDownEqual = "Move down";
+            std::string beforeDownEqual = "MOVE DOWN";
             std::string afterDownEqual =
                 moveDownAction.substr(equalPosDown + 1);
             size_t firstdoublepoint = afterDownEqual.find("::");
@@ -340,11 +348,11 @@ void RType::GameInstance::levelSettingsMenu()
 
         size_t equalPosAutoFire = autoFireAction.find("=");
         if (equalPosAutoFire != std::string::npos) {
-            std::string beforeAutoFireEqual = "Auto fire";
+            std::string beforeAutoFireEqual = "AUTO FIRE";
             std::string afterAutoFireEqual =
                 autoFireAction.substr(equalPosAutoFire + 1);
             endAutoFire = beforeAutoFireEqual + " : "
-                + (afterAutoFireEqual == "true" ? "Yes" : "No");
+                + (afterAutoFireEqual == "true" ? "YES" : "NO");
         }
 
         factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
@@ -403,19 +411,18 @@ void RType::GameInstance::handleAutoFireButton(
     text->setStr("AUTO FIRE : " + value);
 }
 
-void RType::GameInstance::handleNicknameButton(
+void RType::GameInstance::handleInputButtons(
     const std::vector<sf::Keyboard::Key> &keys)
 {
     std::string nickname;
-    const size_t maxNicknameLength = 8;
+    const size_t maxInputLenght = 16;
 
     for (auto key : keys) {
         std::string keyStr = getKeyString(key);
         if (key == sf::Keyboard::BackSpace && !nickname.empty()) {
             nickname.pop_back();
-        } else if (key != sf::Keyboard::BackSpace && keyStr.size() == 1
-            && std::isalpha(keyStr[0])) {
-            if (nickname.size() < maxNicknameLength) {
+        } else if (key != sf::Keyboard::BackSpace && keyStr.size() == 1) {
+            if (nickname.size() < maxInputLenght) {
                 nickname += keyStr;
             }
         }

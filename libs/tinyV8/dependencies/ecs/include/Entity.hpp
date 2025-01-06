@@ -20,6 +20,8 @@ namespace ecs
         explicit Entity(std::size_t id);
         ~Entity();
 
+        std::size_t getId() const;
+
         template <typename componentType>
         void addComponent(std::shared_ptr<componentType> component)
         {

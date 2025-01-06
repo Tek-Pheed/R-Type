@@ -28,7 +28,6 @@ namespace RType
         ecs::Entity &buildBackground();
         void buildBulletFromPlayer(size_t playerID);
 
-      private:
         GameInstance *_game;
     };
 } // namespace RType

@@ -87,11 +87,11 @@ void RType::GameInstance::connectToGame()
                 continue;
 
             switch (count) {
-                case 1: _ip = text->getStr(); break;
-                case 2:
+                case 2: _ip = text->getStr(); break;
+                case 3:
                     _tcpPort = (uint16_t) std::atoi(text->getStr().c_str());
                     break;
-                case 3:
+                case 4:
                     _udpPort = (uint16_t) std::atoi(text->getStr().c_str());
                     break;
                 default: break;
