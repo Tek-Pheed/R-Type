@@ -54,11 +54,10 @@ std::string getKeyString(sf::Keyboard::Key key)
 
 void RType::GameInstance::createPersistentLevel()
 {
-    Factory factory(this);
     auto &level = refEntityManager.getPersistentLevel();
 
     if (!isServer())
-        factory.buildBackground();
+        _factory.buildBackground();
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);

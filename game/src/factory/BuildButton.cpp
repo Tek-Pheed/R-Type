@@ -15,7 +15,7 @@ namespace RType
         unsigned int characterSize, sf::Color textColor)
     {
         auto &button =
-            _game->refEntityManager.getCurrentLevel().createEntity();
+            _game.refEntityManager.getCurrentLevel().createEntity();
 
         sf::RectangleShape rect;
         rect.setFillColor(fillColor);
@@ -25,7 +25,7 @@ namespace RType
 
         sf::Text text;
         text.setFont(
-            _game->refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
+            _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
         text.setCharacterSize(characterSize);
         text.setFillColor(textColor);
         text.setString(str);

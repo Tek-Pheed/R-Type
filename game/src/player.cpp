@@ -36,10 +36,10 @@ void GameInstance::handleNetworkPlayers(
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::shared_ptr<ecs::PositionComponent> pos;
                 if (isServer()) {
-                    auto &pl = buildPlayer(true, id);
+                    auto &pl = _factory.buildPlayer(true, id);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 } else {
-                    auto &pl = buildPlayer(false, id);
+                    auto &pl = _factory.buildPlayer(false, id);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 }
                 updatePlayerPosition(id, (float) std::atof(tokens[1].c_str()),

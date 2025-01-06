@@ -12,15 +12,15 @@ namespace RType
 {
     ecs::Entity &Factory::buildBackground()
     {
-        auto &bg = _game->refEntityManager.getPersistentLevel().createEntity();
-        auto &texture = _game->refAssetManager.getAsset<sf::Texture>(
+        auto &bg = _game.refEntityManager.getPersistentLevel().createEntity();
+        auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
             Asset::BACKGROUND_TEXTURE);
         sf::Sprite sprite;
 
         texture.setRepeated(true);
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
-        sprite.setTexture(_game->refAssetManager.getAsset<sf::Texture>(
+        sprite.setTexture(_game.refAssetManager.getAsset<sf::Texture>(
             Asset::BACKGROUND_TEXTURE));
         bg.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));

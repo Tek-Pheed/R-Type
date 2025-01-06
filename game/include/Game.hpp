@@ -23,9 +23,12 @@
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
 #include "GameSystems.hpp"
+#include "Factory.hpp"
 
 namespace RType
 {
+
+    class Factory;
 
     class GameInstance {
       public:
@@ -66,7 +69,6 @@ namespace RType
             std::string newAutoFireValue, ecs::Entity &entity);
 
         // Player functions and utilities
-        ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
         bool hasLocalPlayer(void) const;
         ecs::Entity &getLocalPlayer();
@@ -155,6 +157,8 @@ namespace RType
         uint16_t _udpPort = DEFAULT_UDP_PORT;
         uint16_t _tcpPort = DEFAULT_TCP_PORT;
         std::string _ip = DEFAULT_IP;
+
+        Factory _factory;
 
         std::unique_ptr<sf::RenderWindow> _window;
 

@@ -31,8 +31,6 @@ using namespace RType;
 void RType::GameInstance::clientHandlerConnection(
     int code, const std::vector<std::string> &tokens)
 {
-    Factory factory;
-
     switch (code) {
         case Protocol::C_INIT_UDP: {
             if (tokens.size() >= 1) {
@@ -56,7 +54,7 @@ void RType::GameInstance::clientHandlerConnection(
 
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
-                    factory.buildPlayer(true, (size_t) _netClientID);
+                    _factory.buildPlayer(true, (size_t) _netClientID);
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }

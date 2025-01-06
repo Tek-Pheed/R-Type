@@ -9,13 +9,14 @@
 
 #include <SFML/Graphics.hpp>
 #include "Entity.hpp"
-#include "Game.hpp"
 
 namespace RType
 {
+
+    class GameInstance;
     class Factory {
       public:
-        explicit Factory(GameInstance *game);
+        explicit Factory(GameInstance &game);
 
         ecs::Entity &buildButton(sf::Vector2f position, sf::Vector2f size,
             sf::Color fillColor = sf::Color::White,
@@ -24,9 +25,11 @@ namespace RType
             sf::Color textColor = sf::Color::Black);
         ecs::Entity &buildPlayer(bool isLocalPlayer, size_t id);
         ecs::Entity &buildBackground();
+        ecs::Entity &buildEnemy(
+            size_t id, float posX, float posY, float health);
 
       private:
-        GameInstance *_game;
+        GameInstance &_game;
     };
 } // namespace RType
 

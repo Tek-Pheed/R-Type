@@ -9,7 +9,7 @@
     #define NOMINMAX
 #endif
 
-#include "SFML/Graphics/Font.hpp"
+#include "Game.hpp"
 #include <any>
 #include <exception>
 #include <iostream>
@@ -21,11 +21,12 @@
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
-#include "Game.hpp"
+#include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
+#include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Texture.hpp"
 
 using namespace RType;
@@ -154,7 +155,8 @@ GameInstance::GameInstance(Engine::Core &engineRef)
           engineRef.getFeature<Engine::Feature::LevelManager<GameInstance>>()),
       refAssetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
       refNetworkManager(
-          engineRef.getFeature<Engine::Feature::NetworkingManager>())
+          engineRef.getFeature<Engine::Feature::NetworkingManager>()),
+      _factory(Factory(*this))
 {
 }
 
