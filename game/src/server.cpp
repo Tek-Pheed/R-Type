@@ -104,3 +104,8 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
     refEntityManager.switchLevel("mainLevel");
 }
+
+bool GameInstance::isConnectedToServer()
+{
+    return this->_isConnectedToServer;
+}

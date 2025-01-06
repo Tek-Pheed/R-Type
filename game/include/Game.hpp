@@ -50,12 +50,20 @@ namespace RType
         sf::RenderWindow &getWindow();
         void playEvent();
 
+        // Server state
+        bool isConnectedToServer();
+
         // Texture Utilities
         void loadAssets();
 
         ecs::Entity &buildBackground(void);
+        ecs::Entity &buildButton(std::string text, int buttonNb);
         void levelMainMenu(void);
         void createPersistentLevel(void);
+        void levelSettingsMenu(void);
+        void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
+        void handleAutoFireButton(
+            std::string newAutoFireValue, ecs::Entity &entity);
 
         // Player functions and utilities
         ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0);
@@ -68,11 +76,13 @@ namespace RType
         void deletePlayer(size_t playerID);
         void playerAnimations(ecs::Entity &player);
         void playerShoot(size_t playerID);
+        void setPlayerEntityID(int id);
 
         std::vector<ecs::Entity> &getEntities();
 
         // Enemies
-        ecs::Entity &buildEnemy(size_t id, float posX, float posY, float health);
+        ecs::Entity &buildEnemy(
+            size_t id, float posX, float posY, float health);
 
         // Networking
         int is_code_valid(int code);
@@ -132,6 +142,11 @@ namespace RType
         //     void enemyShoot(std::vector<std::string> &tokens);
         //     void enemyDamage(std::vector<std::string> &tokens);
 
+        bool _isSettingsUpButtonClicked = false;
+        bool _isSettingsRightButtonClicked = false;
+        bool _isSettingsLeftButtonClicked = false;
+        bool _isSettingsDownButtonClicked = false;
+
       private:
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
@@ -142,6 +157,8 @@ namespace RType
         std::string _ip = DEFAULT_IP;
 
         std::unique_ptr<sf::RenderWindow> _window;
+
+        sf::Clock _autoFireClock;
     };
 }; // namespace RType
 

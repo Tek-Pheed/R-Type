@@ -17,6 +17,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 #include "Engine.hpp"
 #include "system_network.hpp"

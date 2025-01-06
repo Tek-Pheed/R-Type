@@ -37,11 +37,11 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
     sprite->getSprite().setPosition(position->getX(), position->getY());
+    text->getText().setString(text->getStr());
     text->getText().setPosition(position->getX()
             + (float) sprite->getSprite().getTextureRect().width
                 * sprite->getSprite().getScale().x / 2
-            - (float) text->getStr().length()
-                * (float) text->getText().getCharacterSize() / 2,
+            - (float) text->getText().getLocalBounds().width / 2,
         position->getY() - 15);
     window.draw(sprite->getSprite());
     window.draw(text->getText());
@@ -54,7 +54,6 @@ void renderRectangle(ecs::Entity &entity, sf::RenderWindow &window)
     auto position = entity.getComponent<ecs::PositionComponent>();
 
     rectangle->getRectangle().setPosition(position->getX(), position->getY());
-    rectangle->getRectangle().setFillColor(sf::Color::Red);
     rectangle->getRectangle().setSize(sf::Vector2f(
         (float) rectangle->getSizeX(), (float) rectangle->getSizeY()));
     window.draw(rectangle->getRectangle());
@@ -77,6 +76,46 @@ void renderText(ecs::Entity &entity, sf::RenderWindow &window)
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
     text->getText().setPosition(position->getX(), position->getY());
+    text->getText().setString(text->getStr());
+    window.draw(text->getText());
+}
+
+void renderButton(ecs::Entity &entity, sf::RenderWindow &window)
+{
+    auto rectangle =
+        entity.getComponent<ecs::RectangleComponent<sf::RectangleShape>>();
+    auto position = entity.getComponent<ecs::PositionComponent>();
+    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+    rectangle->getRectangle().setPosition(position->getX(), position->getY());
+    rectangle->getRectangle().setSize(sf::Vector2f(
+        (float) rectangle->getSizeX(), (float) rectangle->getSizeY()));
+    text->getText().setString(text->getStr());
+    text->getText().setPosition(position->getX()
+            + (float) rectangle->getSizeX() / 2
+            - (float) text->getStr().length()
+            - (float) text->getText().getLocalBounds().width / 2,
+        position->getY() + (float) rectangle->getSizeY() / 2 - (float)text->getText().getCharacterSize() / 2);
+    window.draw(rectangle->getRectangle());
+    window.draw(text->getText());
+}
+
+void renderInput(ecs::Entity &entity, sf::RenderWindow &window)
+{
+    auto rectangle =
+        entity.getComponent<ecs::RectangleComponent<sf::RectangleShape>>();
+    auto position = entity.getComponent<ecs::PositionComponent>();
+    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+    rectangle->getRectangle().setPosition(position->getX(), position->getY());
+    rectangle->getRectangle().setSize(sf::Vector2f(
+        (float) rectangle->getSizeX(), (float) rectangle->getSizeY()));
+    text->getText().setString(text->getStr());
+    text->getText().setPosition(position->getX()
+            + (float) rectangle->getSizeX() / 2
+            - (float) text->getText().getLocalBounds().width / 2,
+        position->getY() + (float) rectangle->getSizeY() / 2 - (float)text->getText().getCharacterSize() / 2);
+    window.draw(rectangle->getRectangle());
     window.draw(text->getText());
 }
 
@@ -102,6 +141,12 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 break;
             case ecs::RenderComponent::ObjectType::TEXT:
                 renderText(entity, _game->getWindow());
+                break;
+            case ecs::RenderComponent::ObjectType::BUTTON:
+                renderButton(entity, _game->getWindow());
+                break;
+            case ecs::RenderComponent::ObjectType::INPUT:
+                renderInput(entity, _game->getWindow());
                 break;
             default: break;
         }

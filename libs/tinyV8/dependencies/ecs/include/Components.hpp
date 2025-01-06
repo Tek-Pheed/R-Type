@@ -7,7 +7,6 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
-#include <SFML/Graphics.hpp>
 #include <string>
 
 namespace ecs
@@ -93,7 +92,15 @@ namespace ecs
 
     class RenderComponent : public Component {
       public:
-        enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT, SPRITEANDTEXT };
+        enum ObjectType {
+            CIRCLE,
+            RECTANGLE,
+            SPRITE,
+            TEXT,
+            SPRITEANDTEXT,
+            BUTTON,
+            INPUT
+        };
         explicit RenderComponent(ObjectType type);
 
         ObjectType getObjectType() const;
