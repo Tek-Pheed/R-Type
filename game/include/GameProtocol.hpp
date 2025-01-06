@@ -70,10 +70,11 @@ namespace RType
             size_t &resultIndexEnd) override;
         ssize_t identifyClient(
             const System::Network::byteArray &bytes) override;
+        void obfuscateData(char *data, size_t size, char key);
         void serializeString(
-            const std::string &str, std::ostream &out) override;
-        void deserializeString(
-            const std::ostream &in, std::string &out) override;
+            const std::string &str, std::ostream &out, char key) override;
+        std::string deserializeString(
+            std::istream &in, char key, size_t size) override;
     };
 
 } // namespace RType

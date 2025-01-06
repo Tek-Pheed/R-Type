@@ -208,7 +208,8 @@ void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
 {
     _writeMutex.lock();
     std::ostringstream out;
-    _pacMan->serializeString(data, out);
+    char key = 0x1A;
+    _pacMan->serializeString(data, out, key);
     std::string serializedData = out.str();
     auto encoded = System::Network::encodeString(serializedData);
 

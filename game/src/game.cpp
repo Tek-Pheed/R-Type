@@ -9,7 +9,7 @@
     #define NOMINMAX
 #endif
 
-#include "SFML/Graphics/Font.hpp"
+#include "Game.hpp"
 #include <any>
 #include <exception>
 #include <iostream>
@@ -21,11 +21,11 @@
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
-#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
+#include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Texture.hpp"
 
 using namespace RType;
@@ -43,7 +43,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-        i++) {
+         i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -144,6 +144,7 @@ int RType::GameInstance::manageBuffers()
                 break;
             default: break;
         }
+        ss.clear();
     }
     return 0;
 }
