@@ -107,7 +107,7 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-            .findEntitiesByComponent<ecs::PlayerComponent>());
+                .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
@@ -214,9 +214,16 @@ void GameInstance::playerShoot(size_t playerID)
 
 void GameInstance::playerAnimations(ecs::Entity &player)
 {
+    static std::unordered_map<size_t, sf::Clock> animationTimers;
     std::string direction = "";
     auto position = player.getComponent<ecs::PositionComponent>();
     auto renderComp = player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
+    size_t playerID =
+        player.getComponent<ecs::PlayerComponent>()->getPlayerID();
+
+    if (animationTimers[playerID].getElapsedTime().asMilliseconds() < 200) {
+        return;
+    }
 
     if (position->getY() < position->getOldY()) {
         direction = "top";
@@ -230,6 +237,8 @@ void GameInstance::playerAnimations(ecs::Entity &player)
     } else {
         renderComp->getSprite().setTextureRect(sf::Rect(66, 0, 33, 14));
     }
+
+    animationTimers[playerID].restart();
 }
 
 void GameInstance::setPlayerEntityID(int id)
