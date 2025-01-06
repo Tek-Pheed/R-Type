@@ -53,7 +53,6 @@ namespace RType
                         break;
                     case ecs::ClickableType::LAUNCH:
                         _game->_buttonList.clear();
-                        _game->_inputList.clear();
                         _game->connectToGame();
                         break;
                     case ecs::ClickableType::EXIT:

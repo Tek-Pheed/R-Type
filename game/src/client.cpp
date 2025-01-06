@@ -74,6 +74,30 @@ void RType::GameInstance::connectToGame()
         return;
     auto currentLevel = refEntityManager.getCurrentLevelName();
     try {
+        size_t count = 0;
+
+        for (auto &entity : _inputList) {
+            count++;
+            auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+            if (!text)
+                continue;
+
+            if (text->getStr().empty())
+                continue;
+
+            switch (count) {
+                case 1: _ip = text->getStr(); break;
+                case 2:
+                    _tcpPort = (uint16_t) std::atoi(text->getStr().c_str());
+                    break;
+                case 3:
+                    _udpPort = (uint16_t) std::atoi(text->getStr().c_str());
+                    break;
+                default: break;
+            }
+        }
+
         refNetworkManager.setupClient<RType::PacketHandler>(
             _tcpPort, _udpPort, _ip);
 
