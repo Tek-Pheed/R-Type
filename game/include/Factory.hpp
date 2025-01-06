@@ -4,6 +4,7 @@
 ** File description:
 ** Factory.hpp
 */
+
 #ifndef R_TYPE_FACTORY_HPP
 #define R_TYPE_FACTORY_HPP
 

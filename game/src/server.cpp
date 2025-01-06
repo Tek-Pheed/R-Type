@@ -56,6 +56,37 @@ void GameInstance::serverEventClosedConn(
 //     manageBuffers();
 // }
 
+void RType::GameInstance::serverSendGameState(size_t clientID)
+{
+    for (auto &p : getAllPlayers()) {
+        auto pos = p.get().getComponent<ecs::PositionComponent>();
+        auto pl = p.get().getComponent<ecs::PlayerComponent>();
+        if (!pl || !pos) {
+            std::cout << "Failed to get player" << std::endl;
+            continue;
+        }
+        std::stringstream sss;
+        sss << P_CONN << " " << pl->getPlayerID() << " " << pos->getX() << " "
+            << pos->getY() << PACKET_END;
+        refNetworkManager.sendToOne(
+            clientID, System::Network::ISocket::Type::TCP, sss.str());
+    }
+    for (auto &e : refEntityManager.getCurrentLevel()
+             .findEntitiesByComponent<ecs::EnemyComponent>()) {
+        auto pos = e.get().getComponent<ecs::PositionComponent>();
+        auto ec = e.get().getComponent<ecs::EnemyComponent>();
+        if (!ec || !pos) {
+            std::cout << "Failed to get player" << std::endl;
+            continue;
+        }
+        std::stringstream sss;
+        sss << E_SPAWN << " " << ec->getEnemyID() << " " << pos->getX() << " "
+            << pos->getY() << PACKET_END;
+        refNetworkManager.sendToOne(
+            clientID, System::Network::ISocket::Type::TCP, sss.str());
+    }
+}
+
 void RType::GameInstance::serverHanlderValidateConnection(
     int code, const std::vector<std::string> &tokens)
 {
@@ -67,19 +98,7 @@ void RType::GameInstance::serverHanlderValidateConnection(
             ss << C_AUTH << " OK" << PACKET_END;
             refNetworkManager.sendToOne((size_t) netClientID,
                 System::Network::ISocket::Type::TCP, ss.str());
-            for (auto &p : getAllPlayers()) {
-                auto pos = p.get().getComponent<ecs::PositionComponent>();
-                auto pl = p.get().getComponent<ecs::PlayerComponent>();
-                if (!pl || !pos) {
-                    std::cout << "can't get player" << std::endl;
-                    continue;
-                }
-                std::stringstream sss;
-                sss << P_CONN << " " << pl->getPlayerID() << " " << pos->getX()
-                    << " " << pos->getY() << PACKET_END;
-                refNetworkManager.sendToOne((size_t) netClientID,
-                    System::Network::ISocket::Type::TCP, sss.str());
-            }
+            serverSendGameState((size_t) netClientID);
         } else {
             std::cout << "Could not read client ID" << std::endl;
         }
