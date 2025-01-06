@@ -26,54 +26,6 @@ using namespace RType;
 
 // If isLocalPlayer is set to false, then this function should only be
 // triggered by a request from the server
-ecs::Entity &RType::GameInstance::buildPlayer(bool isLocalPlayer, size_t id)
-{
-    std::cout << "Adding new player to the game" << std::endl;
-    auto &player = refEntityManager.getCurrentLevel().createEntity();
-    player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
-    player.addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
-    player.addComponent(std::make_shared<ecs::HealthComponent>(100));
-    player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
-    if (!_isServer) {
-        auto &texture =
-            refAssetManager.getAsset<sf::Texture>(Asset::PLAYER_TEXTURE);
-        auto &font = refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
-
-        sf::Sprite sprite;
-        sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
-        sprite.setScale(sf::Vector2f(3, 3));
-        player.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
-        player.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
-
-        sf::Text text;
-        text.setFont(font);
-        text.setCharacterSize(20);
-        player.addComponent(
-            std::make_shared<ecs::TextComponent<sf::Text>>(text, "Samy"));
-    }
-    if (isLocalPlayer) {
-        _playerEntityID = (int) player.getID();
-    }
-    if ((isLocalPlayer && _isConnectedToServer) || _isServer) {
-        auto pos = player.getComponent<ecs::PositionComponent>();
-        if (pos) {
-            std::stringstream sss;
-            sss << P_CONN << " " << id << " " << pos->getX() << " "
-                << pos->getY() << PACKET_END;
-            if (!isServer()) {
-                refNetworkManager.sendToAll(
-                    System::Network::ISocket::Type::TCP, sss.str());
-            } else {
-                refNetworkManager.sendToOthers(
-                    id, System::Network::ISocket::Type::TCP, sss.str());
-            }
-        }
-    }
-    return (player);
-}
 
 void GameInstance::handleNetworkPlayers(
     int code, const std::vector<std::string> &tokens)
@@ -280,4 +232,9 @@ void GameInstance::playerAnimations(ecs::Entity &player)
     } else {
         renderComp->getSprite().setTextureRect(sf::Rect(66, 0, 33, 14));
     }
+}
+
+void GameInstance::setPlayerEntityID(int id)
+{
+    this->_playerEntityID = id;
 }
