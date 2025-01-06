@@ -32,6 +32,7 @@ namespace RType
 
         constexpr auto PLAYER_TEXTURE = "playerTexture";
         constexpr auto ENEMY_TEXTURE = "enemyTexture";
+        constexpr auto BOSS_TEXTURE = "bossTexture";
         constexpr auto BACKGROUND_TEXTURE = "backgroundTexture";
         constexpr auto BULLET_TEXTURE = "bulletTexture";
         constexpr auto R_TYPE_FONT = "rTypeFont";
@@ -40,6 +41,8 @@ namespace RType
             {PLAYER_TEXTURE, "assets/sprites/r-typesheet42.gif",
                 typeid(sf::Texture)},
             {ENEMY_TEXTURE, "assets/sprites/r-typesheet31.gif",
+                typeid(sf::Texture)},
+            {BOSS_TEXTURE, "assets/sprites/r-typesheet30.gif",
                 typeid(sf::Texture)},
             {BACKGROUND_TEXTURE, "assets/background/background.png",
                 typeid(sf::Texture)},

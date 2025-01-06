@@ -80,6 +80,9 @@ namespace RType
         // Enemies
         ecs::Entity &buildEnemy(size_t id, float posX, float posY, float health);
 
+        //Boss
+        ecs::Entity &buildBoss(size_t id, float posX, float posY, float health);
+
         // Networking
         int is_code_valid(int code);
         int manageBuffers();

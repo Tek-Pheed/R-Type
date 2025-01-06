@@ -76,7 +76,13 @@ namespace ecs
 
     class BossComponent : public Component {
       public:
-        explicit BossComponent();
+        explicit BossComponent(size_t bossID);
+
+        size_t getBossID() const;
+        void setBossID(size_t bossID);
+
+      private:
+        size_t _bossID;
     };
 
     class EnemyComponent : public Component {
@@ -87,7 +93,7 @@ namespace ecs
         void setEnemyID(size_t enemyID);
 
       private:
-        size_t _enemyID;
+        size_t _bossID;
     };
 
     class RenderComponent : public Component {

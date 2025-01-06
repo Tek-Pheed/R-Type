@@ -46,6 +46,13 @@ namespace RType
         M_WIN = 133,
         M_LOSE = 134,
         M_GOVER = 135,
+
+        // Boss
+        B_SPAWN = 141,
+        B_POS = 142,
+        B_DEAD = 143,
+        B_SHOOT = 144,
+        B_DMG = 145,
     };
 
     template <typename... Args>
