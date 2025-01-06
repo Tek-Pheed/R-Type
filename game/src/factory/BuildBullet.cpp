@@ -5,6 +5,7 @@
 ** BuildBullet.cpp
 */
 
+#include <sstream>
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
@@ -41,6 +42,13 @@ namespace RType
             bullet.addComponent(
                 std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
                     s, 132, 33));
+            auto &bulletSound =
+                _game->refAssetManager.getAsset<sf::SoundBuffer>(
+                    Asset::BULLET_SOUND);
+            static sf::Sound sound;
+            sound.setBuffer(bulletSound);
+            sound.setVolume(25.0f);
+            sound.play();
             if (playerID == (size_t) _game->getNetClientID())
                 _game->refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::UDP, ss.str());

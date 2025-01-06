@@ -31,7 +31,7 @@ using namespace RType;
 void RType::GameInstance::clientHandlerConnection(
     int code, const std::vector<std::string> &tokens)
 {
-    Factory factory;
+    Factory factory(this);
 
     switch (code) {
         case Protocol::C_INIT_UDP: {
@@ -130,23 +130,20 @@ sf::RenderWindow &GameInstance::getWindow()
     return *_window;
 }
 
-constexpr unsigned int str2int(const char *str, int h = 0)
-{
-    return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
-}
 void GameInstance::playEvent()
 {
     sf::Event event;
     std::stringstream ss;
     Config config("config.cfg");
     EventManager event_manager(this);
+    Factory factory(this);
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
     if (hasLocalPlayer() && autoFireEnabled
         && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
         if (_netClientID >= 0) {
-            playerShoot((size_t) _netClientID);
+            factory.buildBulletFromPlayer((size_t) _netClientID);
             this->_autoFireClock.restart();
         }
     }

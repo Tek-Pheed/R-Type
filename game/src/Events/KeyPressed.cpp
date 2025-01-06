@@ -51,21 +51,19 @@ namespace RType
             keyPressed = event.key.code;
             _game->handleConfigButtons(keyPressed, -3);
             _game->_isSettingsDownButtonClicked = false;
-        }
-
         } else if (_game->_isSettingsNicknameButtonClicked) {
             keyPressed = event.key.code;
             if (keyPressed == sf::Keyboard::Enter) {
                 _game->handleNicknameButton(_game->_nicknameKeys);
                 _game->_nicknameKeys.clear();
                 _game->_isSettingsNicknameButtonClicked = false;
-            }
-            else if (keyPressed == sf::Keyboard::Backspace && !_game->_nicknameKeys.empty()) {
+            } else if (keyPressed == sf::Keyboard::Backspace
+                && !_game->_nicknameKeys.empty()) {
                 _game->_nicknameKeys.pop_back();
                 _game->handleNicknameButton(_game->_nicknameKeys);
-            }
-            else if (keyPressed >= sf::Keyboard::A && keyPressed <= sf::Keyboard::Z) {
-                if (_game->_nicknameKeys.size() < maxNicknameLength) { 
+            } else if (keyPressed >= sf::Keyboard::A
+                && keyPressed <= sf::Keyboard::Z) {
+                if (_game->_nicknameKeys.size() < maxNicknameLength) {
                     _game->_nicknameKeys.push_back(keyPressed);
                     _game->handleNicknameButton(_game->_nicknameKeys);
                 }
