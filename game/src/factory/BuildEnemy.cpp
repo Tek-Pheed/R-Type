@@ -85,7 +85,7 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 
 void GameInstance::deleteEnemy(size_t enemyID)
 {
-    if (isServer() || _isConnectedToServer) {
+    //if (isServer()) {
         std::unique_lock lock(_serverLock);
         std::cout << "Deleting enemy" << std::endl;
         auto &ene = getEnemyById(enemyID);
@@ -96,7 +96,7 @@ void GameInstance::deleteEnemy(size_t enemyID)
             refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, ss.str());
         }
-    }
+    //}
 }
 
 void GameInstance::handleNetworkEnemies(
