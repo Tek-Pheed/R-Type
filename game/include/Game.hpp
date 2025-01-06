@@ -16,14 +16,15 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <vector>
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
-#include "GameSystems.hpp"
 #include "Factory.hpp"
+#include "GameSystems.hpp"
 
 namespace RType
 {
@@ -84,7 +85,12 @@ namespace RType
 
         // Enemies
         ecs::Entity &buildEnemy(
-            size_t id, float posX, float posY, float health);
+            size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &getEnemyById(size_t enemyID);
+        void sendEnemyPosition(size_t enemyID);
+        void deleteEnemy(size_t playerID);
+        void handleNetworkEnemies(
+            int code, const std::vector<std::string> &tokens);
 
         // Networking
         int is_code_valid(int code);
@@ -161,6 +167,7 @@ namespace RType
         Factory _factory;
 
         std::unique_ptr<sf::RenderWindow> _window;
+        std::recursive_mutex _serverLock;
 
         sf::Clock _autoFireClock;
     };

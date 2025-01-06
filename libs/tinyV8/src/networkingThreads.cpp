@@ -11,6 +11,7 @@
 #include <thread>
 #include "EngineNetworking.hpp"
 #include "system_network.hpp"
+#include "system_udp.hpp"
 
 using namespace Engine::Feature;
 
@@ -89,6 +90,7 @@ void NetworkingManager::runWriteThread()
                             this->removeClient((size_t) id);
                         }
                         if (client.writeBufferTCP.size() > 0) {
+                            std::unique_lock lock(_writeMutex);
                             len = sock->sendData(client.writeBufferTCP);
                             std::cout << "ENGINE: [Write Thread] Sending: "
                                       << System::Network::decodeString(
@@ -96,9 +98,10 @@ void NetworkingManager::runWriteThread()
                                              .substr(0, (size_t) len)
                                       << "to client (" << std::to_string(id)
                                       << ") on TCP connection ("
-                                      << std::to_string(sock->getUID()) << ")"
-                                      << std::endl;
-                            std::unique_lock lock(_writeMutex);
+                                      << std::to_string(sock->getUID())
+                                      << ") [" << len << "/"
+                                      << client.writeBufferTCP.size()
+                                      << " written]" << std::endl;
                             if ((size_t) len < client.writeBufferTCP.size())
                                 shouldWait = false;
                             client.writeBufferTCP.erase(
@@ -122,12 +125,15 @@ void NetworkingManager::runWriteThread()
                                     if (cli.port == 0 || cli.ip.empty()
                                         || cli.writeBufferUDP.size() == 0)
                                         continue;
+                                    std::unique_lock lock(_writeMutex);
                                     len = _SocketUDP.sendDataTo(
                                         cli.writeBufferUDP, cli.ip, cli.port);
                                 } else {
+                                    std::unique_lock lock(_writeMutex);
                                     len = _SocketUDP.sendData(
                                         cli.writeBufferUDP);
                                 }
+                                std::unique_lock lock(_writeMutex);
                                 std::cout
                                     << "ENGINE: [Write Thread] Sending: "
                                     << System::Network::decodeString(
@@ -135,9 +141,9 @@ void NetworkingManager::runWriteThread()
                                            .substr(0, (size_t) len)
                                     << "to client (" << std::to_string(index)
                                     << ") on UDP connection ("
-                                    << std::to_string(sock->getUID()) << ")"
-                                    << std::endl;
-                                std::unique_lock lock(_writeMutex);
+                                    << std::to_string(sock->getUID()) << ") ["
+                                    << len << "/" << cli.writeBufferUDP.size()
+                                    << " bytes]" << std::endl;
                                 if ((size_t) len < cli.writeBufferUDP.size())
                                     shouldWait = false;
                                 cli.writeBufferUDP.erase(
@@ -294,8 +300,20 @@ void NetworkingManager::runReadThread()
                             << "): " << System::Network::decodeString(vect)
                             << std::endl;
                         _globalMutex.lock();
-                        client.readBufferUDP.insert(client.readBufferUDP.end(),
-                            vect.begin(), vect.end());
+                        if (!(client.readBufferUDP.size()
+                                >= UDP_PACKET_MAX_SIZE
+                                    * UDP_BUFFER_MAX_QUEUED_PACKETS)) {
+                            client.readBufferUDP.insert(
+                                client.readBufferUDP.end(), vect.begin(),
+                                vect.end());
+                        } else {
+                            std::cout << "ENGINE: [Read Thread] The packet "
+                                         "queue is full on UDP ("
+                                      << std::to_string(sock->getUID())
+                                      << ") for client (" << std::to_string(id)
+                                      << "): Ignoring extra packets."
+                                      << std::endl;
+                        }
                         _globalMutex.unlock();
                         AEngineFeature::_engineRef.triggerEvent(
                             Events::EVENT_OnDataReceived);

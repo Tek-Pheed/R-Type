@@ -26,7 +26,7 @@ namespace RType
         ecs::Entity &buildPlayer(bool isLocalPlayer, size_t id);
         ecs::Entity &buildBackground();
         ecs::Entity &buildEnemy(
-            size_t id, float posX, float posY, float health);
+            size_t id, float posX, float posY, float health = 100.0f);
 
       private:
         GameInstance &_game;

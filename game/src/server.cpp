@@ -5,6 +5,7 @@
 ** server specific functions
 */
 
+#include <mutex>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -45,18 +46,20 @@ void GameInstance::serverEventClosedConn(
     }
 }
 
-void GameInstance::serverEventPackets(
-    Engine::Events::EventType event, Engine::Core &core, std::any arg)
-{
-    (void) arg;
-    (void) core;
-    std::cout << "Server wakeup on event: " << event << std::endl;
-    manageBuffers();
-}
+// void GameInstance::serverEventPackets(
+//     Engine::Events::EventType event, Engine::Core &core, std::any arg)
+// {
+//     (void) arg;
+//     (void) core;
+
+//     std::cout << "Server wakeup on event: " << event << std::endl;
+//     manageBuffers();
+// }
 
 void RType::GameInstance::serverHanlderValidateConnection(
     int code, const std::vector<std::string> &tokens)
 {
+    std::unique_lock lock(_serverLock);
     if (code == Protocol::C_START_UDP && tokens.size() >= 1) {
         ssize_t netClientID = (ssize_t) atoi(tokens[0].c_str());
         if (netClientID >= 0) {
@@ -90,15 +93,17 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     _udpPort = udpPort;
     refNetworkManager.setupServer<PacketHandler>(_tcpPort, _udpPort);
     refGameEngine.setTickRate(SERVER_REFRESH_RATE);
-    refGameEngine.addEventBinding<GameInstance>(
-        Engine::Events::EVENT_OnDataReceived,
-        &GameInstance::serverEventPackets, *this);
+    // refGameEngine.addEventBinding<GameInstance>(
+    //     Engine::Events::EVENT_OnDataReceived,
+    //     &GameInstance::serverEventPackets, *this);
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnServerNewClient,
         &GameInstance::serverEventNewConn, *this);
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnServerLostClient,
         &GameInstance::serverEventClosedConn, *this);
+    refGameEngine.addEventBinding<RType::GameInstance>(
+        Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);
     auto &level = refEntityManager.createNewLevel("mainLevel");
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
