@@ -24,7 +24,7 @@ ecs::PlayerComponent::PlayerComponent()
 | Position component  | Store position of an entity      |
 | Player component    | Define entity as a player        |
 | Velocity component  | Store velocity of an entity      |
-| Health component    | Store health of a entity         |
+| Health component    | Store health of an entity        |
 | Boss component      | Define entity as a boss          |
 | Enemy component     | Define entity as an enemy        |
 | Render component    | Renders an entity                |
@@ -34,3 +34,4 @@ ecs::PlayerComponent::PlayerComponent()
 | Circle component    | Defines an entity as a Circle    |
 | Rectangle component | Defines an entity as a Rectangle |
 | Text component      | Defines an entity as a text      |
+| Hitbox component    | Add a hitbox to an entity        |
