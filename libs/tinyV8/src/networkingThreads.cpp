@@ -287,6 +287,7 @@ void NetworkingManager::runReadThread()
                             getClient((size_t) id).ip = addr;
                             getClient((size_t) id).port = port;
                         }
+                        std::unique_lock lock(_globalMutex);
                         NetClient &client = getClient((size_t) id);
                         if (client.isDisconnected)
                             continue;
@@ -296,7 +297,6 @@ void NetworkingManager::runReadThread()
                                   << ") for client (" << std::to_string(id)
                                   << ") [" << vect.size() << " bytes]"
                                   << std::endl;
-                        _globalMutex.lock();
                         if (!(client.readBufferUDP.size()
                                 >= UDP_PACKET_MAX_SIZE
                                     * UDP_BUFFER_MAX_QUEUED_PACKETS)) {
@@ -311,7 +311,6 @@ void NetworkingManager::runReadThread()
                                       << "): Ignoring extra packets."
                                       << std::endl;
                         }
-                        _globalMutex.unlock();
                         AEngineFeature::_engineRef.triggerEvent(
                             Events::EVENT_OnDataReceived);
                         break;

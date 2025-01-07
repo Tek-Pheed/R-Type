@@ -148,35 +148,28 @@ void RType::GameInstance::levelMainMenu()
     refEntityManager.switchLevel("mainMenu");
 
     if (!isServer()) {
-        auto &title = refEntityManager.getCurrentLevel().createEntity();
         auto &musicSong =
             this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
+        _factory.buildMusic(musicSong);
 
-        if (this->_currentMusic.getStatus() != sf::SoundSource::Playing) {
-            this->_currentMusic.setBuffer(musicSong);
-            this->_currentMusic.setVolume(25.0f);
-            this->_currentMusic.setLoop(true);
-            this->_currentMusic.play();
-        }
-
+        auto &title = refEntityManager.getCurrentLevel().createEntity();
         sf::Text text;
         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
         text.setCharacterSize(100);
         text.setFillColor(sf::Color::White);
         text.setString("F TYPE V8");
-
         float textWidth = text.getLocalBounds().width;
         float windowWidth = (float) this->_window->getSize().x;
-
         float posX = (windowWidth - textWidth) / 2;
         float posY = (float) this->_window->getSize().y / 4;
 
-        title.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::TEXT));
+        auto comp = std::make_shared<ecs::RenderComponent>(
+            ecs::RenderComponent::ObjectType::TEXT);
+        title.addComponent(comp);
         title.addComponent(
             std::make_shared<ecs::PositionComponent>(posX, posY));
         title.addComponent(
-            std::make_shared<ecs::TextComponent<sf::Text>>(text, "F Type V8"));
+            std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
 
         _factory.buildButton(
             sf::Vector2f(

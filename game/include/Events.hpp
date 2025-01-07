@@ -13,6 +13,7 @@
 #endif
 
 #include <Entity.hpp>
+#include <memory>
 #include <vector>
 #include "Game.hpp"
 
@@ -29,7 +30,6 @@ namespace RType
       protected:
         Factory &_factory;
         GameInstance &_game;
-        ecs::Entity *_entity;
     };
 
 } // namespace RType

@@ -202,6 +202,7 @@ sf::RenderWindow &GameInstance::getWindow()
 
 void GameInstance::playEvent()
 {
+    std::unique_lock lock(_serverLock);
     sf::Event event;
     std::stringstream ss;
     Config config("config.cfg");
@@ -209,6 +210,13 @@ void GameInstance::playEvent()
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
+    if (hasLocalPlayer() && autoFireEnabled
+        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
+        if (_netClientID >= 0) {
+            _factory.buildBulletFromPlayer((size_t) _netClientID);
+            this->_autoFireClock.restart();
+        }
+    }
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             this->_window->close();

@@ -77,7 +77,7 @@ namespace Engine
     class AEngineFeature {
       public:
         explicit AEngineFeature(Core &engineRef) : _engineRef(engineRef) {};
-        ~AEngineFeature() {};
+        virtual ~AEngineFeature() = default;
         explicit AEngineFeature(AEngineFeature &&other)
             : _engineRef(other._engineRef) {};
 

@@ -9,21 +9,24 @@
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "SFML/Audio/Sound.hpp"
 
 namespace RType
 {
     ecs::Entity &Factory::buildMusic(sf::SoundBuffer &soundBuffer)
     {
         auto &music = _game.refEntityManager.getCurrentLevel().createEntity();
-        sf::Sound sound;
 
-        sound.setBuffer(soundBuffer);
-        sound.setLoop(true);
-        sound.setVolume(25.0f);
-        sound.play();
+        sf::Sound a;
+        music.addComponent(std::make_shared<ecs::MusicComponent<sf::Sound>>(a));
 
-        music.addComponent(std::make_shared<ecs::MusicComponent<sf::Sound>>(sound));
+        auto &s = music.getComponent<ecs::MusicComponent<sf::Sound>>()
+                     ->getMusicType();
 
+        s.setBuffer(soundBuffer);
+        s.setLoop(true);
+        s.setVolume(25.0f);
+        s.play();
         return (music);
     }
 } // namespace RType
