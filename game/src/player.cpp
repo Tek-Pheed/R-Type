@@ -137,17 +137,17 @@ ecs::Entity &GameInstance::getPlayerById(size_t id)
 void GameInstance::deletePlayer(size_t playerID)
 {
     if (isServer() || _isConnectedToServer) {
+        auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
         refEntityManager.getCurrentLevel().destroyEntityById(pl.getID());
         std::stringstream ss;
         ss << P_DEAD << " " << playerID << " " << PACKET_END;
         if (isServer()) {
-            refNetworkManager.sendToOthers(
-                playerID, System::Network::ISocket::Type::TCP, ss.str());
-        } else {
             refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, ss.str());
         }
+        // Switch scene if no more players
+        // if (players.size() == 0) {}
     }
 }
 
