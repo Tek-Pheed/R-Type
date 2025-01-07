@@ -12,6 +12,7 @@
     #define NOMINMAX
 #endif
 
+#include <memory>
 #include <Entity.hpp>
 #include <vector>
 #include "Game.hpp"
@@ -29,7 +30,7 @@ namespace RType
       protected:
         Factory &_factory;
         GameInstance &_game;
-        ecs::Entity *_entity;
+        std::unique_ptr<ecs::Entity> _entity;
     };
 
 } // namespace RType

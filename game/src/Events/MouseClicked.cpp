@@ -50,7 +50,7 @@ namespace RType
                         _game._buttonList.clear();
                         _game._inputList.clear();
                         _game.levelContinueMenu();
-                        break;
+                        return;
                     case ecs::ClickableType::LAUNCH:
                         _game._buttonList.clear();
                         _game.connectToGame();
@@ -63,7 +63,7 @@ namespace RType
                         _game._buttonList.clear();
                         _game._inputList.clear();
                         _game.levelSettingsMenu();
-                        break;
+                        return;
                     case ecs::ClickableType::AUTO_FIRE:
                         _game.handleAutoFireButton(
                             currentAutoFireValue ? "false" : "true", entity);
@@ -72,7 +72,7 @@ namespace RType
                         _game._buttonList.clear();
                         _game._inputList.clear();
                         _game.levelMainMenu();
-                        break;
+                        return;
                     case ecs::ClickableType::MOVE_UP:
                         _game._isSettingsUpButtonClicked = true;
                         _game._lastButtonIdClicked = entity.get().getID();

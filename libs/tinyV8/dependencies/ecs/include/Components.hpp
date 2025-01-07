@@ -134,7 +134,7 @@ namespace ecs
       public:
         explicit MusicComponent(musicType &music): _music(music) {}
 
-        musicType getMusicType() {
+        musicType &getMusicType() {
           return this->_music;
         }
 
