@@ -51,8 +51,6 @@ namespace RType
         // Loby
         L_STARTGAME = 141,
         L_SETMAXPLAYRS = 142,
-        L_LISTPLAYERS = 143,
-        L_QUITLOBY = 144
     };
 
     template <typename... Args>

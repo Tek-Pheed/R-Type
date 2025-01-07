@@ -234,6 +234,8 @@ void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
     const std::string &data, System::Network::ISocket::Type socketType)
 {
     _writeMutex.lock();
+    if (client.isDisconnected)
+        return;
     std::ostringstream out;
 
     _pacMan->serializeString(data, out, _pacMan->getKey());

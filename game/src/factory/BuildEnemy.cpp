@@ -9,6 +9,8 @@
     #define NOMINMAX
 #endif
 
+#include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -78,8 +80,8 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
         auto &ene = getEnemyById(enemyID);
         auto position = ene.getComponent<ecs::PositionComponent>();
         std::stringstream ss;
-        ss << E_POS << " " << enemyID << " " << position->getX() << " "
-           << position->getY() << PACKET_END;
+        ss << E_POS << " " << _ticks << " " << enemyID << " "
+           << position->getX() << " " << position->getY() << PACKET_END;
 
         refNetworkManager.sendToAll(
             System::Network::ISocket::Type::UDP, ss.str());
@@ -117,13 +119,17 @@ void GameInstance::handleNetworkEnemies(
             break;
         }
         case Protocol::E_POS: {
-            if (tokens.size() >= 3) {
+            if (tokens.size() >= 4) {
                 if (!isServer()) {
-                    size_t id = (size_t) atoi(tokens[0].c_str());
-                    auto &ene = getEnemyById(id);
-                    auto pos = ene.getComponent<ecs::PositionComponent>();
-                    pos->setX((float) std::atof(tokens[1].c_str()));
-                    pos->setY((float) std::atof(tokens[2].c_str()));
+                    uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
+                    if (_lastNetTick <= tick) {
+                        _lastNetTick = tick;
+                        size_t id = (size_t) atoi(tokens[1].c_str());
+                        auto &ene = getEnemyById(id);
+                        auto pos = ene.getComponent<ecs::PositionComponent>();
+                        pos->setX((float) std::atof(tokens[2].c_str()));
+                        pos->setY((float) std::atof(tokens[3].c_str()));
+                    }
                 }
             }
             break;

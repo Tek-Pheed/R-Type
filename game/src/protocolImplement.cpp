@@ -5,11 +5,12 @@
 ** protocolImplement
 */
 
-#include <cmath>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <sstream>
@@ -31,7 +32,7 @@ int GameInstance::is_code_valid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
-    if (code >= L_STARTGAME && code <= L_QUITLOBY)
+    if (code >= L_STARTGAME && code <= L_SETMAXPLAYRS)
         return 4;
     if (code >= C_INIT_UDP && code <= C_AUTH)
         return 9;

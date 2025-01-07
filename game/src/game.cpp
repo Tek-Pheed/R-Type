@@ -86,6 +86,7 @@ void GameInstance::gameTick(
     (void) event;
     float deltaTime_sec = std::any_cast<float>(arg);
 
+    _ticks++;
     try {
         manageBuffers();
         if (!_isServer) {

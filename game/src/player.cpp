@@ -9,6 +9,7 @@
     #define NOMINMAX
 #endif
 
+#include <cstdint>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -36,10 +37,22 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
             }
+            break;
         }
-        case Protocol::L_LISTPLAYERS: {
+        case Protocol::L_SETMAXPLAYRS: {
+            if (tokens.size() >= 2) {
+                _maxPlayers = (size_t) atoi(tokens[1].c_str());
+                if (_isServer) {
+                    std::stringstream sss;
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    sss << L_SETMAXPLAYRS << " " << id << PACKET_END;
+                    refNetworkManager.sendToOthers(
+                        id, System::Network::ISocket::Type::TCP, sss.str());
+                }
+            }
+            break;
+            default: break;
         }
-        default: break;
     }
 }
 
@@ -64,21 +77,28 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_POS: {
-            if (tokens.size() >= 3) {
-                size_t id = (size_t) atoi(tokens[0].c_str());
+            if (tokens.size() >= 4) {
+                uint64_t tick = _ticks;
+                if (!isServer()) {
+                    tick = (uint64_t) atoi(tokens[0].c_str());
+                    if (!(_lastNetTick <= tick)) {
+                        return;
+                    }
+                }
+                size_t id = (size_t) atoi(tokens[1].c_str());
                 auto &player = getPlayerById(id);
                 auto pos = player.getComponent<ecs::PositionComponent>();
-                pos->setX((float) std::atof(tokens[1].c_str()));
-                pos->setY((float) std::atof(tokens[2].c_str()));
+                pos->setX((float) std::atof(tokens[2].c_str()));
+                pos->setY((float) std::atof(tokens[3].c_str()));
                 if (isServer()) {
                     std::stringstream ss;
-                    ss << P_POS << " "
+                    ss << P_POS << " " << tick << " "
                        << player.getComponent<ecs::PlayerComponent>()
                               ->getPlayerID()
                        << " " << pos->getX() << " " << pos->getY()
                        << PACKET_END;
                     refNetworkManager.sendToOthers(
-                        (size_t) std::atoi(tokens[0].c_str()),
+                        (size_t) std::atoi(tokens[1].c_str()),
                         System::Network::ISocket::Type::UDP, ss.str());
                 }
             }
@@ -160,8 +180,8 @@ void GameInstance::sendPlayerPosition(size_t playerID)
         auto &player = getPlayerById(playerID);
         auto position = player.getComponent<ecs::PositionComponent>();
         std::stringstream ss;
-        ss << P_POS << " " << playerID << " " << position->getX() << " "
-           << position->getY() << PACKET_END;
+        ss << P_POS << " " << _ticks << " " << playerID << " "
+           << position->getX() << " " << position->getY() << PACKET_END;
         if (isServer()) {
             refNetworkManager.sendToOthers(
                 playerID, System::Network::ISocket::Type::UDP, ss.str());

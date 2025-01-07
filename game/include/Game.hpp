@@ -40,7 +40,7 @@ namespace RType
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
-        static constexpr size_t DEFAULT_MAX_PLAYERS = 1U;
+        static constexpr size_t DEFAULT_MAX_PLAYERS = 0U;
         static constexpr const char *DEFAULT_PLAYER_NAME = "Anonymous_Player";
 
         GameInstance(Engine::Core &engineRef);
@@ -177,6 +177,8 @@ namespace RType
 
         Factory _factory;
 
+        uint64_t _ticks = 0U;
+        uint64_t _lastNetTick = 0U;
         ssize_t _clientGameMasterId = -1;
         std::unique_ptr<sf::RenderWindow> _window;
         std::recursive_mutex _gameLock;
