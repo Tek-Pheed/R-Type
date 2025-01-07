@@ -123,9 +123,13 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_DMG: {
-            if (tokens.size() >= 2) {
-                size_t id = (size_t) atoi(tokens[0].c_str());
-                int health = atoi(tokens[1].c_str());
+            if (tokens.size() >= 3) {
+                uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
+                if (!_isServer && !(_lastNetTick <= tick)) {
+                    return;
+                }
+                size_t id = (size_t) atoi(tokens[1].c_str());
+                int health = atoi(tokens[2].c_str());
                 auto &player = getPlayerById(id);
                 auto healthComp = player.getComponent<ecs::HealthComponent>();
                 if (healthComp) {
@@ -199,8 +203,8 @@ void GameInstance::damagePlayer(size_t playerID, int damage)
         if (health) {
             health->setHealth(health->getHealth() - damage);
             std::stringstream ss;
-            ss << P_DMG << " " << playerID << " " << health->getHealth()
-               << PACKET_END;
+            ss << P_DMG << " " << _ticks << " " << playerID << " "
+               << health->getHealth() << PACKET_END;
             if (isServer()) {
                 refNetworkManager.sendToOthers(
                     playerID, System::Network::ISocket::Type::UDP, ss.str());

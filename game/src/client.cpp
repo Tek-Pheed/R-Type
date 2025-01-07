@@ -149,6 +149,7 @@ void RType::GameInstance::clientHandleDisconnected(
     (void) event;
     (void) core;
     (void) arg;
+
     std::unique_lock lock(_gameLock);
     _gameStarted = false;
     _isConnectedToServer = false;
@@ -208,14 +209,6 @@ void GameInstance::playEvent()
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
-    if (hasLocalPlayer() && autoFireEnabled && _gameStarted
-        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
-        if (_netClientID >= 0) {
-            _factory.buildBulletFromPlayer((size_t) _netClientID);
-            this->_autoFireClock.restart();
-        }
-    }
-
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             this->_window->close();
@@ -243,6 +236,13 @@ void GameInstance::playEvent()
         }
         if (event.type == sf::Event::MouseButtonPressed) {
             event_manager.mouseClicked();
+        }
+    }
+    if (hasLocalPlayer() && autoFireEnabled && _gameStarted
+        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
+        if (_netClientID >= 0) {
+            _factory.buildBulletFromPlayer((size_t) _netClientID);
+            this->_autoFireClock.restart();
         }
     }
 }
