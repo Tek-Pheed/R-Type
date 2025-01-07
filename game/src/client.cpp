@@ -13,20 +13,31 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include "Components.hpp"
 #include "Config.hpp"
 #include "Engine.hpp"
+#include "EngineNetworking.hpp"
 #include "Events.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
+#include "SFML/Window/WindowStyle.hpp"
 #include "system_network.hpp"
 
 using namespace RType;
+
+void RType::GameInstance::clientStartLevel()
+{
+    _gameStarted = true;
+    std::stringstream ss;
+    ss << L_STARTGAME << " " << _netClientID << PACKET_END;
+    refNetworkManager.sendToAll(System::Network::ISocket::Type::TCP, ss.str());
+}
 
 void RType::GameInstance::clientHandlerConnection(
     int code, const std::vector<std::string> &tokens)
@@ -113,14 +124,14 @@ void RType::GameInstance::connectToGame()
         }
 
         // Prepare level
-        auto &level = refEntityManager.createNewLevel("mainRemoteLevel");
+        auto &level = refEntityManager.createNewLevel("mainLevel");
         level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
             *this);
         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
-        refEntityManager.switchLevel("mainRemoteLevel", false);
+        refEntityManager.switchLevel("mainLevel", false);
 
         _playerEntityID = -1;
         _isConnectedToServer = true;
@@ -130,6 +141,26 @@ void RType::GameInstance::connectToGame()
                   << " with error: " << e.what() << std::endl;
         refEntityManager.switchLevel(currentLevel);
     }
+}
+
+void RType::GameInstance::clientHandleDisconnected(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    (void) event;
+    (void) core;
+    (void) arg;
+
+    std::unique_lock lock(_gameLock);
+    _gameStarted = false;
+    _isConnectedToServer = false;
+    _playerEntityID = -1;
+    refNetworkManager.disconnectClient(1);
+    std::cout << "You are now disconnected from the game server, maybe the "
+                 "connection was unstable."
+              << std::endl;
+    refNetworkManager.stopNetworking();
+    refEntityManager.deleteAllLevel();
+    levelMainMenu();
 }
 
 void RType::GameInstance::setupClient(
@@ -156,6 +187,9 @@ void RType::GameInstance::setupClient(
     refGameEngine.addEventBinding<RType::GameInstance>(
         Engine::Events::EVENT_PostTick, &RType::GameInstance::gamePostTick,
         *this);
+    refGameEngine.addEventBinding<RType::GameInstance>(
+        Engine::Events::EVENT_DisconnectedFromServer,
+        &RType::GameInstance::clientHandleDisconnected, *this);
     loadAssets();
     createPersistentLevel();
     levelMainMenu();
@@ -175,14 +209,6 @@ void GameInstance::playEvent()
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
-    if (hasLocalPlayer() && autoFireEnabled
-        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
-        if (_netClientID >= 0) {
-            _factory.buildBulletFromPlayer((size_t) _netClientID);
-            this->_autoFireClock.restart();
-        }
-    }
-
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             this->_window->close();
@@ -190,12 +216,33 @@ void GameInstance::playEvent()
         }
         if (event.type == sf::Event::KeyPressed) {
             event_manager.keyPressed(event);
+            if (!_gameStarted) {
+                if (event.key.code == sf::Keyboard::Tab) {
+                    clientStartLevel();
+                }
+            }
+            if (hasLocalPlayer() && _gameStarted) {
+                auto &player = getLocalPlayer();
+                auto velocity = player.getComponent<ecs::VelocityComponent>();
+                if (!autoFireEnabled
+                    && event.key.code == sf::Keyboard::Space) {
+                    if (_netClientID >= 0)
+                        playerShoot((size_t) _netClientID);
+                }
+            }
         }
         if (hasLocalPlayer() && event.type == sf::Event::KeyReleased) {
             event_manager.keyReleased(event);
         }
         if (event.type == sf::Event::MouseButtonPressed) {
             event_manager.mouseClicked();
+        }
+    }
+    if (hasLocalPlayer() && autoFireEnabled && _gameStarted
+        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
+        if (_netClientID >= 0) {
+            _factory.buildBulletFromPlayer((size_t) _netClientID);
+            this->_autoFireClock.restart();
         }
     }
 }

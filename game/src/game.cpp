@@ -20,7 +20,6 @@
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
-
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
@@ -43,7 +42,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -88,6 +87,7 @@ void GameInstance::gameTick(
     (void) event;
     float deltaTime_sec = std::any_cast<float>(arg);
 
+    _ticks++;
     try {
         manageBuffers();
         if (!_isServer) {
@@ -96,8 +96,9 @@ void GameInstance::gameTick(
                 playerAnimations(pl.get());
             }
         } else {
+            if (!_gameStarted)
+                return;
             static float time = 15.0f;
-
             time += deltaTime_sec;
             if (time >= 5.0f) {
                 _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
@@ -129,7 +130,7 @@ int RType::GameInstance::manageBuffers()
     if (packets.size() == 0)
         return 0;
 
-    std::unique_lock lock(_serverLock);
+    std::unique_lock lock(_gameLock);
     for (auto &buff : packets) {
         std::string buffer = buff;
         std::string codeStr = buffer.substr(0, 3);
@@ -152,6 +153,7 @@ int RType::GameInstance::manageBuffers()
             case 1: handleNetworkEnemies(code, tokens); break;
             // case 2: handle_terrain(code, tokens); break;
             // case 3: handle_mechs(code, tokens); break;
+            case 24: handleLoby(code, tokens); break;
             case 9:
                 if (isServer()) {
                     serverHanlderValidateConnection(code, tokens);

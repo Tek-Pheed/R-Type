@@ -28,6 +28,7 @@ namespace RType
         P_SHOOT = 104,
         P_DMG = 105,
         P_DISCONN = 106,
+        P_NAME = 107,
 
         // Enemy
         E_SPAWN = 111,
@@ -53,6 +54,10 @@ namespace RType
         B_DEAD = 143,
         B_SHOOT = 144,
         B_DMG = 145,
+
+        // Loby
+        L_STARTGAME = 241,
+        L_SETMAXPLAYRS = 242,
     };
 
     template <typename... Args>

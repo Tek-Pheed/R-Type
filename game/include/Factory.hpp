@@ -14,7 +14,8 @@
 
 namespace RType
 {
-  class GameInstance;
+    static constexpr const char *DEFAULT_PLAYER_NAME = "Anonymous_Player";
+    class GameInstance;
     class Factory {
       public:
         explicit Factory(GameInstance &game);
@@ -25,8 +26,8 @@ namespace RType
             const std::string &str = "", unsigned int characterSize = 40,
             sf::Color textColor = sf::Color::Black,
             ecs::ClickableType type = ecs::ClickableType::LAUNCH);
-        ecs::Entity &buildPlayer(
-            bool isLocalPlayer, size_t id, const std::string &name);
+        ecs::Entity &buildPlayer(bool isLocalPlayer, size_t id,
+            const std::string &name = DEFAULT_PLAYER_NAME);
         ecs::Entity &buildBackground();
         void buildBulletFromPlayer(size_t playerID);
         ecs::Entity &buildEnemy(
