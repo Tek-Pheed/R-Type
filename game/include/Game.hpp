@@ -80,6 +80,7 @@ namespace RType
         void playerAnimations(ecs::Entity &player);
         void playerShoot(size_t playerID);
         void setPlayerEntityID(int id);
+        void damagePlayer(size_t playerID, int damage);
 
         std::vector<ecs::Entity> &getEntities();
 

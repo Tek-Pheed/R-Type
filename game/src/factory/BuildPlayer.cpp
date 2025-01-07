@@ -14,13 +14,14 @@ namespace RType
 {
     ecs::Entity &Factory::buildPlayer(bool isLocalPlayer, size_t id)
     {
-        auto &player =
-            _game.refEntityManager.getCurrentLevel().createEntity();
+        auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(
             std::make_shared<ecs::PositionComponent>(100, 100));
         player.addComponent(std::make_shared<ecs::HealthComponent>(100));
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
+        player.addComponent(
+            std::make_shared<ecs::HitboxComponent>(33 * 3, 14 * 3));
         if (!_game.isServer()) {
             auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
                 Asset::PLAYER_TEXTURE);
