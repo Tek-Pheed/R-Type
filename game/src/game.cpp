@@ -45,7 +45,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -94,8 +94,9 @@ void GameInstance::gameTick(
                 playerAnimations(pl.get());
             }
         } else {
+            if (!_gameStarted)
+                return;
             static float time = 15.0f;
-
             time += deltaTime_sec;
             if (time >= 15.0f) {
                 _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
@@ -127,7 +128,7 @@ int RType::GameInstance::manageBuffers()
     if (packets.size() == 0)
         return 0;
 
-    std::unique_lock lock(_serverLock);
+    std::unique_lock lock(_gameLock);
     for (auto &buff : packets) {
         std::string buffer = buff;
         std::string codeStr = buffer.substr(0, 3);

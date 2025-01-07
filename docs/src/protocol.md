@@ -100,7 +100,7 @@ As seen in the handshake, this instructions is used to associate a UDP socket to
 
 The following isntructions are the one used to manage players
 
-- Player connection (clientId, x, y) - 101 <-> TCP
+- Player connection (clientId, x, y, name) - 101 <-> TCP
 
 This is sent to all the clients when a new player join the game.
 
@@ -176,9 +176,3 @@ When in loby, launch the game. (Only the first connected player can send this, t
 
 Set max players.
 - Set max player 142 (id, max) - <- TCP
-
-Lists all players in game
-- List Game Players 143 (id, 'player1' 'player2' 'player3' 'player4') -> TCP
-
-Quit the current loby
-- Quit loby 144 (id) <-> TCP

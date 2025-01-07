@@ -13,20 +13,31 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include "Components.hpp"
 #include "Config.hpp"
 #include "Engine.hpp"
+#include "EngineNetworking.hpp"
 #include "Events.hpp"
 #include "Factory.hpp"
 #include "Game.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
+#include "SFML/Window/WindowStyle.hpp"
 #include "system_network.hpp"
 
 using namespace RType;
+
+void RType::GameInstance::clientStartLevel()
+{
+    _gameStarted = true;
+    std::stringstream ss;
+    ss << L_STARTGAME << " " << _netClientID << PACKET_END;
+    refNetworkManager.sendToAll(System::Network::ISocket::Type::TCP, ss.str());
+}
 
 void RType::GameInstance::clientHandlerConnection(
     int code, const std::vector<std::string> &tokens)
@@ -66,33 +77,6 @@ void RType::GameInstance::clientHandlerConnection(
     }
 }
 
-// void RType::GameInstance::connectToGame()
-// {
-//     if (_isConnectedToServer)
-//         return;
-//     auto currentLevel = refEntityManager.getCurrentLevelName();
-//     try {
-//         refNetworkManager.setupClient<RType::PacketHandler>(
-//             _tcpPort, _udpPort, _ip);
-
-//         // Prepare level
-//         auto &level = refEntityManager.createNewLevel("mainRemoteLevel");
-//         level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
-//         level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
-//         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
-//             *this);
-//         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
-//         refEntityManager.switchLevel("mainRemoteLevel", false);
-//         _playerEntityID = -1;
-//         _isConnectedToServer = true;
-//     } catch (const std::exception &e) {
-//         std::cout << "Failed to connect to server: IP=" << _ip
-//                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
-//                   << " with error: " << e.what() << std::endl;
-//         refEntityManager.switchLevel(currentLevel);
-//     }
-// }
-
 void RType::GameInstance::connectToGame()
 {
     if (_isConnectedToServer)
@@ -103,13 +87,13 @@ void RType::GameInstance::connectToGame()
             _tcpPort, _udpPort, _ip);
 
         // Prepare level
-        auto &level = refEntityManager.createNewLevel("mainLoby");
+        auto &level = refEntityManager.createNewLevel("mainLevel");
         level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
             *this);
-        //level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
-        refEntityManager.switchLevel("mainLoby", false);
+        level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+        refEntityManager.switchLevel("mainLevel", false);
         _playerEntityID = -1;
         _isConnectedToServer = true;
     } catch (const std::exception &e) {
@@ -118,6 +102,25 @@ void RType::GameInstance::connectToGame()
                   << " with error: " << e.what() << std::endl;
         refEntityManager.switchLevel(currentLevel);
     }
+}
+
+void RType::GameInstance::clientHandleDisconnected(
+    Engine::Events::EventType event, Engine::Core &core, std::any arg)
+{
+    (void) event;
+    (void) core;
+    (void) arg;
+    std::unique_lock lock(_gameLock);
+    _gameStarted = false;
+    _isConnectedToServer = false;
+    _playerEntityID = -1;
+    refNetworkManager.disconnectClient(1);
+    std::cout << "You are now disconnected from the game server, maybe the "
+                 "connection was unstable."
+              << std::endl;
+    refNetworkManager.stopNetworking();
+    refEntityManager.deleteAllLevel();
+    levelMainMenu();
 }
 
 void RType::GameInstance::setupClient(
@@ -132,7 +135,7 @@ void RType::GameInstance::setupClient(
     sf::VideoMode videoMode(sf::VideoMode::getDesktopMode().width,
         sf::VideoMode::getDesktopMode().height,
         sf::VideoMode::getDesktopMode().bitsPerPixel);
-    _window->create(videoMode, "R-Type", sf::Style::Fullscreen);
+    _window->create(videoMode, "R-Type", sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
@@ -145,6 +148,9 @@ void RType::GameInstance::setupClient(
     refGameEngine.addEventBinding<RType::GameInstance>(
         Engine::Events::EVENT_PostTick, &RType::GameInstance::gamePostTick,
         *this);
+    refGameEngine.addEventBinding<RType::GameInstance>(
+        Engine::Events::EVENT_DisconnectedFromServer,
+        &RType::GameInstance::clientHandleDisconnected, *this);
     loadAssets();
     createPersistentLevel();
     levelMainMenu();
@@ -168,7 +174,7 @@ void GameInstance::playEvent()
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
-    if (hasLocalPlayer() && autoFireEnabled
+    if (hasLocalPlayer() && autoFireEnabled && _gameStarted
         && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
         if (_netClientID >= 0) {
             playerShoot((size_t) _netClientID);
@@ -200,7 +206,12 @@ void GameInstance::playEvent()
                 handleConfigButtons(keyPressed, -3);
                 this->_isSettingsDownButtonClicked = false;
             }*/
-            if (hasLocalPlayer()) {
+            if (!_gameStarted) {
+                if (event.key.code == sf::Keyboard::Tab) {
+                    clientStartLevel();
+                }
+            }
+            if (hasLocalPlayer() && _gameStarted) {
                 auto &player = getLocalPlayer();
                 auto velocity = player.getComponent<ecs::VelocityComponent>();
                 if (!autoFireEnabled

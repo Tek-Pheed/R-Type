@@ -13,6 +13,7 @@
 #define TINY_V8_NETWORKING
 
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -162,7 +163,7 @@ namespace Engine
                       writeBufferTCP(System::Network::byteArray()),
                       readBufferUDP(System::Network::byteArray()),
                       writeBufferUDP(System::Network::byteArray()),
-                      isReady(false), isDisconnected(false){};
+                      isReady(false), isDisconnected(false) {};
             };
 
             explicit NetworkingManager(Core &engineRef);
@@ -211,8 +212,22 @@ namespace Engine
             template <class PacketManager>
             void setupServer(uint16_t TCP_port, uint16_t UDP_port)
             {
+                std::unique_lock lock(_globalMutex);
+
                 _pacMan = std::make_unique<PacketManager>();
                 _isServer = true;
+                for (auto &cli : _clients) {
+                    try {
+                        cli.second.tcpSocket.closeSocket();
+                    } catch (const std::exception &e) {
+                        std::cout << "Can't close client socket, it might "
+                                     "already be closed"
+                                  << std::endl;
+                    }
+                }
+                _clients.clear();
+                _clientCounter = 0;
+                _clientID = 0;
                 _SocketTCP.initSocket(
                     TCP_port, System::Network::ISocket::SERVE);
                 _SocketUDP.initSocket(UDP_port);
@@ -220,6 +235,7 @@ namespace Engine
                           << std::to_string(TCP_port)
                           << ", UDP:" << std::to_string(UDP_port) << std::endl;
 
+                _running = true;
                 std::thread(&NetworkingManager::runReadThread, this).detach();
                 std::thread(&NetworkingManager::runWriteThread, this).detach();
                 std::thread(&NetworkingManager::runConnectThread, this)
@@ -239,6 +255,20 @@ namespace Engine
             void setupClient(
                 uint16_t TCP_port, uint16_t UDP_port, const std::string &ip)
             {
+                std::unique_lock lock(_globalMutex);
+
+                for (auto &cli : _clients) {
+                    try {
+                        cli.second.tcpSocket.closeSocket();
+                    } catch (const std::exception &e) {
+                        std::cout << "Can't close client socket, it might "
+                                     "already be closed"
+                                  << std::endl;
+                    }
+                }
+                _clients.clear();
+                _clientCounter = 0;
+                _clientID = 0;
                 _pacMan = std::make_unique<PacketManager>();
                 _isServer = false;
                 std::cout << "ENGINE: Connecting to server on port TCP:"
@@ -251,6 +281,7 @@ namespace Engine
                 cli.tcpSocket.initSocket(
                     TCP_port, System::Network::ISocket::CONNECT, ip);
                 addClient(cli);
+                _running = true;
                 std::thread(&NetworkingManager::runReadThread, this).detach();
                 std::thread(&NetworkingManager::runWriteThread, this).detach();
             }
@@ -263,6 +294,12 @@ namespace Engine
              * @param id: An ID
              */
             void setClientID(size_t id);
+
+            /**
+             * @brief Reset networking and clear all client lists.
+
+             */
+            void stopNetworking();
 
             /**
              * @brief Get the Client ID
@@ -334,6 +371,13 @@ namespace Engine
              */
             bool hasClient(size_t id);
 
+            /**
+             * @brief Force disconnect a client.
+
+             * @param id: The client ID.
+             */
+            void disconnectClient(size_t id);
+
           protected:
             void engineOnStart(void) override;
             void engineOnTick(float deltaTimeSec) override;
@@ -367,6 +411,7 @@ namespace Engine
             std::unordered_map<size_t, NetClient> _clients;
             System::Network::TCPSocket _SocketTCP;
             System::Network::UDPSocket _SocketUDP;
+            bool _running = true;
         };
 
     } // namespace Feature

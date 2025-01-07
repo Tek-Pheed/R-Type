@@ -42,7 +42,7 @@ void NetworkingManager::runWriteThread()
     System::Network::timeoutStruct tv = {{0, 50000}};
     bool shouldWait = true;
 
-    while (true) {
+    while (_running) {
         try {
             if (shouldWait) {
                 std::unique_lock lock(_writeMutex);
@@ -99,7 +99,7 @@ void NetworkingManager::runWriteThread()
                                       << std::to_string(sock->getUID())
                                       << ") [" << len << "/"
                                       << client.writeBufferTCP.size()
-                                      << " written]" << std::endl;
+                                      << " bytes]" << std::endl;
                             if ((size_t) len < client.writeBufferTCP.size())
                                 shouldWait = false;
                             client.writeBufferTCP.erase(
@@ -168,6 +168,7 @@ void NetworkingManager::runWriteThread()
                       << e.what() << ", ignoring..." << std::endl;
         }
     }
+    std::cout << "ENGINE: [Write Thread] Terminating." << std::endl;
 }
 
 void NetworkingManager::runReadThread()
@@ -177,7 +178,7 @@ void NetworkingManager::runReadThread()
     System::Network::socketSetGeneric readfds;
     System::Network::timeoutStruct tv = {{0, 500000}};
 
-    while (true) {
+    while (_running) {
         try {
             readfds.clear();
             this->_globalMutex.lock();
@@ -319,4 +320,5 @@ void NetworkingManager::runReadThread()
                       << e.what() << ", ignoring..." << std::endl;
         }
     }
+    std::cout << "ENGINE: [Read Thread] Terminating." << std::endl;
 }

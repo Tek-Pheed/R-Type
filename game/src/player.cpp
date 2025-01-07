@@ -24,75 +24,20 @@
 
 using namespace RType;
 
-// If isLocalPlayer is set to false, then this function should only be
-// triggered by a request from the server
-ecs::Entity &RType::GameInstance::buildPlayer(bool isLocalPlayer, size_t id, const std::string &name)
-{
-    std::cout << "Adding new player to the game" << std::endl;
-    auto &player = refEntityManager.getCurrentLevel().createEntity();
-    player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
-    player.addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
-    player.addComponent(std::make_shared<ecs::HealthComponent>(100));
-    player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
-    if (!_isServer) {
-        auto &texture =
-            refAssetManager.getAsset<sf::Texture>(Asset::PLAYER_TEXTURE);
-        auto &font = refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
-
-        sf::Sprite sprite;
-        sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
-        sprite.setScale(sf::Vector2f(3, 3));
-        player.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
-        player.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
-
-        sf::Text text;
-        text.setFont(font);
-        text.setCharacterSize(10);
-        text.setString(name);
-        player.addComponent(
-            std::make_shared<ecs::TextComponent<sf::Text>>(text, name));
-    }
-    if (isLocalPlayer) {
-        _playerEntityID = (int) player.getID();
-    }
-    if ((isLocalPlayer && _isConnectedToServer) || _isServer) {
-        auto pos = player.getComponent<ecs::PositionComponent>();
-        if (pos) {
-            std::stringstream sss;
-            sss << P_CONN << " " << id << " " << pos->getX() << " "
-                << pos->getY() << PACKET_END;
-            if (!isServer()) {
-                refNetworkManager.sendToAll(
-                    System::Network::ISocket::Type::TCP, sss.str());
-            } else {
-                refNetworkManager.sendToOthers(
-                    id, System::Network::ISocket::Type::TCP, sss.str());
-            }
-        }
-    }
-    return (player);
-}
-
 void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
 {
     switch (code) {
         case Protocol::L_STARTGAME: {
-            if (tokens.size() >= 1) {
-                _gameStarted = true;
-                if (_isServer) {
-                    size_t id = (size_t) atoi(tokens[0].c_str());
-                    std::stringstream sss;
-                    sss << L_STARTGAME << " " << id << PACKET_END;
-                    refNetworkManager.sendToAll(
-                        System::Network::ISocket::Type::TCP, sss.str());
-                }
+            _gameStarted = true;
+            if (_isServer) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                std::stringstream sss;
+                sss << L_STARTGAME << " " << id << PACKET_END;
+                refNetworkManager.sendToAll(
+                    System::Network::ISocket::Type::TCP, sss.str());
             }
         }
         case Protocol::L_LISTPLAYERS: {
-
         }
         default: break;
     }
@@ -103,14 +48,14 @@ void GameInstance::handleNetworkPlayers(
 {
     switch (code) {
         case Protocol::P_CONN: {
-            if (tokens.size() >= 3) {
+            if (tokens.size() >= 4) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::shared_ptr<ecs::PositionComponent> pos;
                 if (isServer()) {
-                    auto &pl = _factory.buildPlayer(true, id);
+                    auto &pl = _factory.buildPlayer(true, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 } else {
-                    auto &pl = _factory.buildPlayer(false, id);
+                    auto &pl = _factory.buildPlayer(false, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 }
                 updatePlayerPosition(id, (float) std::atof(tokens[1].c_str()),
@@ -178,7 +123,7 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
@@ -230,7 +175,7 @@ void GameInstance::sendPlayerPosition(size_t playerID)
 void GameInstance::updatePlayerPosition(
     size_t playerID, float newX, float newY)
 {
-    std::unique_lock lock(_serverLock);
+    std::unique_lock lock(_gameLock);
     auto &player = getPlayerById(playerID);
     auto position = player.getComponent<ecs::PositionComponent>();
 
@@ -253,7 +198,7 @@ void GameInstance::updatePlayerPosition(
 
 void GameInstance::playerShoot(size_t playerID)
 {
-    std::unique_lock lock(_serverLock);
+    std::unique_lock lock(_gameLock);
     auto player = getPlayerById(playerID);
     auto positionComp = player.getComponent<ecs::PositionComponent>();
     if (!positionComp)

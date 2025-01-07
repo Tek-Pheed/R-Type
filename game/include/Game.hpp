@@ -13,6 +13,8 @@
 #endif
 
 #include <SFML/Graphics.hpp>
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -38,6 +40,8 @@ namespace RType
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
+        static constexpr size_t DEFAULT_MAX_PLAYERS = 1U;
+        static constexpr const char *DEFAULT_PLAYER_NAME = "Anonymous_Player";
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
@@ -70,7 +74,6 @@ namespace RType
             std::string newAutoFireValue, ecs::Entity &entity);
 
         // Player functions and utilities
-        ecs::Entity &buildPlayer(bool isLocalPlayer = true, size_t id = 0, const std::string &name = "Anonymous Player");
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
         bool hasLocalPlayer(void) const;
         ecs::Entity &getLocalPlayer();
@@ -92,16 +95,18 @@ namespace RType
         void deleteEnemy(size_t playerID);
         void handleNetworkEnemies(
             int code, const std::vector<std::string> &tokens);
+        void clientHandleDisconnected(
+            Engine::Events::EventType event, Engine::Core &core, std::any arg);
 
         // Networking
         int is_code_valid(int code);
         int manageBuffers();
         void connectToGame();
+        void clientStartLevel();
         void clientHandlerConnection(
             int code, const std::vector<std::string> &tokens);
         void serverHanlderValidateConnection(
             int code, const std::vector<std::string> &tokens);
-        void serverCreateLoby();
         void handleNetworkPlayers(
             int code, const std::vector<std::string> &tokens);
         void serverSendGameState(size_t clientID);
@@ -160,6 +165,7 @@ namespace RType
         bool _isSettingsDownButtonClicked = false;
 
       private:
+        size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
         bool _isServer;
@@ -171,8 +177,9 @@ namespace RType
 
         Factory _factory;
 
+        ssize_t _clientGameMasterId = -1;
         std::unique_ptr<sf::RenderWindow> _window;
-        std::recursive_mutex _serverLock;
+        std::recursive_mutex _gameLock;
 
         sf::Clock _autoFireClock;
     };

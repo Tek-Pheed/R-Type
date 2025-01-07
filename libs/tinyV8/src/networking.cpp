@@ -66,6 +66,14 @@ void NetworkingManager::setClientID(size_t id)
     _clientID = id;
 }
 
+void NetworkingManager::stopNetworking()
+{
+    _globalMutex.lock();
+    _running = false;
+    _globalMutex.unlock();
+    _writeCondition.notify_all();
+}
+
 size_t NetworkingManager::getClientID(void) const
 {
     return (_clientID);
@@ -185,6 +193,17 @@ void NetworkingManager::removeClient(size_t id)
     _clients.at(id).isDisconnected = true;
     std::cout << "ENGINE: Removed a client (" << id << ") from the server."
               << std::endl;
+}
+
+void NetworkingManager::disconnectClient(size_t id)
+{
+    std::unique_lock lock(_globalMutex);
+
+    _clients.at(id).tcpSocket.closeSocket();
+    _clients.at(id).isDisconnected = true;
+
+    std::cout << "ENGINE: Force disconnection of a client (" << id
+              << ") from the server." << std::endl;
 }
 
 ssize_t NetworkingManager::identifyClient(

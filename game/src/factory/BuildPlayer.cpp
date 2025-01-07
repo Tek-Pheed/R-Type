@@ -5,22 +5,30 @@
 ** BuildPlayer.cpp
 */
 
+#include <memory>
 #include <sstream>
+#include "Components.hpp"
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 
 namespace RType
 {
-    ecs::Entity &Factory::buildPlayer(bool isLocalPlayer, size_t id)
+    // If isLocalPlayer is set to false, then this function should only be
+    // triggered by a request from the server
+    ecs::Entity &Factory::buildPlayer(
+        bool isLocalPlayer, size_t id, const std::string &name)
     {
-        auto &player =
-            _game.refEntityManager.getCurrentLevel().createEntity();
+        std::cout << "Adding new player to the game" << std::endl;
+        auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(
             std::make_shared<ecs::PositionComponent>(100, 100));
         player.addComponent(std::make_shared<ecs::HealthComponent>(100));
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
+        std::string n = GameInstance::DEFAULT_PLAYER_NAME;
+        if (name != "")
+            n = name;
         if (!_game.isServer()) {
             auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
                 Asset::PLAYER_TEXTURE);
@@ -40,8 +48,12 @@ namespace RType
             sf::Text text;
             text.setFont(font);
             text.setCharacterSize(20);
+            text.setString(n);
             player.addComponent(
-                std::make_shared<ecs::TextComponent<sf::Text>>(text, "Samy"));
+                std::make_shared<ecs::TextComponent<sf::Text>>(text, n));
+        } else {
+            player.addComponent(
+                std::make_shared<ecs::TextComponent<std::string>>(n, n));
         }
         if (isLocalPlayer) {
             _game.setPlayerEntityID((int) player.getID());
@@ -52,7 +64,7 @@ namespace RType
             if (pos) {
                 std::stringstream sss;
                 sss << P_CONN << " " << id << " " << pos->getX() << " "
-                    << pos->getY() << PACKET_END;
+                    << pos->getY() << " " << n << PACKET_END;
                 if (!_game.isServer()) {
                     _game.refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::TCP, sss.str());
