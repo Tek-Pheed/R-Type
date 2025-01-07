@@ -84,6 +84,20 @@ void GameInstance::handleNetworkPlayers(
                 factory.buildBulletFromPlayer(id);
                 break;
             }
+            break;
+        }
+        case Protocol::P_DMG: {
+            if (tokens.size() >= 2) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                int health = atoi(tokens[1].c_str());
+                auto &player = getPlayerById(id);
+                auto healthComp = player.getComponent<ecs::HealthComponent>();
+                if (healthComp) {
+                    healthComp->setHealth(health);
+                }
+                break;
+            }
+            break;
         }
         default: break;
     }
@@ -108,7 +122,7 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-            .findEntitiesByComponent<ecs::PlayerComponent>());
+                .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
@@ -139,16 +153,33 @@ void GameInstance::deletePlayer(size_t playerID)
     }
 }
 
-// transform to set send entity position
+void GameInstance::damagePlayer(size_t playerID, int damage)
+{
+    if (isServer() || _isConnectedToServer) {
+        auto &pl = getPlayerById(playerID);
+        auto health = pl.getComponent<ecs::HealthComponent>();
+
+        if (health) {
+            health->setHealth(health->getHealth() - damage);
+            std::stringstream ss;
+            ss << P_DMG << " " << playerID << " " << health->getHealth()
+               << PACKET_END;
+            if (isServer()) {
+                refNetworkManager.sendToOthers(
+                    playerID, System::Network::ISocket::Type::UDP, ss.str());
+            }
+        }
+    }
+}
+
 void GameInstance::sendPlayerPosition(size_t playerID)
 {
     if (isServer() || _isConnectedToServer) {
         auto &player = getPlayerById(playerID);
         auto position = player.getComponent<ecs::PositionComponent>();
         std::stringstream ss;
-        ss << P_POS << " "
-           << player.getComponent<ecs::PlayerComponent>()->getPlayerID() << " "
-           << position->getX() << " " << position->getY() << PACKET_END;
+        ss << P_POS << " " << playerID << " " << position->getX() << " "
+           << position->getY() << PACKET_END;
         if (isServer()) {
             refNetworkManager.sendToOthers(
                 playerID, System::Network::ISocket::Type::UDP, ss.str());
@@ -162,6 +193,7 @@ void GameInstance::sendPlayerPosition(size_t playerID)
 void GameInstance::updatePlayerPosition(
     size_t playerID, float newX, float newY)
 {
+    std::unique_lock lock(_serverLock);
     auto &player = getPlayerById(playerID);
     auto position = player.getComponent<ecs::PositionComponent>();
 
@@ -184,9 +216,16 @@ void GameInstance::updatePlayerPosition(
 
 void GameInstance::playerAnimations(ecs::Entity &player)
 {
+    static std::unordered_map<size_t, sf::Clock> animationTimers;
     std::string direction = "";
     auto position = player.getComponent<ecs::PositionComponent>();
     auto renderComp = player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
+    size_t playerID =
+        player.getComponent<ecs::PlayerComponent>()->getPlayerID();
+
+    if (animationTimers[playerID].getElapsedTime().asMilliseconds() < 200) {
+        return;
+    }
 
     if (position->getY() < position->getOldY()) {
         direction = "top";
@@ -200,6 +239,13 @@ void GameInstance::playerAnimations(ecs::Entity &player)
     } else {
         renderComp->getSprite().setTextureRect(sf::Rect(66, 0, 33, 14));
     }
+
+    animationTimers[playerID].restart();
+}
+
+void GameInstance::setPlayerEntityID(int id)
+{
+    this->_playerEntityID = id;
 }
 
 void GameInstance::setPlayerEntityID(int id)

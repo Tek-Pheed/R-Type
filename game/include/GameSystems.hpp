@@ -65,6 +65,28 @@ namespace RType
             GameInstance *_game;
         };
 
+        class HealthSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
+
+          protected:
+            GameInstance *_game;
+        };
+
+        class HitboxSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
+            void BulletCollision(ecs::Entity &bullet);
+            void EnemyCollision(ecs::Entity &enemy, float deltaTime);
+
+          protected:
+            GameInstance *_game;
+        };
+
     } // namespace GameSystems
 
 } // namespace RType

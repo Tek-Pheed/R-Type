@@ -4,6 +4,7 @@
 ** File description:
 ** Factory.hpp
 */
+
 #ifndef R_TYPE_FACTORY_HPP
 #define R_TYPE_FACTORY_HPP
 
@@ -16,7 +17,7 @@ namespace RType
 {
     class Factory {
       public:
-        explicit Factory(GameInstance *game);
+        explicit Factory(GameInstance &game);
 
         ecs::Entity &buildButton(sf::Vector2f position, sf::Vector2f size,
             sf::Color fillColor = sf::Color::White,
@@ -28,8 +29,11 @@ namespace RType
             bool isLocalPlayer, size_t id, const std::string &name);
         ecs::Entity &buildBackground();
         void buildBulletFromPlayer(size_t playerID);
+        ecs::Entity &buildEnemy(
+            size_t id, float posX, float posY, float health = 100.0f);
 
-        GameInstance *_game;
+      private:
+        GameInstance &_game;
     };
 } // namespace RType
 

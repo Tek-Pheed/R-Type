@@ -123,6 +123,7 @@ void RType::GameInstance::connectToGame()
         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
             *this);
         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+        level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
         refEntityManager.switchLevel("mainRemoteLevel", false);
 
         _playerEntityID = -1;

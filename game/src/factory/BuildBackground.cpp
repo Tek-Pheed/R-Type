@@ -13,8 +13,7 @@ namespace RType
     ecs::Entity &Factory::buildBackground()
     {
         auto &bg = _game->refEntityManager.getPersistentLevel().createEntity();
-        auto &texture = _game->refAssetManager.getAsset<sf::Texture>(
-            Asset::BACKGROUND_TEXTURE);
+        auto &texture = _game->refAssetManager.getAsset<sf::Texture>(Asset::BACKGROUND_TEXTURE);
         sf::Sprite sprite;
 
         texture.setRepeated(true);

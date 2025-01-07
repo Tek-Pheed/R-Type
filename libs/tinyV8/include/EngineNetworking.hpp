@@ -121,7 +121,7 @@ namespace Engine
          * @param out: The output buffer.
          */
         virtual void serializeString(
-            const std::string &str, std::ostream &out) = 0;
+            const std::string &str, std::ostream &out, char key) = 0;
 
         /**
          * @brief Deserialize a string
@@ -129,14 +129,20 @@ namespace Engine
          * @param in: The buffer to deserialize.
          * @param out: The output string.
          */
-        virtual void deserializeString(
-            const std::ostream &in, std::string &out) = 0;
+        virtual std::string deserializeString(
+            std::istream &in, char key, size_t size) = 0;
+
+        virtual char getKey(void) const = 0;
     };
     namespace Feature
     {
         class NetworkingManager : public AEngineFeature {
             static size_t constexpr DEFAULT_TCP_PORT = 8081;
             static size_t constexpr DEFAULT_UDP_PORT = 8082;
+            static size_t constexpr UDP_PACKET_MAX_SIZE = 1400U;
+            static size_t constexpr UDP_BUFFER_MAX_QUEUED_PACKETS = 128;
+
+          public:
             struct NetClient {
               public:
                 System::Network::TCPSocket tcpSocket;
@@ -156,10 +162,9 @@ namespace Engine
                       writeBufferTCP(System::Network::byteArray()),
                       readBufferUDP(System::Network::byteArray()),
                       writeBufferUDP(System::Network::byteArray()),
-                      isReady(false), isDisconnected(false) {};
+                      isReady(false), isDisconnected(false){};
             };
 
-          public:
             explicit NetworkingManager(Core &engineRef);
             ~NetworkingManager();
 
@@ -320,6 +325,15 @@ namespace Engine
                 System::Network::ISocket::Type socketType,
                 const std::string &buffer);
 
+            /**
+             * @brief Checks if a client is still present.
+
+             * @param id: The id of the client.
+             * @return true: The client exists.
+             * @return false: The client does not exists.
+             */
+            bool hasClient(size_t id);
+
           protected:
             void engineOnStart(void) override;
             void engineOnTick(float deltaTimeSec) override;
@@ -344,7 +358,8 @@ namespace Engine
             bool _isServer = false;
             size_t _tcpPort = DEFAULT_TCP_PORT;
             size_t _updPort = DEFAULT_UDP_PORT;
-            std::mutex _globalMutex;
+            std::recursive_mutex _globalMutex;
+            std::mutex _writeFinished;
             std::condition_variable _writeCondition;
             std::mutex _writeMutex;
             size_t _clientCounter = 0;

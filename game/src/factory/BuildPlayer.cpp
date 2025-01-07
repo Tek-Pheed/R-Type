@@ -17,17 +17,19 @@ namespace RType
     {
         auto &player =
             _game->refEntityManager.getCurrentLevel().createEntity();
+      
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(
             std::make_shared<ecs::PositionComponent>(100, 100));
         player.addComponent(std::make_shared<ecs::HealthComponent>(100));
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
+        player.addComponent(
+            std::make_shared<ecs::HitboxComponent>(33 * 3, 14 * 3));
         if (!_game->isServer()) {
             auto &texture = _game->refAssetManager.getAsset<sf::Texture>(
                 Asset::PLAYER_TEXTURE);
             auto &font =
                 _game->refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
-
             sf::Sprite sprite;
             sprite.setTexture(texture);
             sprite.setTextureRect(sf::Rect(66, 0, 33, 14));

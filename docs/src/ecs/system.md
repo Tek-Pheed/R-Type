@@ -10,6 +10,7 @@ present in an entity.
 | Position system | Update position of a entity |
 | Render system   | Render entity with sfml     |
 | Bullet system   | Update bullet in game       |
+| Health system   | Update health in game       |
 
 ## Exemple
 

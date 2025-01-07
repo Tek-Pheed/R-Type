@@ -61,6 +61,11 @@ The protocol used (TPC/UDP) will be explicitly precised, and the way the paquet 
 - <- From Client to Server
 - <-> From Both
 
+All of the communication betweet the server and clients will be obsufcated, meaning that an XOR operation will be applied on the string
+using a secret key, shared by both the client and server.
+
+i.e.
+"901 4\t\n" -> "\a\000\000\000\000\000\000\000#*+:+\023\020"
 
 # Conventions and Definitions
 

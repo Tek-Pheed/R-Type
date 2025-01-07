@@ -62,10 +62,12 @@ void RType::GameInstance::createPersistentLevel()
     auto &level = refEntityManager.getPersistentLevel();
 
     if (!isServer())
-        factory.buildBackground();
+        _factory.buildBackground();
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
 }
 
 ecs::Entity &RType::GameInstance::buildButton(std::string str, int buttonID)
@@ -197,6 +199,7 @@ void RType::GameInstance::levelMainMenu()
                                     - (float) 50 / 2 - (float) 75 * -2),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "EXIT",
             40, sf::Color::Black, ecs::ClickableType::EXIT);
+        
     }
 }
 
@@ -355,7 +358,7 @@ void RType::GameInstance::levelSettingsMenu()
             std::string afterAutoFireEqual =
                 autoFireAction.substr(equalPosAutoFire + 1);
             endAutoFire = beforeAutoFireEqual + " : "
-                + (afterAutoFireEqual == "true" ? "YES" : "NO");
+                + (afterAutoFireEqual == "true" ? "Yes" : "No");
         }
 
         factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2

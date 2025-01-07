@@ -300,9 +300,8 @@ namespace Engine
             void engineOnTick(float deltaTimeSec)
             {
                 _persistentLevel.engineOnTick(deltaTimeSec);
-                for (auto &[name, level] : _levels) {
-                    level.engineOnTick(deltaTimeSec);
-                }
+                if (_currentLevel != "")
+                    getCurrentLevel().engineOnTick(deltaTimeSec);
             };
             void engineOnStop(void) {};
             void engineOnStart(void) {};

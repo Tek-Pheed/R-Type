@@ -9,7 +9,7 @@
 
 namespace RType
 {
-    Factory::Factory(RType::GameInstance *game) : _game(game)
+    Factory::Factory(RType::GameInstance &game) : _game(game)
     {
     }
 } // namespace RType
