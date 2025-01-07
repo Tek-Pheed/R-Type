@@ -166,6 +166,8 @@ namespace RType
         std::vector<ecs::Entity> _inputList;
         size_t _lastInputIdClicked;
 
+        sf::Sound _currentMusic;
+
       private:
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;

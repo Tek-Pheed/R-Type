@@ -25,6 +25,7 @@
 #include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
 #include "system_network.hpp"
+#include "GameAssets.hpp"
 
 using namespace RType;
 
@@ -70,6 +71,9 @@ void RType::GameInstance::clientHandlerConnection(
 
 void RType::GameInstance::connectToGame()
 {
+    Factory factory(this);
+    auto &levelSong = factory._game->refAssetManager.getAsset<sf::SoundBuffer>(Asset::LEVEL_SONG);
+
     if (_isConnectedToServer)
         return;
     auto currentLevel = refEntityManager.getCurrentLevelName();
@@ -101,6 +105,14 @@ void RType::GameInstance::connectToGame()
         refNetworkManager.setupClient<RType::PacketHandler>(
             _tcpPort, _udpPort, _ip);
 
+        if (this->_currentMusic.getStatus() == sf::SoundSource::Playing) {
+            this->_currentMusic.stop();
+            this->_currentMusic.setBuffer(levelSong);
+            this->_currentMusic.setLoop(true);
+            this->_currentMusic.setVolume(25.0f);
+            this->_currentMusic.play();
+        }
+
         // Prepare level
         auto &level = refEntityManager.createNewLevel("mainRemoteLevel");
         level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
@@ -109,6 +121,7 @@ void RType::GameInstance::connectToGame()
             *this);
         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
         refEntityManager.switchLevel("mainRemoteLevel", false);
+
         _playerEntityID = -1;
         _isConnectedToServer = true;
     } catch (const std::exception &e) {

@@ -150,10 +150,13 @@ void RType::GameInstance::levelMainMenu()
     if (!isServer()) {
         auto &title = refEntityManager.getCurrentLevel().createEntity();
         auto &musicSong = factory._game->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
-        static sf::Sound music;
-        music.setBuffer(musicSong);
-        music.setVolume(25.0f);
-        music.play();
+
+        if (this->_currentMusic.getStatus() != sf::SoundSource::Playing) {
+            this->_currentMusic.setBuffer(musicSong);
+            this->_currentMusic.setVolume(25.0f);
+            this->_currentMusic.setLoop(true);
+            this->_currentMusic.play();
+        }
 
         sf::Text text;
         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
