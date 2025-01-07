@@ -84,6 +84,8 @@ namespace RType
 
         std::vector<ecs::Entity> &getEntities();
 
+        std::string _playerName;
+
         // Enemies
         ecs::Entity &buildEnemy(
             size_t id, float posX, float posY, float health);

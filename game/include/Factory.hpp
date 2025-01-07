@@ -24,7 +24,8 @@ namespace RType
             const std::string &str = "", unsigned int characterSize = 40,
             sf::Color textColor = sf::Color::Black,
             ecs::ClickableType type = ecs::ClickableType::LAUNCH);
-        ecs::Entity &buildPlayer(bool isLocalPlayer, size_t id);
+        ecs::Entity &buildPlayer(
+            bool isLocalPlayer, size_t id, const std::string &name);
         ecs::Entity &buildBackground();
         void buildBulletFromPlayer(size_t playerID);
 

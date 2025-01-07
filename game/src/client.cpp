@@ -21,11 +21,11 @@
 #include "Events.hpp"
 #include "Factory.hpp"
 #include "Game.hpp"
+#include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
 #include "system_network.hpp"
-#include "GameAssets.hpp"
 
 using namespace RType;
 
@@ -57,7 +57,8 @@ void RType::GameInstance::clientHandlerConnection(
 
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
-                    factory.buildPlayer(true, (size_t) _netClientID);
+                    factory.buildPlayer(
+                        true, (size_t) _netClientID, _playerName);
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }
@@ -72,7 +73,8 @@ void RType::GameInstance::clientHandlerConnection(
 void RType::GameInstance::connectToGame()
 {
     Factory factory(this);
-    auto &levelSong = factory._game->refAssetManager.getAsset<sf::SoundBuffer>(Asset::LEVEL_SONG);
+    auto &levelSong = factory._game->refAssetManager.getAsset<sf::SoundBuffer>(
+        Asset::LEVEL_SONG);
 
     if (_isConnectedToServer)
         return;
@@ -91,6 +93,7 @@ void RType::GameInstance::connectToGame()
                 continue;
 
             switch (count) {
+                case 1: _playerName = text->getStr(); break;
                 case 2: _ip = text->getStr(); break;
                 case 3:
                     _tcpPort = (uint16_t) std::atoi(text->getStr().c_str());

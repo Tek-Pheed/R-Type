@@ -12,7 +12,8 @@
 
 namespace RType
 {
-    ecs::Entity &Factory::buildPlayer(bool isLocalPlayer, size_t id)
+    ecs::Entity &Factory::buildPlayer(
+        bool isLocalPlayer, size_t id, const std::string &name)
     {
         auto &player =
             _game->refEntityManager.getCurrentLevel().createEntity();
@@ -41,7 +42,7 @@ namespace RType
             text.setFont(font);
             text.setCharacterSize(20);
             player.addComponent(
-                std::make_shared<ecs::TextComponent<sf::Text>>(text, "Samy"));
+                std::make_shared<ecs::TextComponent<sf::Text>>(text, name));
         }
         if (isLocalPlayer) {
             _game->setPlayerEntityID((int) player.getID());
