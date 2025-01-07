@@ -130,6 +130,22 @@ namespace ecs
         const float _moveDelta;
     };
 
+    template <typename musicType> class MusicComponent : public Component {
+      public:
+        explicit MusicComponent(musicType &music): _music(music) {}
+
+        musicType getMusicType() {
+          return this->_music;
+        }
+
+        void setMusicType(musicType &music) {
+          _music = music;
+        }
+
+        private:
+          musicType _music;
+    };
+
     template <typename spriteType> class SpriteComponent : public Component {
       public:
         SpriteComponent(spriteType &sprite, int sizeX, int sizeY)
