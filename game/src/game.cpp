@@ -15,7 +15,6 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
@@ -25,7 +24,6 @@
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
-#include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Texture.hpp"
@@ -97,7 +95,7 @@ void GameInstance::gameTick(
             static float time = 15.0f;
 
             time += deltaTime_sec;
-            if (time >= 15.0f) {
+            if (time >= 5.0f) {
                 _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
                 time = 0.0f;
             }

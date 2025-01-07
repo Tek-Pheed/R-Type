@@ -82,6 +82,7 @@ void RType::GameInstance::connectToGame()
         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
             *this);
         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
+        level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
         refEntityManager.switchLevel("mainRemoteLevel", false);
         _playerEntityID = -1;
         _isConnectedToServer = true;
@@ -130,7 +131,9 @@ sf::RenderWindow &GameInstance::getWindow()
 
 constexpr unsigned int str2int(const char *str, int h = 0)
 {
-    return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
+    return !str[h]
+        ? 5381
+        : (str2int(str, h + 1) * 33) ^ static_cast<unsigned int>(str[h]);
 }
 void GameInstance::playEvent()
 {

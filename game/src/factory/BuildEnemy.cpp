@@ -30,7 +30,7 @@ ecs::Entity &RType::Factory::buildEnemy(
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(
         std::make_shared<ecs::VelocityComponent>(-200.0f, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(32.0f, 32.0f));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));
 
     if (!_game.isServer()) {
         auto &texture =

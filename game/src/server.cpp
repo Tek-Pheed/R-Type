@@ -127,6 +127,7 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
     refEntityManager.switchLevel("mainLevel");
 }
 

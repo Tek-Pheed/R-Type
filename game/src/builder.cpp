@@ -16,7 +16,6 @@
 #include "Components.hpp"
 #include "Config.hpp"
 #include "Entity.hpp"
-#include "ErrorClass.hpp"
 #include "Factory.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
@@ -62,6 +61,7 @@ void RType::GameInstance::createPersistentLevel()
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
 }
 
 ecs::Entity &RType::GameInstance::buildButton(std::string str, int buttonID)
