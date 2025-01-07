@@ -15,9 +15,8 @@ namespace RType
     ecs::Entity &Factory::buildPlayer(
         bool isLocalPlayer, size_t id, const std::string &name)
     {
-        auto &player =
-            _game->refEntityManager.getCurrentLevel().createEntity();
-      
+        auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
+
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(
             std::make_shared<ecs::PositionComponent>(100, 100));
@@ -25,11 +24,11 @@ namespace RType
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
         player.addComponent(
             std::make_shared<ecs::HitboxComponent>(33 * 3, 14 * 3));
-        if (!_game->isServer()) {
-            auto &texture = _game->refAssetManager.getAsset<sf::Texture>(
+        if (!_game.isServer()) {
+            auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
                 Asset::PLAYER_TEXTURE);
             auto &font =
-                _game->refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
+                _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
             sf::Sprite sprite;
             sprite.setTexture(texture);
             sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
@@ -47,20 +46,20 @@ namespace RType
                 std::make_shared<ecs::TextComponent<sf::Text>>(text, name));
         }
         if (isLocalPlayer) {
-            _game->setPlayerEntityID((int) player.getID());
+            _game.setPlayerEntityID((int) player.getID());
         }
-        if ((isLocalPlayer && _game->isConnectedToServer())
-            || _game->isServer()) {
+        if ((isLocalPlayer && _game.isConnectedToServer())
+            || _game.isServer()) {
             auto pos = player.getComponent<ecs::PositionComponent>();
             if (pos) {
                 std::stringstream sss;
                 sss << P_CONN << " " << id << " " << pos->getX() << " "
                     << pos->getY() << PACKET_END;
-                if (!_game->isServer()) {
-                    _game->refNetworkManager.sendToAll(
+                if (!_game.isServer()) {
+                    _game.refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::TCP, sss.str());
                 } else {
-                    _game->refNetworkManager.sendToOthers(
+                    _game.refNetworkManager.sendToOthers(
                         id, System::Network::ISocket::Type::TCP, sss.str());
                 }
             }

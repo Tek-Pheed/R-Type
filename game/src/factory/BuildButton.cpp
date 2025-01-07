@@ -15,8 +15,7 @@ namespace RType
         unsigned int characterSize, sf::Color textColor,
         ecs::ClickableType type)
     {
-        auto &button =
-            _game->refEntityManager.getCurrentLevel().createEntity();
+        auto &button = _game.refEntityManager.getCurrentLevel().createEntity();
 
         sf::RectangleShape rect;
         rect.setFillColor(fillColor);
@@ -42,7 +41,7 @@ namespace RType
             ecs::RenderComponent::ObjectType::BUTTON));
         button.addComponent(std::make_shared<ecs::ClickableComponent>(type));
 
-        _game->_inputList.push_back(button);
+        _game._inputList.push_back(button);
 
         return button;
     }

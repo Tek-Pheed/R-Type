@@ -14,12 +14,11 @@ namespace RType
 {
     void Factory::buildBulletFromPlayer(size_t playerID)
     {
-        auto player = _game->getPlayerById(playerID);
+        auto player = _game.getPlayerById(playerID);
         auto positionComp = player.getComponent<ecs::PositionComponent>();
         if (!positionComp)
             return;
-        auto &bullet =
-            _game->refEntityManager.getCurrentLevel().createEntity();
+        auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
         bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
         bullet.addComponent(
             std::make_shared<ecs::VelocityComponent>(350.0f, 0));
@@ -28,11 +27,11 @@ namespace RType
 
         std::stringstream ss;
         ss << P_SHOOT << " " << playerID << " " << PACKET_END;
-        if (_game->isServer()) {
-            _game->refNetworkManager.sendToOthers(
+        if (_game.isServer()) {
+            _game.refNetworkManager.sendToOthers(
                 playerID, System::Network::ISocket::Type::UDP, ss.str());
         } else {
-            auto &texture = _game->refAssetManager.getAsset<sf::Texture>(
+            auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
                 Asset::BULLET_TEXTURE);
             bullet.addComponent(std::make_shared<ecs::RenderComponent>(
                 ecs::RenderComponent::ObjectType::SPRITE));
@@ -43,14 +42,14 @@ namespace RType
                 std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
                     s, 132, 33));
             auto &bulletSound =
-                _game->refAssetManager.getAsset<sf::SoundBuffer>(
+                _game.refAssetManager.getAsset<sf::SoundBuffer>(
                     Asset::BULLET_SOUND);
             static sf::Sound sound;
             sound.setBuffer(bulletSound);
             sound.setVolume(25.0f);
             sound.play();
-            if (playerID == (size_t) _game->getNetClientID())
-                _game->refNetworkManager.sendToAll(
+            if (playerID == (size_t) _game.getNetClientID())
+                _game.refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::UDP, ss.str());
         }
     }

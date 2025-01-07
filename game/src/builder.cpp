@@ -58,7 +58,6 @@ std::string getKeyString(sf::Keyboard::Key key)
 
 void RType::GameInstance::createPersistentLevel()
 {
-    Factory factory(this);
     auto &level = refEntityManager.getPersistentLevel();
 
     if (!isServer())
@@ -147,11 +146,11 @@ void RType::GameInstance::levelMainMenu()
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     refEntityManager.switchLevel("mainMenu");
-    Factory factory(this);
 
     if (!isServer()) {
         auto &title = refEntityManager.getCurrentLevel().createEntity();
-        auto &musicSong = factory._game->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
+        auto &musicSong =
+            this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
 
         if (this->_currentMusic.getStatus() != sf::SoundSource::Playing) {
             this->_currentMusic.setBuffer(musicSong);
@@ -179,34 +178,35 @@ void RType::GameInstance::levelMainMenu()
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F Type V8"));
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * 0),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 0),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "PLAY",
             40, sf::Color::Black, ecs::ClickableType::MULTIPLAYER);
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * -1),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
             "SETTINGS", 40, sf::Color::Black, ecs::ClickableType::SETTINGS);
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * -2),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -2),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "EXIT",
             40, sf::Color::Black, ecs::ClickableType::EXIT);
-        
     }
 }
 
 void RType::GameInstance::levelContinueMenu()
 {
     auto &level = refEntityManager.createNewLevel("continueMenu");
-    Factory factory(this);
 
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
@@ -238,16 +238,18 @@ void RType::GameInstance::levelContinueMenu()
         buildInput("IP ADRESS", 1);
         buildInput("TCP PORT", 0);
         buildInput("UDP PORT", -1);
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * -3),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -3),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
             "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * -4),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -4),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "BACK",
             40, sf::Color::Black, ecs::ClickableType::BACK);
     }
@@ -257,7 +259,6 @@ void RType::GameInstance::levelSettingsMenu()
 {
     Config config("config.cfg");
     auto &level = refEntityManager.createNewLevel("settingsMenu");
-    Factory factory(this);
 
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
@@ -361,46 +362,52 @@ void RType::GameInstance::levelSettingsMenu()
                 + (afterAutoFireEqual == "true" ? "Yes" : "No");
         }
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * 2),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 2),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
             endUpMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_UP);
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * 1),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 1),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
             endDownMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_DOWN);
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * 0),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 0),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
             endRightMove, 40, sf::Color::Black,
             ecs::ClickableType::MOVE_RIGHT);
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * -1),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
             endLeftMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_LEFT);
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * -2),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -2),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
             endAutoFire, 40, sf::Color::Black, ecs::ClickableType::AUTO_FIRE);
 
-        factory.buildButton(sf::Vector2f((float) this->_window->getSize().x / 2
-                                    - (float) 700 / 2,
-                                (float) this->_window->getSize().y / 2
-                                    - (float) 50 / 2 - (float) 75 * -3),
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -3),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "BACK",
             40, sf::Color::Black, ecs::ClickableType::BACK);
     }

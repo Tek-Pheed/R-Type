@@ -19,7 +19,6 @@
 #include "Config.hpp"
 #include "Engine.hpp"
 #include "Events.hpp"
-#include "Factory.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
@@ -32,8 +31,6 @@ using namespace RType;
 void RType::GameInstance::clientHandlerConnection(
     int code, const std::vector<std::string> &tokens)
 {
-    Factory factory(this);
-
     switch (code) {
         case Protocol::C_INIT_UDP: {
             if (tokens.size() >= 1) {
@@ -57,7 +54,7 @@ void RType::GameInstance::clientHandlerConnection(
 
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
-                    factory.buildPlayer(
+                    _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                 } else {
                     std::cout << "The connection failed." << std::endl;
@@ -72,9 +69,8 @@ void RType::GameInstance::clientHandlerConnection(
 
 void RType::GameInstance::connectToGame()
 {
-    Factory factory(this);
-    auto &levelSong = factory._game->refAssetManager.getAsset<sf::SoundBuffer>(
-        Asset::LEVEL_SONG);
+    auto &levelSong =
+        this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::LEVEL_SONG);
 
     if (_isConnectedToServer)
         return;
@@ -176,15 +172,14 @@ void GameInstance::playEvent()
     sf::Event event;
     std::stringstream ss;
     Config config("config.cfg");
-    EventManager event_manager(this);
-    Factory factory(this);
+    EventManager event_manager(*this, _factory);
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
     if (hasLocalPlayer() && autoFireEnabled
         && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
         if (_netClientID >= 0) {
-            factory.buildBulletFromPlayer((size_t) _netClientID);
+            _factory.buildBulletFromPlayer((size_t) _netClientID);
             this->_autoFireClock.restart();
         }
     }

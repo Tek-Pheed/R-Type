@@ -10,11 +10,11 @@
 
 #include <SFML/Graphics.hpp>
 #include "Entity.hpp"
-#include "Game.hpp"
 #include "components/ClickableComponent.hpp"
 
 namespace RType
 {
+  class GameInstance;
     class Factory {
       public:
         explicit Factory(GameInstance &game);

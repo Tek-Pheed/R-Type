@@ -5,8 +5,7 @@
 ** game
 */
 
-#ifndef GAME_HPP
-#define GAME_HPP
+#pragma once
 
 #if defined(WIN32)
     #define NOMINMAX
@@ -28,9 +27,6 @@
 
 namespace RType
 {
-
-    class Factory;
-
     class GameInstance {
       public:
         static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
@@ -197,5 +193,3 @@ namespace RType
         sf::Clock _autoFireClock;
     };
 }; // namespace RType
-
-#endif /* GAME_HPP */

@@ -29,18 +29,16 @@ using namespace RType;
 void GameInstance::handleNetworkPlayers(
     int code, const std::vector<std::string> &tokens)
 {
-    Factory factory(this);
-
     switch (code) {
         case Protocol::P_CONN: {
             if (tokens.size() >= 3) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::shared_ptr<ecs::PositionComponent> pos;
                 if (isServer()) {
-                    auto &pl = factory.buildPlayer(true, id, "");
+                    auto &pl = _factory.buildPlayer(true, id, "");
                     pos = pl.getComponent<ecs::PositionComponent>();
                 } else {
-                    auto &pl = factory.buildPlayer(false, id, "");
+                    auto &pl = _factory.buildPlayer(false, id, "");
                     pos = pl.getComponent<ecs::PositionComponent>();
                 }
                 updatePlayerPosition(id, (float) std::atof(tokens[1].c_str()),
@@ -81,7 +79,7 @@ void GameInstance::handleNetworkPlayers(
         case Protocol::P_SHOOT: {
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
-                factory.buildBulletFromPlayer(id);
+                _factory.buildBulletFromPlayer(id);
                 break;
             }
             break;
@@ -122,7 +120,7 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
@@ -241,11 +239,6 @@ void GameInstance::playerAnimations(ecs::Entity &player)
     }
 
     animationTimers[playerID].restart();
-}
-
-void GameInstance::setPlayerEntityID(int id)
-{
-    this->_playerEntityID = id;
 }
 
 void GameInstance::setPlayerEntityID(int id)
