@@ -5,8 +5,7 @@
 ** game
 */
 
-#ifndef GAME_HPP
-#define GAME_HPP
+#pragma once
 
 #if defined(WIN32)
     #define NOMINMAX
@@ -28,9 +27,6 @@
 
 namespace RType
 {
-
-    class Factory;
-
     class GameInstance {
       public:
         static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
@@ -56,18 +52,22 @@ namespace RType
 
         // Server state
         bool isConnectedToServer();
+        ssize_t getNetClientID();
 
         // Texture Utilities
         void loadAssets();
 
-        ecs::Entity &buildBackground(void);
+        ecs::Entity &buildBackground();
         ecs::Entity &buildButton(std::string text, int buttonNb);
-        void levelMainMenu(void);
-        void createPersistentLevel(void);
-        void levelSettingsMenu(void);
+        ecs::Entity &buildInput(std::string str, int buttonID);
+        void levelMainMenu();
+        void createPersistentLevel();
+        void levelSettingsMenu();
+        void levelContinueMenu();
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
+        void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         // Player functions and utilities
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
@@ -84,8 +84,14 @@ namespace RType
 
         std::vector<ecs::Entity> &getEntities();
 
+        std::string _playerName;
+
         // Enemies
         ecs::Entity &buildEnemy(
+            size_t id, float posX, float posY, float health);
+
+        // Boss
+        ecs::Entity &buildBoss(
             size_t id, float posX, float posY, float health = 100.0f);
         ecs::Entity &getEnemyById(size_t enemyID);
         void sendEnemyPosition(size_t enemyID);
@@ -157,6 +163,19 @@ namespace RType
         bool _isSettingsLeftButtonClicked = false;
         bool _isSettingsDownButtonClicked = false;
 
+        bool _isSettingsNicknameButtonClicked = false;
+        std::vector<sf::Keyboard::Key> _nicknameKeys;
+        ecs::Entity *_nicknameInputEntity = nullptr;
+
+        // MENU
+        std::vector<ecs::Entity> _buttonList;
+        size_t _lastButtonIdClicked;
+
+        std::vector<ecs::Entity> _inputList;
+        size_t _lastInputIdClicked;
+
+        sf::Sound _currentMusic;
+
       private:
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
@@ -174,5 +193,3 @@ namespace RType
         sf::Clock _autoFireClock;
     };
 }; // namespace RType
-
-#endif /* GAME_HPP */

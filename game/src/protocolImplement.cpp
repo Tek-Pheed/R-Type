@@ -31,6 +31,8 @@ int GameInstance::is_code_valid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
+    if (code >= B_SPAWN && code <= B_DMG)
+        return 4;
     if (code >= C_INIT_UDP && code <= C_AUTH)
         return 9;
     return -1;

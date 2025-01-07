@@ -135,3 +135,8 @@ bool GameInstance::isConnectedToServer()
 {
     return this->_isConnectedToServer;
 }
+
+ssize_t GameInstance::getNetClientID()
+{
+    return this->_netClientID;
+}

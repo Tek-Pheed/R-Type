@@ -13,11 +13,10 @@
 #include <sstream>
 #include <string>
 #include "Components.hpp"
-#include "EngineNetworking.hpp"
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
+#include "Factory.hpp"
 #include "Game.hpp"
-#include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "system_network.hpp"
@@ -36,10 +35,10 @@ void GameInstance::handleNetworkPlayers(
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::shared_ptr<ecs::PositionComponent> pos;
                 if (isServer()) {
-                    auto &pl = _factory.buildPlayer(true, id);
+                    auto &pl = _factory.buildPlayer(true, id, "");
                     pos = pl.getComponent<ecs::PositionComponent>();
                 } else {
-                    auto &pl = _factory.buildPlayer(false, id);
+                    auto &pl = _factory.buildPlayer(false, id, "");
                     pos = pl.getComponent<ecs::PositionComponent>();
                 }
                 updatePlayerPosition(id, (float) std::atof(tokens[1].c_str()),
@@ -80,7 +79,7 @@ void GameInstance::handleNetworkPlayers(
         case Protocol::P_SHOOT: {
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
-                playerShoot(id);
+                _factory.buildBulletFromPlayer(id);
                 break;
             }
             break;
@@ -121,7 +120,7 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
@@ -210,41 +209,6 @@ void GameInstance::updatePlayerPosition(
                 || isServer())
                 sendPlayerPosition(playerID);
         }
-    }
-}
-
-void GameInstance::playerShoot(size_t playerID)
-{
-    std::unique_lock lock(_serverLock);
-    auto player = getPlayerById(playerID);
-    auto positionComp = player.getComponent<ecs::PositionComponent>();
-    if (!positionComp)
-        return;
-    auto &bullet = refEntityManager.getCurrentLevel().createEntity();
-    bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
-    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
-    bullet.addComponent(std::make_shared<ecs::PositionComponent>(
-        positionComp->getX() + 100, positionComp->getY() + 25));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(10.0f, 10.0f));
-
-    std::stringstream ss;
-    ss << P_SHOOT << " " << playerID << " " << PACKET_END;
-    if (isServer()) {
-        refNetworkManager.sendToOthers(
-            playerID, System::Network::ISocket::Type::UDP, ss.str());
-    } else {
-        auto &texture =
-            refAssetManager.getAsset<sf::Texture>(Asset::BULLET_TEXTURE);
-        bullet.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::SPRITE));
-        sf::Sprite s;
-        s.setTexture(texture);
-        s.setTextureRect(sf::Rect(137, 153, 64, 16));
-        bullet.addComponent(
-            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
-        if (playerID == (size_t) _netClientID)
-            refNetworkManager.sendToAll(
-                System::Network::ISocket::Type::UDP, ss.str());
     }
 }
 

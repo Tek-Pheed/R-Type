@@ -11,6 +11,7 @@
 
 #include "Game.hpp"
 #include "GameSystems.hpp"
+#include "Components.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 
 using namespace RType;

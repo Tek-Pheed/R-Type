@@ -19,8 +19,8 @@
 #include "Config.hpp"
 #include "Engine.hpp"
 #include "Events.hpp"
-#include "Factory.hpp"
 #include "Game.hpp"
+#include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Window/VideoMode.hpp"
@@ -54,7 +54,8 @@ void RType::GameInstance::clientHandlerConnection(
 
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
-                    _factory.buildPlayer(true, (size_t) _netClientID);
+                    _factory.buildPlayer(
+                        true, (size_t) _netClientID, _playerName);
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }
@@ -68,12 +69,48 @@ void RType::GameInstance::clientHandlerConnection(
 
 void RType::GameInstance::connectToGame()
 {
+    auto &levelSong =
+        this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::LEVEL_SONG);
+
     if (_isConnectedToServer)
         return;
     auto currentLevel = refEntityManager.getCurrentLevelName();
     try {
+        size_t count = 0;
+
+        for (auto &entity : _inputList) {
+            count++;
+            auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+            if (!text)
+                continue;
+
+            if (text->getStr().empty())
+                continue;
+
+            switch (count) {
+                case 1: _playerName = text->getStr(); break;
+                case 2: _ip = text->getStr(); break;
+                case 3:
+                    _tcpPort = (uint16_t) std::atoi(text->getStr().c_str());
+                    break;
+                case 4:
+                    _udpPort = (uint16_t) std::atoi(text->getStr().c_str());
+                    break;
+                default: break;
+            }
+        }
+
         refNetworkManager.setupClient<RType::PacketHandler>(
             _tcpPort, _udpPort, _ip);
+
+        if (this->_currentMusic.getStatus() == sf::SoundSource::Playing) {
+            this->_currentMusic.stop();
+            this->_currentMusic.setBuffer(levelSong);
+            this->_currentMusic.setLoop(true);
+            this->_currentMusic.setVolume(25.0f);
+            this->_currentMusic.play();
+        }
 
         // Prepare level
         auto &level = refEntityManager.createNewLevel("mainRemoteLevel");
@@ -84,6 +121,7 @@ void RType::GameInstance::connectToGame()
         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
         refEntityManager.switchLevel("mainRemoteLevel", false);
+
         _playerEntityID = -1;
         _isConnectedToServer = true;
     } catch (const std::exception &e) {
@@ -129,25 +167,19 @@ sf::RenderWindow &GameInstance::getWindow()
     return *_window;
 }
 
-constexpr unsigned int str2int(const char *str, int h = 0)
-{
-    return !str[h]
-        ? 5381
-        : (str2int(str, h + 1) * 33) ^ static_cast<unsigned int>(str[h]);
-}
 void GameInstance::playEvent()
 {
     sf::Event event;
     std::stringstream ss;
     Config config("config.cfg");
-    EventManager event_manager(this);
+    EventManager event_manager(*this, _factory);
 
     bool autoFireEnabled = config.getAutoFireConfig();
 
     if (hasLocalPlayer() && autoFireEnabled
         && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
         if (_netClientID >= 0) {
-            playerShoot((size_t) _netClientID);
+            _factory.buildBulletFromPlayer((size_t) _netClientID);
             this->_autoFireClock.restart();
         }
     }
@@ -159,32 +191,6 @@ void GameInstance::playEvent()
         }
         if (event.type == sf::Event::KeyPressed) {
             event_manager.keyPressed(event);
-            /*if (this->_isSettingsUpButtonClicked) {
-                keyPressed = event.key.code;
-                handleConfigButtons(keyPressed, 0);
-                this->_isSettingsUpButtonClicked = false;
-            } else if (this->_isSettingsRightButtonClicked) {
-                keyPressed = event.key.code;
-                handleConfigButtons(keyPressed, -1);
-                this->_isSettingsRightButtonClicked = false;
-            } else if (this->_isSettingsLeftButtonClicked) {
-                keyPressed = event.key.code;
-                handleConfigButtons(keyPressed, -2);
-                this->_isSettingsLeftButtonClicked = false;
-            } else if (this->_isSettingsDownButtonClicked) {
-                keyPressed = event.key.code;
-                handleConfigButtons(keyPressed, -3);
-                this->_isSettingsDownButtonClicked = false;
-            }*/
-            if (hasLocalPlayer()) {
-                auto &player = getLocalPlayer();
-                auto velocity = player.getComponent<ecs::VelocityComponent>();
-                if (!autoFireEnabled
-                    && event.key.code == sf::Keyboard::Space) {
-                    if (_netClientID >= 0)
-                        playerShoot((size_t) _netClientID);
-                }
-            }
         }
         if (hasLocalPlayer() && event.type == sf::Event::KeyReleased) {
             event_manager.keyReleased(event);
