@@ -15,7 +15,6 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
@@ -24,7 +23,6 @@
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
-#include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Texture.hpp"
@@ -60,6 +58,10 @@ void GameInstance::loadAssets()
         for (const auto asset : Asset::getAllAssetsOfType<sf::Font>()) {
             refAssetManager.loadAsset(
                 asset->path, asset->identifier, &sf::Font::loadFromFile);
+        }
+        for (const auto asset : Asset::getAllAssetsOfType<sf::SoundBuffer>()) {
+            refAssetManager.loadAsset(
+                asset->path, asset->identifier, &sf::SoundBuffer::loadFromFile);
         }
     } catch (const std::exception &e) {
         std::cout << "Failed to an load asset with error: " << e.what()
@@ -98,7 +100,7 @@ void GameInstance::gameTick(
                 return;
             static float time = 15.0f;
             time += deltaTime_sec;
-            if (time >= 15.0f) {
+            if (time >= 5.0f) {
                 _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
                 time = 0.0f;
             }
@@ -151,7 +153,7 @@ int RType::GameInstance::manageBuffers()
             case 1: handleNetworkEnemies(code, tokens); break;
             // case 2: handle_terrain(code, tokens); break;
             // case 3: handle_mechs(code, tokens); break;
-            case 4: handleLoby(code, tokens); break;
+            case 24: handleLoby(code, tokens); break;
             case 9:
                 if (isServer()) {
                     serverHanlderValidateConnection(code, tokens);

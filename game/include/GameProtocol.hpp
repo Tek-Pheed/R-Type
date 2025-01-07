@@ -48,9 +48,16 @@ namespace RType
         M_LOSE = 134,
         M_GOVER = 135,
 
+        // Boss
+        B_SPAWN = 141,
+        B_POS = 142,
+        B_DEAD = 143,
+        B_SHOOT = 144,
+        B_DMG = 145,
+
         // Loby
-        L_STARTGAME = 141,
-        L_SETMAXPLAYRS = 142,
+        L_STARTGAME = 241,
+        L_SETMAXPLAYRS = 242,
     };
 
     template <typename... Args>

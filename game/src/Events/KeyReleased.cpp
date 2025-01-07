@@ -5,12 +5,14 @@
 ** KeyReleased.cpp
 */
 
-#include "Events.hpp"
 #include "Config.hpp"
+#include "Events.hpp"
 #include "Utils.hpp"
 
-namespace RType {
-    void EventManager::keyReleased(sf::Event &event) {
+namespace RType
+{
+    void EventManager::keyReleased(sf::Event &event)
+    {
         Config config("config.cfg");
         Utils utils;
 
@@ -20,19 +22,20 @@ namespace RType {
         std::string moveDownKeyString = config.getKeyFromConfig("MOVE_DOWN");
 
         sf::Keyboard::Key moveUpKey = utils.getKeyFromString(moveUpKeyString);
-        sf::Keyboard::Key moveRightKey = utils.getKeyFromString(moveRightKeyString);
-        sf::Keyboard::Key moveLeftKey = utils.getKeyFromString(moveLeftKeyString);
-        sf::Keyboard::Key moveDownKey = utils.getKeyFromString(moveDownKeyString);
+        sf::Keyboard::Key moveRightKey =
+            utils.getKeyFromString(moveRightKeyString);
+        sf::Keyboard::Key moveLeftKey =
+            utils.getKeyFromString(moveLeftKeyString);
+        sf::Keyboard::Key moveDownKey =
+            utils.getKeyFromString(moveDownKeyString);
 
-        auto &player = _game->getLocalPlayer();
+        auto &player = _game.getLocalPlayer();
         auto velocity = player.getComponent<ecs::VelocityComponent>();
-        if (event.key.code == moveUpKey
-            || event.key.code == moveDownKey) {
+        if (event.key.code == moveUpKey || event.key.code == moveDownKey) {
             velocity->setVy(0.0f);
-            }
-        if (event.key.code == moveLeftKey
-            || event.key.code == moveRightKey) {
+        }
+        if (event.key.code == moveLeftKey || event.key.code == moveRightKey) {
             velocity->setVx(0.0f);
-            }
+        }
     }
-}
+} // namespace RType

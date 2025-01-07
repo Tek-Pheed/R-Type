@@ -32,6 +32,8 @@ int GameInstance::is_code_valid(int code)
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
     if (code >= L_STARTGAME && code <= L_SETMAXPLAYRS)
+        return 24;
+    if (code >= B_SPAWN && code <= B_DMG)
         return 4;
     if (code >= C_INIT_UDP && code <= C_AUTH)
         return 9;

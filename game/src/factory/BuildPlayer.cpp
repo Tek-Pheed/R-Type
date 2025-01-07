@@ -14,8 +14,6 @@
 
 namespace RType
 {
-    // If isLocalPlayer is set to false, then this function should only be
-    // triggered by a request from the server
     ecs::Entity &Factory::buildPlayer(
         bool isLocalPlayer, size_t id, const std::string &name)
     {
@@ -26,7 +24,9 @@ namespace RType
             std::make_shared<ecs::PositionComponent>(100, 100));
         player.addComponent(std::make_shared<ecs::HealthComponent>(100));
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
-        std::string n = GameInstance::DEFAULT_PLAYER_NAME;
+        player.addComponent(
+            std::make_shared<ecs::HitboxComponent>(33 * 3, 14 * 3));
+        std::string n = DEFAULT_PLAYER_NAME;
         if (name != "")
             n = name;
         if (!_game.isServer()) {
@@ -34,7 +34,6 @@ namespace RType
                 Asset::PLAYER_TEXTURE);
             auto &font =
                 _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
-
             sf::Sprite sprite;
             sprite.setTexture(texture);
             sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
@@ -53,7 +52,7 @@ namespace RType
                 std::make_shared<ecs::TextComponent<sf::Text>>(text, n));
         } else {
             player.addComponent(
-                std::make_shared<ecs::TextComponent<std::string>>(n, n));
+                std::make_shared<ecs::TextComponent<std::string>>(n, name));
         }
         if (isLocalPlayer) {
             _game.setPlayerEntityID((int) player.getID());

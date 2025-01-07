@@ -169,12 +169,12 @@ Removed a terrain, if its has been destroyed or went off the screen.
 - Lose - 134 -> TCP
 - Game Over - 135 -> TCP
 
-# Game Management (140)
+# Game Management (240)
 
 When in loby, launch the game. (Only the first connected player can send this, then the server replicates it to all connected clients).
-- Launch Game - 141 (id) <-> TCP
+- Launch Game - 241 (id) <-> TCP
 
 Set max players.
-- Set max player 142 (id, max) - <- TCP
+- Set max player 242 (id, max) - <- TCP
 
 # TODO: add bonus on/off

@@ -13,9 +13,10 @@
 #endif
 
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 class Utils {
-public:
+  public:
     Utils() = default;
 
     sf::Keyboard::Key getKeyFromString(const std::string &keyStr);

@@ -5,19 +5,19 @@
 ** player
 */
 
-#include <mutex>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include "Components.hpp"
-#include "EngineNetworking.hpp"
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
+#include "Factory.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
@@ -117,9 +117,23 @@ void GameInstance::handleNetworkPlayers(
         case Protocol::P_SHOOT: {
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
-                playerShoot(id);
+                _factory.buildBulletFromPlayer(id);
                 break;
             }
+            break;
+        }
+        case Protocol::P_DMG: {
+            if (tokens.size() >= 2) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                int health = atoi(tokens[1].c_str());
+                auto &player = getPlayerById(id);
+                auto healthComp = player.getComponent<ecs::HealthComponent>();
+                if (healthComp) {
+                    healthComp->setHealth(health);
+                }
+                break;
+            }
+            break;
         }
         default: break;
     }
@@ -172,6 +186,25 @@ void GameInstance::deletePlayer(size_t playerID)
         } else {
             refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, ss.str());
+        }
+    }
+}
+
+void GameInstance::damagePlayer(size_t playerID, int damage)
+{
+    if (isServer() || _isConnectedToServer) {
+        auto &pl = getPlayerById(playerID);
+        auto health = pl.getComponent<ecs::HealthComponent>();
+
+        if (health) {
+            health->setHealth(health->getHealth() - damage);
+            std::stringstream ss;
+            ss << P_DMG << " " << playerID << " " << health->getHealth()
+               << PACKET_END;
+            if (isServer()) {
+                refNetworkManager.sendToOthers(
+                    playerID, System::Network::ISocket::Type::UDP, ss.str());
+            }
         }
     }
 }
