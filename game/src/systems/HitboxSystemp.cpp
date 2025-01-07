@@ -61,7 +61,7 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
             && enemyPos->getY() + enemyHitB->getHeight() / 2
                 > playerCenterY - playerHitbox->getHeight() / 2 - hitbox) {
             if (_game->isServer() && damageCooldown <= 0.0f) {
-                health->setHealth(health->getHealth() - 51);
+                _game->damagePlayer(player->getPlayerID(), 51);
                 damageCooldown = 1.0f;
             }
         }
