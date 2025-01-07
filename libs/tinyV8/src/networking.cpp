@@ -234,9 +234,13 @@ ssize_t NetworkingManager::identifyClient(
 void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
     const std::string &data, System::Network::ISocket::Type socketType)
 {
-    _writeMutex.lock();
-    if (client.isDisconnected)
+    _globalMutex.lock();
+    if (client.isDisconnected) {
+        _globalMutex.unlock();
         return;
+    }
+    _globalMutex.unlock();
+    _writeMutex.lock();
     std::ostringstream out;
 
     _pacMan->serializeString(data, out, _pacMan->getKey());

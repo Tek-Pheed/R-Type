@@ -40,7 +40,7 @@ namespace RType
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
-        static constexpr size_t DEFAULT_MAX_PLAYERS = 1U;
+        static constexpr size_t DEFAULT_MAX_PLAYERS = 4U;
         static constexpr const char *DEFAULT_PLAYER_NAME = "Anonymous_Player";
 
         GameInstance(Engine::Core &engineRef);

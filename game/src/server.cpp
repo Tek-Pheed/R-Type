@@ -113,8 +113,8 @@ void RType::GameInstance::serverHanlderValidateConnection(
             std::stringstream ss;
             if (getAllPlayers().size() + 1 > _maxPlayers) {
                 ss << C_AUTH << " KO" << PACKET_END;
-                //refNetworkManager.sendToOne((size_t) netClientID,
-                //    System::Network::ISocket::Type::TCP, ss.str());
+                refNetworkManager.sendToOne((size_t) netClientID,
+                    System::Network::ISocket::Type::TCP, ss.str());
                 refNetworkManager.disconnectClient((size_t) netClientID);
             } else {
                 ss << C_AUTH << " OK" << PACKET_END;
