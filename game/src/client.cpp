@@ -171,10 +171,9 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
-    sf::VideoMode videoMode(sf::VideoMode::getDesktopMode().width,
-        sf::VideoMode::getDesktopMode().height,
-        sf::VideoMode::getDesktopMode().bitsPerPixel);
-    _window->create(videoMode, "R-Type", sf::Style::Close);
+    sf::VideoMode videoMode(1920, 1080);
+    _window->create(
+        videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
