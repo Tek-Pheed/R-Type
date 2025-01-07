@@ -32,6 +32,7 @@ namespace RType
         void buildBulletFromPlayer(size_t playerID);
         ecs::Entity &buildEnemy(
             size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &buildMusic(sf::SoundBuffer &soundBuffer);
 
       private:
         GameInstance &_game;
