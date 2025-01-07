@@ -62,8 +62,24 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
                 > playerCenterY - playerHitbox->getHeight() / 2 - hitbox) {
             if (_game->isServer() && damageCooldown <= 0.0f) {
                 _game->damagePlayer(player->getPlayerID(), 51);
-                damageCooldown = 1.0f;
             }
+
+            if (!_game->isServer()
+                && player->getPlayerID()
+                    == _game->getLocalPlayer()
+                           .getComponent<ecs::PlayerComponent>()
+                           ->getPlayerID()
+                && damageCooldown <= 0.0f) {
+                auto healthEnt =
+                    _game->refEntityManager.getCurrentLevel().getEntityById(
+                        _game->getHealthId());
+                auto healthText =
+                    healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
+                if (healthText)
+                    healthText->setStr(
+                        "Health: " + std::to_string(health->getHealth() - 50));
+            }
+            damageCooldown = 1.0f;
         }
     }
 }

@@ -55,6 +55,13 @@ void RType::GameInstance::clientHandlerConnection(
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
                     _factory.buildPlayer(true, (size_t) _netClientID);
+                    std::string text = "Health: "
+                        + std::to_string(
+                            getLocalPlayer()
+                                .getComponent<ecs::HealthComponent>()
+                                ->getHealth());
+                    setHealthId(getNewId());
+                    _factory.buildText(getHealthId(), 1800.0f, 50.0f, text);
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }

@@ -28,6 +28,8 @@ namespace RType
         ecs::Entity &buildBackground();
         ecs::Entity &buildEnemy(
             size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &buildText(
+            size_t id, float posX, float posY, std::string &content);
 
       private:
         GameInstance &_game;
