@@ -21,7 +21,6 @@
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
-
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"

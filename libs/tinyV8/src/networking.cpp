@@ -133,6 +133,7 @@ void NetworkingManager::sendToAll(
     System::Network::ISocket::Type socketType, const std::string &buffer)
 {
     std::unique_lock lock(_globalMutex);
+
     for (auto &client : _clients) {
         writeToClient(client.second, buffer, socketType);
     }
@@ -197,11 +198,11 @@ void NetworkingManager::removeClient(size_t id)
 
 void NetworkingManager::disconnectClient(size_t id)
 {
-    std::unique_lock lock(_globalMutex);
-
+    _globalMutex.lock();
     _clients.at(id).tcpSocket.closeSocket();
     _clients.at(id).isDisconnected = true;
-
+    _globalMutex.unlock();
+    _writeCondition.notify_all();
     std::cout << "ENGINE: Force disconnection of a client (" << id
               << ") from the server." << std::endl;
 }

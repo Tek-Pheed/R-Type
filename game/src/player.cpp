@@ -5,6 +5,7 @@
 ** player
 */
 
+#include <mutex>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -148,6 +149,7 @@ std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
 {
+    std::unique_lock lock(_gameLock);
     auto players = getAllPlayers();
 
     for (auto &pl : players) {

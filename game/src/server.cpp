@@ -48,7 +48,7 @@ void GameInstance::serverEventClosedConn(
             deletePlayer((size_t) id);
             refNetworkManager.disconnectClient((size_t) id);
         } catch (const std::exception &e) {
-            std::cout << "Coudl not delete player: " << id
+            std::cout << "Could not delete player: " << id
                       << ", maybe it failed to connect." << std::endl;
         }
     }
@@ -106,14 +106,15 @@ void RType::GameInstance::serverHanlderValidateConnection(
     int code, const std::vector<std::string> &tokens)
 {
     std::unique_lock lock(_gameLock);
+
     if (code == Protocol::C_START_UDP && tokens.size() >= 1) {
         ssize_t netClientID = (ssize_t) atoi(tokens[0].c_str());
         if (netClientID >= 0) {
             std::stringstream ss;
-            if (getAllPlayers().size() > _maxPlayers) {
+            if (getAllPlayers().size() + 1 > _maxPlayers) {
                 ss << C_AUTH << " KO" << PACKET_END;
-                refNetworkManager.sendToOne((size_t) netClientID,
-                    System::Network::ISocket::Type::TCP, ss.str());
+                //refNetworkManager.sendToOne((size_t) netClientID,
+                //    System::Network::ISocket::Type::TCP, ss.str());
                 refNetworkManager.disconnectClient((size_t) netClientID);
             } else {
                 ss << C_AUTH << " OK" << PACKET_END;
