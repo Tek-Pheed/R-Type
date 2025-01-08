@@ -23,6 +23,8 @@ NetworkingManager::NetworkingManager(Core &engineRef)
 
 NetworkingManager::~NetworkingManager()
 {
+    if (_running)
+        stopNetworking();
 }
 
 void NetworkingManager::engineOnStart(void)
@@ -72,6 +74,8 @@ void NetworkingManager::stopNetworking()
     _running = false;
     _globalMutex.unlock();
     _writeCondition.notify_all();
+    std::unique_lock wlock(_writeThreadTerminated);
+    std::unique_lock rlock(_readThreadTerminated);
 }
 
 size_t NetworkingManager::getClientID(void) const

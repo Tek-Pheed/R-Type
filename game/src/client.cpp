@@ -157,7 +157,9 @@ void RType::GameInstance::clientHandleDisconnected(
     (void) core;
     (void) arg;
 
+    refNetworkManager.stopNetworking();
     std::unique_lock lock(_gameLock);
+
     _gameStarted = false;
     _isConnectedToServer = false;
     _playerEntityID = -1;
@@ -165,7 +167,6 @@ void RType::GameInstance::clientHandleDisconnected(
     std::cout << "You are now disconnected from the game server, maybe the "
                  "connection was unstable."
               << std::endl;
-    refNetworkManager.stopNetworking();
     refEntityManager.deleteAllLevel();
     levelMainMenu();
 }
@@ -220,6 +221,7 @@ void GameInstance::playEvent()
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             this->_window->close();
+            refNetworkManager.stopNetworking();
             refGameEngine.stop();
         }
         if (event.type == sf::Event::KeyPressed) {

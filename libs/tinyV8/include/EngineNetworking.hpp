@@ -405,6 +405,8 @@ namespace Engine
             size_t _updPort = DEFAULT_UDP_PORT;
             std::recursive_mutex _globalMutex;
             std::mutex _writeFinished;
+            std::recursive_mutex _writeThreadTerminated;
+            std::recursive_mutex _readThreadTerminated;
             std::condition_variable _writeCondition;
             std::mutex _writeMutex;
             size_t _clientCounter = 0;

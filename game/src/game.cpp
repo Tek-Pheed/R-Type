@@ -184,6 +184,7 @@ GameInstance::GameInstance(Engine::Core &engineRef)
 
 GameInstance::~GameInstance()
 {
+    refNetworkManager.stopNetworking();
     refGameEngine.stop();
 }
 

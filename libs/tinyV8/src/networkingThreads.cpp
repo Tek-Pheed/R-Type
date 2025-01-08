@@ -44,6 +44,7 @@ void NetworkingManager::runConnectThread()
 
 void NetworkingManager::runWriteThread()
 {
+    std::unique_lock wlock(_writeThreadTerminated);
     System::Network::socketSetGeneric writefds;
     System::Network::timeoutStruct tv = {{0, 100000}};
     bool shouldWait = true;
@@ -179,6 +180,7 @@ void NetworkingManager::runWriteThread()
 
 void NetworkingManager::runReadThread()
 {
+    std::unique_lock rlock(_readThreadTerminated);
     System::Network::byteArray arr;
     System::Network::byteArray vect;
     System::Network::socketSetGeneric readfds;
@@ -237,6 +239,24 @@ void NetworkingManager::runReadThread()
                                       << ") for client (" << std::to_string(id)
                                       << ") [" << vect.size() << " bytes]"
                                       << std::endl;
+                            if (vect.size() == 0) {
+                                std::cout << "ENGINE: [Read Thread] client ("
+                                          << std::to_string(id)
+                                          << ") closed TCP connection ("
+                                          << std::to_string(sock->getUID())
+                                          << ")" << std::endl;
+                                if (_isServer) {
+                                    AEngineFeature::_engineRef.triggerEvent(
+                                        Events::EVENT_OnServerLostClient, id);
+                                    removeClient((size_t) id);
+                                    break;
+                                } else {
+                                    AEngineFeature::_engineRef.triggerEvent(
+                                        Events::EVENT_DisconnectedFromServer);
+                                    getClient(1).isDisconnected = true;
+                                    break;
+                                }
+                            }
                             _globalMutex.lock();
                             client.readBufferTCP.insert(
                                 client.readBufferTCP.end(), vect.begin(),
