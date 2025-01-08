@@ -229,8 +229,8 @@ void RType::GameInstance::levelContinueMenu()
 
         buildInput("NICKNAME", 2);
         buildInput("IP ADRESS", 1);
-        buildInput("TCP PORT", 0);
-        buildInput("UDP PORT", -1);
+        buildInput("8081", 0);
+        buildInput("8082", -1);
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,

@@ -89,8 +89,13 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
             continue;
         }
         std::stringstream sss;
-        sss << E_SPAWN << " " << ec->getEnemyID() << " " << pos->getX() << " "
-            << pos->getY() << PACKET_END;
+        if (e.get().getComponent<ecs::BulletComponent>() != nullptr) {
+            sss << E_SPAWN << " " << "1" << " " << ec->getEnemyID() << " " << pos->getX() << " "
+                << pos->getY() << PACKET_END;
+        } else {
+            sss << E_SPAWN << " " << "0" << " " << ec->getEnemyID() << " " << pos->getX() << " "
+                << pos->getY() << PACKET_END;
+        }
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }

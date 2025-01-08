@@ -228,7 +228,7 @@ void GameInstance::playEvent()
                 if (!autoFireEnabled
                     && event.key.code == sf::Keyboard::Space) {
                     if (_netClientID >= 0)
-                        playerShoot((size_t) _netClientID);
+                        _factory.buildBulletFromPlayer((size_t) _netClientID);
                 }
             }
         }
