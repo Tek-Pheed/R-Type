@@ -19,6 +19,7 @@
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "Game.hpp"
 
 using namespace RType;
 
@@ -62,8 +63,7 @@ ecs::Entity &RType::Factory::buildEnemy(
 ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
 {
     std::unique_lock lock(_gameLock);
-    auto enemies = refEntityManager.getCurrentLevel()
-                       .findEntitiesByComponent<ecs::EnemyComponent>();
+    auto enemies = refEntityManager.getCurrentLevel().findEntitiesByComponent<ecs::EnemyComponent>();
 
     for (auto &pl : enemies) {
         if (pl.get().getComponent<ecs::EnemyComponent>()->getEnemyID()
@@ -145,4 +145,41 @@ void GameInstance::handleNetworkEnemies(
         }
         default: break;
     }
+}
+
+ecs::Entity &RType::Factory::buildEnemyShooter(
+    size_t id, float posX, float posY, float health)
+{
+    std::cout << "Adding new enemy shooter to the game" << std::endl;
+    auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
+    enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
+    enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
+    enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
+    enemy.addComponent(std::make_shared<ecs::VelocityComponent>(-200.0f, 0.0f));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(75.0f, 66.0f));
+    enemy.addComponent(std::make_shared<ecs::BulletComponent>(false));
+
+    if (!_game.isServer()) {
+        auto &texture =
+            _game.refAssetManager.getAsset<sf::Texture>(Asset::ENEMYSHOOTER_TEXTURE);
+        sf::Sprite sprite;
+        sprite.setTexture(texture);
+        sprite.setTextureRect(sf::Rect(0, 14, 50, 44));
+        sprite.setScale(sf::Vector2f(1.5, 1.5));
+        enemy.addComponent(std::make_shared<ecs::RenderComponent>(
+            ecs::RenderComponent::ObjectType::SPRITE));
+        enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
+            sprite, 3.0, 3.0));
+    } else {
+        auto pos = enemy.getComponent<ecs::PositionComponent>();
+        auto ene = enemy.getComponent<ecs::EnemyComponent>();
+        if (pos) {
+            std::stringstream sss;
+            sss << E_SPAWN << " " << ene->getEnemyID() << " " << pos->getX()
+                << " " << pos->getY() << PACKET_END;
+            _game.refNetworkManager.sendToAll(
+                System::Network::ISocket::Type::TCP, sss.str());
+        }
+    }
+    return (enemy);
 }
