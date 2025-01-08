@@ -25,6 +25,8 @@ using namespace RType;
 ecs::Entity &RType::Factory::buildEnemy(
     size_t id, float posX, float posY, float health)
 {
+    (void) posX;
+    (void) posY;
     std::cout << "Adding new enemy to the game" << std::endl;
     auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
