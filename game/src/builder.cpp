@@ -207,6 +207,60 @@ void RType::GameInstance::levelMainMenu()
     }
 }
 
+void RType::GameInstance::levelLobbyMenu()
+{
+    auto &level = refEntityManager.createNewLevel("lobbyMenu");
+
+    level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+    refEntityManager.switchLevel("lobbyMenu");
+
+    if (!isServer()) {
+        auto &button = refEntityManager.getCurrentLevel().createEntity();
+
+        sf::Text text;
+        text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
+        text.setCharacterSize(100);
+        text.setFillColor(sf::Color::White);
+        text.setString("LOBBY");
+
+        float textWidth = text.getLocalBounds().width;
+        float windowWidth = (float) this->_window->getSize().x;
+
+        float posX = (windowWidth - textWidth) / 2;
+        float posY = (float) this->_window->getSize().y / 4;
+
+        title.addComponent(std::make_shared<ecs::RenderComponent>(
+            ecs::RenderComponent::ObjectType::TEXT));
+        title.addComponent(
+            std::make_shared<ecs::PositionComponent>(posX, posY - 50));
+        title.addComponent(
+            std::make_shared<ecs::TextComponent<sf::Text>>(text, "LOBBY"));
+
+        _factory.buildButton(sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 650 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            "NUMBER OF PLAYER", 40, sf::Color::Black, ecs::ClickableType::NUMBER_OF_PLAYER);
+
+        _factory.buildButton(sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            "DIFFICULTY", 40, sf::Color::Black, ecs::ClickableType::DIFFICULTY);
+
+        _factory.buildButton(sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 750 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            "BONUS", 40, sf::Color::Black, ecs::ClickableType::BONUS);
+
+    }
+}
+
 void RType::GameInstance::levelContinueMenu()
 {
     auto &level = refEntityManager.createNewLevel("continueMenu");
