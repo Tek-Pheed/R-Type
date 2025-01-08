@@ -55,7 +55,9 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
                 + (float) sprite->getSprite().getTextureRect().width
                     * sprite->getSprite().getScale().x / 2
                 - (float) text->getText().getLocalBounds().width / 2,
-            position->getY() + sprite->getSprite().getTextureRect().height
+            position->getY()
+                + static_cast<float>(
+                    sprite->getSprite().getTextureRect().height)
                 + 25);
     } else {
         text->getText().setPosition(position->getX()
