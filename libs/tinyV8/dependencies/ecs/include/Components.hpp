@@ -8,6 +8,7 @@
 #define R_TYPE_COMPONENT_HPP
 
 #include <string>
+#include <SFML/Audio.hpp>
 
 namespace ecs
 {
@@ -76,7 +77,13 @@ namespace ecs
 
     class BossComponent : public Component {
       public:
-        explicit BossComponent();
+        explicit BossComponent(size_t bossID);
+
+        size_t getBossID() const;
+        void setBossID(size_t bossID);
+
+      private:
+        size_t _bossID;
     };
 
     class EnemyComponent : public Component {
@@ -121,6 +128,22 @@ namespace ecs
       private:
         float _deltaCounter;
         const float _moveDelta;
+    };
+
+    template <typename musicType> class MusicComponent : public Component {
+      public:
+        explicit MusicComponent(musicType &music): _music(music) {}
+
+        musicType &getMusicType() {
+          return this->_music;
+        }
+
+        void setMusicType(musicType &music) {
+          _music = music;
+        }
+
+        private:
+          musicType _music;
     };
 
     template <typename spriteType> class SpriteComponent : public Component {
@@ -257,8 +280,9 @@ namespace ecs
             this->_str = str;
         }
 
-      private:
         textType _text;
+
+      private:
         std::string _str;
     };
 

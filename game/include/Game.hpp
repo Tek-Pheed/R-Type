@@ -5,14 +5,15 @@
 ** game
 */
 
-#ifndef GAME_HPP
-#define GAME_HPP
+#pragma once
 
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
 #include <SFML/Graphics.hpp>
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -28,9 +29,6 @@
 
 namespace RType
 {
-
-    class Factory;
-
     class GameInstance {
       public:
         static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
@@ -38,6 +36,7 @@ namespace RType
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
+        static constexpr size_t DEFAULT_MAX_PLAYERS = 4U;
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
@@ -56,18 +55,22 @@ namespace RType
 
         // Server state
         bool isConnectedToServer();
+        ssize_t getNetClientID();
 
         // Texture Utilities
         void loadAssets();
 
-        ecs::Entity &buildBackground(void);
+        ecs::Entity &buildBackground();
         ecs::Entity &buildButton(std::string text, int buttonNb);
-        void levelMainMenu(void);
-        void createPersistentLevel(void);
-        void levelSettingsMenu(void);
+        ecs::Entity &buildInput(std::string str, int buttonID);
+        void levelMainMenu();
+        void createPersistentLevel();
+        void levelSettingsMenu();
+        void levelContinueMenu();
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
+        void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         // Player functions and utilities
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
@@ -86,19 +89,28 @@ namespace RType
 
         std::vector<ecs::Entity> &getEntities();
 
+        std::string _playerName;
+
         // Enemies
         ecs::Entity &buildEnemy(
+            size_t id, float posX, float posY, float health);
+
+        // Boss
+        ecs::Entity &buildBoss(
             size_t id, float posX, float posY, float health = 100.0f);
         ecs::Entity &getEnemyById(size_t enemyID);
         void sendEnemyPosition(size_t enemyID);
         void deleteEnemy(size_t playerID);
         void handleNetworkEnemies(
             int code, const std::vector<std::string> &tokens);
+        void clientHandleDisconnected(
+            Engine::Events::EventType event, Engine::Core &core, std::any arg);
 
         // Networking
         int is_code_valid(int code);
         int manageBuffers();
         void connectToGame();
+        void clientStartLevel();
         void clientHandlerConnection(
             int code, const std::vector<std::string> &tokens);
         void serverHanlderValidateConnection(
@@ -106,6 +118,7 @@ namespace RType
         void handleNetworkPlayers(
             int code, const std::vector<std::string> &tokens);
         void serverSendGameState(size_t clientID);
+        void handleLoby(int code, const std::vector<std::string> &tokens);
 
         // Server Only Events
         void serverEventNewConn(
@@ -159,24 +172,40 @@ namespace RType
         bool _isSettingsLeftButtonClicked = false;
         bool _isSettingsDownButtonClicked = false;
 
+        bool _isSettingsNicknameButtonClicked = false;
+        std::vector<sf::Keyboard::Key> _nicknameKeys;
+        ecs::Entity *_nicknameInputEntity = nullptr;
+
+        // MENU
+        std::vector<ecs::Entity> _buttonList;
+        size_t _lastButtonIdClicked;
+
+        std::vector<ecs::Entity> _inputList;
+        size_t _lastInputIdClicked;
+
+        sf::Sound _currentMusic;
+
       private:
+        size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
         bool _isServer;
         bool _isConnectedToServer = false;
+        bool _gameStarted = false;
         uint16_t _udpPort = DEFAULT_UDP_PORT;
         uint16_t _tcpPort = DEFAULT_TCP_PORT;
         std::string _ip = DEFAULT_IP;
 
         Factory _factory;
 
+        uint64_t _ticks = 0U;
+        uint64_t _lastNetTick = 0U;
+        ssize_t _clientGameMasterId = -1;
         std::unique_ptr<sf::RenderWindow> _window;
-        std::recursive_mutex _serverLock;
+        std::recursive_mutex _gameLock;
 
         sf::Clock _autoFireClock;
 
         size_t _healthId;
     };
 }; // namespace RType
-
-#endif /* GAME_HPP */

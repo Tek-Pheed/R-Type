@@ -10,6 +10,7 @@
 #endif
 
 #include "Components.hpp"
+#include "ErrorClass.hpp"
 #include "Game.hpp"
 #include "GameSystems.hpp"
 
@@ -26,6 +27,11 @@ void renderSprite(ecs::Entity &entity, sf::RenderWindow &window)
     auto position = entity.getComponent<ecs::PositionComponent>();
     auto sprite = entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
+    if (!position || !sprite) {
+        throw ErrorClass("RenderSprite failed to render entity, missing "
+                         "component: position or sprite !");
+        return;
+    }
     sprite->getSprite().setPosition(position->getX(), position->getY());
     window.draw(sprite->getSprite());
 }
@@ -36,6 +42,12 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
     auto sprite = entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
+    if (!position || !sprite || !text) {
+        throw ErrorClass(
+            "RenderSpriteAndText failed to render entity, missing "
+            "component: position or sprite or text !");
+        return;
+    }
     sprite->getSprite().setPosition(position->getX(), position->getY());
     text->getText().setString(text->getStr());
     text->getText().setPosition(position->getX()
@@ -53,6 +65,11 @@ void renderRectangle(ecs::Entity &entity, sf::RenderWindow &window)
         entity.getComponent<ecs::RectangleComponent<sf::RectangleShape>>();
     auto position = entity.getComponent<ecs::PositionComponent>();
 
+    if (!rectangle || !position) {
+        throw ErrorClass("RenderRectangle failed to render entity, missing "
+                         "component: rectangle or position !");
+        return;
+    }
     rectangle->getRectangle().setPosition(position->getX(), position->getY());
     rectangle->getRectangle().setSize(sf::Vector2f(
         (float) rectangle->getSizeX(), (float) rectangle->getSizeY()));
@@ -64,6 +81,11 @@ void renderCircle(ecs::Entity &entity, sf::RenderWindow &window)
     auto circle = entity.getComponent<ecs::CircleComponent<sf::CircleShape>>();
     auto position = entity.getComponent<ecs::PositionComponent>();
 
+    if (!circle || !position) {
+        throw ErrorClass("RenderCircle failed to render entity, missing "
+                         "component: circle or position !");
+        return;
+    }
     circle->getCircle().setPosition(position->getX(), position->getY());
     circle->getCircle().setFillColor(sf::Color::Green);
     circle->getCircle().setRadius((float) circle->getRadius());
@@ -75,6 +97,11 @@ void renderText(ecs::Entity &entity, sf::RenderWindow &window)
     auto position = entity.getComponent<ecs::PositionComponent>();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
+    if (!text || !position) {
+        throw ErrorClass("RenderText failed to render entity, missing "
+                         "component: text or position !");
+        return;
+    }
     text->getText().setPosition(position->getX(), position->getY());
     text->getText().setString(text->getStr());
     window.draw(text->getText());
@@ -87,6 +114,11 @@ void renderButton(ecs::Entity &entity, sf::RenderWindow &window)
     auto position = entity.getComponent<ecs::PositionComponent>();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
+    if (!text || !position || !rectangle) {
+        throw ErrorClass("RenderButton failed to render entity, missing "
+                         "component: text or position or rectangle!");
+        return;
+    }
     rectangle->getRectangle().setPosition(position->getX(), position->getY());
     rectangle->getRectangle().setSize(sf::Vector2f(
         (float) rectangle->getSizeX(), (float) rectangle->getSizeY()));
@@ -95,7 +127,8 @@ void renderButton(ecs::Entity &entity, sf::RenderWindow &window)
             + (float) rectangle->getSizeX() / 2
             - (float) text->getStr().length()
             - (float) text->getText().getLocalBounds().width / 2,
-        position->getY() + (float) rectangle->getSizeY() / 2 - (float)text->getText().getCharacterSize() / 2);
+        position->getY() + (float) rectangle->getSizeY() / 2
+            - (float) text->getText().getCharacterSize() / 2);
     window.draw(rectangle->getRectangle());
     window.draw(text->getText());
 }
@@ -107,14 +140,21 @@ void renderInput(ecs::Entity &entity, sf::RenderWindow &window)
     auto position = entity.getComponent<ecs::PositionComponent>();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
+    if (!text || !position || !rectangle) {
+        throw ErrorClass("RenderInput failed to render entity, missing "
+                         "component: text or position or rectangle!");
+        return;
+    }
     rectangle->getRectangle().setPosition(position->getX(), position->getY());
     rectangle->getRectangle().setSize(sf::Vector2f(
         (float) rectangle->getSizeX(), (float) rectangle->getSizeY()));
     text->getText().setString(text->getStr());
     text->getText().setPosition(position->getX()
             + (float) rectangle->getSizeX() / 2
+            - (float) text->getStr().length()
             - (float) text->getText().getLocalBounds().width / 2,
-        position->getY() + (float) rectangle->getSizeY() / 2 - (float)text->getText().getCharacterSize() / 2);
+        position->getY() + (float) rectangle->getSizeY() / 2
+            - (float) text->getText().getCharacterSize() / 2);
     window.draw(rectangle->getRectangle());
     window.draw(text->getText());
 }
@@ -126,6 +166,8 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
     for (auto &entity : entities) {
         auto renderComponent = entity.getComponent<ecs::RenderComponent>();
 
+        if (!renderComponent)
+            continue;
         switch (renderComponent->getObjectType()) {
             case ecs::RenderComponent::ObjectType::SPRITE:
                 renderSprite(entity, _game->getWindow());

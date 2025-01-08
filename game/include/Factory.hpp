@@ -10,10 +10,11 @@
 
 #include <SFML/Graphics.hpp>
 #include "Entity.hpp"
+#include "components/ClickableComponent.hpp"
 
 namespace RType
 {
-
+    static constexpr const char *DEFAULT_PLAYER_NAME = "Anonymous_Player";
     class GameInstance;
     class Factory {
       public:
@@ -23,13 +24,17 @@ namespace RType
             sf::Color fillColor = sf::Color::White,
             sf::Color outlineColor = sf::Color::Blue,
             const std::string &str = "", unsigned int characterSize = 40,
-            sf::Color textColor = sf::Color::Black);
-        ecs::Entity &buildPlayer(bool isLocalPlayer, size_t id);
+            sf::Color textColor = sf::Color::Black,
+            ecs::ClickableType type = ecs::ClickableType::LAUNCH);
+        ecs::Entity &buildPlayer(bool isLocalPlayer, size_t id,
+            const std::string &name = DEFAULT_PLAYER_NAME);
         ecs::Entity &buildBackground();
+        void buildBulletFromPlayer(size_t playerID);
         ecs::Entity &buildEnemy(
             size_t id, float posX, float posY, float health = 100.0f);
         ecs::Entity &buildText(
             size_t id, float posX, float posY, std::string &content);
+        ecs::Entity &buildMusic(sf::SoundBuffer &soundBuffer);
 
       private:
         GameInstance &_game;

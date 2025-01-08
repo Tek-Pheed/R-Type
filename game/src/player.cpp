@@ -9,13 +9,15 @@
     #define NOMINMAX
 #endif
 
+#include <cstdint>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include "Components.hpp"
-#include "EngineNetworking.hpp"
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
+#include "Factory.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
@@ -24,22 +26,50 @@
 
 using namespace RType;
 
-// If isLocalPlayer is set to false, then this function should only be
-// triggered by a request from the server
+void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
+{
+    switch (code) {
+        case Protocol::L_STARTGAME: {
+            _gameStarted = true;
+            if (_isServer) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                std::stringstream sss;
+                sss << L_STARTGAME << " " << id << PACKET_END;
+                refNetworkManager.sendToAll(
+                    System::Network::ISocket::Type::TCP, sss.str());
+            }
+            break;
+        }
+        case Protocol::L_SETMAXPLAYRS: {
+            if (tokens.size() >= 2) {
+                _maxPlayers = (size_t) atoi(tokens[1].c_str());
+                if (_isServer) {
+                    std::stringstream sss;
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    sss << L_SETMAXPLAYRS << " " << id << PACKET_END;
+                    refNetworkManager.sendToOthers(
+                        id, System::Network::ISocket::Type::TCP, sss.str());
+                }
+            }
+            break;
+            default: break;
+        }
+    }
+}
 
 void GameInstance::handleNetworkPlayers(
     int code, const std::vector<std::string> &tokens)
 {
     switch (code) {
         case Protocol::P_CONN: {
-            if (tokens.size() >= 3) {
+            if (tokens.size() >= 4) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::shared_ptr<ecs::PositionComponent> pos;
                 if (isServer()) {
-                    auto &pl = _factory.buildPlayer(true, id);
+                    auto &pl = _factory.buildPlayer(true, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 } else {
-                    auto &pl = _factory.buildPlayer(false, id);
+                    auto &pl = _factory.buildPlayer(false, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 }
                 updatePlayerPosition(id, (float) std::atof(tokens[1].c_str()),
@@ -48,21 +78,28 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_POS: {
-            if (tokens.size() >= 3) {
-                size_t id = (size_t) atoi(tokens[0].c_str());
+            if (tokens.size() >= 4) {
+                uint64_t tick = _ticks;
+                if (!isServer()) {
+                    tick = (uint64_t) atoi(tokens[0].c_str());
+                    if (!(_lastNetTick <= tick)) {
+                        return;
+                    }
+                }
+                size_t id = (size_t) atoi(tokens[1].c_str());
                 auto &player = getPlayerById(id);
                 auto pos = player.getComponent<ecs::PositionComponent>();
-                pos->setX((float) std::atof(tokens[1].c_str()));
-                pos->setY((float) std::atof(tokens[2].c_str()));
+                pos->setX((float) std::atof(tokens[2].c_str()));
+                pos->setY((float) std::atof(tokens[3].c_str()));
                 if (isServer()) {
                     std::stringstream ss;
-                    ss << P_POS << " "
+                    ss << P_POS << " " << tick << " "
                        << player.getComponent<ecs::PlayerComponent>()
                               ->getPlayerID()
                        << " " << pos->getX() << " " << pos->getY()
                        << PACKET_END;
                     refNetworkManager.sendToOthers(
-                        (size_t) std::atoi(tokens[0].c_str()),
+                        (size_t) std::atoi(tokens[1].c_str()),
                         System::Network::ISocket::Type::UDP, ss.str());
                 }
             }
@@ -80,15 +117,19 @@ void GameInstance::handleNetworkPlayers(
         case Protocol::P_SHOOT: {
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
-                playerShoot(id);
+                _factory.buildBulletFromPlayer(id);
                 break;
             }
             break;
         }
         case Protocol::P_DMG: {
-            if (tokens.size() >= 2) {
-                size_t id = (size_t) atoi(tokens[0].c_str());
-                int health = atoi(tokens[1].c_str());
+            if (tokens.size() >= 3) {
+                uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
+                if (!_isServer && !(_lastNetTick <= tick)) {
+                    return;
+                }
+                size_t id = (size_t) atoi(tokens[1].c_str());
+                int health = atoi(tokens[2].c_str());
                 auto &player = getPlayerById(id);
                 auto healthComp = player.getComponent<ecs::HealthComponent>();
                 if (healthComp) {
@@ -121,11 +162,12 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
 {
+    std::unique_lock lock(_gameLock);
     auto players = getAllPlayers();
 
     for (auto &pl : players) {
@@ -161,8 +203,8 @@ void GameInstance::damagePlayer(size_t playerID, int damage)
         if (health) {
             health->setHealth(health->getHealth() - damage);
             std::stringstream ss;
-            ss << P_DMG << " " << playerID << " " << health->getHealth()
-               << PACKET_END;
+            ss << P_DMG << " " << _ticks << " " << playerID << " "
+               << health->getHealth() << PACKET_END;
             if (isServer()) {
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::UDP, ss.str());
@@ -177,8 +219,8 @@ void GameInstance::sendPlayerPosition(size_t playerID)
         auto &player = getPlayerById(playerID);
         auto position = player.getComponent<ecs::PositionComponent>();
         std::stringstream ss;
-        ss << P_POS << " " << playerID << " " << position->getX() << " "
-           << position->getY() << PACKET_END;
+        ss << P_POS << " " << _ticks << " " << playerID << " "
+           << position->getX() << " " << position->getY() << PACKET_END;
         if (isServer()) {
             refNetworkManager.sendToOthers(
                 playerID, System::Network::ISocket::Type::UDP, ss.str());
@@ -192,7 +234,7 @@ void GameInstance::sendPlayerPosition(size_t playerID)
 void GameInstance::updatePlayerPosition(
     size_t playerID, float newX, float newY)
 {
-    std::unique_lock lock(_serverLock);
+    std::unique_lock lock(_gameLock);
     auto &player = getPlayerById(playerID);
     auto position = player.getComponent<ecs::PositionComponent>();
 
@@ -215,7 +257,7 @@ void GameInstance::updatePlayerPosition(
 
 void GameInstance::playerShoot(size_t playerID)
 {
-    std::unique_lock lock(_serverLock);
+    std::unique_lock lock(_gameLock);
     auto player = getPlayerById(playerID);
     auto positionComp = player.getComponent<ecs::PositionComponent>();
     if (!positionComp)

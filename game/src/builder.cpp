@@ -16,10 +16,12 @@
 #include "Components.hpp"
 #include "Config.hpp"
 #include "Entity.hpp"
+#include "ErrorClass.hpp"
 #include "Factory.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameSystems.hpp"
+#include "components/ClickableComponent.hpp"
 
 std::string getKeyString(sf::Keyboard::Key key)
 {
@@ -31,7 +33,7 @@ std::string getKeyString(sf::Keyboard::Key key)
         {sf::Keyboard::BackSpace, "BackSpace"},
         {sf::Keyboard::Delete, "Delete"}, {sf::Keyboard::Home, "Home"},
         {sf::Keyboard::End, "End"}, {sf::Keyboard::PageUp, "PageUp"},
-        {sf::Keyboard::PageDown, "PageDown"}};
+        {sf::Keyboard::PageDown, "PageDown"}, {sf::Keyboard::Period, "."}};
 
     auto it = specialKeys.find(key);
 
@@ -44,6 +46,9 @@ std::string getKeyString(sf::Keyboard::Key key)
     }
     if (key >= sf::Keyboard::Num0 && key <= sf::Keyboard::Num9) {
         return std::to_string(key - sf::Keyboard::Num0);
+    }
+    if (key >= sf::Keyboard::Numpad0 && key <= sf::Keyboard::Numpad9) {
+        return std::to_string(key - sf::Keyboard::Numpad0);
     }
     if (key >= sf::Keyboard::F1 && key <= sf::Keyboard::F15) {
         return std::to_string(1 + (key - sf::Keyboard::F1));
@@ -91,8 +96,47 @@ ecs::Entity &RType::GameInstance::buildButton(std::string str, int buttonID)
         std::make_shared<ecs::TextComponent<sf::Text>>(text, str));
     button.addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::RenderComponent::ObjectType::BUTTON));
+    button.addComponent(std::make_shared<ecs::ClickableComponent>(
+        ecs::ClickableType::AUTO_FIRE));
+
+    _buttonList.push_back(button);
 
     return button;
+}
+
+ecs::Entity &RType::GameInstance::buildInput(std::string str, int buttonID)
+{
+    auto &input = refEntityManager.getCurrentLevel().createEntity();
+
+    sf::RectangleShape rect;
+    rect.setFillColor(sf::Color::White);
+    rect.setOutlineColor(sf::Color::Blue);
+    rect.setOutlineThickness(2);
+    rect.setSize(sf::Vector2f(700, 50));
+
+    sf::Text text;
+    text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
+    text.setCharacterSize(40);
+    text.setFillColor(sf::Color::Black);
+    text.setString(str);
+
+    input.addComponent(std::make_shared<ecs::PositionComponent>(
+        (float) this->_window->getSize().x / 2 - (float) rect.getSize().x / 2,
+        (float) this->_window->getSize().y / 2 - (float) rect.getSize().y / 2
+            - (float) 75 * (float) buttonID));
+    input.addComponent(
+        std::make_shared<ecs::RectangleComponent<sf::RectangleShape>>(
+            rect, rect.getSize().x, rect.getSize().y));
+    input.addComponent(
+        std::make_shared<ecs::TextComponent<sf::Text>>(text, str));
+    input.addComponent(std::make_shared<ecs::RenderComponent>(
+        ecs::RenderComponent::ObjectType::INPUT));
+    input.addComponent(
+        std::make_shared<ecs::ClickableComponent>(ecs::ClickableType::INPUT));
+
+    _inputList.push_back(input);
+
+    return input;
 }
 
 void RType::GameInstance::levelMainMenu()
@@ -104,30 +148,103 @@ void RType::GameInstance::levelMainMenu()
     refEntityManager.switchLevel("mainMenu");
 
     if (!isServer()) {
+        auto &musicSong =
+            this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
+        _factory.buildMusic(musicSong);
+
+        auto &title = refEntityManager.getCurrentLevel().createEntity();
+        sf::Text text;
+        text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
+        text.setCharacterSize(100);
+        text.setFillColor(sf::Color::White);
+        text.setString("F TYPE V8");
+        float textWidth = text.getLocalBounds().width;
+        float windowWidth = (float) this->_window->getSize().x;
+        float posX = (windowWidth - textWidth) / 2;
+        float posY = (float) this->_window->getSize().y / 4;
+
+        auto comp = std::make_shared<ecs::RenderComponent>(
+            ecs::RenderComponent::ObjectType::TEXT);
+        title.addComponent(comp);
+        title.addComponent(
+            std::make_shared<ecs::PositionComponent>(posX, posY));
+        title.addComponent(
+            std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 0),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "PLAY",
+            40, sf::Color::Black, ecs::ClickableType::MULTIPLAYER);
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            "SETTINGS", 40, sf::Color::Black, ecs::ClickableType::SETTINGS);
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -2),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "EXIT",
+            40, sf::Color::Black, ecs::ClickableType::EXIT);
+    }
+}
+
+void RType::GameInstance::levelContinueMenu()
+{
+    auto &level = refEntityManager.createNewLevel("continueMenu");
+
+    level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+    refEntityManager.switchLevel("continueMenu");
+
+    if (!isServer()) {
         auto &title = refEntityManager.getCurrentLevel().createEntity();
 
         sf::Text text;
         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
         text.setCharacterSize(100);
         text.setFillColor(sf::Color::White);
-        text.setString("F Type V8");
+        text.setString("CONNECTION TO SERVER");
 
         float textWidth = text.getLocalBounds().width;
         float windowWidth = (float) this->_window->getSize().x;
 
         float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 4;
+        float posY = (float) this->_window->getSize().y / 5;
 
         title.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));
         title.addComponent(
             std::make_shared<ecs::PositionComponent>(posX, posY));
-        title.addComponent(
-            std::make_shared<ecs::TextComponent<sf::Text>>(text, "F Type V8"));
+        title.addComponent(std::make_shared<ecs::TextComponent<sf::Text>>(
+            text, "CONNECTION TO SERVER"));
 
-        buildButton("PLAY", 1);
-        buildButton("SETTINGS", 0);
-        buildButton("EXIT", -1);
+        buildInput("NICKNAME", 2);
+        buildInput("IP ADRESS", 1);
+        buildInput("TCP PORT", 0);
+        buildInput("UDP PORT", -1);
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -3),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -4),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "BACK",
+            40, sf::Color::Black, ecs::ClickableType::BACK);
     }
 }
 
@@ -158,7 +275,7 @@ void RType::GameInstance::levelSettingsMenu()
         title.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));
         title.addComponent(
-            std::make_shared<ecs::PositionComponent>(posX, posY));
+            std::make_shared<ecs::PositionComponent>(posX, posY - 50));
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "SETTINGS"));
 
@@ -176,30 +293,48 @@ void RType::GameInstance::levelSettingsMenu()
 
         size_t equalPosUp = moveUpAction.find("=");
         if (equalPosUp != std::string::npos) {
-            std::string beforeUpEqual = "Move up";
+            std::string beforeUpEqual = "MOVE UP";
             std::string afterUpEqual = moveUpAction.substr(equalPosUp + 1);
-            endUpMove = beforeUpEqual + " : " + afterUpEqual;
+            size_t firstdoublepoint = afterUpEqual.find("::");
+            std::string afterfirstdoublepoint =
+                afterUpEqual.substr(firstdoublepoint + 2);
+            size_t seconddoublepoint = afterfirstdoublepoint.find("::");
+            std::string aftersedoublepoint =
+                afterfirstdoublepoint.substr(seconddoublepoint + 2);
+            endUpMove = beforeUpEqual + " : " + aftersedoublepoint;
         }
 
         size_t equalPosRight = moveRightAction.find("=");
         if (equalPosRight != std::string::npos) {
-            std::string beforeRightEqual = "Move right";
+            std::string beforeRightEqual = "MOVE RIGHT";
             std::string afterRightEqual =
                 moveRightAction.substr(equalPosRight + 1);
-            endRightMove = beforeRightEqual + " : " + afterRightEqual;
+            size_t firstdoublepoint = afterRightEqual.find("::");
+            std::string afterfirstdoublepoint =
+                afterRightEqual.substr(firstdoublepoint + 2);
+            size_t seconddoublepoint = afterfirstdoublepoint.find("::");
+            std::string aftersedoublepoint =
+                afterfirstdoublepoint.substr(seconddoublepoint + 2);
+            endRightMove = beforeRightEqual + " : " + aftersedoublepoint;
         }
 
         size_t equalPosLeft = moveLeftAction.find("=");
         if (equalPosLeft != std::string::npos) {
-            std::string beforeLeftEqual = "Move left";
+            std::string beforeLeftEqual = "MOVE LEFT";
             std::string afterLeftEqual =
                 moveLeftAction.substr(equalPosLeft + 1);
-            endLeftMove = beforeLeftEqual + " : " + afterLeftEqual;
+            size_t firstdoublepoint = afterLeftEqual.find("::");
+            std::string afterfirstdoublepoint =
+                afterLeftEqual.substr(firstdoublepoint + 2);
+            size_t seconddoublepoint = afterfirstdoublepoint.find("::");
+            std::string aftersedoublepoint =
+                afterfirstdoublepoint.substr(seconddoublepoint + 2);
+            endLeftMove = beforeLeftEqual + " : " + aftersedoublepoint;
         }
 
         size_t equalPosDown = moveDownAction.find("=");
         if (equalPosDown != std::string::npos) {
-            std::string beforeDownEqual = "Move down";
+            std::string beforeDownEqual = "MOVE DOWN";
             std::string afterDownEqual =
                 moveDownAction.substr(equalPosDown + 1);
             size_t firstdoublepoint = afterDownEqual.find("::");
@@ -213,19 +348,61 @@ void RType::GameInstance::levelSettingsMenu()
 
         size_t equalPosAutoFire = autoFireAction.find("=");
         if (equalPosAutoFire != std::string::npos) {
-            std::string beforeAutoFireEqual = "Auto fire";
+            std::string beforeAutoFireEqual = "AUTO FIRE";
             std::string afterAutoFireEqual =
                 autoFireAction.substr(equalPosAutoFire + 1);
             endAutoFire = beforeAutoFireEqual + " : "
                 + (afterAutoFireEqual == "true" ? "Yes" : "No");
         }
 
-        buildButton(endUpMove, 2);
-        buildButton(endRightMove, 1);
-        buildButton(endLeftMove, 0);
-        buildButton(endDownMove, -1);
-        buildButton(endAutoFire, -2);
-        buildButton("BACK", -3);
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 2),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            endUpMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_UP);
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 1),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            endDownMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_DOWN);
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 0),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            endRightMove, 40, sf::Color::Black,
+            ecs::ClickableType::MOVE_RIGHT);
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            endLeftMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_LEFT);
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -2),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            endAutoFire, 40, sf::Color::Black, ecs::ClickableType::AUTO_FIRE);
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -3),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue, "BACK",
+            40, sf::Color::Black, ecs::ClickableType::BACK);
     }
 }
 
@@ -233,11 +410,42 @@ void RType::GameInstance::handleAutoFireButton(
     std::string newAutoFireValue, ecs::Entity &entity)
 {
     Config config("config.cfg");
-    std::string value = (newAutoFireValue == "true" ? "Yes" : "No");
+    std::string value = (newAutoFireValue == "true" ? "YES" : "NO");
     config.updateConfigValue("AUTO_FIRE=", newAutoFireValue);
     config.saveConfig();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
-    text->setStr("Auto fire : " + value);
+    text->setStr("AUTO FIRE : " + value);
+}
+
+void RType::GameInstance::handleInputButtons(
+    const std::vector<sf::Keyboard::Key> &keys)
+{
+    std::string nickname;
+    const size_t maxInputLenght = 16;
+
+    for (auto key : keys) {
+        std::string keyStr = getKeyString(key);
+        if (key == sf::Keyboard::BackSpace && !nickname.empty()) {
+            nickname.pop_back();
+        } else if (key != sf::Keyboard::BackSpace && keyStr.size() == 1) {
+            if (nickname.size() < maxInputLenght) {
+                nickname += keyStr;
+            }
+        }
+    }
+
+    for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
+        auto text = entity.get().getComponent<ecs::TextComponent<sf::Text>>();
+
+        if (text && entity.get().getID() == _lastInputIdClicked) {
+            if (nickname.empty()) {
+                text->setStr("");
+            } else {
+                text->setStr(nickname);
+            }
+            break;
+        }
+    }
 }
 
 void RType::GameInstance::handleConfigButtons(
@@ -256,7 +464,16 @@ void RType::GameInstance::handleConfigButtons(
                     moveUpAction = moveUpAction.substr(equalPosUp + 1);
                 }
                 config.updateConfigValue("MOVE_UP=", newValue);
-                buildButton("Move up : " + pressedKeyString, 2);
+                for (auto &entity :
+                    refEntityManager.getCurrentLevel().getEntities()) {
+                    if (entity.get().getID() == _lastButtonIdClicked) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        text->setStr("MOVE UP : " + pressedKeyString);
+                        break;
+                    }
+                }
                 break;
             }
             case -1: {
@@ -267,7 +484,16 @@ void RType::GameInstance::handleConfigButtons(
                         moveRightAction.substr(equalPosRight + 1);
                 }
                 config.updateConfigValue("MOVE_RIGHT=", newValue);
-                buildButton("Move right : " + pressedKeyString, 1);
+                for (auto &entity :
+                    refEntityManager.getCurrentLevel().getEntities()) {
+                    if (entity.get().getID() == _lastButtonIdClicked) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        text->setStr("MOVE RIGHT : " + pressedKeyString);
+                        break;
+                    }
+                }
                 break;
             }
             case -2: {
@@ -277,7 +503,16 @@ void RType::GameInstance::handleConfigButtons(
                     moveLeftAction = moveLeftAction.substr(equalPosLeft + 1);
                 }
                 config.updateConfigValue("MOVE_LEFT=", newValue);
-                buildButton("Move left : " + pressedKeyString, 0);
+                for (auto &entity :
+                    refEntityManager.getCurrentLevel().getEntities()) {
+                    if (entity.get().getID() == _lastButtonIdClicked) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        text->setStr("MOVE LEFT : " + pressedKeyString);
+                        break;
+                    }
+                }
                 break;
             }
             case -3: {
@@ -287,7 +522,16 @@ void RType::GameInstance::handleConfigButtons(
                     moveDownAction = moveDownAction.substr(equalPosDown + 1);
                 }
                 config.updateConfigValue("MOVE_DOWN=", newValue);
-                buildButton("Move down : " + pressedKeyString, -1);
+                for (auto &entity :
+                    refEntityManager.getCurrentLevel().getEntities()) {
+                    if (entity.get().getID() == _lastButtonIdClicked) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        text->setStr("MOVE DOWN : " + pressedKeyString);
+                        break;
+                    }
+                }
                 break;
             }
             default: std::cerr << "Invalid action type." << std::endl; break;
