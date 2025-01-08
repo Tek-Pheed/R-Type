@@ -216,7 +216,7 @@ void RType::GameInstance::levelLobbyMenu()
     refEntityManager.switchLevel("lobbyMenu");
 
     if (!isServer()) {
-        auto &button = refEntityManager.getCurrentLevel().createEntity();
+        auto &title = refEntityManager.getCurrentLevel().createEntity();
 
         sf::Text text;
         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
