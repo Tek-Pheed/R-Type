@@ -172,7 +172,8 @@ void NetworkingManager::runWriteThread()
             }
         } catch (const std::exception &e) {
             std::cout << "ENGINE: [Write Thread] failed with exception: "
-                      << e.what() << ", ignoring..." << std::endl;
+                      << e.what() << ", tying again..." << std::endl;
+            shouldWait = false;
         }
     }
     std::cout << "ENGINE: [Write Thread] Terminating." << std::endl;
@@ -342,7 +343,7 @@ void NetworkingManager::runReadThread()
             }
         } catch (const std::exception &e) {
             std::cout << "ENGINE: [Read Thread] failed with exception: "
-                      << e.what() << ", ignoring..." << std::endl;
+                      << e.what() << ", trying again..." << std::endl;
         }
     }
     std::cout << "ENGINE: [Read Thread] Terminating." << std::endl;
