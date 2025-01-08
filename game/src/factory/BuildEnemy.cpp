@@ -90,7 +90,6 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 
 void GameInstance::deleteEnemy(size_t enemyID)
 {
-    std::unique_lock lock(_gameLock);
     std::cout << "Deleting enemy" << std::endl;
     auto &ene = getEnemyById(enemyID);
     refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
@@ -135,6 +134,7 @@ void GameInstance::handleNetworkEnemies(
             break;
         }
         case Protocol::E_DEAD: {
+            std::unique_lock lock(_gameLock);
             if (_isServer)
                 return;
             if (tokens.size() >= 1) {

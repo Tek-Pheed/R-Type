@@ -62,11 +62,17 @@ void RType::GameInstance::clientHandlerConnection(
                 if (tokens[0].starts_with("OK") && _netClientID >= 0) {
                     // We can create the player here, or wait and create it
                     // later
-
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
+                    std::string text = "Health: "
+                        + std::to_string(
+                            getLocalPlayer()
+                                .getComponent<ecs::HealthComponent>()
+                                ->getHealth());
+                    setHealthId(getNewId());
+                    _factory.buildText(getHealthId(), 1800.0f, 50.0f, text);
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }
@@ -131,6 +137,7 @@ void RType::GameInstance::connectToGame()
             *this);
         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
+        level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
         refEntityManager.switchLevel("mainLevel", false);
 
         _playerEntityID = -1;

@@ -10,6 +10,7 @@
     #define NOMINMAX
 #endif
 
+#include <cmath>
 #include "Game.hpp"
 #include "GameSystems.hpp"
 
@@ -46,7 +47,7 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
         auto health = enti.getComponent<ecs::HealthComponent>();
         auto playerHitbox = enti.getComponent<ecs::HitboxComponent>();
 
-        if (!position || !player || !health || !playerHitbox)
+        if (!position || !player || !playerHitbox)
             continue;
 
         float playerCenterX = position->getX() + playerHitbox->getWidth() / 2;
@@ -61,9 +62,32 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
             && enemyPos->getY() + enemyHitB->getHeight() / 2
                 > playerCenterY - playerHitbox->getHeight() / 2 - hitbox) {
             if (_game->isServer() && damageCooldown <= 0.0f) {
-                _game->damagePlayer(player->getPlayerID(), 51);
-                damageCooldown = 1.0f;
+                _game->damagePlayer(player->getPlayerID(), 50);
+                _game->deleteEnemy(enemyComp->getEnemyID());
             }
+
+            if (!_game->isServer()
+                && player->getPlayerID()
+                    == _game->getLocalPlayer()
+                           .getComponent<ecs::PlayerComponent>()
+                           ->getPlayerID()
+                && damageCooldown <= 0.0f) {
+                auto healthEnt =
+                    _game->refEntityManager.getCurrentLevel().getEntityById(
+                        _game->getHealthId());
+                auto healthText =
+                    healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
+                if (healthText && health) {
+                    if (floor(health->getHealth() - 50) <= 0) {
+                        healthText->setStr("Health: Dead");
+                    } else
+                        healthText->setStr("Health: "
+                            + std::to_string(health->getHealth() - 50));
+                } else if (healthText && !health) {
+                    healthText->setStr("Health: Dead");
+                }
+            }
+            damageCooldown = 1.0f;
         }
     }
 }
@@ -102,7 +126,7 @@ void HitboxSystem::BulletCollision(ecs::Entity &bullet)
             && bulletPos->getY() + bulletHitB->getHeight() / 2
                 > enemyCenterY - enemyHitB->getHeight() / 2 - hitbox) {
             if (_game->isServer())
-                health->setHealth(health->getHealth() - 101);
+                health->setHealth(health->getHealth() - 100);
             _game->refEntityManager.getCurrentLevel().destroyEntityById(
                 bullet.getID());
         }

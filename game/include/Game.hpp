@@ -84,6 +84,8 @@ namespace RType
         void playerShoot(size_t playerID);
         void setPlayerEntityID(int id);
         void damagePlayer(size_t playerID, int damage);
+        size_t getHealthId();
+        void setHealthId(size_t id);
 
         std::vector<ecs::Entity> &getEntities();
 
@@ -203,5 +205,7 @@ namespace RType
         std::recursive_mutex _gameLock;
 
         sf::Clock _autoFireClock;
+
+        size_t _healthId;
     };
 }; // namespace RType

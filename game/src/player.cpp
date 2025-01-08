@@ -206,8 +206,8 @@ void GameInstance::damagePlayer(size_t playerID, int damage)
             ss << P_DMG << " " << _ticks << " " << playerID << " "
                << health->getHealth() << PACKET_END;
             if (isServer()) {
-                refNetworkManager.sendToOthers(
-                    playerID, System::Network::ISocket::Type::UDP, ss.str());
+                refNetworkManager.sendToAll(
+                    System::Network::ISocket::Type::UDP, ss.str());
             }
         }
     }
@@ -322,4 +322,14 @@ void GameInstance::playerAnimations(ecs::Entity &player)
 void GameInstance::setPlayerEntityID(int id)
 {
     this->_playerEntityID = id;
+}
+
+size_t GameInstance::getHealthId()
+{
+    return _healthId;
+}
+
+void GameInstance::setHealthId(size_t id)
+{
+    _healthId = id;
 }

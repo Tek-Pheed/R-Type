@@ -42,7 +42,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-        i++) {
+         i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -60,8 +60,8 @@ void GameInstance::loadAssets()
                 asset->path, asset->identifier, &sf::Font::loadFromFile);
         }
         for (const auto asset : Asset::getAllAssetsOfType<sf::SoundBuffer>()) {
-            refAssetManager.loadAsset(
-                asset->path, asset->identifier, &sf::SoundBuffer::loadFromFile);
+            refAssetManager.loadAsset(asset->path, asset->identifier,
+                &sf::SoundBuffer::loadFromFile);
         }
     } catch (const std::exception &e) {
         std::cout << "Failed to an load asset with error: " << e.what()
@@ -130,7 +130,7 @@ int RType::GameInstance::manageBuffers()
     if (packets.size() == 0)
         return 0;
 
-    std::unique_lock lock(_gameLock);
+    //std::unique_lock lock(_gameLock);
     for (auto &buff : packets) {
         std::string buffer = buff;
         std::string codeStr = buffer.substr(0, 3);
