@@ -180,13 +180,10 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
-    _view = std::make_unique<sf::View>();
-    sf::VideoMode videoMode(1920, 1080);
-    _window->create(videoMode, "R-Type",
-        sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
+    sf::VideoMode videoMode(1280, 720);
+    _window->create(
+        videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
-    _view->reset(sf::FloatRect(0, 0, 1920, 1080));
-    _window->setView(*_view);
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");
     }
@@ -243,29 +240,6 @@ void GameInstance::playEvent()
                         _factory.buildBulletFromPlayer((size_t) _netClientID);
                 }
             }
-        }
-        if (event.type == sf::Event::Resized) {
-            float aspectRatio =
-                1920.0f / 1080.0f; // Desired aspect ratio (16:9)
-            float newWidth = static_cast<float>(event.size.width);
-            float newHeight = static_cast<float>(event.size.height);
-
-            // Adjust the view to maintain the aspect ratio
-            if (newWidth / newHeight > aspectRatio) {
-                // Window is too wide
-                float viewHeight = newHeight;
-                float viewWidth = viewHeight * aspectRatio;
-                _view->setSize(viewWidth, viewHeight);
-                _view->setCenter(viewWidth / 2, viewHeight / 2);
-            } else {
-                // Window is too tall
-                float viewWidth = newWidth;
-                float viewHeight = viewWidth / aspectRatio;
-                _view->setSize(viewWidth, viewHeight);
-                _view->setCenter(viewWidth / 2, viewHeight / 2);
-            }
-
-            _window->setView(*_view);
         }
         if (hasLocalPlayer() && event.type == sf::Event::KeyReleased) {
             event_manager.keyReleased(event);

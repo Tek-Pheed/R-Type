@@ -202,7 +202,6 @@ namespace RType
         uint64_t _lastNetTick = 0U;
         ssize_t _clientGameMasterId = -1;
         std::unique_ptr<sf::RenderWindow> _window;
-        std::unique_ptr<sf::View> _view;
         std::recursive_mutex _gameLock;
         std::unordered_map<size_t, uint64_t> _clientTicks;
         sf::Clock _autoFireClock;
