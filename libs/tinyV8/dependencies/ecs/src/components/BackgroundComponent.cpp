@@ -10,7 +10,7 @@
 namespace ecs
 {
     BackgroundComponent::BackgroundComponent(float moveDelta)
-        : _moveDelta(moveDelta)
+        : _deltaCounter(0.0f), _moveDelta(moveDelta)
     {
     }
 

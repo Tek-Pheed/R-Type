@@ -40,9 +40,9 @@ The project is developed using the following libraries:
 
 - **SFML (Simple and Fast Multimedia Library)**: Used for graphics, audio, and
   event handling.
-  - [Official SFML Website](https://www.sfml-dev.org/)
+    - [Official SFML Website](https://www.sfml-dev.org/)
 - **Criterion**: For unit testing during development.
-  - [Criterion](https://github.com/Snaipe/Criterion)
+    - [Criterion](https://github.com/Snaipe/Criterion)
 
 ## 3. How to Launch
 
@@ -75,7 +75,7 @@ You can run the mdbook server who contains the documentation of the project :
 ```bash
 cd docs/
 docker build -f Dockerfile -t r-type-mdbook:latest .
-docker run --rm -it r-type-mdbook
+docker run --rm -it -p 3000:3000 r-type-mdbook
 ```
 
 or you can go [here](https://r-type.leafs-studio.com) to see it !
@@ -84,7 +84,8 @@ or you can go [here](https://r-type.leafs-studio.com) to see it !
 
 Benchmarks have been made in order to choose the best way to realise this
 project, one for the languages and one for the graphical libraries.
-You can find the [Benchmarks](./benchmarks.md) here.
+You can find the [Benchmarks](https://r-type.leafs-studio.com/benchmarks.html)
+here.
 
 ## 5. Authors
 

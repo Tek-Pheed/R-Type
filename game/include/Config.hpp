@@ -25,6 +25,8 @@ class Config {
     void parseConfig();
     void validateOrCreateConfig();
     void updateConfigValue(const std::string &key, const std::string &newValue);
+    std::string getKeyFromConfig(const std::string &key);
+    bool getAutoFireConfig();
 
   private:
     std::string _filename;

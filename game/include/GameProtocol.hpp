@@ -28,6 +28,7 @@ namespace RType
         P_SHOOT = 104,
         P_DMG = 105,
         P_DISCONN = 106,
+        P_NAME = 107,
 
         // Enemy
         E_SPAWN = 111,
@@ -46,6 +47,17 @@ namespace RType
         M_WIN = 133,
         M_LOSE = 134,
         M_GOVER = 135,
+
+        // Boss
+        B_SPAWN = 141,
+        B_POS = 142,
+        B_DEAD = 143,
+        B_SHOOT = 144,
+        B_DMG = 145,
+
+        // Loby
+        L_STARTGAME = 241,
+        L_SETMAXPLAYRS = 242,
     };
 
     template <typename... Args>
@@ -70,10 +82,12 @@ namespace RType
             size_t &resultIndexEnd) override;
         ssize_t identifyClient(
             const System::Network::byteArray &bytes) override;
+        void obfuscateData(char *data, size_t size, char key);
         void serializeString(
-            const std::string &str, std::ostream &out) override;
-        void deserializeString(
-            const std::ostream &in, std::string &out) override;
+            const std::string &str, std::ostream &out, char key) override;
+        std::string deserializeString(
+            std::istream &in, char key, size_t size) override;
+        char getKey(void) const override;
     };
 
 } // namespace RType

@@ -32,7 +32,7 @@ namespace RType
                 std::vector<ecs::Entity> &entity, float deltaTime) override;
 
           protected:
-            GameInstance *_game;
+            GameInstance *_game = nullptr;
         };
 
         class PositionSystem : public ecs::ISystem<GameInstance> {
@@ -42,7 +42,7 @@ namespace RType
                 std::vector<ecs::Entity> &entity, float deltaTime) override;
 
           protected:
-            GameInstance *_game;
+            GameInstance *_game = nullptr;
         };
 
         class BulletSystem : public ecs::ISystem<GameInstance> {
@@ -52,7 +52,7 @@ namespace RType
                 std::vector<ecs::Entity> &entity, float deltaTime) override;
 
           protected:
-            GameInstance *_game;
+            GameInstance *_game = nullptr;
         };
 
         class BackgroundSystem : public ecs::ISystem<GameInstance> {
@@ -62,7 +62,29 @@ namespace RType
                 std::vector<ecs::Entity> &entity, float deltaTime) override;
 
           protected:
-            GameInstance *_game;
+            GameInstance *_game = nullptr;
+        };
+
+        class HealthSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
+
+          protected:
+            GameInstance *_game = nullptr;
+        };
+
+        class HitboxSystem : public ecs::ISystem<GameInstance> {
+          public:
+            void initSystem(GameInstance &gameRef) override;
+            void update(
+                std::vector<ecs::Entity> &entity, float deltaTime) override;
+            void BulletCollision(ecs::Entity &bullet);
+            void EnemyCollision(ecs::Entity &enemy, float deltaTime);
+
+          protected:
+            GameInstance *_game = nullptr;
         };
 
     } // namespace GameSystems

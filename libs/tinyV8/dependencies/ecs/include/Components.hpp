@@ -7,8 +7,8 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
-#include <SFML/Graphics.hpp>
 #include <string>
+#include <SFML/Audio.hpp>
 
 namespace ecs
 {
@@ -77,7 +77,13 @@ namespace ecs
 
     class BossComponent : public Component {
       public:
-        explicit BossComponent();
+        explicit BossComponent(size_t bossID);
+
+        size_t getBossID() const;
+        void setBossID(size_t bossID);
+
+      private:
+        size_t _bossID;
     };
 
     class EnemyComponent : public Component {
@@ -93,7 +99,15 @@ namespace ecs
 
     class RenderComponent : public Component {
       public:
-        enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT };
+        enum ObjectType {
+            CIRCLE,
+            RECTANGLE,
+            SPRITE,
+            TEXT,
+            SPRITEANDTEXT,
+            BUTTON,
+            INPUT
+        };
         explicit RenderComponent(ObjectType type);
 
         ObjectType getObjectType() const;
@@ -114,6 +128,22 @@ namespace ecs
       private:
         float _deltaCounter;
         const float _moveDelta;
+    };
+
+    template <typename musicType> class MusicComponent : public Component {
+      public:
+        explicit MusicComponent(musicType &music): _music(music) {}
+
+        musicType &getMusicType() {
+          return this->_music;
+        }
+
+        void setMusicType(musicType &music) {
+          _music = music;
+        }
+
+        private:
+          musicType _music;
     };
 
     template <typename spriteType> class SpriteComponent : public Component {
@@ -250,14 +280,14 @@ namespace ecs
             this->_str = str;
         }
 
-      private:
         textType _text;
+
+      private:
         std::string _str;
     };
 
     class BulletComponent : public Component {
       public:
-        BulletComponent();
         explicit BulletComponent(bool isFromPlayer);
 
         bool getIsFromPlayer();
@@ -289,6 +319,21 @@ namespace ecs
 
       private:
         Bonus _bonus;
+    };
+  
+    class HitboxComponent : public Component {
+      public:
+        explicit HitboxComponent(float height, float width);
+
+        float getHeight() const;
+        float getWidth() const;
+
+        void setHeight(float height);
+        void setWidth(float width);
+
+      private:
+        float _height;
+        float _width;
     };
 
     // class ReplicationComponent : public Component {

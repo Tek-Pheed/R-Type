@@ -75,7 +75,7 @@ You can run the mdbook server who contains the documentation of the project :
 ```bash
 cd docs/
 docker build -f Dockerfile -t r-type-mdbook:latest .
-docker run --rm -it r-type-mdbook
+docker run --rm -it -p 3000:3000 r-type-mdbook
 ```
 
 or you can go [here](https://r-type.leafs-studio.com) to see it !

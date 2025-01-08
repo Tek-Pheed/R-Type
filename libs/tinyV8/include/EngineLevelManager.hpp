@@ -165,7 +165,8 @@ namespace Engine
             {
                 if (_levels.contains(levelName)) {
                     throw std::range_error(
-                        "A level with the same name already exists !");
+                        "A level with the same name already exists ! ["
+                        + levelName + "]");
                 }
                 _levels.emplace(levelName,
                     std::move(Level<GameClass>(_engineRef, levelName)));
@@ -187,6 +188,8 @@ namespace Engine
                 const std::string cur = _currentLevel;
 
                 if (!_levels.contains(levelName)) {
+                    std::cout << "ENGINE: Can't delete level" << levelName
+                              << std::endl;
                     return (false);
                 }
                 _levels.erase(levelName);
@@ -194,6 +197,22 @@ namespace Engine
                     _currentLevel = "";
                 std::cout << "ENGINE: Deleted level: " << levelName
                           << std::endl;
+                return (true);
+            }
+
+            /**
+             * @brief Deletes all levels.
+             * All enitites contained in the level will also be delete.
+
+             * @param levelName: The name of the level to delete.
+             * @return true: The level was deleted successfully.
+             * @return false: The level could not be deleted.
+             */
+            bool deleteAllLevel()
+            {
+                _currentLevel = "";
+
+                _levels.clear();
                 return (true);
             }
 
@@ -300,9 +319,8 @@ namespace Engine
             void engineOnTick(float deltaTimeSec)
             {
                 _persistentLevel.engineOnTick(deltaTimeSec);
-                for (auto &[name, level] : _levels) {
-                    level.engineOnTick(deltaTimeSec);
-                }
+                if (_currentLevel != "")
+                    getCurrentLevel().engineOnTick(deltaTimeSec);
             };
             void engineOnStop(void) {};
             void engineOnStart(void) {};

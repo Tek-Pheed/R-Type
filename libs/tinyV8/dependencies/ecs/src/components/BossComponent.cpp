@@ -9,7 +9,18 @@
 
 namespace ecs
 {
-    BossComponent::BossComponent()
+    BossComponent::BossComponent(size_t bossID) : _bossID(bossID)
     {
     }
+
+    size_t BossComponent::getBossID() const
+    {
+        return (_bossID);
+    }
+
+    void BossComponent::setBossID(size_t bossID)
+    {
+        _bossID = bossID;
+    }
+
 } // namespace ecs
