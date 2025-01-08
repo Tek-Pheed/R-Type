@@ -202,7 +202,7 @@ sf::RenderWindow &GameInstance::getWindow()
 
 void GameInstance::playEvent()
 {
-    std::unique_lock lock(_serverLock);
+    std::unique_lock lock(_gameLock);
     sf::Event event;
     std::stringstream ss;
     Config config("config.cfg");
