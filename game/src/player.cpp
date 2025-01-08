@@ -9,6 +9,7 @@
     #define NOMINMAX
 #endif
 
+#include "LevelConfig.hpp"
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -37,6 +38,7 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
+                loadLevel("level1.txt");
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
                 auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
@@ -189,7 +191,7 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)

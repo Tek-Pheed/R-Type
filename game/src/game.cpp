@@ -8,8 +8,10 @@
 #if defined(WIN32)
     #define NOMINMAX
 #endif
+#include <cstdlib>
+#include "ErrorClass.hpp"
+#include "LevelConfig.hpp"
 
-#include "Game.hpp"
 #include <any>
 #include <exception>
 #include <iostream>
@@ -21,6 +23,7 @@
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
 #include "Factory.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
@@ -28,6 +31,9 @@
 #include "SFML/Graphics/Texture.hpp"
 
 using namespace RType;
+
+constexpr auto BUILD_BASIC_ENEMY = "BASIC_ENEMY";
+constexpr auto BUILD_SHOOTER_ENEMY = "SHOOTER_ENEMY";
 
 size_t RType::getNewId()
 {
@@ -37,12 +43,29 @@ size_t RType::getNewId()
     return (id);
 }
 
+void GameInstance::loadLevel(const std::string &filename)
+{
+    LevelConfig l(filename);
+    auto map = l.parseLevelConfig();
+
+    for (auto &[key, value] : map) {
+        if (key == BUILD_BASIC_ENEMY) {
+            if (value.size() < 3)
+                throw ErrorClass("Failed to create enemy from level config");
+            _factory.buildEnemy(getNewId(),
+                (float) std::atof(value[0].c_str()),
+                (float) std::atof(value[1].c_str()),
+                (float) std::atof(value[2].c_str()));
+        }
+    }
+}
+
 const std::vector<const Asset::AssetStore *> getAllAsset()
 {
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -85,7 +108,7 @@ void GameInstance::gameTick(
 {
     (void) core;
     (void) event;
-    float deltaTime_sec = std::any_cast<float>(arg);
+    (void) arg;
 
     _ticks++;
     try {
@@ -98,13 +121,13 @@ void GameInstance::gameTick(
         } else {
             if (!_gameStarted)
                 return;
-            static float time = 15.0f;
-            time += deltaTime_sec;
-            if (time >= 5.0f) {
-                _factory.buildEnemy(getNewId(), 1200.0f, 300.0f);
-                _factory.buildEnemyShooter(getNewId(), 1200.0f, 600.0f);
-                time = 0.0f;
-            }
+            // float deltaTime_sec = std::any_cast<float>(arg);
+            // static float time = 15.0f;
+            // time += deltaTime_sec;
+            // if (time >= 5.0f) {
+            //     _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
+            //     time = 0.0f;
+            // }
         }
     } catch (const std::exception &e) {
         std::cout << "An error occured while playing: " << e.what()

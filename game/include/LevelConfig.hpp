@@ -11,6 +11,8 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <vector>
+#include <unordered_map>
 
 class LevelConfig {
 
@@ -22,7 +24,7 @@ class LevelConfig {
         const std::map<int, std::string> &getLevelConfig();
 
         void saveLevelConfig();
-        void parseLevelConfig();
+        std::vector<std::pair<std::string, std::vector<std::string>>> parseLevelConfig();
         void validateOrCreateLevelConfig();
         void updateLevelConfigValue(const std::string &key, const std::string &newValue);
 
