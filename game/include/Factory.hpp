@@ -34,7 +34,7 @@ namespace RType
             size_t id, float posX, float posY, float health = 100.0f);
         ecs::Entity &buildText(
             size_t id, float posX, float posY, std::string &content);
-        ecs::Entity &buildMusic(sf::SoundBuffer &soundBuffer);
+        ecs::Entity &buildMusic(sf::SoundBuffer &soundBuffer, std::string str);
 
       private:
         GameInstance &_game;

@@ -67,6 +67,8 @@ void RType::GameInstance::createPersistentLevel()
     level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
+    auto &musicSong = this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
+    _factory.buildMusic(musicSong, "menuSong");
 }
 
 ecs::Entity &RType::GameInstance::buildButton(std::string str, int buttonID)
@@ -148,9 +150,12 @@ void RType::GameInstance::levelMainMenu()
     refEntityManager.switchLevel("mainMenu");
 
     if (!isServer()) {
-        auto &musicSong =
-            this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
-        _factory.buildMusic(musicSong);
+        auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+
+        if (currentSong->getMusicType().getStatus() != sf::SoundSource::Playing) {
+            currentSong->getMusicType().play();
+        }
 
         auto &title = refEntityManager.getCurrentLevel().createEntity();
         sf::Text text;
