@@ -11,7 +11,6 @@
     #define NOMINMAX
 #endif
 
-#include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <cstddef>
@@ -27,6 +26,7 @@
 #include "Entity.hpp"
 #include "Factory.hpp"
 #include "GameSystems.hpp"
+#include <unordered_map>
 
 namespace RType
 {
@@ -97,13 +97,22 @@ namespace RType
         ecs::Entity &buildEnemy(
             size_t id, float posX, float posY, float health);
 
+        ecs::Entity &buildEnemyShooter(
+            size_t id, float posX, float posY, float health);
+
+        ecs::Entity &getEnemyById(size_t enemyID);
+        void sendEnemyPosition(size_t enemyID);
+        void deleteEnemy(size_t enemyID);
+        void handleNetworkEnemies(
+            int code, const std::vector<std::string> &tokens);
+
         // Boss
         ecs::Entity &buildBoss(
             size_t id, float posX, float posY, float health = 100.0f);
-        ecs::Entity &getEnemyById(size_t enemyID);
-        void sendEnemyPosition(size_t enemyID);
-        void deleteEnemy(size_t playerID);
-        void handleNetworkEnemies(
+        ecs::Entity &getBossById(size_t bossID);
+        void sendBossPosition(size_t bossID);
+        void deleteBoss(size_t bossID);
+        void handleNetworkBosses(
             int code, const std::vector<std::string> &tokens);
         void clientHandleDisconnected(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);

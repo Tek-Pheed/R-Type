@@ -50,11 +50,22 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
     }
     sprite->getSprite().setPosition(position->getX(), position->getY());
     text->getText().setString(text->getStr());
-    text->getText().setPosition(position->getX()
-            + (float) sprite->getSprite().getTextureRect().width
-                * sprite->getSprite().getScale().x / 2
-            - (float) text->getText().getLocalBounds().width / 2,
-        position->getY() - 15);
+    if (position->getY() < 15) {
+        text->getText().setPosition(position->getX()
+                + (float) sprite->getSprite().getTextureRect().width
+                    * sprite->getSprite().getScale().x / 2
+                - (float) text->getText().getLocalBounds().width / 2,
+            position->getY()
+                + static_cast<float>(
+                    sprite->getSprite().getTextureRect().height)
+                + 25);
+    } else {
+        text->getText().setPosition(position->getX()
+                + (float) sprite->getSprite().getTextureRect().width
+                    * sprite->getSprite().getScale().x / 2
+                - (float) text->getText().getLocalBounds().width / 2,
+            position->getY() - 15);
+    }
     window.draw(sprite->getSprite());
     window.draw(text->getText());
 }

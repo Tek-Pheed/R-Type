@@ -67,8 +67,7 @@ void RType::GameInstance::clientHandlerConnection(
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                     std::string text = "Health: "
-                        + std::to_string(
-                            getLocalPlayer()
+                        + std::to_string(getLocalPlayer()
                                 .getComponent<ecs::HealthComponent>()
                                 ->getHealth());
                     setHealthId(getNewId());
@@ -86,9 +85,6 @@ void RType::GameInstance::clientHandlerConnection(
 
 void RType::GameInstance::connectToGame()
 {
-    auto &levelSong =
-        this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::LEVEL_SONG);
-
     if (_isConnectedToServer)
         return;
     auto currentLevel = refEntityManager.getCurrentLevelName();
@@ -102,7 +98,7 @@ void RType::GameInstance::connectToGame()
             if (!text)
                 continue;
 
-            if (text->getStr().empty())
+            if (text->getStr().empty() || text->getStr() == "IP ADRESS")
                 continue;
 
             switch (count) {
@@ -121,12 +117,14 @@ void RType::GameInstance::connectToGame()
         refNetworkManager.setupClient<RType::PacketHandler>(
             _tcpPort, _udpPort, _ip);
 
-        if (this->_currentMusic.getStatus() == sf::SoundSource::Playing) {
-            this->_currentMusic.stop();
-            this->_currentMusic.setBuffer(levelSong);
-            this->_currentMusic.setLoop(true);
-            this->_currentMusic.setVolume(25.0f);
-            this->_currentMusic.play();
+        auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+        auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(Asset::LOBBY_SONG);
+
+        if (currentSong->getMusicType().getStatus() == sf::SoundSource::Playing) {
+            currentSong->getMusicType().stop();
+            currentSong->getMusicType().setBuffer(newMusic);
+            currentSong->getMusicType().play();
         }
 
         // Prepare level
@@ -180,7 +178,7 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
-    sf::VideoMode videoMode(1920, 1080);
+    sf::VideoMode videoMode(1280, 720);
     _window->create(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());

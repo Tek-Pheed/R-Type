@@ -28,4 +28,6 @@ find . -type l \( -name "*.dylib" -o -name "*.dylib" \) -exec cp -P {} $RELEASE_
 printf "\n### Shared libraries copied to release folder\n"
 
 printf "\n### Fix link for macos"
+cd ..
 install_name_tool -add_rpath @loader_path/ ./release/client
+install_name_tool -add_rpath @loader_path/ ./release/server

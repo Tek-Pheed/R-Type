@@ -48,17 +48,17 @@ void PositionSystem::update(
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
-                float maxX = (float)this->_game->getWindow().getSize().x;
-                float maxY = (float)this->_game->getWindow().getSize().y;
+                float maxX = (float) this->_game->getWindow().getSize().x;
+                float maxY = (float) this->_game->getWindow().getSize().y;
 
                 if (sprite) {
                     maxX = (float) _game->getWindow().getSize().x
                         - (float) sprite->getSprite().getTextureRect().width
-                        - (float) sprite->getSprite().getScale().x;
+                            * (float) sprite->getSprite().getScale().x;
 
                     maxY = (float) _game->getWindow().getSize().y
                         - (float) sprite->getSprite().getTextureRect().height
-                        - (float) sprite->getSprite().getScale().y;
+                            * (float) sprite->getSprite().getScale().y;
                 }
 
                 if (positionComponent->getX() < 0) {
@@ -82,7 +82,9 @@ void PositionSystem::update(
                             != positionComponent->getY())) {
                     _game->sendEnemyPosition(enemy->getEnemyID());
                 }
-                if (enemy && (positionComponent->getX() < 0.0f || positionComponent->getY() < 0.0f)) {
+                if (enemy
+                    && (positionComponent->getX() < 0.0f
+                        || positionComponent->getY() < 0.0f)) {
                     _game->deleteEnemy(enemy->getEnemyID());
                 }
             }

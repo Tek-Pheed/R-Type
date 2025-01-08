@@ -67,6 +67,8 @@ void RType::GameInstance::createPersistentLevel()
     level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
+    auto &musicSong = this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
+    _factory.buildMusic(musicSong, "menuSong");
 }
 
 ecs::Entity &RType::GameInstance::buildButton(std::string str, int buttonID)
@@ -148,9 +150,12 @@ void RType::GameInstance::levelMainMenu()
     refEntityManager.switchLevel("mainMenu");
 
     if (!isServer()) {
-        auto &musicSong =
-            this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
-        _factory.buildMusic(musicSong);
+        auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+
+        if (currentSong->getMusicType().getStatus() != sf::SoundSource::Playing) {
+            currentSong->getMusicType().play();
+        }
 
         auto &title = refEntityManager.getCurrentLevel().createEntity();
         sf::Text text;
@@ -161,7 +166,7 @@ void RType::GameInstance::levelMainMenu()
         float textWidth = text.getLocalBounds().width;
         float windowWidth = (float) this->_window->getSize().x;
         float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 4;
+        float posY = (float) this->_window->getSize().y / 10;
 
         auto comp = std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT);
@@ -218,7 +223,7 @@ void RType::GameInstance::levelContinueMenu()
         float windowWidth = (float) this->_window->getSize().x;
 
         float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 5;
+        float posY = (float) this->_window->getSize().y / 10;
 
         title.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));
@@ -229,8 +234,8 @@ void RType::GameInstance::levelContinueMenu()
 
         buildInput("NICKNAME", 2);
         buildInput("IP ADRESS", 1);
-        buildInput("TCP PORT", 0);
-        buildInput("UDP PORT", -1);
+        buildInput("8081", 0);
+        buildInput("8082", -1);
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
@@ -270,7 +275,7 @@ void RType::GameInstance::levelSettingsMenu()
         float windowWidth = (float) this->_window->getSize().x;
 
         float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 4;
+        float posY = (float) this->_window->getSize().y / 10;
 
         title.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));
