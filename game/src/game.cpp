@@ -130,7 +130,7 @@ int RType::GameInstance::manageBuffers()
     if (packets.size() == 0)
         return 0;
 
-    std::unique_lock lock(_gameLock);
+    //std::unique_lock lock(_gameLock);
     for (auto &buff : packets) {
         std::string buffer = buff;
         std::string codeStr = buffer.substr(0, 3);

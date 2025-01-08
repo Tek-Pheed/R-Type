@@ -134,6 +134,7 @@ void GameInstance::handleNetworkEnemies(
             break;
         }
         case Protocol::E_DEAD: {
+            std::unique_lock lock(_gameLock);
             if (_isServer)
                 return;
             if (tokens.size() >= 1) {
