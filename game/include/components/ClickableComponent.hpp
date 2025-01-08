@@ -22,7 +22,10 @@ namespace ecs
         MOVE_RIGHT,
         MOVE_LEFT,
         AUTO_FIRE,
-        BACK
+        BACK,
+        DIFFICULTY,
+        BONUS,
+        NUMBER_OF_PLAYER
     };
 
     class ClickableComponent : public Component {
