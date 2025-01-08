@@ -68,12 +68,12 @@ void RType::GameInstance::clientHandlerConnection(
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                     std::string text = "Health: "
-                        + std::to_string(
-                            getLocalPlayer()
+                        + std::to_string(getLocalPlayer()
                                 .getComponent<ecs::HealthComponent>()
                                 ->getHealth());
                     setHealthId(getNewId());
-                    _factory.buildText(getHealthId(), 1800.0f, 50.0f, text);
+                    _factory.buildText(
+                        getHealthId(), 1800.0f - 40.0f, 50.0f - 50.0f, text);
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }
@@ -148,16 +148,7 @@ void RType::GameInstance::connectToGame()
         _playerEntityID = -1;
         _isConnectedToServer = true;
 
-        auto players = getAllPlayers();
-        for (auto player : players) {
-            auto textcomp = player.get().getComponent<ecs::TextComponent<sf::Text>>();
-            if (!textcomp) {
-                continue;
-            }
-            auto playerName = textcomp.get()->getStr();
-            this->_playersConnectedToGame.push_back(playerName);
-            
-        }
+        // this->_playersConnectedToGame.push_back(_playerName);
 
     } catch (const std::exception &e) {
         std::cout << CATCH_ERROR_LOCATION << "Failed to connect to server: IP=" << _ip

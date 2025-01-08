@@ -275,7 +275,7 @@ void RType::GameInstance::levelContinueMenu()
 //         text.setCharacterSize(100);
 //         text.setFillColor(sf::Color::White);
 //         text.setString("LOBBY");
-        
+
 //         float textWidth = text.getLocalBounds().width;
 //         float windowWidth = (float)this->_window->getSize().x;
 
@@ -289,7 +289,6 @@ void RType::GameInstance::levelContinueMenu()
 //         title.addComponent(
 //             std::make_shared<ecs::TextComponent<sf::Text>>(text, "LOBBY"));
 
-                
 //     }
 // }
 
