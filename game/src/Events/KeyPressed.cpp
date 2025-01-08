@@ -81,9 +81,9 @@ namespace RType
             } else if (event.key.code == moveDownKey) {
                 velocity->setVy(0.2f);
             } else if (event.key.code == moveRightKey) {
-                velocity->setVx(0.2f);
+                velocity->setVx(0.1f);
             } else if (event.key.code == moveLeftKey) {
-                velocity->setVx(-0.2f);
+                velocity->setVx(-0.1f);
             }
 
             /*if (!autoFireEnabled && event.key.code == sf::Keyboard::Space) {

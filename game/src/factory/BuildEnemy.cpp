@@ -28,7 +28,7 @@ ecs::Entity &RType::Factory::buildEnemy(
     std::cout << "Adding new enemy to the game" << std::endl;
     auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
-    enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
+    enemy.addComponent(std::make_shared<ecs::PositionComponent>(0.8, 0.5));
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(std::make_shared<ecs::VelocityComponent>(-0.1f, 0.0f));
     enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 32.0f));
