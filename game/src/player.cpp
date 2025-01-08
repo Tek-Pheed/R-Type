@@ -79,21 +79,28 @@ void GameInstance::handleNetworkPlayers(
         }
         case Protocol::P_POS: {
             if (tokens.size() >= 4) {
-                uint64_t tick = _ticks;
+                uint64_t tick = (uint64_t) atoi(tokens[0].c_str());
+                size_t id = (size_t) atoi(tokens[1].c_str());
                 if (!isServer()) {
-                    tick = (uint64_t) atoi(tokens[0].c_str());
-                    if (!(_lastNetTick <= tick)) {
+                    if (tick < _lastNetTick) {
                         return;
+                    } else {
+                        _lastNetTick = tick;
+                    }
+                } else {
+                    if (tick < _clientTicks[id]) {
+                        return;
+                    } else {
+                        _clientTicks[id] = tick;
                     }
                 }
-                size_t id = (size_t) atoi(tokens[1].c_str());
                 auto &player = getPlayerById(id);
                 auto pos = player.getComponent<ecs::PositionComponent>();
                 pos->setX((float) std::atof(tokens[2].c_str()));
                 pos->setY((float) std::atof(tokens[3].c_str()));
                 if (isServer()) {
                     std::stringstream ss;
-                    ss << P_POS << " " << tick << " "
+                    ss << P_POS << " " << _ticks << " "
                        << player.getComponent<ecs::PlayerComponent>()
                               ->getPlayerID()
                        << " " << pos->getX() << " " << pos->getY()
@@ -125,10 +132,20 @@ void GameInstance::handleNetworkPlayers(
         case Protocol::P_DMG: {
             if (tokens.size() >= 3) {
                 uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
-                if (!_isServer && !(_lastNetTick <= tick)) {
-                    return;
-                }
                 size_t id = (size_t) atoi(tokens[1].c_str());
+                if (!_isServer) {
+                    if (tick < _lastNetTick) {
+                        return;
+                    } else {
+                        _lastNetTick = tick;
+                    }
+                } else {
+                    if (tick < _clientTicks[id]) {
+                        return;
+                    } else {
+                        _clientTicks[id] = tick;
+                    }
+                }
                 int health = atoi(tokens[2].c_str());
                 auto &player = getPlayerById(id);
                 auto healthComp = player.getComponent<ecs::HealthComponent>();

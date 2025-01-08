@@ -110,6 +110,7 @@ void RType::GameInstance::serverHanlderValidateConnection(
     if (code == Protocol::C_START_UDP && tokens.size() >= 1) {
         ssize_t netClientID = (ssize_t) atoi(tokens[0].c_str());
         if (netClientID >= 0) {
+            _clientTicks[(size_t) netClientID] = 0;
             std::stringstream ss;
             if (getAllPlayers().size() + 1 > _maxPlayers) {
                 ss << C_AUTH << " KO" << PACKET_END;
