@@ -31,7 +31,6 @@ namespace RType
       protected:
         Factory &_factory;
         GameInstance &_game;
-        std::unique_ptr<ecs::Entity> _entity;
     };
 
 } // namespace RType
