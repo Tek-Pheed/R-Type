@@ -216,48 +216,47 @@ void RType::GameInstance::levelLobbyMenu()
     refEntityManager.switchLevel("lobbyMenu");
 
     if (!isServer()) {
-        auto &title = refEntityManager.getCurrentLevel().createEntity();
+        std::string title = "GAME CONFIG";
 
-        sf::Text text;
-        text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
-        text.setCharacterSize(100);
-        text.setFillColor(sf::Color::White);
-        text.setString("LOBBY");
+        auto &text = _factory.buildText(0, 0, 0, title);
+        auto titleText = text.getComponent<ecs::TextComponent<sf::Text>>();
+        auto titlePos = text.getComponent<ecs::PositionComponent>();
 
-        float textWidth = text.getLocalBounds().width;
-        float windowWidth = (float) this->_window->getSize().x;
+        titlePos->setX(
+            (float) (static_cast<float>(_window->getSize().x - 350 / 2) - 50
+                - titleText->getText().getLocalBounds().width / 2));
+        titlePos->setY(
+            (float) (this->_window->getSize().y / 2 - 50 / 2 - 75 * 1));
 
-        float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 4;
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 0),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "NUMBER OF PLAYER : 4", 40, sf::Color::Black,
+            ecs::ClickableType::NUMBER_OF_PLAYER);
 
-        title.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::TEXT));
-        title.addComponent(
-            std::make_shared<ecs::PositionComponent>(posX, posY - 50));
-        title.addComponent(
-            std::make_shared<ecs::TextComponent<sf::Text>>(text, "LOBBY"));
-
-        _factory.buildButton(sf::Vector2f(
-                (float) this->_window->getSize().x / 2 - (float) 650 / 2,
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -1),
-            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
-            "NUMBER OF PLAYER", 40, sf::Color::Black, ecs::ClickableType::NUMBER_OF_PLAYER);
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "DIFFICULTY : EASY", 40, sf::Color::Black,
+            ecs::ClickableType::DIFFICULTY);
 
-        _factory.buildButton(sf::Vector2f(
-                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
-                    - (float) 75 * -1),
-            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
-            "DIFFICULTY", 40, sf::Color::Black, ecs::ClickableType::DIFFICULTY);
+                    - (float) 75 * -2),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "BONUS : YES", 40, sf::Color::Black, ecs::ClickableType::BONUS);
 
-        _factory.buildButton(sf::Vector2f(
-                (float) this->_window->getSize().x / 2 - (float) 750 / 2,
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
-                    - (float) 75 * -1),
-            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
-            "BONUS", 40, sf::Color::Black, ecs::ClickableType::BONUS);
-
+                    - (float) 75 * -4),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "LAUNCH GAME", 40, sf::Color::Black, ecs::ClickableType::BONUS);
     }
 }
 

@@ -67,14 +67,13 @@ void RType::GameInstance::clientHandlerConnection(
                     std::unique_lock lock(_gameLock);
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
-                    std::string text = "Health: "
-                        + std::to_string(
-                            getLocalPlayer()
+                    /*std::string text = "Health: "
+                        + std::to_string(getLocalPlayer()
                                 .getComponent<ecs::HealthComponent>()
                                 ->getHealth());
                     setHealthId(getNewId());
                     _factory.buildText(
-                        getHealthId(), 1800.0f - 40.0f, 50.0f - 50.0f, text);
+                        getHealthId(), 1800.0f - 40.0f, 50.0f - 50.0f, text);*/
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }

@@ -90,29 +90,6 @@ void GameInstance::handleNetworkPlayers(
                 } else {
                     auto &pl = _factory.buildPlayer(false, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
-
-                    auto players = getAllPlayers();
-                    for (auto player : players) {
-                        auto textcomp =
-                            player.get()
-                                .getComponent<ecs::TextComponent<sf::Text>>();
-                        if (!textcomp) {
-                            continue;
-                        }
-                        auto playerName = textcomp.get()->getStr();
-                        std::cout << playerName << std::endl;
-                        this->_playersConnectedToGame.push_back(playerName);
-                    }
-
-                    size_t playerId = 1;
-
-                    for (auto currentPlayerName :
-                        this->_playersConnectedToGame) {
-                        std::cout << currentPlayerName << std::endl;
-                        _factory.buildText(playerId, 0, 50 * (float) playerId,
-                            currentPlayerName);
-                        playerId++;
-                    }
                 }
                 updatePlayerPosition(id, (float) std::atof(tokens[1].c_str()),
                     (float) std::atof(tokens[2].c_str()));
