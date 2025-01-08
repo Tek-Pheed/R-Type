@@ -81,7 +81,6 @@ namespace RType
         void sendPlayerPosition(size_t playerID);
         void deletePlayer(size_t playerID);
         void playerAnimations(ecs::Entity &player);
-        void playerShoot(size_t playerID);
         void setPlayerEntityID(int id);
         void damagePlayer(size_t playerID, int damage);
         size_t getHealthId();

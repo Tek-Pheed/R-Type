@@ -17,7 +17,7 @@ namespace RType
         Config config("config.cfg");
         Utils utils;
 
-        bool autoFireEnabled = config.getAutoFireConfig();
+        // bool autoFireEnabled = config.getAutoFireConfig();
         sf::Keyboard::Key keyPressed = sf::Keyboard::Unknown;
         const size_t maxInputLenght = 16;
 
@@ -86,12 +86,12 @@ namespace RType
                 velocity->setVx(-200.0f);
             }
 
-            if (!autoFireEnabled && event.key.code == sf::Keyboard::Space) {
+            /*if (!autoFireEnabled && event.key.code == sf::Keyboard::Space) {
                 if (_game.getNetClientID() >= 0) {
                     _factory.buildBulletFromPlayer(
                         (size_t) _game.getNetClientID());
                 }
-            }
+            }*/
         }
     }
 } // namespace RType

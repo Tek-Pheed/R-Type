@@ -6,9 +6,11 @@
 */
 
 #include <sstream>
+#include "Components.hpp"
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "GameSystems.hpp"
 
 namespace RType
 {
@@ -19,12 +21,14 @@ namespace RType
         if (!positionComp)
             return;
         auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
+        float x = positionComp->getX() + 100;
+        float y = positionComp->getY() + 25;
+
         bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
         bullet.addComponent(
             std::make_shared<ecs::VelocityComponent>(350.0f, 0));
-        bullet.addComponent(std::make_shared<ecs::HitboxComponent>(64, 16));
-        bullet.addComponent(std::make_shared<ecs::PositionComponent>(
-            positionComp->getX() + 100, positionComp->getY() + 25));
+        bullet.addComponent(std::make_shared<ecs::HitboxComponent>(54, 16));
+        bullet.addComponent(std::make_shared<ecs::PositionComponent>(x, y));
 
         std::stringstream ss;
         ss << P_SHOOT << " " << playerID << " " << PACKET_END;
@@ -37,11 +41,11 @@ namespace RType
             bullet.addComponent(std::make_shared<ecs::RenderComponent>(
                 ecs::RenderComponent::ObjectType::SPRITE));
             sf::Sprite s;
+
             s.setTexture(texture);
             s.setTextureRect(sf::Rect(137, 153, 64, 16));
             bullet.addComponent(
-                std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-                    s, 132, 33));
+                std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 1, 1));
             auto &bulletSound =
                 _game.refAssetManager.getAsset<sf::SoundBuffer>(
                     Asset::BULLET_SOUND);

@@ -7,8 +7,8 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
-#include <string>
 #include <SFML/Audio.hpp>
+#include <string>
 
 namespace ecs
 {
@@ -132,18 +132,22 @@ namespace ecs
 
     template <typename musicType> class MusicComponent : public Component {
       public:
-        explicit MusicComponent(musicType &music): _music(music) {}
-
-        musicType &getMusicType() {
-          return this->_music;
+        explicit MusicComponent(musicType &music) : _music(music)
+        {
         }
 
-        void setMusicType(musicType &music) {
-          _music = music;
+        musicType &getMusicType()
+        {
+            return this->_music;
         }
 
-        private:
-          musicType _music;
+        void setMusicType(musicType &music)
+        {
+            _music = music;
+        }
+
+      private:
+        musicType _music;
     };
 
     template <typename spriteType> class SpriteComponent : public Component {
@@ -308,7 +312,7 @@ namespace ecs
         std::string _name;
     };
 
-	enum Bonus { RAPIDFIRE, DOUBLEFIRE, TRIPLEFIRE, ALLIES };
+    enum Bonus { RAPIDFIRE, DOUBLEFIRE, TRIPLEFIRE, ALLIES };
 
     class BonusComponent : public Component {
       public:
@@ -320,10 +324,10 @@ namespace ecs
       private:
         Bonus _bonus;
     };
-  
+
     class HitboxComponent : public Component {
       public:
-        explicit HitboxComponent(float height, float width);
+        explicit HitboxComponent(float width, float height);
 
         float getHeight() const;
         float getWidth() const;

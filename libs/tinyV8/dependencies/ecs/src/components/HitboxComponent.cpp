@@ -9,7 +9,7 @@
 
 namespace ecs
 {
-    HitboxComponent::HitboxComponent(float height, float width)
+    HitboxComponent::HitboxComponent(float width, float height)
         : _height(height), _width(width)
     {
     }
