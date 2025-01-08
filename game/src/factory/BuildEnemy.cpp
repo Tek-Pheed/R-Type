@@ -88,7 +88,6 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 
 void GameInstance::deleteEnemy(size_t enemyID)
 {
-    std::unique_lock lock(_serverLock);
     std::cout << "Deleting enemy" << std::endl;
     auto &ene = getEnemyById(enemyID);
     refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());

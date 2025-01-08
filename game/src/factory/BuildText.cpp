@@ -38,7 +38,6 @@ ecs::Entity &RType::Factory::buildText(
         sfText.setFillColor(sf::Color::White);
         sfText.setString(content);
 
-        // Adjust position to ensure text fits inside the screen
         sf::FloatRect textRect = sfText.getLocalBounds();
         if (posX + textRect.width
             > static_cast<float>(_game.getWindow().getSize().x)) {
@@ -50,7 +49,7 @@ ecs::Entity &RType::Factory::buildText(
             posY = static_cast<float>(_game.getWindow().getSize().y)
                 - textRect.height;
         }
-        text.getComponent<ecs::PositionComponent>()->setX(posX - 25);
+        text.getComponent<ecs::PositionComponent>()->setX(posX - 40);
         text.getComponent<ecs::PositionComponent>()->setY(posY - 50);
 
         text.addComponent(std::make_shared<ecs::RenderComponent>(

@@ -9,6 +9,7 @@
     #define NOMINMAX
 #endif
 
+#include <cmath>
 #include "Components.hpp"
 #include "Game.hpp"
 #include "GameSystems.hpp"
@@ -28,7 +29,7 @@ void HealthSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         auto health = entity.getComponent<ecs::HealthComponent>();
         if (!health)
             continue;
-        if (health->getHealth() <= 0) {
+        if (floor(health->getHealth()) <= 0) {
             if (entity.getComponent<ecs::PlayerComponent>()) {
                 _game->deletePlayer(
                     entity.getComponent<ecs::PlayerComponent>()
