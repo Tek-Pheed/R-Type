@@ -97,7 +97,6 @@ void HitboxSystem::BulletCollision(ecs::Entity &bullet)
     auto bulletPos = bullet.getComponent<ecs::PositionComponent>();
     auto bulletComp = bullet.getComponent<ecs::BulletComponent>();
     auto bulletHitB = bullet.getComponent<ecs::HitboxComponent>();
-    const float hitbox = 5.0f;
 
     if (!bulletPos || !bulletComp || !bulletHitB)
         return;
@@ -114,19 +113,28 @@ void HitboxSystem::BulletCollision(ecs::Entity &bullet)
         if (enti.getID() == bullet.getID())
             continue;
 
-        float enemyCenterX = position->getX() + enemyHitB->getWidth() / 2;
-        float enemyCenterY = position->getY() + enemyHitB->getHeight() / 2;
+        float enemyCenterX = position->getX() + enemyHitB->getWidth() / 2.0f;
+        float enemyCenterY = (position->getY() + enemyHitB->getHeight() / 2.0f)
+            + enemyHitB->getHeight() / 2.0f;
 
-        if (bulletPos->getX() + bulletHitB->getWidth() / 2
-                < enemyCenterX + enemyHitB->getWidth() / 2 + hitbox
-            && bulletPos->getX() + bulletHitB->getWidth() / 2
-                > enemyCenterX - enemyHitB->getWidth() / 2 - hitbox
-            && bulletPos->getY() + bulletHitB->getHeight() / 2
-                < enemyCenterY + enemyHitB->getHeight() / 2 + hitbox
-            && bulletPos->getY() + bulletHitB->getHeight() / 2
-                > enemyCenterY - enemyHitB->getHeight() / 2 - hitbox) {
-            if (_game->isServer())
+        float bulletCenterX =
+            bulletPos->getX() + bulletHitB->getWidth() / 2.0f;
+        float bulletCenterY =
+            bulletPos->getY() + bulletHitB->getHeight() / 2.0f;
+
+        float enemyHalfWidth = enemyHitB->getWidth() / 2;
+        float enemyHalfHeight = enemyHitB->getHeight() / 2;
+
+        float bulletHalfWidth = bulletHitB->getWidth() / 2;
+        float bulletHalfHeight = bulletHitB->getHeight() / 2;
+
+        if (std::abs(bulletCenterX - enemyCenterX)
+                < (enemyHalfWidth + bulletHalfWidth)
+            && std::abs(bulletCenterY - enemyCenterY)
+                < (enemyHalfHeight + bulletHalfHeight)) {
+            if (_game->isServer()) {
                 health->setHealth(health->getHealth() - 100);
+            }
             _game->refEntityManager.getCurrentLevel().destroyEntityById(
                 bullet.getID());
         }

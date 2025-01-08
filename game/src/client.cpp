@@ -237,7 +237,7 @@ void GameInstance::playEvent()
                 if (!autoFireEnabled
                     && event.key.code == sf::Keyboard::Space) {
                     if (_netClientID >= 0)
-                        playerShoot((size_t) _netClientID);
+                        _factory.buildBulletFromPlayer((size_t) _netClientID);
                 }
             }
         }
@@ -246,13 +246,6 @@ void GameInstance::playEvent()
         }
         if (event.type == sf::Event::MouseButtonPressed) {
             event_manager.mouseClicked();
-        }
-    }
-    if (hasLocalPlayer() && autoFireEnabled && _gameStarted
-        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
-        if (_netClientID >= 0) {
-            _factory.buildBulletFromPlayer((size_t) _netClientID);
-            this->_autoFireClock.restart();
         }
     }
     if (hasLocalPlayer() && autoFireEnabled && _gameStarted

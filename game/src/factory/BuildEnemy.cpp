@@ -30,13 +30,13 @@ ecs::Entity &RType::Factory::buildEnemy(
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
-    enemy.addComponent(
-        std::make_shared<ecs::VelocityComponent>(-200.0f, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));
+    enemy.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 32.0f));
 
     if (!_game.isServer()) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::ENEMY_TEXTURE);
+
         sf::Sprite sprite;
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::Rect(0, 16, 32, 32));
@@ -44,7 +44,7 @@ ecs::Entity &RType::Factory::buildEnemy(
         enemy.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
+            sprite, 1.0, 1.0));
     } else {
         auto pos = enemy.getComponent<ecs::PositionComponent>();
         auto ene = enemy.getComponent<ecs::EnemyComponent>();
