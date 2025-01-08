@@ -30,7 +30,7 @@ ecs::Entity &RType::Factory::buildEnemy(
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
-    enemy.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
+    enemy.addComponent(std::make_shared<ecs::VelocityComponent>(-100.0f, 0.0f));
     enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 32.0f));
 
     if (!_game.isServer()) {
