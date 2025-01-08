@@ -26,9 +26,10 @@ namespace RType
 
         bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
         bullet.addComponent(
-            std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+            std::make_shared<ecs::VelocityComponent>(0.35f, 0));
         bullet.addComponent(std::make_shared<ecs::HitboxComponent>(54, 16));
-        bullet.addComponent(std::make_shared<ecs::PositionComponent>(x, y));
+        bullet.addComponent(std::make_shared<ecs::PositionComponent>(
+            positionComp->getX() + 0.05, positionComp->getY() + 0.025));
 
         std::stringstream ss;
         ss << P_SHOOT << " " << playerID << " " << PACKET_END;

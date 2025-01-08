@@ -32,7 +32,9 @@ void renderSprite(ecs::Entity &entity, sf::RenderWindow &window)
                          "component: position or sprite !");
         return;
     }
-    sprite->getSprite().setPosition(position->getX(), position->getY());
+    sprite->getSprite().setPosition(
+        position->getX() * (float) window.getSize().x,
+        position->getY() * (float) window.getSize().y);
     window.draw(sprite->getSprite());
 }
 
@@ -48,13 +50,15 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
             "component: position or sprite or text !");
         return;
     }
-    sprite->getSprite().setPosition(position->getX(), position->getY());
+    sprite->getSprite().setPosition(
+        position->getX() * (float) window.getSize().x,
+        position->getY() * (float) window.getSize().y);
     text->getText().setString(text->getStr());
-    text->getText().setPosition(position->getX()
+    text->getText().setPosition(position->getX() * (float) window.getSize().x
             + (float) sprite->getSprite().getTextureRect().width
                 * sprite->getSprite().getScale().x / 2
             - (float) text->getText().getLocalBounds().width / 2,
-        position->getY() - 15);
+        position->getY() * (float) window.getSize().y - 15);
     window.draw(sprite->getSprite());
     window.draw(text->getText());
 }

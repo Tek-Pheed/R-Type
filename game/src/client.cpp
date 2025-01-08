@@ -67,8 +67,7 @@ void RType::GameInstance::clientHandlerConnection(
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                     std::string text = "Health: "
-                        + std::to_string(
-                            getLocalPlayer()
+                        + std::to_string(getLocalPlayer()
                                 .getComponent<ecs::HealthComponent>()
                                 ->getHealth());
                     setHealthId(getNewId());
@@ -102,7 +101,8 @@ void RType::GameInstance::connectToGame()
             if (!text)
                 continue;
 
-            if (text->getStr().empty())
+            if (text->getStr().empty() || text->getStr() == "IP ADDRESS"
+                || std::atoi(text->getStr().c_str()) == 0)
                 continue;
 
             switch (count) {
@@ -180,9 +180,10 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
-    sf::VideoMode videoMode(1920, 1080);
-    _window->create(
-        videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
+    sf::VideoMode videoMode(sf::VideoMode::getDesktopMode().width,
+        sf::VideoMode::getDesktopMode().height,
+        sf::VideoMode::getDesktopMode().bitsPerPixel);
+    _window->create(videoMode, "R-Type", sf::Style::Resize | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
         throw std::runtime_error("Failed to create the SFML window.");

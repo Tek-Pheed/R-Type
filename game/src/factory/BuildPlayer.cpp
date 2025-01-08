@@ -21,7 +21,7 @@ namespace RType
         auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(
-            std::make_shared<ecs::PositionComponent>(100, 100));
+            std::make_shared<ecs::PositionComponent>(0.1, 0.1));
         player.addComponent(std::make_shared<ecs::HealthComponent>(100));
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
         player.addComponent(

@@ -77,13 +77,13 @@ namespace RType
             auto &player = _game.getLocalPlayer();
             auto velocity = player.getComponent<ecs::VelocityComponent>();
             if (event.key.code == moveUpKey) {
-                velocity->setVy(-200.0f);
+                velocity->setVy(-0.1f);
             } else if (event.key.code == moveDownKey) {
-                velocity->setVy(200.0f);
+                velocity->setVy(0.1f);
             } else if (event.key.code == moveRightKey) {
-                velocity->setVx(200.0f);
+                velocity->setVx(0.1f);
             } else if (event.key.code == moveLeftKey) {
-                velocity->setVx(-200.0f);
+                velocity->setVx(-0.1f);
             }
 
             /*if (!autoFireEnabled && event.key.code == sf::Keyboard::Space) {
