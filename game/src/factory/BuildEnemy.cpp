@@ -30,7 +30,7 @@ ecs::Entity &RType::Factory::buildEnemy(
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
-    enemy.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
+    enemy.addComponent(std::make_shared<ecs::VelocityComponent>(-0.1f, 0.0f));
     enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 32.0f));
 
     if (!_game.isServer()) {
@@ -111,8 +111,10 @@ void GameInstance::handleNetworkEnemies(
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
                     _factory.buildEnemy(id,
-                        (float) std::atof(tokens[1].c_str()),
-                        (float) std::atof(tokens[2].c_str()));
+                        (float) std::atof(tokens[1].c_str())
+                            / (float) _window->getSize().x,
+                        (float) std::atof(tokens[2].c_str())
+                            / (float) _window->getSize().y);
                 }
             }
             break;
