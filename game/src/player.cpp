@@ -37,6 +37,16 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
+            } else {
+                auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+                auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+                auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(Asset::GAME_SONG);
+
+                if (currentSong->getMusicType().getStatus() == sf::SoundSource::Playing) {
+                    currentSong->getMusicType().stop();
+                    currentSong->getMusicType().setBuffer(newMusic);
+                    currentSong->getMusicType().play();
+                }
             }
             break;
         }

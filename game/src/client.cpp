@@ -119,7 +119,7 @@ void RType::GameInstance::connectToGame()
 
         auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
         auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
-        auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(Asset::LEVEL_SONG);
+        auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(Asset::LOBBY_SONG);
 
         if (currentSong->getMusicType().getStatus() == sf::SoundSource::Playing) {
             currentSong->getMusicType().stop();

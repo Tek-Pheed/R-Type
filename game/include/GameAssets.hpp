@@ -38,7 +38,8 @@ namespace RType
         constexpr auto BULLET_TEXTURE = "bulletTexture";
         constexpr auto BULLET_SOUND = "bulletSound";
         constexpr auto MENU_SONG = "menuSong";
-        constexpr auto LEVEL_SONG = "levelSong";
+        constexpr auto LOBBY_SONG = "lobbySong";
+        constexpr auto GAME_SONG = "gameSong";
         constexpr auto BOSS_SONG = "bossSong";
         constexpr auto R_TYPE_FONT = "rTypeFont";
 
@@ -54,8 +55,9 @@ namespace RType
             {BULLET_TEXTURE, "./assets/sprites/r-typesheet1.gif",
                 typeid(sf::Texture)},
             {BULLET_SOUND, "./assets/sounds/bullet.ogg", typeid(sf::SoundBuffer)},
-            {MENU_SONG, "./assets/sounds/lobbyMusic.ogg", typeid(sf::SoundBuffer)},
-            {LEVEL_SONG, "./assets/sounds/gameMusic.ogg", typeid(sf::SoundBuffer)},
+            {MENU_SONG, "./assets/sounds/menuMusic.ogg", typeid(sf::SoundBuffer)},
+            {LOBBY_SONG, "./assets/sounds/lobbyMusic.ogg", typeid(sf::SoundBuffer)},
+            {GAME_SONG, "./assets/sounds/gameMusic.ogg", typeid(sf::SoundBuffer)},
             {BOSS_SONG, "./assets/sounds/bossMusic.ogg", typeid(sf::SoundBuffer)},
             {R_TYPE_FONT, "./assets/font/r-type.ttf", typeid(sf::Font)}};
 
