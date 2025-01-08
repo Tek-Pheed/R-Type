@@ -308,6 +308,19 @@ namespace ecs
         std::string _name;
     };
 
+	enum Bonus { RAPIDFIRE, DOUBLEFIRE, TRIPLEFIRE, ALLIES };
+
+    class BonusComponent : public Component {
+      public:
+        explicit BonusComponent(const Bonus &bonus);
+
+        Bonus getBonus();
+        void setBonus(const Bonus &bonus);
+
+      private:
+        Bonus _bonus;
+    };
+  
     class HitboxComponent : public Component {
       public:
         explicit HitboxComponent(float height, float width);
