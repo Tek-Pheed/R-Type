@@ -131,8 +131,9 @@ Sets the name of a player.
 
 This are the instructions used to manage the enemies
 
-- Enemy spawn (id, x, y) - 111 -> TCP
+- Enemy spawn (id, type, x, y) - 111 -> TCP
 
+The type represent the enemy type (0 for basic, 1 for shooter)
 Sent by the server to all the clients to spawn an enemy at a specific position.
 
 - Enemy change position (tick, id, x, y) - 112 -> UDP
