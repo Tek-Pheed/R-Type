@@ -13,12 +13,12 @@
 
 namespace RType
 {
-    ecs::Entity &Factory::buildMusic(sf::SoundBuffer &soundBuffer)
+    ecs::Entity &Factory::buildMusic(sf::SoundBuffer &soundBuffer, std::string str)
     {
-        auto &music = _game.refEntityManager.getCurrentLevel().createEntity();
+        auto &music = _game.refEntityManager.getPersistentLevel().createEntity();
 
         sf::Sound a;
-        music.addComponent(std::make_shared<ecs::MusicComponent<sf::Sound>>(a));
+        music.addComponent(std::make_shared<ecs::MusicComponent<sf::Sound>>(a, str));
 
         auto &s = music.getComponent<ecs::MusicComponent<sf::Sound>>()
                      ->getMusicType();
@@ -26,7 +26,6 @@ namespace RType
         s.setBuffer(soundBuffer);
         s.setLoop(true);
         s.setVolume(25.0f);
-        s.play();
         return (music);
     }
 } // namespace RType

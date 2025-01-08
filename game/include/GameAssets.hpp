@@ -39,7 +39,8 @@ namespace RType
         constexpr auto BULLETENEMY_TEXTURE = "bulletEnemyTexture";
         constexpr auto BULLET_SOUND = "bulletSound";
         constexpr auto MENU_SONG = "menuSong";
-        constexpr auto LEVEL_SONG = "levelSong";
+        constexpr auto LOBBY_SONG = "lobbySong";
+        constexpr auto GAME_SONG = "gameSong";
         constexpr auto BOSS_SONG = "bossSong";
         constexpr auto R_TYPE_FONT = "rTypeFont";
 

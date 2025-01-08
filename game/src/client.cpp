@@ -85,9 +85,6 @@ void RType::GameInstance::clientHandlerConnection(
 
 void RType::GameInstance::connectToGame()
 {
-    auto &levelSong =
-        this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::LEVEL_SONG);
-
     if (_isConnectedToServer)
         return;
     auto currentLevel = refEntityManager.getCurrentLevelName();
@@ -120,12 +117,14 @@ void RType::GameInstance::connectToGame()
         refNetworkManager.setupClient<RType::PacketHandler>(
             _tcpPort, _udpPort, _ip);
 
-        if (this->_currentMusic.getStatus() == sf::SoundSource::Playing) {
-            this->_currentMusic.stop();
-            this->_currentMusic.setBuffer(levelSong);
-            this->_currentMusic.setLoop(true);
-            this->_currentMusic.setVolume(25.0f);
-            this->_currentMusic.play();
+        auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+        auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(Asset::LOBBY_SONG);
+
+        if (currentSong->getMusicType().getStatus() == sf::SoundSource::Playing) {
+            currentSong->getMusicType().stop();
+            currentSong->getMusicType().setBuffer(newMusic);
+            currentSong->getMusicType().play();
         }
 
         // Prepare level

@@ -132,7 +132,7 @@ namespace ecs
 
     template <typename musicType> class MusicComponent : public Component {
       public:
-        explicit MusicComponent(musicType &music) : _music(music)
+        explicit MusicComponent(musicType &music, std::string str) : _music(music), _str(str)
         {
         }
 
@@ -148,6 +148,7 @@ namespace ecs
 
       private:
         musicType _music;
+        std::string _str;
     };
 
     template <typename spriteType> class SpriteComponent : public Component {
