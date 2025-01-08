@@ -101,7 +101,8 @@ void GameInstance::gameTick(
             static float time = 15.0f;
             time += deltaTime_sec;
             if (time >= 5.0f) {
-                _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
+                _factory.buildEnemy(getNewId(), 1200.0f, 300.0f);
+                _factory.buildEnemyShooter(getNewId(), 1200.0f, 600.0f);
                 time = 0.0f;
             }
         }
