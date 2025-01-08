@@ -79,6 +79,7 @@ namespace RType
         void createPersistentLevel();
         void levelSettingsMenu();
         void levelContinueMenu();
+        void levelLobbyMenu();
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
