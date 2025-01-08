@@ -117,11 +117,16 @@ void RType::GameInstance::connectToGame()
         refNetworkManager.setupClient<RType::PacketHandler>(
             _tcpPort, _udpPort, _ip);
 
-        auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
-        auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
-        auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(Asset::LOBBY_SONG);
+        auto songEntity =
+            refEntityManager.getPersistentLevel()
+                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong =
+            songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+        auto &newMusic =
+            refAssetManager.getAsset<sf::SoundBuffer>(Asset::LOBBY_SONG);
 
-        if (currentSong->getMusicType().getStatus() == sf::SoundSource::Playing) {
+        if (currentSong->getMusicType().getStatus()
+            == sf::SoundSource::Playing) {
             currentSong->getMusicType().stop();
             currentSong->getMusicType().setBuffer(newMusic);
             currentSong->getMusicType().play();
@@ -178,7 +183,8 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
-    sf::VideoMode videoMode(1280, 720);
+    sf::VideoMode videoMode(
+        GameInstance::RESULUTION_X, GameInstance::RESULUTION_Y);
     _window->create(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());

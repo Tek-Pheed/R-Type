@@ -140,7 +140,7 @@ namespace Engine
                     if (entity.getID() == id)
                         return (entity);
                 }
-                throw std::out_of_range("Id not found");
+                throw std::out_of_range("getEntityById: Id not found");
             }
 
             /**

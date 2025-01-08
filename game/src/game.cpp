@@ -51,8 +51,18 @@ void GameInstance::loadLevel(const std::string &filename)
     for (auto &[key, value] : map) {
         if (key == BUILD_BASIC_ENEMY) {
             if (value.size() < 3)
-                throw ErrorClass("Failed to create enemy from level config");
+                throw ErrorClass(
+                    "Failed to create basic enemy from level config");
             _factory.buildEnemy(getNewId(),
+                (float) std::atof(value[0].c_str()),
+                (float) std::atof(value[1].c_str()),
+                (float) std::atof(value[2].c_str()));
+        }
+        if (key == BUILD_SHOOTER_ENEMY) {
+            if (value.size() < 3)
+                throw ErrorClass(
+                    "Failed to create shooter enemy from level config");
+            _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()));

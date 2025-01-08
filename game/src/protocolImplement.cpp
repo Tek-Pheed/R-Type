@@ -10,7 +10,6 @@
 #endif
 
 #include <cmath>
-#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <sstream>
@@ -118,9 +117,6 @@ void PacketHandler::serializeString(
     out.write(buffer.data(), static_cast<std::streamsize>(size));
 }
 
-// This will need to be reworked
-// Note: for now this function is unused be the interface function should be
-// called in the game engine networking threads.
 std::string PacketHandler::deserializeString(
     std::istream &in, char key, size_t size)
 {
