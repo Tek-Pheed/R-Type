@@ -33,9 +33,11 @@ namespace RType
 
         constexpr auto PLAYER_TEXTURE = "playerTexture";
         constexpr auto ENEMY_TEXTURE = "enemyTexture";
+        constexpr auto ENEMYSHOOTER_TEXTURE = "enemyTexture";
         constexpr auto BOSS_TEXTURE = "bossTexture";
         constexpr auto BACKGROUND_TEXTURE = "backgroundTexture";
         constexpr auto BULLET_TEXTURE = "bulletTexture";
+        constexpr auto BULLETENEMY_TEXTURE = "bulletEnemyTexture";
         constexpr auto BULLET_SOUND = "bulletSound";
         constexpr auto MENU_SONG = "menuSong";
         constexpr auto LOBBY_SONG = "lobbySong";
@@ -48,11 +50,15 @@ namespace RType
                 typeid(sf::Texture)},
             {ENEMY_TEXTURE, "assets/sprites/r-typesheet31.gif",
                 typeid(sf::Texture)},
+            {ENEMYSHOOTER_TEXTURE, "assets/sprites/r-typesheet9.gif",
+                typeid(sf::Texture)},
             {BOSS_TEXTURE, "assets/sprites/r-typesheet30.gif",
                 typeid(sf::Texture)},
             {BACKGROUND_TEXTURE, "assets/background/background.png",
                 typeid(sf::Texture)},
             {BULLET_TEXTURE, "./assets/sprites/r-typesheet1.gif",
+                typeid(sf::Texture)},
+            {BULLETENEMY_TEXTURE, "./assets/sprites/r-typesheet2.gif",
                 typeid(sf::Texture)},
             {BULLET_SOUND, "./assets/sounds/bullet.ogg", typeid(sf::SoundBuffer)},
             {MENU_SONG, "./assets/sounds/menuMusic.ogg", typeid(sf::SoundBuffer)},
