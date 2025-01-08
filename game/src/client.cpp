@@ -68,7 +68,8 @@ void RType::GameInstance::clientHandlerConnection(
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                     std::string text = "Health: "
-                        + std::to_string(getLocalPlayer()
+                        + std::to_string(
+                            getLocalPlayer()
                                 .getComponent<ecs::HealthComponent>()
                                 ->getHealth());
                     setHealthId(getNewId());
@@ -135,7 +136,7 @@ void RType::GameInstance::connectToGame()
         }
 
         // Prepare level
-        auto &level = refEntityManager.createNewLevel("mainLevel");
+        /*auto &level = refEntityManager.createNewLevel("lobbyMenu");
         level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
@@ -143,7 +144,9 @@ void RType::GameInstance::connectToGame()
         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
-        refEntityManager.switchLevel("mainLevel", false);
+        refEntityManager.switchLevel("lobbyMenu", false);*/
+
+        levelLobbyMenu();
 
         _playerEntityID = -1;
         _isConnectedToServer = true;
