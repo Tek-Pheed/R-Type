@@ -11,7 +11,6 @@
     #define NOMINMAX
 #endif
 
-#include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <cstddef>
@@ -27,6 +26,7 @@
 #include "Entity.hpp"
 #include "Factory.hpp"
 #include "GameSystems.hpp"
+#include <unordered_map>
 
 namespace RType
 {

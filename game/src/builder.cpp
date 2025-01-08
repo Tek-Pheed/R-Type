@@ -161,7 +161,7 @@ void RType::GameInstance::levelMainMenu()
         float textWidth = text.getLocalBounds().width;
         float windowWidth = (float) this->_window->getSize().x;
         float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 4;
+        float posY = (float) this->_window->getSize().y / 10;
 
         auto comp = std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT);
@@ -218,7 +218,7 @@ void RType::GameInstance::levelContinueMenu()
         float windowWidth = (float) this->_window->getSize().x;
 
         float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 5;
+        float posY = (float) this->_window->getSize().y / 10;
 
         title.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));
@@ -229,8 +229,8 @@ void RType::GameInstance::levelContinueMenu()
 
         buildInput("NICKNAME", 2);
         buildInput("IP ADRESS", 1);
-        buildInput("TCP PORT", 0);
-        buildInput("UDP PORT", -1);
+        buildInput("8081", 0);
+        buildInput("8082", -1);
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
@@ -270,7 +270,7 @@ void RType::GameInstance::levelSettingsMenu()
         float windowWidth = (float) this->_window->getSize().x;
 
         float posX = (windowWidth - textWidth) / 2;
-        float posY = (float) this->_window->getSize().y / 4;
+        float posY = (float) this->_window->getSize().y / 10;
 
         title.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));
