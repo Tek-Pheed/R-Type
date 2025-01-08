@@ -36,6 +36,13 @@ namespace RType
             size_t id, float posX, float posY, float health = 100.0f);
         ecs::Entity &buildEnemyShooter(
             size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &buildBoss(
+            size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &getBossById(size_t bossID);
+        void sendBossPosition(size_t bossID);
+        void deleteBoss(size_t bossID);
+        void handleNetworkBosses(
+            int code, const std::vector<std::string> &tokens);
         ecs::Entity &buildMusic(sf::SoundBuffer &soundBuffer);
 
       private:

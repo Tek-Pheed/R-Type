@@ -132,7 +132,7 @@ namespace RType
             sound.setBuffer(bulletSound);
             sound.setVolume(25.0f);
             sound.play();
-            if (enemyID == (size_t) _game.getNetClientID())
+            if (bossId == (size_t) _game.getNetClientID())
                 _game.refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::UDP, ss.str());
         }

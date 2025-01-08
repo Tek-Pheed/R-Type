@@ -19,6 +19,7 @@
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "Game.hpp"
 
 using namespace RType;
 
@@ -26,16 +27,16 @@ ecs::Entity &RType::Factory::buildBoss(
     size_t id, float posX, float posY, float health)
 {
     std::cout << "Adding new boss to the game" << std::endl;
-    auto &boss = refEntityManager.getCurrentLevel().createEntity();
+    auto &boss = _game.refEntityManager.getCurrentLevel().createEntity();
     boss.addComponent(std::make_shared<ecs::BossComponent>(id));
     boss.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     boss.addComponent(std::make_shared<ecs::HealthComponent>(health));
     boss.addComponent(std::make_shared<ecs::BulletComponent>(false));
     boss.addComponent(
         std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
-    if (!_isServer) {
+    if (!_game.isServer()) {
         auto &texture =
-            refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
+            _game.refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
         sf::Sprite sprite;
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::Rect(0, 0, 183, 207));
@@ -45,14 +46,14 @@ ecs::Entity &RType::Factory::buildBoss(
         boss.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
             sprite, 3.0, 3.0));
     }
-    if (_isServer) {
+    if (_game.isServer()) {
         auto pos = boss.getComponent<ecs::PositionComponent>();
         auto ene = boss.getComponent<ecs::BossComponent>();
         if (pos) {
             std::stringstream sss;
             sss << B_SPAWN << " " << ene->getBossID() << " " << pos->getX()
                 << " " << pos->getY() << PACKET_END;
-            refNetworkManager.sendToAll(
+            _game.refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, sss.str());
         }
     }
@@ -66,8 +67,7 @@ ecs::Entity &GameInstance::getBossById(size_t bossID)
                        .findEntitiesByComponent<ecs::BossComponent>();
 
     for (auto &pl : enemies) {
-        if (pl.get().getComponent<ecs::BossComponent>()->getBossById()
-            == bossID)
+        if (pl.get().getComponent<ecs::BossComponent>()->getBossID() == bossID)
             return (pl.get());
     }
     throw ErrorClass("Boss not found id=" + std::to_string(bossID));

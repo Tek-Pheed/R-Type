@@ -19,6 +19,7 @@
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "Game.hpp"
 
 using namespace RType;
 
@@ -62,8 +63,7 @@ ecs::Entity &RType::Factory::buildEnemy(
 ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
 {
     std::unique_lock lock(_gameLock);
-    auto enemies = refEntityManager.getCurrentLevel()
-                       .findEntitiesByComponent<ecs::EnemyComponent>();
+    auto enemies = refEntityManager.getCurrentLevel().findEntitiesByComponent<ecs::EnemyComponent>();
 
     for (auto &pl : enemies) {
         if (pl.get().getComponent<ecs::EnemyComponent>()->getEnemyID()
