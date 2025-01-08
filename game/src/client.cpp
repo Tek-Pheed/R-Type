@@ -147,6 +147,18 @@ void RType::GameInstance::connectToGame()
 
         _playerEntityID = -1;
         _isConnectedToServer = true;
+
+        auto players = getAllPlayers();
+        for (auto player : players) {
+            auto textcomp = player.get().getComponent<ecs::TextComponent<sf::Text>>();
+            if (!textcomp) {
+                continue;
+            }
+            auto playerName = textcomp.get()->getStr();
+            this->_playersConnectedToGame.push_back(playerName);
+            
+        }
+
     } catch (const std::exception &e) {
         std::cout << CATCH_ERROR_LOCATION << "Failed to connect to server: IP=" << _ip
                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
@@ -232,6 +244,9 @@ void GameInstance::playEvent()
         if (event.type == sf::Event::KeyPressed) {
             event_manager.keyPressed(event);
             if (!_gameStarted) {
+                for (auto name : this->_playersConnectedToGame) {
+                    std::cout << name << std::endl;
+                }
                 if (event.key.code == sf::Keyboard::Tab) {
                     clientStartLevel();
                 }
