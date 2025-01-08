@@ -258,6 +258,42 @@ void RType::GameInstance::levelContinueMenu()
     }
 }
 
+void RType::GameInstance::levelLobbyMenu()
+{
+    auto &level = refEntityManager.createNewLevel("lobbyMenu");
+
+    level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
+    level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+    refEntityManager.switchLevel("lobbyMenu");
+
+    if (!isServer()) {
+        auto &players = refEntityManager.getCurrentLevel().createEntity();
+        auto &title = refEntityManager.getCurrentLevel().createEntity();
+
+        sf::Text text;
+        text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
+        text.setCharacterSize(100);
+        text.setFillColor(sf::Color::White);
+        text.setString("LOBBY");
+        
+        float textWidth = text.getLocalBounds().width;
+        float windowWidth = (float)this->_window->getSize().x;
+
+        float posX = (windowWidth - textWidth) / 2;
+        float posY = (float)this->_window->getSize().y / 8;
+
+        title.addComponent(std::make_shared<ecs::RenderComponent>(
+            ecs::RenderComponent::ObjectType::TEXT));
+        title.addComponent(
+            std::make_shared<ecs::PositionComponent>(posX, posY - 50));
+        title.addComponent(
+            std::make_shared<ecs::TextComponent<sf::Text>>(text, "LOBBY"));
+
+        
+        
+    }
+}
+
 void RType::GameInstance::levelSettingsMenu()
 {
     auto &level = refEntityManager.createNewLevel("settingsMenu");
