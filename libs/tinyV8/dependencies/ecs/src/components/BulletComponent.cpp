@@ -9,9 +9,10 @@
 
 namespace ecs
 {
-    BulletComponent::BulletComponent(bool isFromPlayer)
+    BulletComponent::BulletComponent(bool isFromPlayer, size_t type)
     {
         this->_isFromPlayer = isFromPlayer;
+        _type = type;
     }
 
     bool BulletComponent::getIsFromPlayer()
@@ -22,5 +23,15 @@ namespace ecs
     void BulletComponent::setIsFromPlayer(bool isFromPlayer)
     {
         this->_isFromPlayer = isFromPlayer;
+    }
+
+    size_t BulletComponent::getType() const
+    {
+        return _type;
+    }
+
+    void BulletComponent::setType(size_t type)
+    {
+        _type = type;
     }
 } // namespace ecs

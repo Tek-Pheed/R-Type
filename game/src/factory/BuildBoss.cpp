@@ -17,9 +17,9 @@
 #include "Components.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
-#include "Game.hpp"
 
 using namespace RType;
 
@@ -28,12 +28,12 @@ ecs::Entity &RType::Factory::buildBoss(
 {
     std::cout << "Adding new boss to the game" << std::endl;
     auto &boss = _game.refEntityManager.getCurrentLevel().createEntity();
-    boss.addComponent(std::make_shared<ecs::BossComponent>(id));
+    boss.addComponent(std::make_shared<ecs::EnemyComponent>(id, 2));
     boss.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     boss.addComponent(std::make_shared<ecs::HealthComponent>(health));
     boss.addComponent(std::make_shared<ecs::BulletComponent>(false));
-    boss.addComponent(
-        std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
+    boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
+    boss.addComponent(std::make_shared<ecs::HitboxComponent>(150.0f, 414.0f));
     if (!_game.isServer()) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
@@ -48,10 +48,10 @@ ecs::Entity &RType::Factory::buildBoss(
     }
     if (_game.isServer()) {
         auto pos = boss.getComponent<ecs::PositionComponent>();
-        auto ene = boss.getComponent<ecs::BossComponent>();
+        auto ene = boss.getComponent<ecs::EnemyComponent>();
         if (pos) {
             std::stringstream sss;
-            sss << B_SPAWN << " " << ene->getBossID() << " " << pos->getX()
+            sss << E_SPAWN << " " << ene->getEnemyID() << " 2 " << pos->getX()
                 << " " << pos->getY() << PACKET_END;
             _game.refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, sss.str());

@@ -62,10 +62,15 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
             && enemyPos->getY() + enemyHitB->getHeight() / 2
                 > playerCenterY - playerHitbox->getHeight() / 2 - hitbox) {
             if (_game->isServer() && damageCooldown <= 0.0f) {
-                _game->damagePlayer(player->getPlayerID(), 50);
-                _game->deleteEnemy(enemyComp->getEnemyID());
+                if (enemyComp->getType() == 0 || enemyComp->getType() == 1) {
+                    _game->damagePlayer(player->getPlayerID(), 50);
+                    _game->deleteEnemy(enemyComp->getEnemyID());
+                }
+                if (enemyComp->getType() == 2) {
+                    _game->damagePlayer(player->getPlayerID(), 100);
+                }
+                damageCooldown = 1.0f;
             }
-            damageCooldown = 1.0f;
         }
     }
 }
@@ -159,7 +164,10 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
             && std::abs(bulletCenterY - enemyCenterY)
                 < (enemyHalfHeight + bulletHalfHeight)) {
             if (_game->isServer()) {
-                _game->damagePlayer(player->getPlayerID(), DMG);
+                if (bulletComp->getType() == 0)
+                    _game->damagePlayer(player->getPlayerID(), DMG);
+                if (bulletComp->getType() == 1)
+                    _game->damagePlayer(player->getPlayerID(), DMG * 3);
             }
             _game->refEntityManager.getCurrentLevel().destroyEntityById(
                 bullet.getID());

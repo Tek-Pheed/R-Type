@@ -34,6 +34,7 @@ using namespace RType;
 
 constexpr auto BUILD_BASIC_ENEMY = "BASIC_ENEMY";
 constexpr auto BUILD_SHOOTER_ENEMY = "SHOOTER_ENEMY";
+constexpr auto BUILD_BOSS = "BOSS";
 
 size_t RType::getNewId()
 {
@@ -64,6 +65,13 @@ void GameInstance::loadLevel(const std::string &filename)
                     "Failed to create shooter enemy from level config");
             _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
+                (float) std::atof(value[1].c_str()),
+                (float) std::atof(value[2].c_str()));
+        }
+        if (key == BUILD_BOSS) {
+            if (value.size() < 3)
+                throw ErrorClass("Failed to create boss from level config");
+            _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()));
         }
@@ -132,13 +140,16 @@ void GameInstance::gameTick(
             if (!_gameStarted)
                 return;
             float deltaTime_sec = std::any_cast<float>(arg);
-            static float time = 15.0f;
+            static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 2.0f) {
                 for (auto entity : getEntities()) {
                     auto enemy = entity.getComponent<ecs::EnemyComponent>();
-                    if (enemy && enemy->getType() == 1) {
+                    if (enemy && (enemy->getType() == 1)) {
                         _factory.buildBulletFromEnemy(enemy->getEnemyID());
+                    }
+                    if (enemy && enemy->getType() == 2) {
+                        _factory.buildBulletFromBoss(enemy->getEnemyID());
                     }
                 }
                 time = 0.0f;

@@ -131,6 +131,10 @@ void GameInstance::handleNetworkEnemies(
                         _factory.buildEnemyShooter(id,
                             (float) std::atof(tokens[2].c_str()),
                             (float) std::atof(tokens[3].c_str()));
+                    if (type == 2)
+                        _factory.buildBoss(id,
+                            (float) std::atof(tokens[2].c_str()),
+                            (float) std::atof(tokens[3].c_str()));
                 }
             }
             break;
@@ -170,7 +174,13 @@ void GameInstance::handleNetworkEnemies(
                     std::cout << "Enemy shoot" << std::endl;
                     _lastNetTick = tick;
                     size_t id = (size_t) atoi(tokens[1].c_str());
-                    _factory.buildBulletFromEnemy(id);
+                    auto mob = getEnemyById(id);
+                    size_t type =
+                        mob.getComponent<ecs::EnemyComponent>()->getType();
+                    if (type == 1)
+                        _factory.buildBulletFromEnemy(id);
+                    else if (type == 2)
+                        _factory.buildBulletFromBoss(id);
                 }
             }
         }

@@ -99,33 +99,35 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
 
 void Factory::buildBulletFromBoss(size_t bossId)
 {
-    auto boss = _game.getBossById(bossId);
+    auto boss = _game.getEnemyById(bossId);
     auto positionComp = boss.getComponent<ecs::PositionComponent>();
     if (!positionComp)
         return;
     auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
-    bullet.addComponent(std::make_shared<ecs::BulletComponent>(0));
-    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+    bullet.addComponent(std::make_shared<ecs::BulletComponent>(false, 1));
+    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(-350.0f, 0));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(34, 34));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
-        positionComp->getX() - 100, positionComp->getY() - 25));
+        positionComp->getX() + 20, positionComp->getY() + 100));
 
     std::stringstream ss;
-    ss << E_SHOOT << " " << bossId << PACKET_END;
+    ss << E_SHOOT << " " << _game.getTicks() << " " << bossId << PACKET_END;
     if (_game.isServer()) {
-        _game.refNetworkManager.sendToOthers(
-            bossId, System::Network::ISocket::Type::UDP, ss.str());
+        _game.refNetworkManager.sendToAll(
+            System::Network::ISocket::Type::UDP, ss.str());
     } else {
-        auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
-            Asset::BULLETENEMY_TEXTURE);
+        auto &texture =
+            _game.refAssetManager.getAsset<sf::Texture>(Asset::BULLET_BOSS);
         bullet.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         sf::Sprite s;
         s.setTexture(texture);
-        s.setTextureRect(sf::Rect(335, 412, 33, 21));
+        s.setTextureRect(sf::Rect(0, 0, 34, 34));
+        s.setScale(sf::Vector2f(2, 2));
         bullet.addComponent(
-            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 2, 2));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
-            Asset::BULLET_SOUND);
+            Asset::BULLET_BOSS_SOUND);
         static sf::Sound sound;
         sound.setBuffer(bulletSound);
         sound.setVolume(25.0f);
