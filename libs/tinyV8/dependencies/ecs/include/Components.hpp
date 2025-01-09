@@ -303,13 +303,18 @@ namespace ecs
 
     class BulletComponent : public Component {
       public:
-        explicit BulletComponent(bool isFromPlayer);
+        explicit BulletComponent(bool isFromPlayer, size_t type = 0);
 
         bool getIsFromPlayer();
         void setIsFromPlayer(bool isFromPlayer);
 
+        size_t getType() const;
+        void setType(size_t type);
+
       private:
         bool _isFromPlayer;
+        // 0 for regular, 1 for boss
+        size_t _type;
     };
 
     class NameComponent : public Component {
