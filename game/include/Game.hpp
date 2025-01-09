@@ -40,8 +40,8 @@ namespace RType
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
         static constexpr size_t DEFAULT_MAX_PLAYERS = 4U;
 
-        static constexpr size_t RESULUTION_X = 1280U;
-        static constexpr size_t RESULUTION_Y = 720U;
+        static constexpr size_t RESOLUTION_X = 1280U;
+        static constexpr size_t RESOLUTION_Y = 720U;
 
         static constexpr auto KILLZONE = -100.0f;
         static constexpr auto ENEMY_VELOCITY = -200.0f;

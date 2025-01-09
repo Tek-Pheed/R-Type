@@ -32,8 +32,8 @@ ecs::Entity &RType::Factory::buildEnemy(
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
-    enemy.addComponent(
-        std::make_shared<ecs::VelocityComponent>(GameInstance::ENEMY_VELOCITY, 0.0f));
+    enemy.addComponent(std::make_shared<ecs::VelocityComponent>(
+        GameInstance::ENEMY_VELOCITY, 0.0f));
     enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));
 
     if (!_game.isServer()) {
@@ -85,9 +85,9 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 
         // Check if in frame (saves bandwith)
         if (position->getX() > KILLZONE
-            && position->getX() < RESULUTION_X + (float) KILLZONE
+            && position->getX() < RESOLUTION_X + (float) KILLZONE
             && position->getY() > KILLZONE
-            && position->getY() < RESULUTION_Y + (float) KILLZONE) {
+            && position->getY() < RESOLUTION_Y + (float) KILLZONE) {
             std::stringstream ss;
             ss << E_POS << " " << _ticks << " " << enemyID << " "
                << position->getX() << " " << position->getY() << PACKET_END;
@@ -186,8 +186,8 @@ ecs::Entity &RType::Factory::buildEnemyShooter(
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id, 1));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
-    enemy.addComponent(
-        std::make_shared<ecs::VelocityComponent>(GameInstance::ENEMY_SHOOTER_VELOCITY, 0.0f));
+    enemy.addComponent(std::make_shared<ecs::VelocityComponent>(
+        GameInstance::ENEMY_SHOOTER_VELOCITY, 0.0f));
     enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));
 
     if (!_game.isServer()) {
