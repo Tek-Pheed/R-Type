@@ -75,7 +75,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-        i++) {
+         i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -131,6 +131,18 @@ void GameInstance::gameTick(
         } else {
             if (!_gameStarted)
                 return;
+            float deltaTime_sec = std::any_cast<float>(arg);
+            static float time = 15.0f;
+            time += deltaTime_sec;
+            if (time >= 2.0f) {
+                for (auto entity : getEntities()) {
+                    auto enemy = entity.getComponent<ecs::EnemyComponent>();
+                    if (enemy && enemy->getType() == 1) {
+                        _factory.buildBulletFromEnemy(enemy->getEnemyID());
+                    }
+                }
+                time = 0.0f;
+            }
             // float deltaTime_sec = std::any_cast<float>(arg);
             // static float time = 15.0f;
             // time += deltaTime_sec;
@@ -235,4 +247,9 @@ bool GameInstance::isServer() const
 std::vector<ecs::Entity> &RType::GameInstance::getEntities()
 {
     return (refEntityManager.getCurrentLevel().getEntitiesVect());
+}
+
+uint64_t GameInstance::getTicks() const
+{
+    return _ticks;
 }

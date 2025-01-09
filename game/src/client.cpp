@@ -67,7 +67,8 @@ void RType::GameInstance::clientHandlerConnection(
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                     std::string text = "Health: "
-                        + std::to_string(getLocalPlayer()
+                        + std::to_string(
+                            getLocalPlayer()
                                 .getComponent<ecs::HealthComponent>()
                                 ->getHealth());
                     setHealthId(getNewId());

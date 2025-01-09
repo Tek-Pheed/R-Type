@@ -34,7 +34,7 @@ ecs::Entity &RType::Factory::buildEnemy(
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(
         std::make_shared<ecs::VelocityComponent>(GameInstance::ENEMY_VELOCITY, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 32.0f));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));
 
     if (!_game.isServer()) {
         auto &texture =
@@ -161,6 +161,19 @@ void GameInstance::handleNetworkEnemies(
             }
             break;
         }
+        case Protocol::E_SHOOT: {
+            if (_isServer)
+                return;
+            if (tokens.size() >= 2) {
+                uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
+                if (_lastNetTick <= tick) {
+                    std::cout << "Enemy shoot" << std::endl;
+                    _lastNetTick = tick;
+                    size_t id = (size_t) atoi(tokens[1].c_str());
+                    _factory.buildBulletFromEnemy(id);
+                }
+            }
+        }
         default: break;
     }
 }
@@ -170,12 +183,12 @@ ecs::Entity &RType::Factory::buildEnemyShooter(
 {
     std::cout << "Adding new enemy to the game" << std::endl;
     auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
-    enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
+    enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id, 1));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(
         std::make_shared<ecs::VelocityComponent>(GameInstance::ENEMY_SHOOTER_VELOCITY, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 32.0f));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));
 
     if (!_game.isServer()) {
         auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
@@ -189,6 +202,7 @@ ecs::Entity &RType::Factory::buildEnemyShooter(
             ecs::RenderComponent::ObjectType::SPRITE));
         enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
             sprite, 1.0, 1.0));
+        buildBulletFromEnemy(id);
     } else {
         auto pos = enemy.getComponent<ecs::PositionComponent>();
         auto ene = enemy.getComponent<ecs::EnemyComponent>();

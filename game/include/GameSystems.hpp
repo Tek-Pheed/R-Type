@@ -80,7 +80,8 @@ namespace RType
             void initSystem(GameInstance &gameRef) override;
             void update(
                 std::vector<ecs::Entity> &entity, float deltaTime) override;
-            void BulletCollision(ecs::Entity &bullet);
+            void PlayerBulletCollision(ecs::Entity &bullet);
+            void EnemyBulletCollision(ecs::Entity &bullet);
             void EnemyCollision(ecs::Entity &enemy, float deltaTime);
 
           protected:

@@ -204,6 +204,9 @@ namespace RType
 
         sf::Sound _currentMusic;
 
+        // Ticks
+        uint64_t getTicks() const;
+
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
         int _playerEntityID = -1;
