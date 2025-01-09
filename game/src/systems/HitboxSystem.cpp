@@ -65,34 +65,12 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
                 _game->damagePlayer(player->getPlayerID(), 50);
                 _game->deleteEnemy(enemyComp->getEnemyID());
             }
-
-            if (!_game->isServer()
-                && player->getPlayerID()
-                    == _game->getLocalPlayer()
-                           .getComponent<ecs::PlayerComponent>()
-                           ->getPlayerID()
-                && damageCooldown <= 0.0f) {
-                auto healthEnt =
-                    _game->refEntityManager.getCurrentLevel().getEntityById(
-                        _game->getHealthId());
-                auto healthText =
-                    healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
-                if (healthText && health) {
-                    if (floor(health->getHealth() - 50) <= 0) {
-                        healthText->setStr("Health: Dead");
-                    } else
-                        healthText->setStr("Health: "
-                            + std::to_string(health->getHealth() - 50));
-                } else if (healthText && !health) {
-                    healthText->setStr("Health: Dead");
-                }
-            }
             damageCooldown = 1.0f;
         }
     }
 }
 
-void HitboxSystem::BulletCollision(ecs::Entity &bullet)
+void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
 {
     auto bulletPos = bullet.getComponent<ecs::PositionComponent>();
     auto bulletComp = bullet.getComponent<ecs::BulletComponent>();
@@ -114,8 +92,7 @@ void HitboxSystem::BulletCollision(ecs::Entity &bullet)
             continue;
 
         float enemyCenterX = position->getX() + enemyHitB->getWidth() / 2.0f;
-        float enemyCenterY = (position->getY() + enemyHitB->getHeight() / 2.0f)
-            + enemyHitB->getHeight() / 2.0f;
+        float enemyCenterY = position->getY() + enemyHitB->getHeight() / 2.0f;
 
         float bulletCenterX =
             bulletPos->getX() + bulletHitB->getWidth() / 2.0f;
@@ -141,6 +118,55 @@ void HitboxSystem::BulletCollision(ecs::Entity &bullet)
     }
 }
 
+void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
+{
+    auto bulletPos = bullet.getComponent<ecs::PositionComponent>();
+    auto bulletComp = bullet.getComponent<ecs::BulletComponent>();
+    auto bulletHitB = bullet.getComponent<ecs::HitboxComponent>();
+    const int DMG = 20;
+
+    if (!bulletPos || !bulletComp || !bulletHitB)
+        return;
+
+    for (auto &entity :
+        _game->refEntityManager.getCurrentLevel().getEntities()) {
+        auto enti = entity.get();
+        auto position = enti.getComponent<ecs::PositionComponent>();
+        auto player = enti.getComponent<ecs::PlayerComponent>();
+        auto health = enti.getComponent<ecs::HealthComponent>();
+        auto playerHitb = enti.getComponent<ecs::HitboxComponent>();
+        if (!position || !player || !health || !playerHitb)
+            continue;
+        if (enti.getID() == bullet.getID())
+            continue;
+
+        float enemyCenterX = position->getX() + playerHitb->getWidth() / 2.0f;
+        float enemyCenterY = position->getY() + playerHitb->getHeight() / 2.0f;
+
+        float bulletCenterX =
+            bulletPos->getX() + bulletHitB->getWidth() / 2.0f;
+        float bulletCenterY =
+            bulletPos->getY() + bulletHitB->getHeight() / 2.0f;
+
+        float enemyHalfWidth = playerHitb->getWidth() / 2;
+        float enemyHalfHeight = playerHitb->getHeight() / 2;
+
+        float bulletHalfWidth = bulletHitB->getWidth() / 2;
+        float bulletHalfHeight = bulletHitB->getHeight() / 2;
+
+        if (std::abs(bulletCenterX - enemyCenterX)
+                < (enemyHalfWidth + bulletHalfWidth)
+            && std::abs(bulletCenterY - enemyCenterY)
+                < (enemyHalfHeight + bulletHalfHeight)) {
+            if (_game->isServer()) {
+                _game->damagePlayer(player->getPlayerID(), DMG);
+            }
+            _game->refEntityManager.getCurrentLevel().destroyEntityById(
+                bullet.getID());
+        }
+    }
+}
+
 void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
 {
     for (auto &entity : entities) {
@@ -154,8 +180,13 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         if (!hitbox)
             continue;
 
-        if (bullet && position && velocity && hitbox) {
-            BulletCollision(entity);
+        if (bullet && position && velocity && hitbox
+            && bullet->getIsFromPlayer() == true) {
+            PlayerBulletCollision(entity);
+        }
+        if (bullet && position && velocity && hitbox
+            && bullet->getIsFromPlayer() == false) {
+            EnemyBulletCollision(entity);
         }
         if (enemy && position && velocity && hitbox) {
             EnemyCollision(entity, deltaTime);

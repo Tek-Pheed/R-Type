@@ -67,7 +67,8 @@ void RType::GameInstance::clientHandlerConnection(
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                     std::string text = "Health: "
-                        + std::to_string(getLocalPlayer()
+                        + std::to_string(
+                            getLocalPlayer()
                                 .getComponent<ecs::HealthComponent>()
                                 ->getHealth());
                     setHealthId(getNewId());
@@ -117,11 +118,16 @@ void RType::GameInstance::connectToGame()
         refNetworkManager.setupClient<RType::PacketHandler>(
             _tcpPort, _udpPort, _ip);
 
-        auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
-        auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
-        auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(Asset::LOBBY_SONG);
+        auto songEntity =
+            refEntityManager.getPersistentLevel()
+                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong =
+            songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+        auto &newMusic =
+            refAssetManager.getAsset<sf::SoundBuffer>(Asset::LOBBY_SONG);
 
-        if (currentSong->getMusicType().getStatus() == sf::SoundSource::Playing) {
+        if (currentSong->getMusicType().getStatus()
+            == sf::SoundSource::Playing) {
             currentSong->getMusicType().stop();
             currentSong->getMusicType().setBuffer(newMusic);
             currentSong->getMusicType().play();
