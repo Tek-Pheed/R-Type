@@ -71,8 +71,12 @@ namespace ecs
         int getHealth();
         void setHealth(int health);
 
+        int getOldHealth();
+        void setOldHealth(int oldHealth);
+
       private:
         int _health;
+        int _oldHealth;
     };
 
     class BossComponent : public Component {
@@ -88,13 +92,18 @@ namespace ecs
 
     class EnemyComponent : public Component {
       public:
-        explicit EnemyComponent(size_t enemyID);
+        explicit EnemyComponent(size_t enemyID, size_t type = 0);
 
         size_t getEnemyID() const;
         void setEnemyID(size_t enemyID);
 
+        size_t getType() const;
+        void setType(size_t type);
+
       private:
         size_t _enemyID;
+        // 0 for enemy, 1 for shooter, 2 for boss
+        size_t _type;
     };
 
     class RenderComponent : public Component {
@@ -132,7 +141,8 @@ namespace ecs
 
     template <typename musicType> class MusicComponent : public Component {
       public:
-        explicit MusicComponent(musicType &music, std::string str) : _music(music), _str(str)
+        explicit MusicComponent(musicType &music, std::string str)
+            : _music(music), _str(str)
         {
         }
 

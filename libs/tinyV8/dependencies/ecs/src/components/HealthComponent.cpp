@@ -12,6 +12,7 @@ namespace ecs
     HealthComponent::HealthComponent()
     {
         this->_health = 100;
+        _oldHealth = 100;
     }
 
     HealthComponent::HealthComponent(int health)
@@ -26,6 +27,17 @@ namespace ecs
 
     void HealthComponent::setHealth(int health)
     {
+        _oldHealth = this->_health;
         this->_health = health;
+    }
+
+    int HealthComponent::getOldHealth()
+    {
+        return this->_oldHealth;
+    }
+
+    void HealthComponent::setOldHealth(int oldHealth)
+    {
+        this->_oldHealth = oldHealth;
     }
 } // namespace ecs

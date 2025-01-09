@@ -9,7 +9,7 @@
     #define NOMINMAX
 #endif
 
-#include "LevelConfig.hpp"
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -23,6 +23,7 @@
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
+#include "LevelConfig.hpp"
 #include "system_network.hpp"
 
 using namespace RType;
@@ -40,11 +41,17 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                     System::Network::ISocket::Type::TCP, sss.str());
                 loadLevel("level1.txt");
             } else {
-                auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
-                auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
-                auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(Asset::GAME_SONG);
+                auto songEntity = refEntityManager.getPersistentLevel()
+                                      .findEntitiesByComponent<
+                                          ecs::MusicComponent<sf::Sound>>()[0];
+                auto currentSong =
+                    songEntity.get()
+                        .getComponent<ecs::MusicComponent<sf::Sound>>();
+                auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(
+                    Asset::GAME_SONG);
 
-                if (currentSong->getMusicType().getStatus() == sf::SoundSource::Playing) {
+                if (currentSong->getMusicType().getStatus()
+                    == sf::SoundSource::Playing) {
                     currentSong->getMusicType().stop();
                     currentSong->getMusicType().setBuffer(newMusic);
                     currentSong->getMusicType().play();
@@ -164,6 +171,23 @@ void GameInstance::handleNetworkPlayers(
                 if (healthComp) {
                     healthComp->setHealth(health);
                 }
+                if (!isServer()
+                    && player.getID() == getLocalPlayer().getID()) {
+                    auto healthEnt =
+                        refEntityManager.getCurrentLevel().getEntityById(
+                            getHealthId());
+                    auto healthText =
+                        healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
+                    if (healthText && health) {
+                        if (floor(healthComp->getHealth()) <= 0) {
+                            healthText->setStr("Health: Dead");
+                        } else
+                            healthText->setStr("Health: "
+                                + std::to_string(healthComp->getHealth()));
+                    } else if (healthText && !health) {
+                        healthText->setStr("Health: Dead");
+                    }
+                }
                 break;
             }
             break;
@@ -191,7 +215,7 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-            .findEntitiesByComponent<ecs::PlayerComponent>());
+                .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
@@ -231,10 +255,10 @@ void GameInstance::damagePlayer(size_t playerID, int damage)
 
         if (health) {
             health->setHealth(health->getHealth() - damage);
-            std::stringstream ss;
-            ss << P_DMG << " " << _ticks << " " << playerID << " "
-               << health->getHealth() << PACKET_END;
             if (isServer()) {
+                std::stringstream ss;
+                ss << P_DMG << " " << _ticks << " " << playerID << " "
+                   << health->getHealth() << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::UDP, ss.str());
             }
