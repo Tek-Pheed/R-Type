@@ -61,16 +61,16 @@ void PositionSystem::update(
                             * (float) sprite->getSprite().getScale().y;
                 }
 
-                if (positionComponent->getX() < 0) {
+                if (player && positionComponent->getX() < 0) {
                     positionComponent->setX(0);
                 }
-                if (positionComponent->getX() > maxX) {
+                if (player && positionComponent->getX() > maxX) {
                     positionComponent->setX(maxX);
                 }
-                if (positionComponent->getY() < 0) {
+                if (player && positionComponent->getY() < 0) {
                     positionComponent->setY(0);
                 }
-                if (positionComponent->getY() > maxY) {
+                if (player && positionComponent->getY() > maxY) {
                     positionComponent->setY(maxY);
                 }
             } else {
@@ -83,8 +83,8 @@ void PositionSystem::update(
                     _game->sendEnemyPosition(enemy->getEnemyID());
                 }
                 if (enemy
-                    && (positionComponent->getX() < 0.0f
-                        || positionComponent->getY() < 0.0f)) {
+                    && (positionComponent->getX() < GameInstance::KILLZONE
+                        || positionComponent->getY() < -GameInstance::KILLZONE)) {
                     _game->deleteEnemy(enemy->getEnemyID());
                 }
             }

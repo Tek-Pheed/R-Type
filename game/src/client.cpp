@@ -184,7 +184,8 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
-    sf::VideoMode videoMode(1280, 720);
+    sf::VideoMode videoMode(
+        GameInstance::RESOLUTION_X, GameInstance::RESOLUTION_Y);
     _window->create(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());

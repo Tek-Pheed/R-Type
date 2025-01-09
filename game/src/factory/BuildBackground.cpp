@@ -19,7 +19,8 @@ namespace RType
 
         texture.setRepeated(true);
         sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(0, 0, 1280, 720));
+        sprite.setTextureRect(sf::Rect(0, 0, (int) GameInstance::RESOLUTION_X,
+            (int) GameInstance::RESOLUTION_Y));
         sprite.setTexture(_game.refAssetManager.getAsset<sf::Texture>(
             Asset::BACKGROUND_TEXTURE));
         bg.addComponent(std::make_shared<ecs::RenderComponent>(

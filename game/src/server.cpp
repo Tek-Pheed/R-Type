@@ -71,7 +71,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
                 nm->getText();
         }
         if (!pl || !pos) {
-            std::cout << "Failed to get player" << std::endl;
+            std::cout << "serverSendGameState: Failed to get player" << std::endl;
             continue;
         }
         std::stringstream sss;
@@ -85,7 +85,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         auto pos = e.get().getComponent<ecs::PositionComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
         if (!ec || !pos) {
-            std::cout << "Failed to get enemy" << std::endl;
+            std::cout << "serverSendGameState: Failed to get enemy" << std::endl;
             continue;
         }
         std::stringstream sss;
@@ -129,7 +129,7 @@ void RType::GameInstance::serverHanlderValidateConnection(
                 serverSendGameState((size_t) netClientID);
             }
         } else {
-            std::cout << "Could not read client ID" << std::endl;
+            std::cout << "serverHanlderValidateConnection: Could not read client ID" << std::endl;
         }
     }
 }

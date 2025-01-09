@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <sys/types.h>
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -38,6 +39,13 @@ namespace RType
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
         static constexpr size_t DEFAULT_MAX_PLAYERS = 4U;
+
+        static constexpr size_t RESOLUTION_X = 1280U;
+        static constexpr size_t RESOLUTION_Y = 720U;
+
+        static constexpr auto KILLZONE = -100.0f;
+        static constexpr auto ENEMY_VELOCITY = -200.0f;
+        static constexpr auto ENEMY_SHOOTER_VELOCITY = -150.0f;
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
