@@ -21,13 +21,7 @@ class LevelConfig {
         explicit LevelConfig(const std::string &filename);
         ~LevelConfig();
 
-        const std::map<int, std::string> &getLevelConfig();
-
-        void saveLevelConfig();
         std::vector<std::pair<std::string, std::vector<std::string>>> parseLevelConfig();
-        void validateOrCreateLevelConfig();
-        void updateLevelConfigValue(const std::string &key, const std::string &newValue);
-
 
     private:
         std::string _filename;

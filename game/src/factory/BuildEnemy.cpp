@@ -100,6 +100,7 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 
 void GameInstance::deleteEnemy(size_t enemyID)
 {
+    std::unique_lock lock(_gameLock);
     std::cout << "Deleting enemy" << std::endl;
     auto &ene = getEnemyById(enemyID);
     refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
@@ -174,6 +175,7 @@ void GameInstance::handleNetworkEnemies(
                     std::cout << "Enemy shoot" << std::endl;
                     _lastNetTick = tick;
                     size_t id = (size_t) atoi(tokens[1].c_str());
+                    std::unique_lock lock(_gameLock);
                     auto mob = getEnemyById(id);
                     size_t type =
                         mob.getComponent<ecs::EnemyComponent>()->getType();

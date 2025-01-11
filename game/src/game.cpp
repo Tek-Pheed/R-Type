@@ -5,6 +5,8 @@
 ** game
 */
 
+#include <mutex>
+#include "Components.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -46,6 +48,7 @@ size_t RType::getNewId()
 
 void GameInstance::loadLevel(const std::string &filename)
 {
+    std::unique_lock lock(_gameLock);
     LevelConfig l(filename);
     auto map = l.parseLevelConfig();
 
@@ -83,7 +86,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -91,6 +94,8 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
 
 void GameInstance::loadAssets()
 {
+    std::unique_lock lock(_gameLock);
+
     try {
         for (const auto asset : Asset::getAllAssetsOfType<sf::Texture>()) {
             refAssetManager.loadAsset(asset->path, asset->identifier,
@@ -116,6 +121,8 @@ void GameInstance::gamePreTick(
     (void) event;
     (void) core;
     (void) arg;
+    std::unique_lock lock(_gameLock);
+
     if (!isServer()) {
         getWindow().clear();
     }
@@ -128,6 +135,7 @@ void GameInstance::gameTick(
     (void) event;
     (void) arg;
 
+    std::unique_lock lock(_gameLock);
     _ticks++;
     try {
         manageBuffers();
@@ -143,8 +151,11 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 2.0f) {
-                for (auto entity : getEntities()) {
-                    auto enemy = entity.getComponent<ecs::EnemyComponent>();
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                    auto enemy = refEntityManager.getCurrentLevel()
+                                     .getEntityById(entID)
+                                     .getComponent<ecs::EnemyComponent>();
                     if (enemy && (enemy->getType() == 1)) {
                         _factory.buildBulletFromEnemy(enemy->getEnemyID());
                     }
@@ -154,13 +165,6 @@ void GameInstance::gameTick(
                 }
                 time = 0.0f;
             }
-            // float deltaTime_sec = std::any_cast<float>(arg);
-            // static float time = 15.0f;
-            // time += deltaTime_sec;
-            // if (time >= 5.0f) {
-            //     _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
-            //     time = 0.0f;
-            // }
         }
     } catch (const std::exception &e) {
         std::cout << "An error occured while playing: " << e.what()
@@ -174,6 +178,9 @@ void GameInstance::gamePostTick(
     (void) event;
     (void) core;
     (void) arg;
+
+    std::unique_lock lock(_gameLock);
+
     if (!isServer()) {
         getWindow().display();
     }

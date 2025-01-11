@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <sys/types.h>
 #if defined(WIN32)
     #define NOMINMAX
 #endif

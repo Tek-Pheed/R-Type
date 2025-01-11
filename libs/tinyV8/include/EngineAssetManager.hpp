@@ -38,7 +38,7 @@ namespace Engine
           public:
             explicit AssetManager(Core &engineRef);
             AssetManager(AssetManager &&other) = default;
-            ~AssetManager();
+            ~AssetManager() override;
 
             /**
              * @brief Make the manager load an asset.
