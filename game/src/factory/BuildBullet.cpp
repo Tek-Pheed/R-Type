@@ -5,6 +5,7 @@
 ** BuildBullet.cpp
 */
 
+#include <mutex>
 #include <sstream>
 #include "Components.hpp"
 #include "Factory.hpp"
@@ -16,7 +17,7 @@ using namespace RType;
 
 void Factory::buildBulletFromPlayer(size_t playerID)
 {
-    auto player = _game.getPlayerById(playerID);
+    auto &player = _game.getPlayerById(playerID);
     auto positionComp = player.getComponent<ecs::PositionComponent>();
     if (!positionComp)
         return;
@@ -59,7 +60,7 @@ void Factory::buildBulletFromPlayer(size_t playerID)
 
 void Factory::buildBulletFromEnemy(size_t enemyID)
 {
-    auto enemy = _game.getEnemyById(enemyID);
+    auto &enemy = _game.getEnemyById(enemyID);
     auto positionComp = enemy.getComponent<ecs::PositionComponent>();
     if (!positionComp)
         return;
@@ -99,7 +100,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
 
 void Factory::buildBulletFromBoss(size_t bossId)
 {
-    auto boss = _game.getEnemyById(bossId);
+    auto &boss = _game.getEnemyById(bossId);
     auto positionComp = boss.getComponent<ecs::PositionComponent>();
     if (!positionComp)
         return;

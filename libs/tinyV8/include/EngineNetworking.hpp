@@ -47,11 +47,6 @@ template <> inline std::string getString(std::string &arg)
     return (arg);
 }
 
-template <> inline std::string getString(std::string arg)
-{
-    return (arg);
-}
-
 namespace Engine
 {
     namespace Events
@@ -163,12 +158,12 @@ namespace Engine
                       writeBufferTCP(System::Network::byteArray()),
                       readBufferUDP(System::Network::byteArray()),
                       writeBufferUDP(System::Network::byteArray()),
-                      isReady(false), isDisconnected(false){};
+                      isReady(false), isDisconnected(false) {};
                 ~NetClient() = default;
             };
 
             explicit NetworkingManager(Core &engineRef);
-            ~NetworkingManager();
+            ~NetworkingManager() override;
 
             /**
              * @brief Sets the TCP port which the class will use.

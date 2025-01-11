@@ -13,3 +13,5 @@ Get-ChildItem -Path $sourceDir -Include *.dll -Recurse | ForEach-Object {
     Write-Host "Copying file: $_.FullName"
     Copy-Item -Path $_.FullName -Destination $destDir
 }
+
+cd $SCRIPTPATH/..

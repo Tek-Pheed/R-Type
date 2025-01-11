@@ -64,6 +64,7 @@ void RType::GameInstance::clientHandlerConnection(
                     // later
                     std::cout << "Build player with id:" << _netClientID
                               << std::endl;
+                    std::unique_lock lock(_gameLock);
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                     std::string text = "Health: "

@@ -8,25 +8,27 @@
 #if defined(WIN32)
     #define NOMINMAX
 #endif
-#include <cstdlib>
-#include "ErrorClass.hpp"
-#include "LevelConfig.hpp"
 
+#include "Game.hpp"
 #include <any>
+#include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <vector>
+#include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
+#include "ErrorClass.hpp"
 #include "Factory.hpp"
-#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
+#include "LevelConfig.hpp"
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Texture.hpp"
 
@@ -35,6 +37,7 @@ using namespace RType;
 constexpr auto BUILD_BASIC_ENEMY = "BASIC_ENEMY";
 constexpr auto BUILD_SHOOTER_ENEMY = "SHOOTER_ENEMY";
 constexpr auto BUILD_BOSS = "BOSS";
+constexpr auto CHANGE_MUSIC = "MUSIC";
 
 size_t RType::getNewId()
 {
@@ -44,8 +47,9 @@ size_t RType::getNewId()
     return (id);
 }
 
-void GameInstance::loadLevel(const std::string &filename)
+void GameInstance::loadLevelContent(const std::string &filename)
 {
+    std::unique_lock lock(_gameLock);
     LevelConfig l(filename);
     auto map = l.parseLevelConfig();
 
@@ -53,7 +57,7 @@ void GameInstance::loadLevel(const std::string &filename)
         if (key == BUILD_BASIC_ENEMY) {
             if (value.size() < 3)
                 throw ErrorClass(
-                    "Failed to create basic enemy from level config");
+                    "loadLevelContent: Failed to create basic enemy from level config");
             _factory.buildEnemy(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
@@ -62,7 +66,7 @@ void GameInstance::loadLevel(const std::string &filename)
         if (key == BUILD_SHOOTER_ENEMY) {
             if (value.size() < 3)
                 throw ErrorClass(
-                    "Failed to create shooter enemy from level config");
+                    "loadLevelContent: Failed to create shooter enemy from level config");
             _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
@@ -70,11 +74,16 @@ void GameInstance::loadLevel(const std::string &filename)
         }
         if (key == BUILD_BOSS) {
             if (value.size() < 3)
-                throw ErrorClass("Failed to create boss from level config");
+                throw ErrorClass("loadLevelContent: Failed to create boss from level config");
             _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()));
         }
+        // if (key == CHANGE_MUSIC) {
+        //     if (value.size() < 1)
+        //         throw ErrorClass("loadLevelContent: Failed to create music from level config");
+                
+        // }
     }
 }
 
@@ -83,7 +92,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -91,6 +100,8 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
 
 void GameInstance::loadAssets()
 {
+    std::unique_lock lock(_gameLock);
+
     try {
         for (const auto asset : Asset::getAllAssetsOfType<sf::Texture>()) {
             refAssetManager.loadAsset(asset->path, asset->identifier,
@@ -116,6 +127,8 @@ void GameInstance::gamePreTick(
     (void) event;
     (void) core;
     (void) arg;
+    std::unique_lock lock(_gameLock);
+
     if (!isServer()) {
         getWindow().clear();
     }
@@ -128,6 +141,7 @@ void GameInstance::gameTick(
     (void) event;
     (void) arg;
 
+    std::unique_lock lock(_gameLock);
     _ticks++;
     try {
         manageBuffers();
@@ -143,8 +157,11 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 2.0f) {
-                for (auto entity : getEntities()) {
-                    auto enemy = entity.getComponent<ecs::EnemyComponent>();
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                    auto enemy = refEntityManager.getCurrentLevel()
+                                     .getEntityById(entID)
+                                     .getComponent<ecs::EnemyComponent>();
                     if (enemy && (enemy->getType() == 1)) {
                         _factory.buildBulletFromEnemy(enemy->getEnemyID());
                     }
@@ -154,13 +171,6 @@ void GameInstance::gameTick(
                 }
                 time = 0.0f;
             }
-            // float deltaTime_sec = std::any_cast<float>(arg);
-            // static float time = 15.0f;
-            // time += deltaTime_sec;
-            // if (time >= 5.0f) {
-            //     _factory.buildEnemy(RType::getNewId(), 600.0f, 300.0f);
-            //     time = 0.0f;
-            // }
         }
     } catch (const std::exception &e) {
         std::cout << "An error occured while playing: " << e.what()
@@ -174,6 +184,9 @@ void GameInstance::gamePostTick(
     (void) event;
     (void) core;
     (void) arg;
+
+    std::unique_lock lock(_gameLock);
+
     if (!isServer()) {
         getWindow().display();
     }
@@ -187,7 +200,6 @@ int RType::GameInstance::manageBuffers()
     if (packets.size() == 0)
         return 0;
 
-    // std::unique_lock lock(_gameLock);
     for (auto &buff : packets) {
         std::string buffer = buff;
         std::string codeStr = buffer.substr(0, 3);

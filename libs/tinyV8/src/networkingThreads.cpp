@@ -161,7 +161,7 @@ void NetworkingManager::runWriteThread()
                 if (removeID != -1 && can_remove == true) {
                     if (_isServer) {
                         AEngineFeature::_engineRef.triggerEvent(
-                            Events::EVENT_OnServerLostClient, removeID);
+                            Events::EVENT_OnServerLostClient, (ssize_t) removeID);
                     } else {
                         AEngineFeature::_engineRef.triggerEvent(
                             Events::EVENT_DisconnectedFromServer);
@@ -222,7 +222,7 @@ void NetworkingManager::runReadThread()
                                       << std::endl;
                             if (_isServer) {
                                 AEngineFeature::_engineRef.triggerEvent(
-                                    Events::EVENT_OnServerLostClient, id);
+                                    Events::EVENT_OnServerLostClient, (ssize_t) id);
                                 removeClient((size_t) id);
                             } else {
                                 AEngineFeature::_engineRef.triggerEvent(
@@ -248,7 +248,7 @@ void NetworkingManager::runReadThread()
                                           << ")" << std::endl;
                                 if (_isServer) {
                                     AEngineFeature::_engineRef.triggerEvent(
-                                        Events::EVENT_OnServerLostClient, id);
+                                        Events::EVENT_OnServerLostClient, (ssize_t) id);
                                     removeClient((size_t) id);
                                     break;
                                 } else {

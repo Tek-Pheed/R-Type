@@ -56,6 +56,9 @@ void GameInstance::serverEventClosedConn(
 
 void RType::GameInstance::serverSendGameState(size_t clientID)
 {
+    std::unique_lock lock(_gameLock);
+
+    std::cout << "Sending game state to new player: " << clientID << std::endl;
     for (auto &p : getAllPlayers()) {
         auto pos = p.get().getComponent<ecs::PositionComponent>();
         auto pl = p.get().getComponent<ecs::PlayerComponent>();
@@ -71,7 +74,8 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
                 nm->getText();
         }
         if (!pl || !pos) {
-            std::cout << "serverSendGameState: Failed to get player" << std::endl;
+            std::cout << "serverSendGameState: Failed to get player"
+                      << std::endl;
             continue;
         }
         std::stringstream sss;
@@ -85,17 +89,13 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         auto pos = e.get().getComponent<ecs::PositionComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
         if (!ec || !pos) {
-            std::cout << "serverSendGameState: Failed to get enemy" << std::endl;
+            std::cout << "serverSendGameState: Failed to get enemy"
+                      << std::endl;
             continue;
         }
         std::stringstream sss;
-        if (e.get().getComponent<ecs::BulletComponent>() != nullptr) {
-            sss << E_SPAWN << " " << "1" << " " << ec->getEnemyID() << " " << pos->getX() << " "
-                << pos->getY() << PACKET_END;
-        } else {
-            sss << E_SPAWN << " " << "0" << " " << ec->getEnemyID() << " " << pos->getX() << " "
-                << pos->getY() << PACKET_END;
-        }
+        sss << E_SPAWN << " " << ec->getEnemyID() << " " << ec->getType()
+            << " " << pos->getX() << " " << pos->getY() << PACKET_END;
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
@@ -129,7 +129,9 @@ void RType::GameInstance::serverHanlderValidateConnection(
                 serverSendGameState((size_t) netClientID);
             }
         } else {
-            std::cout << "serverHanlderValidateConnection: Could not read client ID" << std::endl;
+            std::cout
+                << "serverHanlderValidateConnection: Could not read client ID"
+                << std::endl;
         }
     }
 }

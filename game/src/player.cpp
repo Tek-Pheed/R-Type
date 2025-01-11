@@ -39,7 +39,7 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
-                loadLevel("level1.txt");
+                loadLevelContent("level1.txt");
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -143,6 +143,7 @@ void GameInstance::handleNetworkPlayers(
         case Protocol::P_SHOOT: {
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
+                std::unique_lock lock(_gameLock);
                 _factory.buildBulletFromPlayer(id);
                 break;
             }
