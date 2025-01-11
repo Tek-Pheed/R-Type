@@ -80,7 +80,7 @@ namespace RType
             std::string newAutoFireValue, ecs::Entity &entity);
         void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
-        void loadLevel(const std::string &filename);
+        void loadLevelContent(const std::string &filename);
 
         // Player functions and utilities
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();

@@ -5,30 +5,30 @@
 ** game
 */
 
-#include <mutex>
-#include "Components.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
-#include <cstdlib>
-#include "ErrorClass.hpp"
-#include "LevelConfig.hpp"
 
+#include "Game.hpp"
 #include <any>
+#include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <vector>
+#include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Entity.hpp"
+#include "ErrorClass.hpp"
 #include "Factory.hpp"
-#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
+#include "LevelConfig.hpp"
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Texture.hpp"
 
@@ -37,6 +37,7 @@ using namespace RType;
 constexpr auto BUILD_BASIC_ENEMY = "BASIC_ENEMY";
 constexpr auto BUILD_SHOOTER_ENEMY = "SHOOTER_ENEMY";
 constexpr auto BUILD_BOSS = "BOSS";
+constexpr auto CHANGE_MUSIC = "MUSIC";
 
 size_t RType::getNewId()
 {
@@ -46,7 +47,7 @@ size_t RType::getNewId()
     return (id);
 }
 
-void GameInstance::loadLevel(const std::string &filename)
+void GameInstance::loadLevelContent(const std::string &filename)
 {
     std::unique_lock lock(_gameLock);
     LevelConfig l(filename);
@@ -56,7 +57,7 @@ void GameInstance::loadLevel(const std::string &filename)
         if (key == BUILD_BASIC_ENEMY) {
             if (value.size() < 3)
                 throw ErrorClass(
-                    "Failed to create basic enemy from level config");
+                    "loadLevelContent: Failed to create basic enemy from level config");
             _factory.buildEnemy(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
@@ -65,7 +66,7 @@ void GameInstance::loadLevel(const std::string &filename)
         if (key == BUILD_SHOOTER_ENEMY) {
             if (value.size() < 3)
                 throw ErrorClass(
-                    "Failed to create shooter enemy from level config");
+                    "loadLevelContent: Failed to create shooter enemy from level config");
             _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
@@ -73,11 +74,16 @@ void GameInstance::loadLevel(const std::string &filename)
         }
         if (key == BUILD_BOSS) {
             if (value.size() < 3)
-                throw ErrorClass("Failed to create boss from level config");
+                throw ErrorClass("loadLevelContent: Failed to create boss from level config");
             _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()));
         }
+        // if (key == CHANGE_MUSIC) {
+        //     if (value.size() < 1)
+        //         throw ErrorClass("loadLevelContent: Failed to create music from level config");
+                
+        // }
     }
 }
 
@@ -194,7 +200,6 @@ int RType::GameInstance::manageBuffers()
     if (packets.size() == 0)
         return 0;
 
-    // std::unique_lock lock(_gameLock);
     for (auto &buff : packets) {
         std::string buffer = buff;
         std::string codeStr = buffer.substr(0, 3);

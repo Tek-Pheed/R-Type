@@ -39,7 +39,7 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
-                loadLevel("level1.txt");
+                loadLevelContent("level1.txt");
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
