@@ -47,11 +47,6 @@ template <> inline std::string getString(std::string &arg)
     return (arg);
 }
 
-template <> inline std::string getString(std::string arg)
-{
-    return (arg);
-}
-
 namespace Engine
 {
     namespace Events
