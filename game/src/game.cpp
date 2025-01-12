@@ -18,6 +18,7 @@
 #include <sstream>
 #include <vector>
 #include "Components.hpp"
+#include "Config.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
@@ -56,8 +57,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
     for (auto &[key, value] : map) {
         if (key == BUILD_BASIC_ENEMY) {
             if (value.size() < 3)
-                throw ErrorClass(
-                    "loadLevelContent: Failed to create basic enemy from level config");
+                throw ErrorClass("loadLevelContent: Failed to create basic "
+                                 "enemy from level config");
             _factory.buildEnemy(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
@@ -65,8 +66,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
         }
         if (key == BUILD_SHOOTER_ENEMY) {
             if (value.size() < 3)
-                throw ErrorClass(
-                    "loadLevelContent: Failed to create shooter enemy from level config");
+                throw ErrorClass("loadLevelContent: Failed to create shooter "
+                                 "enemy from level config");
             _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
@@ -74,15 +75,17 @@ void GameInstance::loadLevelContent(const std::string &filename)
         }
         if (key == BUILD_BOSS) {
             if (value.size() < 3)
-                throw ErrorClass("loadLevelContent: Failed to create boss from level config");
+                throw ErrorClass("loadLevelContent: Failed to create boss "
+                                 "from level config");
             _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()));
         }
         // if (key == CHANGE_MUSIC) {
         //     if (value.size() < 1)
-        //         throw ErrorClass("loadLevelContent: Failed to create music from level config");
-                
+        //         throw ErrorClass("loadLevelContent: Failed to create music
+        //         from level config");
+
         // }
     }
 }
@@ -240,6 +243,24 @@ int RType::GameInstance::manageBuffers()
     return 0;
 }
 
+static std::string getConfigPath()
+{
+    const char *appImagePath = std::getenv("APPIMAGE");
+
+    if (appImagePath == NULL) {
+        return (GameInstance::USER_CONFIG_FILE);
+    } else {
+        std::string fullAppImagePath = appImagePath;
+        size_t lastSlashPos = fullAppImagePath.find_last_of("/");
+        if (lastSlashPos != std::string::npos) {
+            std::string appImageDir = fullAppImagePath.substr(0, lastSlashPos);
+            return (appImageDir + "/" + GameInstance::USER_CONFIG_FILE);
+        } else {
+            return (GameInstance::USER_CONFIG_FILE);
+        }
+    }
+}
+
 GameInstance::GameInstance(Engine::Core &engineRef)
     : refGameEngine(engineRef),
       refEntityManager(
@@ -247,7 +268,7 @@ GameInstance::GameInstance(Engine::Core &engineRef)
       refAssetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
       refNetworkManager(
           engineRef.getFeature<Engine::Feature::NetworkingManager>()),
-      _factory(Factory(*this))
+      _gameConfig(Config(getConfigPath())), _factory(Factory(*this))
 {
 }
 

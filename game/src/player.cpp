@@ -39,7 +39,7 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
-                loadLevelContent("level1.txt");
+                loadLevelContent(LEVEL_CONFIG_PATH);
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -216,7 +216,7 @@ ecs::Entity &GameInstance::getLocalPlayer()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)

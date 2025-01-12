@@ -67,7 +67,8 @@ void RType::GameInstance::createPersistentLevel()
     level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
-    auto &musicSong = this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
+    auto &musicSong =
+        this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
     _factory.buildMusic(musicSong, "menuSong");
 }
 
@@ -150,10 +151,14 @@ void RType::GameInstance::levelMainMenu()
     refEntityManager.switchLevel("mainMenu");
 
     if (!isServer()) {
-        auto songEntity = refEntityManager.getPersistentLevel().findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
-        auto currentSong = songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+        auto songEntity =
+            refEntityManager.getPersistentLevel()
+                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong =
+            songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
 
-        if (currentSong->getMusicType().getStatus() != sf::SoundSource::Playing) {
+        if (currentSong->getMusicType().getStatus()
+            != sf::SoundSource::Playing) {
             currentSong->getMusicType().play();
         }
 
@@ -255,7 +260,6 @@ void RType::GameInstance::levelContinueMenu()
 
 void RType::GameInstance::levelSettingsMenu()
 {
-    Config config("config.cfg");
     auto &level = refEntityManager.createNewLevel("settingsMenu");
 
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
@@ -284,11 +288,11 @@ void RType::GameInstance::levelSettingsMenu()
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "SETTINGS"));
 
-        std::string moveUpAction = config.getConfig().at(1);
-        std::string moveRightAction = config.getConfig().at(2);
-        std::string moveLeftAction = config.getConfig().at(3);
-        std::string moveDownAction = config.getConfig().at(4);
-        std::string autoFireAction = config.getConfig().at(7);
+        std::string moveUpAction = _gameConfig.getConfig().at(1);
+        std::string moveRightAction = _gameConfig.getConfig().at(2);
+        std::string moveLeftAction = _gameConfig.getConfig().at(3);
+        std::string moveDownAction = _gameConfig.getConfig().at(4);
+        std::string autoFireAction = _gameConfig.getConfig().at(7);
 
         std::string endUpMove = "";
         std::string endRightMove = "";
@@ -414,10 +418,9 @@ void RType::GameInstance::levelSettingsMenu()
 void RType::GameInstance::handleAutoFireButton(
     std::string newAutoFireValue, ecs::Entity &entity)
 {
-    Config config("config.cfg");
     std::string value = (newAutoFireValue == "true" ? "YES" : "NO");
-    config.updateConfigValue("AUTO_FIRE=", newAutoFireValue);
-    config.saveConfig();
+    _gameConfig.updateConfigValue("AUTO_FIRE=", newAutoFireValue);
+    _gameConfig.saveConfig();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
     text->setStr("AUTO FIRE : " + value);
 }
@@ -457,18 +460,17 @@ void RType::GameInstance::handleConfigButtons(
     sf::Keyboard::Key pressedKey, int actionType)
 {
     if (!isServer()) {
-        Config config("config.cfg");
         std::string pressedKeyString = getKeyString(pressedKey);
         std::string newValue = "sf::Keyboard::" + pressedKeyString;
 
         switch (actionType) {
             case 0: {
-                std::string moveUpAction = config.getConfig().at(1);
+                std::string moveUpAction = _gameConfig.getConfig().at(1);
                 size_t equalPosUp = moveUpAction.find("=");
                 if (equalPosUp != std::string::npos) {
                     moveUpAction = moveUpAction.substr(equalPosUp + 1);
                 }
-                config.updateConfigValue("MOVE_UP=", newValue);
+                _gameConfig.updateConfigValue("MOVE_UP=", newValue);
                 for (auto &entity :
                     refEntityManager.getCurrentLevel().getEntities()) {
                     if (entity.get().getID() == _lastButtonIdClicked) {
@@ -482,13 +484,13 @@ void RType::GameInstance::handleConfigButtons(
                 break;
             }
             case -1: {
-                std::string moveRightAction = config.getConfig().at(2);
+                std::string moveRightAction = _gameConfig.getConfig().at(2);
                 size_t equalPosRight = moveRightAction.find("=");
                 if (equalPosRight != std::string::npos) {
                     moveRightAction =
                         moveRightAction.substr(equalPosRight + 1);
                 }
-                config.updateConfigValue("MOVE_RIGHT=", newValue);
+                _gameConfig.updateConfigValue("MOVE_RIGHT=", newValue);
                 for (auto &entity :
                     refEntityManager.getCurrentLevel().getEntities()) {
                     if (entity.get().getID() == _lastButtonIdClicked) {
@@ -502,12 +504,12 @@ void RType::GameInstance::handleConfigButtons(
                 break;
             }
             case -2: {
-                std::string moveLeftAction = config.getConfig().at(3);
+                std::string moveLeftAction = _gameConfig.getConfig().at(3);
                 size_t equalPosLeft = moveLeftAction.find("=");
                 if (equalPosLeft != std::string::npos) {
                     moveLeftAction = moveLeftAction.substr(equalPosLeft + 1);
                 }
-                config.updateConfigValue("MOVE_LEFT=", newValue);
+                _gameConfig.updateConfigValue("MOVE_LEFT=", newValue);
                 for (auto &entity :
                     refEntityManager.getCurrentLevel().getEntities()) {
                     if (entity.get().getID() == _lastButtonIdClicked) {
@@ -521,12 +523,12 @@ void RType::GameInstance::handleConfigButtons(
                 break;
             }
             case -3: {
-                std::string moveDownAction = config.getConfig().at(4);
+                std::string moveDownAction = _gameConfig.getConfig().at(4);
                 size_t equalPosDown = moveDownAction.find("=");
                 if (equalPosDown != std::string::npos) {
                     moveDownAction = moveDownAction.substr(equalPosDown + 1);
                 }
-                config.updateConfigValue("MOVE_DOWN=", newValue);
+                _gameConfig.updateConfigValue("MOVE_DOWN=", newValue);
                 for (auto &entity :
                     refEntityManager.getCurrentLevel().getEntities()) {
                     if (entity.get().getID() == _lastButtonIdClicked) {
@@ -541,6 +543,6 @@ void RType::GameInstance::handleConfigButtons(
             }
             default: std::cerr << "Invalid action type." << std::endl; break;
         }
-        config.saveConfig();
+        _gameConfig.saveConfig();
     }
 }

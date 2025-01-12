@@ -14,17 +14,16 @@ namespace RType
 {
     void EventManager::keyPressed(sf::Event &event)
     {
-        Config config("config.cfg");
         Utils utils;
 
         // bool autoFireEnabled = config.getAutoFireConfig();
         sf::Keyboard::Key keyPressed = sf::Keyboard::Unknown;
         const size_t maxInputLenght = 16;
 
-        std::string moveUpKeyString = config.getKeyFromConfig("MOVE_UP");
-        std::string moveRightKeyString = config.getKeyFromConfig("MOVE_RIGHT");
-        std::string moveLeftKeyString = config.getKeyFromConfig("MOVE_LEFT");
-        std::string moveDownKeyString = config.getKeyFromConfig("MOVE_DOWN");
+        std::string moveUpKeyString = _game._gameConfig.getKeyFromConfig("MOVE_UP");
+        std::string moveRightKeyString = _game._gameConfig.getKeyFromConfig("MOVE_RIGHT");
+        std::string moveLeftKeyString = _game._gameConfig.getKeyFromConfig("MOVE_LEFT");
+        std::string moveDownKeyString = _game._gameConfig.getKeyFromConfig("MOVE_DOWN");
 
         sf::Keyboard::Key moveUpKey = utils.getKeyFromString(moveUpKeyString);
         sf::Keyboard::Key moveRightKey =

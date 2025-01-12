@@ -63,3 +63,12 @@ vgcore.*
 release/*
 .refcache
 *.xml
+
+appimagetool-x86_64.AppImage
+appimageTool
+appimageTool/*
+appimagetool*
+
+release/packages/*
+*.tar.gz
+*.AppImage

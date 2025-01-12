@@ -13,13 +13,12 @@ namespace RType
 {
     void EventManager::keyReleased(sf::Event &event)
     {
-        Config config("config.cfg");
         Utils utils;
 
-        std::string moveUpKeyString = config.getKeyFromConfig("MOVE_UP");
-        std::string moveRightKeyString = config.getKeyFromConfig("MOVE_RIGHT");
-        std::string moveLeftKeyString = config.getKeyFromConfig("MOVE_LEFT");
-        std::string moveDownKeyString = config.getKeyFromConfig("MOVE_DOWN");
+        std::string moveUpKeyString = _game._gameConfig.getKeyFromConfig("MOVE_UP");
+        std::string moveRightKeyString = _game._gameConfig.getKeyFromConfig("MOVE_RIGHT");
+        std::string moveLeftKeyString = _game._gameConfig.getKeyFromConfig("MOVE_LEFT");
+        std::string moveDownKeyString = _game._gameConfig.getKeyFromConfig("MOVE_DOWN");
 
         sf::Keyboard::Key moveUpKey = utils.getKeyFromString(moveUpKeyString);
         sf::Keyboard::Key moveRightKey =
