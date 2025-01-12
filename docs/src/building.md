@@ -72,3 +72,24 @@ If this is not the case, just run the command in an elevated powershell: `set-ex
 Then, just run the script located in `tools/build-windows.ps1`
 
 The script will automatically pull all submodules and build the application using your MSVC.
+
+
+# Packaging and distribution
+
+## Linux
+
+**Easily share the project with friends on different Linux distributions**
+
+We've made it simple to distribute the project to your friends, even if they use different Linux distributions, without them needing to recompile everything.
+
+We provide a script, `tools/distribute-linux.sh`, that automates the build process and generates three packages in the `release/packages` folder:
+
+- **A `.tar.gz` archive:** This archive contains the entire release folder, including dependencies, the server, the client, and all assets.
+- **A Client AppImage:** This is a self-contained Linux executable for the game client. AppImages are convenient because they can run on most Linux distributions that support them, without requiring installation.
+- **A Server AppImage:** This is a self-contained Linux executable for the game server, similar to the client AppImage.
+
+By distributing these AppImages, you can share the project with your friends on almost any Linux distribution that supports AppImages.
+
+## Windows
+
+### TODO: ZIP file
