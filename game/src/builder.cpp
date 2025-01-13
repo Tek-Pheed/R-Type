@@ -182,20 +182,20 @@ void RType::GameInstance::levelMainMenu()
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
 
         _factory.buildAIPlayer(
-            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Arnaud",
-            (size_t) rand() % 4);
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Arnaud",
+            static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Lucas",
-            (size_t) rand() % 4);
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Lucas",
+            static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Raphael",
-            (size_t) rand() % 4);
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Raphael",
+            static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Samy",
-            (size_t) rand() % 4);
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Samy",
+            static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Alexandre",
-            (size_t) rand() % 4);
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Alexandre",
+            static_cast<size_t>(rand() % 4));
 
         _factory.buildButton(
             sf::Vector2f(

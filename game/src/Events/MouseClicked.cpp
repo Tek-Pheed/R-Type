@@ -10,6 +10,8 @@
 #include "Events.hpp"
 #include "GameProtocol.hpp"
 #include "components/ClickableComponent.hpp"
+#include <filesystem>
+#include <cstdlib>
 
 void handleDifficultyButton(ecs::Entity &entity)
 {
@@ -55,6 +57,18 @@ void handleBonusButton(ecs::Entity &entity)
     }
 }
 
+int countTxtFiles(const std::string &folderPath)
+{
+    int count = 0;
+
+    for (const auto &entry : std::filesystem::directory_iterator(folderPath)) {
+        if (entry.path().extension() == ".txt") {
+            count++;
+        }
+    }
+    return count;
+}
+
 void handleLevelButton(ecs::Entity &entity)
 {
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
@@ -67,9 +81,12 @@ void handleLevelButton(ecs::Entity &entity)
     std::stringstream ss;
 
     if (separator != std::string::npos) {
+
         std::string level = str.substr(separator + 2);
         int levelNB = std::atoi(level.c_str());
-        if (levelNB >= 3) {
+        int maxLevel = countTxtFiles("./assets/levels");
+
+        if (levelNB >= maxLevel) {
             levelNB = 1;
         } else {
             levelNB++;
