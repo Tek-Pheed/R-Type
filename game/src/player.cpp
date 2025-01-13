@@ -40,22 +40,6 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
                 loadLevelContent(LEVEL_CONFIG_PATH);
-            } else {
-                auto songEntity = refEntityManager.getPersistentLevel()
-                                      .findEntitiesByComponent<
-                                          ecs::MusicComponent<sf::Sound>>()[0];
-                auto currentSong =
-                    songEntity.get()
-                        .getComponent<ecs::MusicComponent<sf::Sound>>();
-                auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(
-                    Asset::GAME_SONG);
-
-                if (currentSong->getMusicType().getStatus()
-                    == sf::SoundSource::Playing) {
-                    currentSong->getMusicType().stop();
-                    currentSong->getMusicType().setBuffer(newMusic);
-                    currentSong->getMusicType().play();
-                }
             }
             break;
         }
@@ -208,7 +192,8 @@ bool GameInstance::hasLocalPlayer(void) const
 ecs::Entity &GameInstance::getLocalPlayer()
 {
     if (!hasLocalPlayer())
-        throw ErrorClass(THROW_ERROR_LOCATION "No player was attached to the client");
+        throw ErrorClass(
+            THROW_ERROR_LOCATION "No player was attached to the client");
     return (refEntityManager.getCurrentLevel().getEntityById(
         (size_t) _playerEntityID));
 }
@@ -228,7 +213,8 @@ ecs::Entity &GameInstance::getPlayerById(size_t id)
         if (pl.get().getComponent<ecs::PlayerComponent>()->getPlayerID() == id)
             return (pl.get());
     }
-    throw ErrorClass(THROW_ERROR_LOCATION "Player not found id=" + std::to_string(id));
+    throw ErrorClass(
+        THROW_ERROR_LOCATION "Player not found id=" + std::to_string(id));
 }
 
 void GameInstance::deletePlayer(size_t playerID)

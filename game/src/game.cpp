@@ -5,11 +5,15 @@
 ** game
 */
 
+#include "GameProtocol.hpp"
+#include "SFML/Audio/Music.hpp"
+#include "SFML/Audio/SoundBuffer.hpp"
+#include "SFML/Graphics/Rect.hpp"
+#include "system_network.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
-#include "Game.hpp"
 #include <any>
 #include <cstdlib>
 #include <exception>
@@ -26,6 +30,7 @@
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
 #include "GameSystems.hpp"
@@ -38,7 +43,9 @@ using namespace RType;
 constexpr auto BUILD_BASIC_ENEMY = "BASIC_ENEMY";
 constexpr auto BUILD_SHOOTER_ENEMY = "SHOOTER_ENEMY";
 constexpr auto BUILD_BOSS = "BOSS";
-//constexpr auto CHANGE_MUSIC = "MUSIC";
+constexpr auto CHANGE_MUSIC = "MUSIC";
+constexpr auto CHANGE_BACKGROUND = "BACKGROUND";
+constexpr auto CHANGE_WAVE = "WAVE";
 
 size_t RType::getNewId()
 {
@@ -48,45 +55,131 @@ size_t RType::getNewId()
     return (id);
 }
 
+sf::Sound &GameInstance::getMusicPlayer()
+{
+    auto songEntity =
+        refEntityManager.getPersistentLevel()
+            .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+    auto currentSong =
+        songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+
+    return (currentSong.get()->getMusicType());
+}
+
+void GameInstance::handleNetworkMechs(
+    int code, const std::vector<std::string> &tokens)
+{
+    switch (code) {
+        case Protocol::M_MUSIC: {
+            if (tokens.size() >= 1 && !isServer()) {
+                auto &ref =
+                    refAssetManager.loadAsset("assets/sounds/" + tokens[0],
+                        tokens[0], &sf::SoundBuffer::loadFromFile);
+                auto &mus = getMusicPlayer();
+                if (mus.getStatus() == sf::SoundSource::Playing)
+                    mus.stop();
+                mus.setBuffer(ref);
+                mus.setVolume(GameInstance::MUSIC_VOLUME);
+                mus.play();
+            }
+            break;
+        }
+        case Protocol::M_BG: {
+            if (tokens.size() >= 1 && !isServer()) {
+                auto &ref =
+                    refAssetManager.loadAsset("assets/background/" + tokens[0],
+                        tokens[0], &sf::Texture::loadFromFile, sf::IntRect());
+                auto bg = refEntityManager.getPersistentLevel()
+                              .findEntitiesByComponent<
+                                  ecs::BackgroundComponent>()[0];
+                auto comp =
+                    bg.get().getComponent<ecs::SpriteComponent<sf::Sprite>>();
+
+                ref.setRepeated(true);
+                comp->getSprite().setTextureRect(
+                    sf::Rect(0, 0, (int) GameInstance::RESOLUTION_X,
+                        (int) GameInstance::RESOLUTION_Y));
+                comp->getSprite().setTexture(ref);
+            }
+            break;
+        }
+        default: break;
+    }
+}
+
 void GameInstance::loadLevelContent(const std::string &filename)
 {
     std::unique_lock lock(_gameLock);
     LevelConfig l(filename);
     auto map = l.parseLevelConfig();
+    size_t wave = 0;
 
     for (auto &[key, value] : map) {
         if (key == BUILD_BASIC_ENEMY) {
-            if (value.size() < 3)
-                throw ErrorClass(THROW_ERROR_LOCATION "loadLevelContent: Failed to create basic "
-                                 "enemy from level config");
-            _factory.buildEnemy(getNewId(),
+            if (value.size() < 5)
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "loadLevelContent: Failed to create basic "
+                    "enemy from level config");
+            auto &ene = _factory.buildEnemy(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
-                (float) std::atof(value[2].c_str()));
+                (float) std::atof(value[4].c_str()));
+            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
+            auto vel = ene.getComponent<ecs::VelocityComponent>();
+            vel->setVx((float) std::atof(value[2].c_str()));
+            vel->setVy((float) std::atof(value[3].c_str()));
         }
         if (key == BUILD_SHOOTER_ENEMY) {
-            if (value.size() < 3)
-                throw ErrorClass(THROW_ERROR_LOCATION "loadLevelContent: Failed to create shooter "
-                                 "enemy from level config");
-            _factory.buildEnemyShooter(getNewId(),
+            if (value.size() < 5)
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "loadLevelContent: Failed to create shooter "
+                    "enemy from level config");
+            auto &ene = _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
-                (float) std::atof(value[2].c_str()));
+                (float) std::atof(value[4].c_str()));
+            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
+            auto vel = ene.getComponent<ecs::VelocityComponent>();
+            vel->setVx((float) std::atof(value[2].c_str()));
+            vel->setVy((float) std::atof(value[3].c_str()));
         }
         if (key == BUILD_BOSS) {
             if (value.size() < 3)
-                throw ErrorClass(THROW_ERROR_LOCATION "loadLevelContent: Failed to create boss "
-                                 "from level config");
-            _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "loadLevelContent: Failed to create boss "
+                    "from level config");
+            auto &ene = _factory.buildBoss(getNewId(),
+                (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()));
+            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
         }
-        // if (key == CHANGE_MUSIC) {
-        //     if (value.size() < 1)
-        //         throw ErrorClass("loadLevelContent: Failed to create music
-        //         from level config");
-
-        // }
+        if (key == CHANGE_MUSIC) {
+            if (value.size() < 1)
+                throw ErrorClass(
+                    THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
+                                         "music from level config");
+            std::stringstream ss;
+            ss << M_MUSIC << " " << value[0] << " " << PACKET_END;
+            refNetworkManager.sendToAll(
+                System::Network::ISocket::TCP, ss.str());
+        }
+        if (key == CHANGE_BACKGROUND) {
+            if (value.size() < 1)
+                throw ErrorClass(
+                    THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
+                                         "background from level config");
+            std::stringstream ss;
+            ss << M_BG << " " << value[0] << " " << PACKET_END;
+            refNetworkManager.sendToAll(
+                System::Network::ISocket::TCP, ss.str());
+        }
+        if (key == CHANGE_WAVE) {
+            if (value.size() < 1)
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "loadLevelContent: Failed to set wave");
+            wave = (size_t) std::atoi(value[0].c_str());
+        }
     }
 }
 
@@ -119,8 +212,9 @@ void GameInstance::loadAssets()
                 &sf::SoundBuffer::loadFromFile);
         }
     } catch (const std::exception &e) {
-        std::cout << CATCH_ERROR_LOCATION "Failed to an load asset with error: " << e.what()
-                  << std::endl;
+        std::cout << CATCH_ERROR_LOCATION
+            "Failed to an load asset with error: "
+                  << e.what() << std::endl;
     }
 }
 
@@ -177,8 +271,8 @@ void GameInstance::gameTick(
             }
         }
     } catch (const std::exception &e) {
-        std::cout << THROW_ERROR_LOCATION "An error occured while playing: " << e.what()
-                  << std::endl;
+        std::cout << CATCH_ERROR_LOCATION "An error occured while playing: "
+                  << e.what() << std::endl;
     }
 }
 
@@ -225,7 +319,7 @@ int RType::GameInstance::manageBuffers()
             case 0: handleNetworkPlayers(code, tokens); break;
             case 1: handleNetworkEnemies(code, tokens); break;
             // case 2: handle_terrain(code, tokens); break;
-            // case 3: handle_mechs(code, tokens); break;
+            case 3: handleNetworkMechs(code, tokens); break;
             case 24: handleLoby(code, tokens); break;
             case 9:
                 if (isServer()) {

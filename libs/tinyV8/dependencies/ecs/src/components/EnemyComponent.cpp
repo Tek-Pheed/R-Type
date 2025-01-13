@@ -10,7 +10,7 @@
 namespace ecs
 {
     EnemyComponent::EnemyComponent(size_t enemyID, size_t type)
-        : _enemyID(enemyID), _type(type)
+        : _enemyID(enemyID), _type(type), _wave(0)
     {
     }
 
@@ -28,9 +28,20 @@ namespace ecs
     {
         return _type;
     }
+
     void EnemyComponent::setType(size_t type)
     {
         _type = type;
+    }
+
+    size_t EnemyComponent::getWave() const
+    {
+        return (_wave);
+    }
+
+    void EnemyComponent::setWave(size_t wave)
+    {
+        _wave = wave;
     }
 
 } // namespace ecs
