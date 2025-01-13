@@ -163,9 +163,12 @@ namespace ecs
 
     template <typename spriteType> class SpriteComponent : public Component {
       public:
-        SpriteComponent(spriteType &sprite, int sizeX, int sizeY)
-            : _sprite(sprite), _sizeX(sizeX), _sizeY(sizeY)
+        SpriteComponent(spriteType &sprite, int offsetX = 0, int offsetY = 0,
+            int maxX = 0, float delay = 0.0f, int startX = 0)
+            : _sprite(sprite), _sizeX(offsetX), _sizeY(offsetY), _maxX(maxX),
+              _delay(delay), _startX(startX)
         {
+            _elapsedTime = 0.0f;
         }
 
         void setSprite(spriteType &sprite)
@@ -180,6 +183,14 @@ namespace ecs
         {
             this->_sizeY = sizeY;
         }
+        void setMaxX(int maxX)
+        {
+            this->_maxX = maxX;
+        }
+        void setElapsedTime(float elapsedTime)
+        {
+            this->_elapsedTime = elapsedTime;
+        }
 
         spriteType &getSprite()
         {
@@ -193,11 +204,31 @@ namespace ecs
         {
             return this->_sizeY;
         }
+        int getMaxX() const
+        {
+            return this->_maxX;
+        }
+        float getDelay() const
+        {
+            return this->_delay;
+        }
+        int getStartX() const
+        {
+            return this->_startX;
+        }
+        float getElapsedTime() const
+        {
+            return this->_elapsedTime;
+        }
 
       private:
         spriteType _sprite;
         int _sizeX;
         int _sizeY;
+        int _maxX;
+        float _delay;
+        int _startX;
+        float _elapsedTime;
     };
 
     template <typename circleType> class CircleComponent : public Component {

@@ -22,16 +22,32 @@ void RenderSystem::initSystem(GameInstance &gameRef)
     _game = &gameRef;
 }
 
-void renderSprite(ecs::Entity &entity, sf::RenderWindow &window)
+void renderSprite(
+    ecs::Entity &entity, sf::RenderWindow &window, float deltaTime)
 {
     auto position = entity.getComponent<ecs::PositionComponent>();
     auto sprite = entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
+    float elapsedTime = 0.0f;
 
     if (!position || !sprite) {
         throw ErrorClass(THROW_ERROR_LOCATION "RenderSprite failed to render entity, missing "
                          "component: position or sprite !");
         return;
     }
+
+    elapsedTime = sprite->getElapsedTime() + deltaTime;
+    if (sprite->getSizeX() != 0) {
+        if (elapsedTime >= sprite->getDelay()) {
+            auto textureRect = sprite->getSprite().getTextureRect();
+            textureRect.left += sprite->getSizeX();
+            if (textureRect.left >= sprite->getMaxX()) {
+                textureRect.left = sprite->getStartX();
+            }
+            sprite->getSprite().setTextureRect(textureRect);
+            elapsedTime -= sprite->getDelay();
+        }
+    }
+    sprite->setElapsedTime(elapsedTime);
     sprite->getSprite().setPosition(position->getX(), position->getY());
     window.draw(sprite->getSprite());
 }
@@ -172,8 +188,6 @@ void renderInput(ecs::Entity &entity, sf::RenderWindow &window)
 
 void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
 {
-    (void) deltaTime;
-
     for (auto &entity : entities) {
         auto renderComponent = entity.getComponent<ecs::RenderComponent>();
 
@@ -181,7 +195,7 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             continue;
         switch (renderComponent->getObjectType()) {
             case ecs::RenderComponent::ObjectType::SPRITE:
-                renderSprite(entity, _game->getWindow());
+                renderSprite(entity, _game->getWindow(), deltaTime);
                 break;
             case ecs::RenderComponent::ObjectType::SPRITEANDTEXT:
                 renderSpriteAndText(entity, _game->getWindow());

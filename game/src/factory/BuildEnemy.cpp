@@ -46,8 +46,8 @@ ecs::Entity &RType::Factory::buildEnemy(
         sprite.setScale(sf::Vector2f(2, 2));
         enemy.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
-        enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 1.0, 1.0));
+        enemy.addComponent(
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
     } else {
         auto pos = enemy.getComponent<ecs::PositionComponent>();
         auto ene = enemy.getComponent<ecs::EnemyComponent>();
@@ -200,7 +200,8 @@ ecs::Entity &RType::Factory::buildEnemyShooter(
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(std::make_shared<ecs::VelocityComponent>(
         GameInstance::ENEMY_SHOOTER_VELOCITY, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));
+    enemy.addComponent(
+        std::make_shared<ecs::HitboxComponent>(33.0f * 2.0f, 34.0f * 2.0f));
 
     if (!_game.isServer()) {
         auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
@@ -208,12 +209,12 @@ ecs::Entity &RType::Factory::buildEnemyShooter(
 
         sf::Sprite sprite;
         sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(0, 16, 32, 32));
+        sprite.setTextureRect(sf::Rect(0, 0, 33, 34));
         sprite.setScale(sf::Vector2f(2, 2));
         enemy.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 1.0, 1.0));
+            sprite, 33, 0, 33 * 3, 0.1f, 0));
         buildBulletFromEnemy(id);
     } else {
         auto pos = enemy.getComponent<ecs::PositionComponent>();

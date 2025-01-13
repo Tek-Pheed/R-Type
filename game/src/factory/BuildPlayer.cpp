@@ -41,8 +41,7 @@ namespace RType
             player.addComponent(std::make_shared<ecs::RenderComponent>(
                 ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
             player.addComponent(
-                std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-                    sprite, 3.0, 3.0));
+                std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
 
             sf::Text text;
             text.setFont(font);

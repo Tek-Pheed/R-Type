@@ -34,8 +34,7 @@ ecs::Entity &RType::GameInstance::buildBoss(
     boss.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     boss.addComponent(std::make_shared<ecs::HealthComponent>(health));
     boss.addComponent(std::make_shared<ecs::BulletComponent>(false));
-    boss.addComponent(
-        std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
+    boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
     if (!_isServer) {
         auto &texture =
             refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
@@ -45,8 +44,8 @@ ecs::Entity &RType::GameInstance::buildBoss(
         sprite.setScale(sf::Vector2f(2, 2));
         boss.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
-        boss.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
+        boss.addComponent(
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
     }
     if (_isServer) {
         auto pos = boss.getComponent<ecs::PositionComponent>();
