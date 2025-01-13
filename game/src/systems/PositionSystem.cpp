@@ -12,6 +12,7 @@
 #include "Components.hpp"
 #include "Game.hpp"
 #include "GameSystems.hpp"
+#include "components/AIComponent.hpp"
 
 using namespace RType;
 using namespace GameSystems;
@@ -38,6 +39,7 @@ void PositionSystem::update(
             positionComponent->setY(newY);
 
             auto player = entity.getComponent<ecs::PlayerComponent>();
+            auto ai = entity.getComponent<ecs::AIComponent>();
             if (player
                 && (positionComponent->getOldX() != positionComponent->getX()
                     || positionComponent->getOldY()
@@ -73,6 +75,29 @@ void PositionSystem::update(
                 if (player && positionComponent->getY() > maxY) {
                     positionComponent->setY(maxY);
                 }
+
+                if (ai) {
+                    if (positionComponent->getX() > maxX) {
+                        velocityComponent->setVx(
+                            velocityComponent->getVx() * -1);
+                    }
+
+                    if (positionComponent->getY() > maxY) {
+                        velocityComponent->setVy(
+                            velocityComponent->getVy() * -1);
+                    }
+
+                    if (positionComponent->getX() < 0) {
+                        velocityComponent->setVx(
+                            velocityComponent->getVx() * -1);
+                    }
+
+                    if (positionComponent->getY() < 0) {
+                        velocityComponent->setVy(
+                            velocityComponent->getVy() * -1);
+                    }
+                }
+
             } else {
                 auto enemy = entity.getComponent<ecs::EnemyComponent>();
                 if (enemy
@@ -84,7 +109,8 @@ void PositionSystem::update(
                 }
                 if (enemy
                     && (positionComponent->getX() < GameInstance::KILLZONE
-                        || positionComponent->getY() < -GameInstance::KILLZONE)) {
+                        || positionComponent->getY()
+                            < -GameInstance::KILLZONE)) {
                     _game->deleteEnemy(enemy->getEnemyID());
                 }
             }

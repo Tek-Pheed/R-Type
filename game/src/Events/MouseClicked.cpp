@@ -134,9 +134,6 @@ namespace RType
                 auto clickableType =
                     entity.get().getComponent<ecs::ClickableComponent>();
 
-                auto text =
-                    entity.get().getComponent<ecs::TextComponent<sf::Text>>();
-
                 if (!clickableType)
                     continue;
 

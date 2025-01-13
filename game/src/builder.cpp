@@ -181,6 +181,22 @@ void RType::GameInstance::levelMainMenu()
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
 
+        _factory.buildAIPlayer(
+            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Arnaud",
+            (size_t) rand() % 4);
+        _factory.buildAIPlayer(
+            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Lucas",
+            (size_t) rand() % 4);
+        _factory.buildAIPlayer(
+            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Raphael",
+            (size_t) rand() % 4);
+        _factory.buildAIPlayer(
+            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Samy",
+            (size_t) rand() % 4);
+        _factory.buildAIPlayer(
+            sf::Vector2f(rand() % 200 + 100, rand() % 200 + 100), "Alexandre",
+            (size_t) rand() % 4);
+
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
@@ -238,12 +254,12 @@ void RType::GameInstance::levelLobbyMenu()
             "DIFFICULTY : EASY", 40, sf::Color::Black,
             ecs::ClickableType::DIFFICULTY);
 
-        _factory.buildButton(sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -2),
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
-            "LEVEL : 1", 40, sf::Color::Black,
-            ecs::ClickableType::LEVEL);
+            "LEVEL : 1", 40, sf::Color::Black, ecs::ClickableType::LEVEL);
 
         _factory.buildButton(
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
