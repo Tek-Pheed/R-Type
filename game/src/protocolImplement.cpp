@@ -28,7 +28,7 @@ int GameInstance::is_code_valid(int code)
         return 1;
     if (code >= T_SPAWN && code <= T_DEAD)
         return 2;
-    if (code >= M_WAVE && code <= M_GOVER)
+    if (code >= M_WAVE && code <= M_MUSIC)
         return 3;
     if (code >= L_STARTGAME && code <= L_SETMAXPLAYRS)
         return 24;

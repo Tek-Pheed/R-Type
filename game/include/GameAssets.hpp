@@ -55,7 +55,7 @@ namespace RType
                 typeid(sf::Texture)},
             {BOSS_TEXTURE, "assets/sprites/r-typesheet30.gif",
                 typeid(sf::Texture)},
-            {BACKGROUND_TEXTURE, "assets/background/nexus.png",
+            {BACKGROUND_TEXTURE, "assets/background/clouds.jpg",
                 typeid(sf::Texture)},
             {BULLET_TEXTURE, "assets/sprites/r-typesheet1.gif",
                 typeid(sf::Texture)},

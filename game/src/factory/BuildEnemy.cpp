@@ -5,6 +5,7 @@
 ** enemy
 */
 
+#include "SFML/Audio/SoundSource.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -73,7 +74,8 @@ ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
             == enemyID)
             return (pl.get());
     }
-    throw ErrorClass(THROW_ERROR_LOCATION "Enemy not found id=" + std::to_string(enemyID));
+    throw ErrorClass(
+        THROW_ERROR_LOCATION "Enemy not found id=" + std::to_string(enemyID));
 }
 
 void GameInstance::sendEnemyPosition(size_t enemyID)
@@ -109,6 +111,28 @@ void GameInstance::deleteEnemy(size_t enemyID)
         ss << E_DEAD << " " << enemyID << " " << PACKET_END;
         refNetworkManager.sendToAll(
             System::Network::ISocket::Type::TCP, ss.str());
+    }
+}
+
+void GameInstance::handleNetworkMechs(
+    int code, const std::vector<std::string> &tokens)
+{
+    switch (code) {
+        case Protocol::M_MUSIC: {
+            if (tokens.size() >= 1 && !isServer()) {
+                std::cout << "Coucou je veux changer de musique" << std::endl;
+                auto &ref =
+                    refAssetManager.loadAsset("assets/sounds/" + tokens[0],
+                        tokens[0], &sf::SoundBuffer::loadFromFile);
+                auto &mus = getMusicPlayer();
+                if (mus.getStatus() == sf::SoundSource::Playing)
+                    mus.stop();
+                mus.setBuffer(ref);
+                mus.setVolume(GameInstance::MUSIC_VOLUME);
+                mus.play();
+            }
+        }
+        default: break;
     }
 }
 

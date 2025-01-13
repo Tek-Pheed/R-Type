@@ -50,7 +50,7 @@ void Factory::buildBulletFromPlayer(size_t playerID)
             Asset::BULLET_SOUND);
         static sf::Sound sound;
         sound.setBuffer(bulletSound);
-        sound.setVolume(10.0f);
+        sound.setVolume(GameInstance::EFFECT_VOLUME);
         sound.play();
         if (playerID == (size_t) _game.getNetClientID())
             _game.refNetworkManager.sendToAll(
@@ -90,7 +90,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
             Asset::BULLET_SOUND);
         static sf::Sound sound;
         sound.setBuffer(bulletSound);
-        sound.setVolume(10.0f);
+        sound.setVolume(GameInstance::EFFECT_VOLUME);
         sound.play();
         if (enemyID == (size_t) _game.getNetClientID())
             _game.refNetworkManager.sendToAll(
@@ -131,7 +131,7 @@ void Factory::buildBulletFromBoss(size_t bossId)
             Asset::BULLET_BOSS_SOUND);
         static sf::Sound sound;
         sound.setBuffer(bulletSound);
-        sound.setVolume(25.0f);
+        sound.setVolume(GameInstance::EFFECT_VOLUME);
         sound.play();
         if (bossId == (size_t) _game.getNetClientID())
             _game.refNetworkManager.sendToAll(

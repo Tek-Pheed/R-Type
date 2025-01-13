@@ -47,6 +47,7 @@ namespace RType
         M_WIN = 133,
         M_LOSE = 134,
         M_GOVER = 135,
+        M_MUSIC = 136,
 
         // Boss
         B_SPAWN = 141,
