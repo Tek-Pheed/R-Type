@@ -240,9 +240,12 @@ void GameInstance::playEvent()
                 auto &player = getLocalPlayer();
                 auto velocity = player.getComponent<ecs::VelocityComponent>();
                 if (!autoFireEnabled
-                    && event.key.code == sf::Keyboard::Space) {
-                    if (_netClientID >= 0)
+                    && event.key.code == sf::Keyboard::Space
+                    && this->_fireClock.getElapsedTime().asSeconds() >= 0.5f) {
+                    if (_netClientID >= 0) {
                         _factory.buildBulletFromPlayer((size_t) _netClientID);
+                        this->_fireClock.restart();
+                    }
                 }
             }
         }
@@ -254,10 +257,10 @@ void GameInstance::playEvent()
         }
     }
     if (hasLocalPlayer() && autoFireEnabled && _gameStarted
-        && this->_autoFireClock.getElapsedTime().asSeconds() >= 1.0f) {
+        && this->_fireClock.getElapsedTime().asSeconds() >= 0.5f) {
         if (_netClientID >= 0) {
             _factory.buildBulletFromPlayer((size_t) _netClientID);
-            this->_autoFireClock.restart();
+            this->_fireClock.restart();
         }
     }
 }
