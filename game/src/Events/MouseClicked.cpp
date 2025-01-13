@@ -70,7 +70,7 @@ void handleBonusButton(ecs::Entity &entity)
 
     if (separator != std::string::npos) {
         std::string bonus = str.substr(separator + 2);
-        if (bonus == "ON") {
+        if (bonus == "YES") {
             text->setStr("BONUS : NO");
         } else {
             text->setStr("BONUS : YES");
