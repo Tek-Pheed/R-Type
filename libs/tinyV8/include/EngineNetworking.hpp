@@ -216,7 +216,7 @@ namespace Engine
                     try {
                         cli.second.tcpSocket.closeSocket();
                     } catch (const std::exception &e) {
-                        std::cout << THROW_ERROR_LOCATION "Can't close client socket, it might "
+                        std::cout << CATCH_ERROR_LOCATION "Can't close client socket, it might "
                                      "already be closed"
                                   << std::endl;
                     }
@@ -257,7 +257,7 @@ namespace Engine
                     try {
                         cli.second.tcpSocket.closeSocket();
                     } catch (const std::exception &e) {
-                        std::cout << THROW_ERROR_LOCATION "Can't close client socket, it might "
+                        std::cout << CATCH_ERROR_LOCATION "Can't close client socket, it might "
                                      "already be closed"
                                   << std::endl;
                     }

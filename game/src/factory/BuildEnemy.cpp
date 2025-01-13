@@ -5,7 +5,6 @@
 ** enemy
 */
 
-#include "SFML/Audio/SoundSource.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -21,6 +20,8 @@
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "SFML/Audio/SoundSource.hpp"
+#include "SFML/Graphics/Texture.hpp"
 
 using namespace RType;
 
@@ -111,28 +112,6 @@ void GameInstance::deleteEnemy(size_t enemyID)
         ss << E_DEAD << " " << enemyID << " " << PACKET_END;
         refNetworkManager.sendToAll(
             System::Network::ISocket::Type::TCP, ss.str());
-    }
-}
-
-void GameInstance::handleNetworkMechs(
-    int code, const std::vector<std::string> &tokens)
-{
-    switch (code) {
-        case Protocol::M_MUSIC: {
-            if (tokens.size() >= 1 && !isServer()) {
-                std::cout << "Coucou je veux changer de musique" << std::endl;
-                auto &ref =
-                    refAssetManager.loadAsset("assets/sounds/" + tokens[0],
-                        tokens[0], &sf::SoundBuffer::loadFromFile);
-                auto &mus = getMusicPlayer();
-                if (mus.getStatus() == sf::SoundSource::Playing)
-                    mus.stop();
-                mus.setBuffer(ref);
-                mus.setVolume(GameInstance::MUSIC_VOLUME);
-                mus.play();
-            }
-        }
-        default: break;
     }
 }
 

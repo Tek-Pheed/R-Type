@@ -8,6 +8,7 @@
 #include "GameProtocol.hpp"
 #include "SFML/Audio/Music.hpp"
 #include "SFML/Audio/SoundBuffer.hpp"
+#include "SFML/Graphics/Rect.hpp"
 #include "system_network.hpp"
 #if defined(WIN32)
     #define NOMINMAX
@@ -43,6 +44,7 @@ constexpr auto BUILD_BASIC_ENEMY = "BASIC_ENEMY";
 constexpr auto BUILD_SHOOTER_ENEMY = "SHOOTER_ENEMY";
 constexpr auto BUILD_BOSS = "BOSS";
 constexpr auto CHANGE_MUSIC = "MUSIC";
+constexpr auto CHANGE_BACKGROUND = "BACKGROUND";
 
 size_t RType::getNewId()
 {
@@ -61,6 +63,47 @@ sf::Sound &GameInstance::getMusicPlayer()
         songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
 
     return (currentSong.get()->getMusicType());
+}
+
+void GameInstance::handleNetworkMechs(
+    int code, const std::vector<std::string> &tokens)
+{
+    switch (code) {
+        case Protocol::M_MUSIC: {
+            if (tokens.size() >= 1 && !isServer()) {
+                auto &ref =
+                    refAssetManager.loadAsset("assets/sounds/" + tokens[0],
+                        tokens[0], &sf::SoundBuffer::loadFromFile);
+                auto &mus = getMusicPlayer();
+                if (mus.getStatus() == sf::SoundSource::Playing)
+                    mus.stop();
+                mus.setBuffer(ref);
+                mus.setVolume(GameInstance::MUSIC_VOLUME);
+                mus.play();
+            }
+            break;
+        }
+        case Protocol::M_BG: {
+            if (tokens.size() >= 1 && !isServer()) {
+                auto &ref =
+                    refAssetManager.loadAsset("assets/background/" + tokens[0],
+                        tokens[0], &sf::Texture::loadFromFile, sf::IntRect());
+                auto bg = refEntityManager.getPersistentLevel()
+                              .findEntitiesByComponent<
+                                  ecs::BackgroundComponent>()[0];
+                auto comp =
+                    bg.get().getComponent<ecs::SpriteComponent<sf::Sprite>>();
+
+                ref.setRepeated(true);
+                comp->getSprite().setTextureRect(
+                    sf::Rect(0, 0, (int) GameInstance::RESOLUTION_X,
+                        (int) GameInstance::RESOLUTION_Y));
+                comp->getSprite().setTexture(ref);
+            }
+            break;
+        }
+        default: break;
+    }
 }
 
 void GameInstance::loadLevelContent(const std::string &filename)
@@ -106,6 +149,16 @@ void GameInstance::loadLevelContent(const std::string &filename)
                                          "music from level config");
             std::stringstream ss;
             ss << M_MUSIC << " " << value[0] << " " << PACKET_END;
+            refNetworkManager.sendToAll(
+                System::Network::ISocket::TCP, ss.str());
+        }
+        if (key == CHANGE_BACKGROUND) {
+            if (value.size() < 1)
+                throw ErrorClass(
+                    THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
+                                         "background from level config");
+            std::stringstream ss;
+            ss << M_BG << " " << value[0] << " " << PACKET_END;
             refNetworkManager.sendToAll(
                 System::Network::ISocket::TCP, ss.str());
         }
@@ -199,7 +252,7 @@ void GameInstance::gameTick(
             }
         }
     } catch (const std::exception &e) {
-        std::cout << THROW_ERROR_LOCATION "An error occured while playing: "
+        std::cout << CATCH_ERROR_LOCATION "An error occured while playing: "
                   << e.what() << std::endl;
     }
 }
