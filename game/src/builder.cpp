@@ -256,7 +256,7 @@ void RType::GameInstance::levelLobbyMenu()
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -4),
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
-            "LAUNCH GAME", 40, sf::Color::Black, ecs::ClickableType::BONUS);
+            "LAUNCH GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
 
             
     }
