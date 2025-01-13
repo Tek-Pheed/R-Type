@@ -70,7 +70,7 @@ ecs::Entity &GameInstance::getBossById(size_t bossID)
         if (pl.get().getComponent<ecs::BossComponent>()->getBossID() == bossID)
             return (pl.get());
     }
-    throw ErrorClass("Boss not found id=" + std::to_string(bossID));
+    throw ErrorClass(THROW_ERROR_LOCATION "Boss not found id=" + std::to_string(bossID));
 }
 
 void GameInstance::sendBossPosition(size_t bossID)
@@ -93,7 +93,7 @@ void GameInstance::deleteBoss(size_t bossID)
     std::unique_lock lock(_gameLock);
     std::cout << "Deleting boss" << std::endl;
     auto &ene = getBossById(bossID);
-    refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
+    refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
     if (isServer()) {
         std::stringstream ss;
         ss << E_DEAD << " " << bossID << " " << PACKET_END;

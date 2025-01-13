@@ -14,6 +14,13 @@
 #ifndef TINY_V8_HPP
 #define TINY_V8_HPP
 
+#define STRINGIZE(x)  STRINGIZE2(x)
+#define STRINGIZE2(x) #x
+#define CATCH_ERROR_LOCATION \
+    "\nCatch error at: " __FILE__ ":" STRINGIZE(__LINE__) ":\n\t"
+#define THROW_ERROR_LOCATION \
+    "\nThrow error at: " __FILE__ ":" STRINGIZE(__LINE__) ":\n\t"
+
 #include <any>
 #include <cstdint>
 #include <functional>
@@ -97,6 +104,14 @@ namespace Engine
          * @param deltaTimeSec: Delta time between two ticks (in seconds).
          */
         virtual void engineOnTick(float deltaTimeSec) = 0;
+
+        /**
+        * @brief Built-In Post-Tick event.
+
+        * This event is called every tick.
+        * @param deltaTimeSec: Delta time between two ticks (in seconds).
+        */
+        virtual void engineOnPostTick(float deltaTimeSec) = 0;
 
         /**
          * @brief The stop event.
@@ -326,6 +341,14 @@ namespace Engine
          * @param deltaTimeSec: Delta time between two ticks (in seconds).
          */
         void engineOnTick(float deltaTimeSec);
+
+        /**
+         * @brief Built-In Post-Tick event.
+
+         * This event is called every tick.
+         * @param deltaTimeSec: Delta time between two ticks (in seconds).
+         */
+        void engineOnPostTick(float deltaTimeSec);
 
         /**
          * @brief Built-In Stop event.

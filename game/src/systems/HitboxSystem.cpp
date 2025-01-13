@@ -78,7 +78,7 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
                 }
             }
         } catch (const std::exception &e) {
-            continue;
+            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }
@@ -129,11 +129,11 @@ void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
                 if (_game->isServer()) {
                     health->setHealth(health->getHealth() - 100);
                 }
-                _game->refEntityManager.getCurrentLevel().destroyEntityById(
+                _game->refEntityManager.getCurrentLevel().markEntityForDeletion(
                     bullet.getID());
             }
         } catch (const std::exception &e) {
-            continue;
+            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }
@@ -188,11 +188,11 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
                     if (bulletComp->getType() == 1)
                         _game->damagePlayer(player->getPlayerID(), DMG * 3);
                 }
-                _game->refEntityManager.getCurrentLevel().destroyEntityById(
+                _game->refEntityManager.getCurrentLevel().markEntityForDeletion(
                     bullet.getID());
             }
         } catch (const std::exception &e) {
-            continue;
+            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }
@@ -227,7 +227,7 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 EnemyCollision(entity, deltaTime);
             }
         } catch (const std::exception &e) {
-            continue;
+            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }

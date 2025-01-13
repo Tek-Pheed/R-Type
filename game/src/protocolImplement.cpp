@@ -68,7 +68,7 @@ std::vector<std::string> PacketHandler::splitPackets(
                     start = buffer.size();
                 }
             } catch (const std::runtime_error &e) {
-                std::cerr << "Error deserializing packet: " << e.what()
+                std::cerr << THROW_ERROR_LOCATION "Error deserializing packet: " << e.what()
                           << std::endl;
                 break;
             }

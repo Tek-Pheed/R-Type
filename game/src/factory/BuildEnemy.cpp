@@ -73,7 +73,7 @@ ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
             == enemyID)
             return (pl.get());
     }
-    throw ErrorClass("Enemy not found id=" + std::to_string(enemyID));
+    throw ErrorClass(THROW_ERROR_LOCATION "Enemy not found id=" + std::to_string(enemyID));
 }
 
 void GameInstance::sendEnemyPosition(size_t enemyID)
@@ -103,7 +103,7 @@ void GameInstance::deleteEnemy(size_t enemyID)
     std::unique_lock lock(_gameLock);
     std::cout << "Deleting enemy" << std::endl;
     auto &ene = getEnemyById(enemyID);
-    refEntityManager.getCurrentLevel().destroyEntityById(ene.getID());
+    refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
     if (isServer()) {
         std::stringstream ss;
         ss << E_DEAD << " " << enemyID << " " << PACKET_END;

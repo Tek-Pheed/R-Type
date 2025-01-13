@@ -26,13 +26,21 @@ void Core::engineOnStart(void)
     triggerEvent(Engine::Events::EVENT_OnStart);
 }
 
+void Core::engineOnPostTick(float deltaTimeSec)
+{
+    for (const auto &sys : _features) {
+        sys.second->engineOnPostTick(deltaTimeSec);
+    }
+    triggerEvent(Events::EVENT_PostTick, deltaTimeSec);
+}
+
 void Core::engineOnTick(float deltaTimeSec)
 {
     triggerEvent(Events::EVENT_BeforeTick, deltaTimeSec);
     for (const auto &sys : _features) {
         sys.second->engineOnTick(deltaTimeSec);
     }
-    triggerEvent(Events::EVENT_PostTick, deltaTimeSec);
+    engineOnPostTick(deltaTimeSec);
 }
 
 void Core::engineOnStop(void)

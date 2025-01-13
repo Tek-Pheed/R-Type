@@ -43,6 +43,12 @@ void NetworkingManager::engineOnStop(void)
     return;
 }
 
+void NetworkingManager::engineOnPostTick(float deltaTimeSec)
+{
+    (void) deltaTimeSec;
+    return;
+}
+
 void NetworkingManager::setTCPPort(size_t port)
 {
     _tcpPort = port;

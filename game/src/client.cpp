@@ -148,7 +148,7 @@ void RType::GameInstance::connectToGame()
         _playerEntityID = -1;
         _isConnectedToServer = true;
     } catch (const std::exception &e) {
-        std::cout << "Failed to connect to server: IP=" << _ip
+        std::cout << CATCH_ERROR_LOCATION << "Failed to connect to server: IP=" << _ip
                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
                   << " with error: " << e.what() << std::endl;
         refEntityManager.switchLevel(currentLevel);
@@ -169,7 +169,7 @@ void RType::GameInstance::clientHandleDisconnected(
     _isConnectedToServer = false;
     _playerEntityID = -1;
     refNetworkManager.disconnectClient(1);
-    std::cout << "You are now disconnected from the game server, maybe the "
+    std::cout << CATCH_ERROR_LOCATION << "You are now disconnected from the game server, maybe the "
                  "connection was unstable."
               << std::endl;
     refEntityManager.deleteAllLevel();
@@ -191,7 +191,7 @@ void RType::GameInstance::setupClient(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
-        throw std::runtime_error("Failed to create the SFML window.");
+        throw std::runtime_error(THROW_ERROR_LOCATION "Failed to create the SFML window.");
     }
     refGameEngine.addEventBinding<RType::GameInstance>(
         Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);

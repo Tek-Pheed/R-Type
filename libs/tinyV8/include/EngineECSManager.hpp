@@ -14,6 +14,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -82,6 +83,8 @@ namespace Engine
 
             /**
              * @brief Destroy en entity owned by the manager.
+             * @warn: Use this function with caution, as reference might become
+             invalid after this call.
 
              * @param id The ID of the entity to detroy.
              * @return true: The entity was successfully deleted.
@@ -97,6 +100,21 @@ namespace Engine
                         break;
                     }
                 }
+                return (true);
+            }
+
+            /**
+             * @brief Mark an entity for safe deletion.
+
+             * @param id The ID of the entity to detroy.
+             * @return true: The entity was successfully deleted.
+             * @return false: The entity could not be delete.
+             */
+            bool markEntityForDeletion(size_t id)
+            {
+                if (!doesEntityExists(id))
+                    return (false);
+                _markedForDelete.emplace_back(id);
                 return (true);
             }
 
@@ -140,7 +158,8 @@ namespace Engine
                     if (entity.getID() == id)
                         return (entity);
                 }
-                throw std::out_of_range("getEntityById: Id not found");
+                throw std::out_of_range(
+                    THROW_ERROR_LOCATION "getEntityById: Id not found");
             }
 
             /**
@@ -303,6 +322,18 @@ namespace Engine
                 }
             }
 
+            void engineOnPostTick(float deltaTimeSec) override
+            {
+                (void) deltaTimeSec;
+                for (size_t id : _markedForDelete) {
+                    if (!destroyEntityById(id))
+                        std::cout << "ENGINE: Trying to delete non existant "
+                                     "entity with id: "
+                                  << id << std::endl;
+                }
+                _markedForDelete.clear();
+            };
+
           protected:
             void engineOnStart(void) override {};
             void engineOnStop(void) override {};
@@ -319,6 +350,7 @@ namespace Engine
             };
 
             std::vector<ecs::Entity> _entities;
+            std::vector<size_t> _markedForDelete;
             std::map<std::type_index, SubSys_t> _systems;
         };
 

@@ -106,7 +106,7 @@ namespace Engine
                         return (*object);
                     }
                 }
-                throw std::out_of_range(
+                throw std::out_of_range(THROW_ERROR_LOCATION
                     "AssetManager: Unable to find requested asset: "
                     + identifier
                     + ", make sure to load the asset before requesting it !");
@@ -136,6 +136,11 @@ namespace Engine
             void engineOnStart(void) override;
             void engineOnTick(float deltaTimeSec) override;
             void engineOnStop(void) override;
+            void engineOnPostTick(float deltaTimeSec) override
+            {
+                (void) deltaTimeSec;
+                return;
+            };
 
             std::unordered_map<std::type_index,
                 std::unordered_map<std::string, std::any>>

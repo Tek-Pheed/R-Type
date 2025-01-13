@@ -208,7 +208,7 @@ bool GameInstance::hasLocalPlayer(void) const
 ecs::Entity &GameInstance::getLocalPlayer()
 {
     if (!hasLocalPlayer())
-        throw ErrorClass("No player was attached to the client");
+        throw ErrorClass(THROW_ERROR_LOCATION "No player was attached to the client");
     return (refEntityManager.getCurrentLevel().getEntityById(
         (size_t) _playerEntityID));
 }
@@ -228,7 +228,7 @@ ecs::Entity &GameInstance::getPlayerById(size_t id)
         if (pl.get().getComponent<ecs::PlayerComponent>()->getPlayerID() == id)
             return (pl.get());
     }
-    throw ErrorClass("Player not found id=" + std::to_string(id));
+    throw ErrorClass(THROW_ERROR_LOCATION "Player not found id=" + std::to_string(id));
 }
 
 void GameInstance::deletePlayer(size_t playerID)
@@ -236,7 +236,7 @@ void GameInstance::deletePlayer(size_t playerID)
     if (isServer() || _isConnectedToServer) {
         auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
-        refEntityManager.getCurrentLevel().destroyEntityById(pl.getID());
+        refEntityManager.getCurrentLevel().markEntityForDeletion(pl.getID());
         std::stringstream ss;
         ss << P_DEAD << " " << playerID << " " << PACKET_END;
         if (isServer()) {

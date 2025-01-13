@@ -216,7 +216,7 @@ namespace Engine
                     try {
                         cli.second.tcpSocket.closeSocket();
                     } catch (const std::exception &e) {
-                        std::cout << "Can't close client socket, it might "
+                        std::cout << THROW_ERROR_LOCATION "Can't close client socket, it might "
                                      "already be closed"
                                   << std::endl;
                     }
@@ -257,7 +257,7 @@ namespace Engine
                     try {
                         cli.second.tcpSocket.closeSocket();
                     } catch (const std::exception &e) {
-                        std::cout << "Can't close client socket, it might "
+                        std::cout << THROW_ERROR_LOCATION "Can't close client socket, it might "
                                      "already be closed"
                                   << std::endl;
                     }
@@ -378,6 +378,7 @@ namespace Engine
             void engineOnStart(void) override;
             void engineOnTick(float deltaTimeSec) override;
             void engineOnStop(void) override;
+            void engineOnPostTick(float deltaTimeSec) override;
 
             NetClient &addClient(const NetClient &client);
             NetClient &getClient(size_t id);

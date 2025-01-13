@@ -48,7 +48,7 @@ void GameInstance::serverEventClosedConn(
             deletePlayer((size_t) id);
             refNetworkManager.disconnectClient((size_t) id);
         } catch (const std::exception &e) {
-            std::cout << "Could not delete player: " << id
+            std::cout << THROW_ERROR_LOCATION "Could not delete player: " << id
                       << ", maybe it failed to connect." << std::endl;
         }
     }
