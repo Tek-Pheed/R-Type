@@ -9,8 +9,8 @@
 
 # TODO: BONUS
 
-MUSIC(streetFighter.ogg)
-BACKGROUND(clouds.jpg)
+MUSIC(evangelion.ogg)
+BACKGROUND(nexus.png)
 
 BASIC_ENEMY(1000.7,100.5, -200.0, 0.0, 500)
 BASIC_ENEMY(1500.1,100.7, -200.0, 0.0, 500)
