@@ -121,7 +121,7 @@ namespace RType
                         _game._inputList.clear();
                         _game.levelContinueMenu();
                         return;
-                    case ecs::ClickableType::LAUNCH:
+                    case ecs::ClickableType::LOBBY:
                         _game._buttonList.clear();
                         _game.connectToGame();
                         break;
@@ -173,6 +173,7 @@ namespace RType
                     case ecs::ClickableType::BONUS:
                         handleBonusButton(entity);
                         break;
+                    case ecs::ClickableType::LAUNCH: _game.launchGame(); break;
                     default: break;
                 }
             }

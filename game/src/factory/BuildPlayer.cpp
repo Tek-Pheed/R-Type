@@ -27,7 +27,7 @@ namespace RType
         player.addComponent(
             std::make_shared<ecs::HitboxComponent>(33 * 3, 14 * 3));
         std::string n = DEFAULT_PLAYER_NAME;
-        if (name != "")
+        if (!name.empty())
             n = name;
         if (!_game.isServer()) {
             auto &texture = _game.refAssetManager.getAsset<sf::Texture>(

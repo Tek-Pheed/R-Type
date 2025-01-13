@@ -209,12 +209,6 @@ void RType::GameInstance::levelMainMenu()
 
 void RType::GameInstance::levelLobbyMenu()
 {
-    auto &level = refEntityManager.createNewLevel("lobbyMenu");
-
-    level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
-    level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
-    refEntityManager.switchLevel("lobbyMenu");
-
     if (!isServer()) {
         std::string title = "GAME CONFIG";
 
@@ -257,8 +251,6 @@ void RType::GameInstance::levelLobbyMenu()
                     - (float) 75 * -4),
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
             "LAUNCH GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
-
-            
     }
 }
 
@@ -302,7 +294,7 @@ void RType::GameInstance::levelContinueMenu()
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -3),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
-            "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
+            "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LOBBY);
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,

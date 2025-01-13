@@ -142,6 +142,7 @@ namespace RType
             int code, const std::vector<std::string> &tokens);
         void serverSendGameState(size_t clientID);
         void handleLoby(int code, const std::vector<std::string> &tokens);
+        void launchGame();
 
         // Server Only Events
         void serverEventNewConn(

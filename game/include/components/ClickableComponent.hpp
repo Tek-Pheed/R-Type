@@ -25,7 +25,8 @@ namespace ecs
         BACK,
         DIFFICULTY,
         BONUS,
-        NUMBER_OF_PLAYER
+        NUMBER_OF_PLAYER,
+        LOBBY
     };
 
     class ClickableComponent : public Component {

@@ -135,7 +135,7 @@ void RType::GameInstance::connectToGame()
         }
 
         // Prepare level
-        /*auto &level = refEntityManager.createNewLevel("lobbyMenu");
+        auto &level = refEntityManager.createNewLevel("mainLevel");
         level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(
@@ -143,20 +143,41 @@ void RType::GameInstance::connectToGame()
         level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
-        refEntityManager.switchLevel("lobbyMenu", false);*/
+        refEntityManager.switchLevel("mainLevel", false);
 
         levelLobbyMenu();
 
         _playerEntityID = -1;
         _isConnectedToServer = true;
 
-        // this->_playersConnectedToGame.push_back(_playerName);
-
     } catch (const std::exception &e) {
         std::cout << CATCH_ERROR_LOCATION << "Failed to connect to server: IP=" << _ip
                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
                   << " with error: " << e.what() << std::endl;
         refEntityManager.switchLevel(currentLevel);
+    }
+}
+
+void RType::GameInstance::launchGame()
+{
+    std::unique_lock lock(_gameLock);
+    try {
+        clientStartLevel();
+        /*std::vector<size_t> entityToRemove;
+        for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
+            auto render = entity.get().getComponent<ecs::RenderComponent>();
+            if (!render)
+                continue;
+            if (render->getObjectType()
+                == ecs::RenderComponent::ObjectType::BUTTON) {
+                entityToRemove.push_back(entity.get().getID());
+            }
+        }
+        for (auto &entity : entityToRemove) {
+            refEntityManager.getCurrentLevel().destroyEntityById(entity);
+        }*/
+    } catch (const std::exception &e) {
+        levelMainMenu();
     }
 }
 
