@@ -14,10 +14,9 @@ namespace RType
 {
     void EventManager::mouseClicked()
     {
-        Config config("config.cfg");
         sf::Vector2f mousePos = _game.getWindow().mapPixelToCoords(
             sf::Mouse::getPosition(_game.getWindow()));
-        bool currentAutoFireValue = config.getAutoFireConfig();
+        bool currentAutoFireValue = _game._gameConfig.getAutoFireConfig();
 
         for (auto &entity :
             _game.refEntityManager.getCurrentLevel().getEntities()) {

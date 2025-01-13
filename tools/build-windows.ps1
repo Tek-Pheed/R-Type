@@ -3,7 +3,7 @@ $ScriptPath = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 cd $SCRIPTPATH/..
 git submodule update --init --recursive
 echo "Generating build files..."
-cmake -B build .
+cmake -B build . -DCMAKE_BUILD_TYPE=Release
 cd build
 echo "Building R-Type..."
 cmake --build . -j $env:NUMBER_OF_PROCESSORS

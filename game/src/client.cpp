@@ -219,10 +219,9 @@ void GameInstance::playEvent()
     std::unique_lock lock(_gameLock);
     sf::Event event;
     std::stringstream ss;
-    Config config("config.cfg");
     EventManager event_manager(*this, _factory);
 
-    bool autoFireEnabled = config.getAutoFireConfig();
+    bool autoFireEnabled = _gameConfig.getAutoFireConfig();
 
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {

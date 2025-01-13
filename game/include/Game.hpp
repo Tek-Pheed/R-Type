@@ -19,6 +19,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include "Config.hpp"
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
@@ -32,6 +33,9 @@ namespace RType
 {
     class GameInstance {
       public:
+        static constexpr const char *USER_CONFIG_FILE = "config.cfg";
+        static constexpr const char *LEVEL_CONFIG_PATH =
+            "./assets/levels/level1.txt";
         static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
         static constexpr uint16_t SERVER_REFRESH_RATE = 60U;
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
@@ -158,6 +162,8 @@ namespace RType
         Engine::Feature::LevelManager<GameInstance> &refEntityManager;
         Engine::Feature::AssetManager &refAssetManager;
         Engine::Feature::NetworkingManager &refNetworkManager;
+
+        Config _gameConfig;
 
         //     int createConnection(const char *ip, int portTCP, int portUDP);
         //     void writeToServer(
