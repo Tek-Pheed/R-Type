@@ -35,9 +35,10 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
     static float damageCooldown = 0.0f;
     damageCooldown -= deltaTime;
 
-    for (auto &entity :
-        _game->refEntityManager.getCurrentLevel().getEntities()) {
-        auto enti = entity.get();
+    for (size_t id :
+        _game->refEntityManager.getCurrentLevel().findEntitiesIdByComponent<ecs::PositionComponent>()) {
+            try {
+                auto &enti = _game->refEntityManager.getCurrentLevel().getEntityById(id);
 
         if (enti.getID() == enemyComp->getEnemyID())
             continue;
@@ -72,6 +73,10 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
                 damageCooldown = 1.0f;
             }
         }
+            } catch (const std::exception &e) {
+                continue;
+            }
+        
     }
 }
 
@@ -84,9 +89,10 @@ void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
     if (!bulletPos || !bulletComp || !bulletHitB)
         return;
 
-    for (auto &entity :
-        _game->refEntityManager.getCurrentLevel().getEntities()) {
-        auto enti = entity.get();
+    for (size_t id :
+        _game->refEntityManager.getCurrentLevel().findEntitiesIdByComponent<ecs::PositionComponent>()) {
+        try {
+            auto &enti = _game->refEntityManager.getCurrentLevel().getEntityById(id);
         auto position = enti.getComponent<ecs::PositionComponent>();
         auto enemy = enti.getComponent<ecs::EnemyComponent>();
         auto health = enti.getComponent<ecs::HealthComponent>();
@@ -120,6 +126,10 @@ void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
             _game->refEntityManager.getCurrentLevel().destroyEntityById(
                 bullet.getID());
         }
+        } catch (const std::exception &e) {
+            continue;
+        }
+        
     }
 }
 
@@ -133,9 +143,10 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
     if (!bulletPos || !bulletComp || !bulletHitB)
         return;
 
-    for (auto &entity :
-        _game->refEntityManager.getCurrentLevel().getEntities()) {
-        auto enti = entity.get();
+    for (size_t id :
+        _game->refEntityManager.getCurrentLevel().findEntitiesIdByComponent<ecs::PositionComponent>()) {
+            try {
+                auto &enti = _game->refEntityManager.getCurrentLevel().getEntityById(id);
         auto position = enti.getComponent<ecs::PositionComponent>();
         auto player = enti.getComponent<ecs::PlayerComponent>();
         auto health = enti.getComponent<ecs::HealthComponent>();
@@ -172,13 +183,19 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
             _game->refEntityManager.getCurrentLevel().destroyEntityById(
                 bullet.getID());
         }
+            } catch (const std::exception &e) {
+                continue;
+            }
     }
 }
 
 void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
 {
-    for (auto &entity : entities) {
-        auto bullet = entity.getComponent<ecs::BulletComponent>();
+    for (size_t id :
+        _game->refEntityManager.getCurrentLevel().findEntitiesIdByComponent<ecs::PositionComponent>()) {
+            try {
+                auto &entity = _game->refEntityManager.getCurrentLevel().getEntityById(id);
+                auto bullet = entity.getComponent<ecs::BulletComponent>();
         auto enemy = entity.getComponent<ecs::EnemyComponent>();
 
         auto hitbox = entity.getComponent<ecs::HitboxComponent>();
@@ -199,5 +216,9 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         if (enemy && position && velocity && hitbox) {
             EnemyCollision(entity, deltaTime);
         }
+            } catch (const std::exception &e) {
+                continue;
+            }
+        
     }
 }
