@@ -69,7 +69,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(-350.0f, 0));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
         positionComp->getX(), positionComp->getY() + 25));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(33, 21));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(33, 22));
 
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << enemyID << PACKET_END;
@@ -83,9 +83,9 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
             ecs::RenderComponent::ObjectType::SPRITE));
         sf::Sprite s;
         s.setTexture(texture);
-        s.setTextureRect(sf::Rect(335, 410, 35, 22));
+        s.setTextureRect(sf::Rect(300, 410, 35, 22));
         bullet.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            s, 35, 0, 335 + (35 * 3), 0.1f, 335));
+            s, 35, 0, 300 + (35 * 4), 0.1f, 300));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
             Asset::BULLET_SOUND);
         static sf::Sound sound;
