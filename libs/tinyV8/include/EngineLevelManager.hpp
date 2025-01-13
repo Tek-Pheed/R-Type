@@ -320,14 +320,14 @@ namespace Engine
             std::string _currentLevel;
             std::unordered_map<std::string, Level<GameClass>> _levels;
 
-            void engineOnTick(float deltaTimeSec)
+            void engineOnTick(float deltaTimeSec) override
             {
                 _persistentLevel.engineOnTick(deltaTimeSec);
                 if (_currentLevel != "")
                     getCurrentLevel().engineOnTick(deltaTimeSec);
             };
-            void engineOnStop(void) {};
-            void engineOnStart(void) {};
+            void engineOnStop(void) override {};
+            void engineOnStart(void) override {};
             void engineOnPostTick(float deltaTimeSec) override
             {
                 if (_currentLevel != "")
