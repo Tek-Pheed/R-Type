@@ -12,7 +12,6 @@
     #define NOMINMAX
 #endif
 
-#include <memory>
 #include <Entity.hpp>
 #include <memory>
 #include <vector>
@@ -27,6 +26,7 @@ namespace RType
         void keyPressed(sf::Event &event);
         void keyReleased(sf::Event &event);
         void mouseClicked();
+        void handleNumberOfPlayerButton(ecs::Entity &entity);
 
       protected:
         Factory &_factory;

@@ -8,31 +8,8 @@
 #include <SFML/Graphics.hpp>
 #include "Config.hpp"
 #include "Events.hpp"
+#include "GameProtocol.hpp"
 #include "components/ClickableComponent.hpp"
-
-void handleNumberOfPlayerButton(ecs::Entity &entity)
-{
-    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
-
-    if (!text)
-        return;
-
-    std::string str = text->getStr();
-    std::size_t separator = str.find(":");
-    std::stringstream ss;
-
-    if (separator != std::string::npos) {
-        std::string maxPlayer = str.substr(separator + 1);
-        int maxPlayerNB = std::atoi(maxPlayer.c_str());
-        if (maxPlayerNB >= 10) {
-            maxPlayerNB = 4;
-        } else {
-            maxPlayerNB++;
-        }
-        ss << maxPlayerNB;
-        text->setStr("NUMBER OF PLAYER : " + ss.str());
-    }
-}
 
 void handleDifficultyButton(ecs::Entity &entity)
 {
@@ -104,6 +81,30 @@ void handleLevelButton(ecs::Entity &entity)
 
 namespace RType
 {
+    void EventManager::handleNumberOfPlayerButton(ecs::Entity &entity)
+    {
+        auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+        if (!text)
+            return;
+
+        std::string str = text->getStr();
+        std::size_t separator = str.find(":");
+        std::stringstream ss;
+
+        if (separator != std::string::npos) {
+            std::string maxPlayer = str.substr(separator + 1);
+            int maxPlayerNB = std::atoi(maxPlayer.c_str());
+            if (maxPlayerNB >= 10) {
+                maxPlayerNB = 4;
+            } else {
+                maxPlayerNB++;
+            }
+            ss << maxPlayerNB;
+            text->setStr("NUMBER OF PLAYER : " + ss.str());
+        }
+    }
+
     void EventManager::mouseClicked()
     {
         sf::Vector2f mousePos = _game.getWindow().mapPixelToCoords(
@@ -197,9 +198,7 @@ namespace RType
                     case ecs::ClickableType::BONUS:
                         handleBonusButton(entity);
                         break;
-                    case ecs::ClickableType::LAUNCH:
-                        _game.launchGame();
-                        break;
+                    case ecs::ClickableType::LAUNCH: _game.launchGame(); break;
                     case ecs::ClickableType::LEVEL:
                         handleLevelButton(entity);
                         break;
