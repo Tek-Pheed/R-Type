@@ -46,7 +46,7 @@ void handleDifficultyButton(ecs::Entity &entity)
     std::stringstream ss;
 
     if (separator != std::string::npos) {
-        std::string difficulty = str.substr(separator + 1);
+        std::string difficulty = str.substr(separator + 2);
         if (difficulty == "EASY") {
             text->setStr("DIFFICULTY : MEDIUM");
         } else if (difficulty == "MEDIUM") {
@@ -69,7 +69,7 @@ void handleBonusButton(ecs::Entity &entity)
     std::stringstream ss;
 
     if (separator != std::string::npos) {
-        std::string bonus = str.substr(separator + 1);
+        std::string bonus = str.substr(separator + 2);
         if (bonus == "ON") {
             text->setStr("BONUS : NO");
         } else {
@@ -168,10 +168,10 @@ namespace RType
                         handleNumberOfPlayerButton(entity);
                         break;
                     case ecs::ClickableType::DIFFICULTY:
-                        _game.handleDifficultyButton(entity);
+                        handleDifficultyButton(entity);
                         break;
                     case ecs::ClickableType::BONUS:
-                        _game.handleBonusButton(entity);
+                        handleBonusButton(entity);
                         break;
                     default: break;
                 }
