@@ -46,8 +46,8 @@ ecs::Entity &RType::Factory::buildEnemy(
         sprite.setScale(sf::Vector2f(2, 2));
         enemy.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
-        enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 1.0, 1.0));
+        enemy.addComponent(
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
     } else {
         auto pos = enemy.getComponent<ecs::PositionComponent>();
         auto ene = enemy.getComponent<ecs::EnemyComponent>();
@@ -212,8 +212,8 @@ ecs::Entity &RType::Factory::buildEnemyShooter(
         sprite.setScale(sf::Vector2f(2, 2));
         enemy.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
-        enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 1.0, 1.0));
+        enemy.addComponent(
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
         buildBulletFromEnemy(id);
     } else {
         auto pos = enemy.getComponent<ecs::PositionComponent>();

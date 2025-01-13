@@ -39,12 +39,12 @@ ecs::Entity &RType::Factory::buildBoss(
             _game.refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
         sf::Sprite sprite;
         sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(0, 0, 183, 207));
+        sprite.setTextureRect(sf::Rect(25, 640, 160, 207));
         sprite.setScale(sf::Vector2f(2, 2));
         boss.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         boss.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
+            sprite, 160, 0, 25 + (160 * 4), 0.5f, 25));
     }
     if (_game.isServer()) {
         auto pos = boss.getComponent<ecs::PositionComponent>();

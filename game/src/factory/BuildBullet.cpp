@@ -45,7 +45,7 @@ void Factory::buildBulletFromPlayer(size_t playerID)
         s.setTexture(texture);
         s.setTextureRect(sf::Rect(137, 153, 64, 16));
         bullet.addComponent(
-            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 1, 1));
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 0));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
             Asset::BULLET_SOUND);
         static sf::Sound sound;
@@ -83,9 +83,9 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
             ecs::RenderComponent::ObjectType::SPRITE));
         sf::Sprite s;
         s.setTexture(texture);
-        s.setTextureRect(sf::Rect(335, 412, 33, 21));
-        bullet.addComponent(
-            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
+        s.setTextureRect(sf::Rect(335, 410, 35, 22));
+        bullet.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
+            s, 35, 0, 335 + (35 * 3), 0.1f, 335));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
             Asset::BULLET_SOUND);
         static sf::Sound sound;
@@ -125,8 +125,8 @@ void Factory::buildBulletFromBoss(size_t bossId)
         s.setTexture(texture);
         s.setTextureRect(sf::Rect(0, 0, 34, 34));
         s.setScale(sf::Vector2f(2, 2));
-        bullet.addComponent(
-            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 2, 2));
+        bullet.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
+            s, 34, 0, 34 * 3, 0.05f, 0));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
             Asset::BULLET_BOSS_SOUND);
         static sf::Sound sound;
