@@ -169,6 +169,10 @@ namespace RType
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         bool isServer() const;
 
+        // Bonus
+        void handleNetworkBonuses(
+            int code, const std::vector<std::string> &tokens);
+
         Engine::Core &refGameEngine;
         Engine::Feature::LevelManager<GameInstance> &refEntityManager;
         Engine::Feature::AssetManager &refAssetManager;

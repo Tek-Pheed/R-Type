@@ -57,6 +57,9 @@ namespace RType
         B_SHOOT = 144,
         B_DMG = 145,
 
+        // Bonus
+        BN_SPAWN = 151,
+
         // Loby
         L_STARTGAME = 241,
         L_SETMAXPLAYRS = 242,

@@ -45,7 +45,8 @@ namespace RType
             const std::string &name, std::size_t skinID);
         ecs::Entity &buildExplosionEnemy(float posX, float posY);
         ecs::Entity &buildExplosionPlayer(float posX, float posY);
-
+		ecs::Entity &buildBonus(
+            size_t id, float posX, float posY, ecs::Bonus bonus);
       private:
         GameInstance &_game;
     };

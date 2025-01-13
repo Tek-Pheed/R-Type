@@ -45,6 +45,7 @@ constexpr auto BUILD_BOSS = "BOSS";
 constexpr auto CHANGE_MUSIC = "MUSIC";
 constexpr auto CHANGE_BACKGROUND = "BACKGROUND";
 constexpr auto CHANGE_WAVE = "WAVE";
+constexpr auto BUILD_BONUS = "BONUS";
 
 size_t RType::getNewId()
 {
@@ -179,6 +180,21 @@ void GameInstance::loadLevelContent(const std::string &filename)
                     "loadLevelContent: Failed to set wave");
             wave = (size_t) std::atoi(value[0].c_str());
         }
+        if (key == BUILD_BONUS) {
+            if (value.size() < 3)
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "loadLevelContent: Failed to create bonus "
+                    "from level config");
+            _factory.buildBonus(getNewId(),
+                (float) std::atof(value[0].c_str()),
+                (float) std::atof(value[1].c_str()), ecs::Bonus::NONE);
+        }
+        // if (key == CHANGE_MUSIC) {
+        //     if (value.size() < 1)
+        //         throw ErrorClass("loadLevelContent: Failed to create music
+        //         from level config");
+
+        // }
     }
 }
 
@@ -187,7 +203,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -253,9 +269,8 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 2.0f) {
-                for (auto entID :
-                    refEntityManager.getCurrentLevel()
-                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -319,6 +334,7 @@ int RType::GameInstance::manageBuffers()
             case 1: handleNetworkEnemies(code, tokens); break;
             // case 2: handle_terrain(code, tokens); break;
             case 3: handleNetworkMechs(code, tokens); break;
+            case 4: handleNetworkBonuses(code, tokens); break;
             case 24: handleLobby(code, tokens); break;
             case 9:
                 if (isServer()) {
