@@ -257,6 +257,8 @@ void RType::GameInstance::levelLobbyMenu()
                     - (float) 75 * -4),
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
             "LAUNCH GAME", 40, sf::Color::Black, ecs::ClickableType::BONUS);
+
+            
     }
 }
 

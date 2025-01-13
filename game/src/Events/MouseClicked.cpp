@@ -10,6 +10,28 @@
 #include "Events.hpp"
 #include "components/ClickableComponent.hpp"
 
+void handleNumberOfPlayerButton(ecs::Entity &entity)
+{
+    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+    if (!text)
+        return;
+
+    std::string str = text->getStr();
+    std::size_t separator = str.find(":");
+
+    if (separator != std::string::npos) {
+        std::string maxPlayer = str.substr(separator + 1);
+        std::size_t maxPlayerNB = std::atoi(maxPlayer.c_str());
+        if (maxPlayerNB > 10) {
+            maxPlayerNB = 1;
+        } else {
+            maxPlayerNB++;
+        }
+        text->setStr("NUMBER OF PLAYER : " + maxPlayerNB);
+    }
+}
+
 namespace RType
 {
     void EventManager::mouseClicked()
@@ -40,6 +62,9 @@ namespace RType
             if (currentHover.contains(mousePos)) {
                 auto clickableType =
                     entity.get().getComponent<ecs::ClickableComponent>();
+
+                auto text =
+                    entity.get().getComponent<ecs::TextComponent<sf::Text>>();
 
                 if (!clickableType)
                     continue;
@@ -92,6 +117,9 @@ namespace RType
                         _game._isSettingsNicknameButtonClicked = true;
                         _game._lastInputIdClicked = entity.get().getID();
                         _game._nicknameKeys.clear();
+                        break;
+                    case ecs::ClickableType::NUMBER_OF_PLAYER:
+                        handleNumberOfPlayerButton(entity);
                         break;
                     default: break;
                 }
