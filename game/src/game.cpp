@@ -45,6 +45,7 @@ constexpr auto BUILD_SHOOTER_ENEMY = "SHOOTER_ENEMY";
 constexpr auto BUILD_BOSS = "BOSS";
 constexpr auto CHANGE_MUSIC = "MUSIC";
 constexpr auto CHANGE_BACKGROUND = "BACKGROUND";
+constexpr auto CHANGE_WAVE = "WAVE";
 
 size_t RType::getNewId()
 {
@@ -111,36 +112,47 @@ void GameInstance::loadLevelContent(const std::string &filename)
     std::unique_lock lock(_gameLock);
     LevelConfig l(filename);
     auto map = l.parseLevelConfig();
+    size_t wave = 0;
 
     for (auto &[key, value] : map) {
         if (key == BUILD_BASIC_ENEMY) {
-            if (value.size() < 3)
+            if (value.size() < 5)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create basic "
                     "enemy from level config");
-            _factory.buildEnemy(getNewId(),
+            auto &ene = _factory.buildEnemy(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
-                (float) std::atof(value[2].c_str()));
+                (float) std::atof(value[4].c_str()));
+            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
+            auto vel = ene.getComponent<ecs::VelocityComponent>();
+            vel->setVx((float) std::atof(value[2].c_str()));
+            vel->setVy((float) std::atof(value[3].c_str()));
         }
         if (key == BUILD_SHOOTER_ENEMY) {
-            if (value.size() < 3)
+            if (value.size() < 5)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create shooter "
                     "enemy from level config");
-            _factory.buildEnemyShooter(getNewId(),
+            auto &ene = _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
-                (float) std::atof(value[2].c_str()));
+                (float) std::atof(value[4].c_str()));
+            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
+            auto vel = ene.getComponent<ecs::VelocityComponent>();
+            vel->setVx((float) std::atof(value[2].c_str()));
+            vel->setVy((float) std::atof(value[3].c_str()));
         }
         if (key == BUILD_BOSS) {
             if (value.size() < 3)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create boss "
                     "from level config");
-            _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
+            auto &ene = _factory.buildBoss(getNewId(),
+                (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()));
+            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
         }
         if (key == CHANGE_MUSIC) {
             if (value.size() < 1)
@@ -161,6 +173,12 @@ void GameInstance::loadLevelContent(const std::string &filename)
             ss << M_BG << " " << value[0] << " " << PACKET_END;
             refNetworkManager.sendToAll(
                 System::Network::ISocket::TCP, ss.str());
+        }
+        if (key == CHANGE_WAVE) {
+            if (value.size() < 1)
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "loadLevelContent: Failed to set wave");
+            wave = (size_t) std::atoi(value[0].c_str());
         }
     }
 }

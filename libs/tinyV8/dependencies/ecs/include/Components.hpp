@@ -100,10 +100,14 @@ namespace ecs
         size_t getType() const;
         void setType(size_t type);
 
+        size_t getWave() const;
+        void setWave(size_t wave);
+
       private:
         size_t _enemyID;
         // 0 for enemy, 1 for shooter, 2 for boss
         size_t _type;
+        size_t _wave;
     };
 
     class RenderComponent : public Component {
