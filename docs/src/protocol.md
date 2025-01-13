@@ -61,6 +61,11 @@ The protocol used (TPC/UDP) will be explicitly precised, and the way the paquet 
 - <- From Client to Server
 - <-> From Both
 
+All of the communication betweet the server and clients will be obsufcated, meaning that an XOR operation will be applied on the string
+using a secret key, shared by both the client and server.
+
+i.e.
+"901 4\t\n" -> "\a\000\000\000\000\000\000\000#*+:+\023\020"
 
 # Conventions and Definitions
 
@@ -95,11 +100,11 @@ As seen in the handshake, this instructions is used to associate a UDP socket to
 
 The following isntructions are the one used to manage players
 
-- Player connection (clientId, x, y) - 101 <-> TCP
+- Player connection (clientId, x, y, name) - 101 <-> TCP
 
 This is sent to all the clients when a new player join the game.
 
-- Player change position(clientId, x, y) - 102 <-> UDP
+- Player change position(tick, clientId, x, y) - 102 <-> UDP
 
 This instructions is sent by both the server and the client to update the position of a specific player.
 
@@ -111,7 +116,7 @@ Used when a player die, so it can be removed from the clients and server.
 
 Allow the server to process the shoot and its collision, and the client to create a projectiles on their screen.
 
-- Player damage (id, newHealth) - 105 -> UDP
+- Player damage (tick, id, newHealth) - 105 -> UDP
 
 Set the player health.
 
@@ -119,25 +124,29 @@ Set the player health.
 
 Used when a player disconnect, has the same behaviour as the instruction 103.
 
+- Player Set Name (id, name) - 107 <- TCP
+Sets the name of a player.
+
 # Enemy Management (110)
 
 This are the instructions used to manage the enemies
 
-- Enemy spawn (id, x, y) - 111 -> TCP
+- Enemy spawn (id, type, x, y) - 111 -> TCP
 
+The type represent the enemy type (0 for basic, 1 for shooter)
 Sent by the server to all the clients to spawn an enemy at a specific position.
 
-- Enemy change position (id, x, y) - 112 -> UDP
+- Enemy change position (tick, id, x, y) - 112 -> UDP
 
-- Enemy killed (id) - 113 -> UDP
+- Enemy killed (id) - 113 -> TCP
 
 Remove an enemy if it has been shot down or if it reach the border of the screen.
 
-- Enemy shooting (id) - 114 -> UDP
+- Enemy shooting (tick, id) - 114 -> UDP
 
 Create a projectile from an enemy position. It allows the client to create a projectile at the position.
 
-- Enemy damage (id, new_health) - 115 -> UDP
+- Enemy damage (tick, id, new_health) - 115 -> UDP
 
 Set the health of an enemy.
 
@@ -145,11 +154,11 @@ Set the health of an enemy.
 
 To manage the terrain, this are the instructions used
 
-- Terrain spawn (x, y) - 121 -> UDP
+- Terrain spawn (tick, x, y) - 121 -> UDP
 
 Spawn terrain at a specific postion on all the clients.
 
-- Terrain destroyed (x, y) - 122 -> UDP
+- Terrain destroyed (tick, x, y) - 122 -> UDP
 
 Removed a terrain, if its has been destroyed or went off the screen.
 
@@ -160,3 +169,14 @@ Removed a terrain, if its has been destroyed or went off the screen.
 - Win - 133 -> TCP
 - Lose - 134 -> TCP
 - Game Over - 135 -> TCP
+- Music change - 136 (filename) -> TCP
+
+# Game Management (240)
+
+When in loby, launch the game. (Only the first connected player can send this, then the server replicates it to all connected clients).
+- Launch Game - 241 (id) <-> TCP
+
+Set max players.
+- Set max player 242 (id, max) - <- TCP
+
+# TODO: add bonus on/off

@@ -8,39 +8,48 @@
 #include <iostream>
 #include <mutex>
 #include <string>
+#include <thread>
 #include "EngineNetworking.hpp"
 #include "system_network.hpp"
+#include "system_udp.hpp"
 
 using namespace Engine::Feature;
 
 void NetworkingManager::runConnectThread()
 {
     System::Network::socketSetGeneric readfds;
+    System::Network::timeoutStruct tv = {{0, 100000}};
 
-    while (true) {
+    while (_running) {
         readfds.clear();
         readfds.emplace_back(&_SocketTCP);
         try {
-            System::Network::select(&readfds);
+            System::Network::select(&readfds, nullptr, nullptr, tv);
         } catch (const std::exception &s) {
-            std::cout << "ENGINE: An error occured in the server: " << s.what()
-                      << std::endl;
+            std::cout
+                << THROW_ERROR_LOCATION "ENGINE: [Accept Thread] An error occured in the server: "
+                << s.what() << std::endl;
         }
         if (readfds.size() == 0)
             continue;
         NetClient cl;
         cl.tcpSocket = System::Network::accept(_SocketTCP);
+        std::cout << "ENGINE: [Accept Thread] Accepting new client on new TCP "
+                     "connection ("
+                  << std::to_string(cl.tcpSocket.getUID()) << ")" << std::endl;
         addClient(cl);
     }
+    std::cout << "ENGINE: [Accept Thread] Terminating." << std::endl;
 }
 
 void NetworkingManager::runWriteThread()
 {
+    std::unique_lock wlock(_writeThreadTerminated);
     System::Network::socketSetGeneric writefds;
-    System::Network::timeoutStruct tv = {{0, 50000}};
+    System::Network::timeoutStruct tv = {{0, 100000}};
     bool shouldWait = true;
 
-    while (true) {
+    while (_running) {
         try {
             if (shouldWait) {
                 std::unique_lock lock(_writeMutex);
@@ -88,16 +97,16 @@ void NetworkingManager::runWriteThread()
                             this->removeClient((size_t) id);
                         }
                         if (client.writeBufferTCP.size() > 0) {
-                            len = sock->sendData(client.writeBufferTCP);
-                            std::cout << "ENGINE: [Write Thread] Sending: "
-                                      << System::Network::decodeString(
-                                             client.writeBufferTCP)
-                                             .substr(0, (size_t) len)
-                                      << "to client (" << std::to_string(id)
-                                      << ") on TCP connection ("
-                                      << std::to_string(sock->getUID()) << ")"
-                                      << std::endl;
                             std::unique_lock lock(_writeMutex);
+                            len = sock->sendData(client.writeBufferTCP);
+                            std::cout
+                                << "ENGINE: [Write Thread] Sending data to "
+                                   "client ("
+                                << std::to_string(id)
+                                << ") on TCP connection ("
+                                << std::to_string(sock->getUID()) << ") ["
+                                << len << "/" << client.writeBufferTCP.size()
+                                << " bytes]" << std::endl;
                             if ((size_t) len < client.writeBufferTCP.size())
                                 shouldWait = false;
                             client.writeBufferTCP.erase(
@@ -121,22 +130,22 @@ void NetworkingManager::runWriteThread()
                                     if (cli.port == 0 || cli.ip.empty()
                                         || cli.writeBufferUDP.size() == 0)
                                         continue;
+                                    std::unique_lock lock(_writeMutex);
                                     len = _SocketUDP.sendDataTo(
                                         cli.writeBufferUDP, cli.ip, cli.port);
                                 } else {
+                                    std::unique_lock lock(_writeMutex);
                                     len = _SocketUDP.sendData(
                                         cli.writeBufferUDP);
                                 }
+                                std::unique_lock lock(_writeMutex);
                                 std::cout
-                                    << "ENGINE: [Write Thread] Sending: "
-                                    << System::Network::decodeString(
-                                           cli.writeBufferUDP)
-                                           .substr(0, (size_t) len)
+                                    << "ENGINE: [Write Thread] Sending "
                                     << "to client (" << std::to_string(index)
                                     << ") on UDP connection ("
-                                    << std::to_string(sock->getUID()) << ")"
-                                    << std::endl;
-                                std::unique_lock lock(_writeMutex);
+                                    << std::to_string(sock->getUID()) << ") ["
+                                    << len << "/" << cli.writeBufferUDP.size()
+                                    << " bytes]" << std::endl;
                                 if ((size_t) len < cli.writeBufferUDP.size())
                                     shouldWait = false;
                                 cli.writeBufferUDP.erase(
@@ -152,7 +161,7 @@ void NetworkingManager::runWriteThread()
                 if (removeID != -1 && can_remove == true) {
                     if (_isServer) {
                         AEngineFeature::_engineRef.triggerEvent(
-                            Events::EVENT_OnServerLostClient, removeID);
+                            Events::EVENT_OnServerLostClient, (ssize_t) removeID);
                     } else {
                         AEngineFeature::_engineRef.triggerEvent(
                             Events::EVENT_DisconnectedFromServer);
@@ -162,20 +171,23 @@ void NetworkingManager::runWriteThread()
                 }
             }
         } catch (const std::exception &e) {
-            std::cout << "ENGINE: [Write Thread] failed with exception: "
-                      << e.what() << ", ignoring..." << std::endl;
+            std::cout << THROW_ERROR_LOCATION "ENGINE: [Write Thread] failed with exception: "
+                      << e.what() << ", tying again..." << std::endl;
+            shouldWait = false;
         }
     }
+    std::cout << "ENGINE: [Write Thread] Terminating." << std::endl;
 }
 
 void NetworkingManager::runReadThread()
 {
+    std::unique_lock rlock(_readThreadTerminated);
     System::Network::byteArray arr;
     System::Network::byteArray vect;
     System::Network::socketSetGeneric readfds;
-    System::Network::timeoutStruct tv = {{0, 500000}};
+    System::Network::timeoutStruct tv = {{0, 100000}};
 
-    while (true) {
+    while (_running) {
         try {
             readfds.clear();
             this->_globalMutex.lock();
@@ -210,7 +222,7 @@ void NetworkingManager::runReadThread()
                                       << std::endl;
                             if (_isServer) {
                                 AEngineFeature::_engineRef.triggerEvent(
-                                    Events::EVENT_OnServerLostClient, id);
+                                    Events::EVENT_OnServerLostClient, (ssize_t) id);
                                 removeClient((size_t) id);
                             } else {
                                 AEngineFeature::_engineRef.triggerEvent(
@@ -222,13 +234,30 @@ void NetworkingManager::runReadThread()
                             if (client.isDisconnected)
                                 continue;
                             vect = sock->receive();
-                            std::cout
-                                << "ENGINE: [Read Thread] Message received "
-                                   "on TCP ("
-                                << std::to_string(sock->getUID())
-                                << ") for client (" << std::to_string(id)
-                                << "): " << System::Network::decodeString(vect)
-                                << std::endl;
+                            std::cout << "ENGINE: [Read Thread] Data received "
+                                         "on TCP ("
+                                      << std::to_string(sock->getUID())
+                                      << ") for client (" << std::to_string(id)
+                                      << ") [" << vect.size() << " bytes]"
+                                      << std::endl;
+                            if (vect.size() == 0) {
+                                std::cout << "ENGINE: [Read Thread] client ("
+                                          << std::to_string(id)
+                                          << ") closed TCP connection ("
+                                          << std::to_string(sock->getUID())
+                                          << ")" << std::endl;
+                                if (_isServer) {
+                                    AEngineFeature::_engineRef.triggerEvent(
+                                        Events::EVENT_OnServerLostClient, (ssize_t) id);
+                                    removeClient((size_t) id);
+                                    break;
+                                } else {
+                                    AEngineFeature::_engineRef.triggerEvent(
+                                        Events::EVENT_DisconnectedFromServer);
+                                    getClient(1).isDisconnected = true;
+                                    break;
+                                }
+                            }
                             _globalMutex.lock();
                             client.readBufferTCP.insert(
                                 client.readBufferTCP.end(), vect.begin(),
@@ -255,14 +284,11 @@ void NetworkingManager::runReadThread()
                         if (id == -1) {
                             id = _pacMan->identifyClient(vect);
                             if (id == -1) {
-                                std::cout
-                                    << "ENGINE: [Read Thread] Failed to "
-                                       "identify "
-                                       "client on UDP ("
-                                    << std::to_string(sock->getUID())
-                                    << ") with packet: "
-                                    << System::Network::decodeString(vect)
-                                    << std::endl;
+                                std::cout << "ENGINE: [Read Thread] Failed to "
+                                             "identify "
+                                             "client on UDP ("
+                                          << std::to_string(sock->getUID())
+                                          << ")" << std::endl;
                                 continue;
                             } else {
                                 std::cout
@@ -282,20 +308,30 @@ void NetworkingManager::runReadThread()
                             getClient((size_t) id).ip = addr;
                             getClient((size_t) id).port = port;
                         }
+                        std::unique_lock lock(_globalMutex);
                         NetClient &client = getClient((size_t) id);
                         if (client.isDisconnected)
                             continue;
-                        std::cout
-                            << "ENGINE: [Read Thread] Message received "
-                               "on UDP ("
-                            << std::to_string(sock->getUID())
-                            << ") for client (" << std::to_string(id)
-                            << "): " << System::Network::decodeString(vect)
-                            << std::endl;
-                        _globalMutex.lock();
-                        client.readBufferUDP.insert(client.readBufferUDP.end(),
-                            vect.begin(), vect.end());
-                        _globalMutex.unlock();
+                        std::cout << "ENGINE: [Read Thread] Message received "
+                                     "on UDP ("
+                                  << std::to_string(sock->getUID())
+                                  << ") for client (" << std::to_string(id)
+                                  << ") [" << vect.size() << " bytes]"
+                                  << std::endl;
+                        if (!(client.readBufferUDP.size()
+                                >= UDP_PACKET_MAX_SIZE
+                                    * UDP_BUFFER_MAX_QUEUED_PACKETS)) {
+                            client.readBufferUDP.insert(
+                                client.readBufferUDP.end(), vect.begin(),
+                                vect.end());
+                        } else {
+                            std::cout << "ENGINE: [Read Thread] The packet "
+                                         "queue is full on UDP ("
+                                      << std::to_string(sock->getUID())
+                                      << ") for client (" << std::to_string(id)
+                                      << "): Ignoring extra packets."
+                                      << std::endl;
+                        }
                         AEngineFeature::_engineRef.triggerEvent(
                             Events::EVENT_OnDataReceived);
                         break;
@@ -306,8 +342,9 @@ void NetworkingManager::runReadThread()
                 }
             }
         } catch (const std::exception &e) {
-            std::cout << "ENGINE: [Read Thread] failed with exception: "
-                      << e.what() << ", ignoring..." << std::endl;
+            std::cout << THROW_ERROR_LOCATION "ENGINE: [Read Thread] failed with exception: "
+                      << e.what() << ", trying again..." << std::endl;
         }
     }
+    std::cout << "ENGINE: [Read Thread] Terminating." << std::endl;
 }

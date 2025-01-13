@@ -13,10 +13,12 @@
 #define TINY_V8_NETWORKING
 
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 #include "Engine.hpp"
 #include "system_network.hpp"
@@ -41,11 +43,6 @@ template <> inline std::string getString(const std::string &arg)
 }
 
 template <> inline std::string getString(std::string &arg)
-{
-    return (arg);
-}
-
-template <> inline std::string getString(std::string arg)
 {
     return (arg);
 }
@@ -120,7 +117,7 @@ namespace Engine
          * @param out: The output buffer.
          */
         virtual void serializeString(
-            const std::string &str, std::ostream &out) = 0;
+            const std::string &str, std::ostream &out, char key) = 0;
 
         /**
          * @brief Deserialize a string
@@ -128,14 +125,20 @@ namespace Engine
          * @param in: The buffer to deserialize.
          * @param out: The output string.
          */
-        virtual void deserializeString(
-            const std::ostream &in, std::string &out) = 0;
+        virtual std::string deserializeString(
+            std::istream &in, char key, size_t size) = 0;
+
+        virtual char getKey(void) const = 0;
     };
     namespace Feature
     {
         class NetworkingManager : public AEngineFeature {
             static size_t constexpr DEFAULT_TCP_PORT = 8081;
             static size_t constexpr DEFAULT_UDP_PORT = 8082;
+            static size_t constexpr UDP_PACKET_MAX_SIZE = 1400U;
+            static size_t constexpr UDP_BUFFER_MAX_QUEUED_PACKETS = 128;
+
+          public:
             struct NetClient {
               public:
                 System::Network::TCPSocket tcpSocket;
@@ -156,11 +159,11 @@ namespace Engine
                       readBufferUDP(System::Network::byteArray()),
                       writeBufferUDP(System::Network::byteArray()),
                       isReady(false), isDisconnected(false) {};
+                ~NetClient() = default;
             };
 
-          public:
             explicit NetworkingManager(Core &engineRef);
-            ~NetworkingManager();
+            ~NetworkingManager() override;
 
             /**
              * @brief Sets the TCP port which the class will use.
@@ -205,8 +208,22 @@ namespace Engine
             template <class PacketManager>
             void setupServer(uint16_t TCP_port, uint16_t UDP_port)
             {
+                std::unique_lock lock(_globalMutex);
+
                 _pacMan = std::make_unique<PacketManager>();
                 _isServer = true;
+                for (auto &cli : _clients) {
+                    try {
+                        cli.second.tcpSocket.closeSocket();
+                    } catch (const std::exception &e) {
+                        std::cout << THROW_ERROR_LOCATION "Can't close client socket, it might "
+                                     "already be closed"
+                                  << std::endl;
+                    }
+                }
+                _clients.clear();
+                _clientCounter = 0;
+                _clientID = 0;
                 _SocketTCP.initSocket(
                     TCP_port, System::Network::ISocket::SERVE);
                 _SocketUDP.initSocket(UDP_port);
@@ -214,6 +231,7 @@ namespace Engine
                           << std::to_string(TCP_port)
                           << ", UDP:" << std::to_string(UDP_port) << std::endl;
 
+                _running = true;
                 std::thread(&NetworkingManager::runReadThread, this).detach();
                 std::thread(&NetworkingManager::runWriteThread, this).detach();
                 std::thread(&NetworkingManager::runConnectThread, this)
@@ -233,6 +251,20 @@ namespace Engine
             void setupClient(
                 uint16_t TCP_port, uint16_t UDP_port, const std::string &ip)
             {
+                std::unique_lock lock(_globalMutex);
+
+                for (auto &cli : _clients) {
+                    try {
+                        cli.second.tcpSocket.closeSocket();
+                    } catch (const std::exception &e) {
+                        std::cout << THROW_ERROR_LOCATION "Can't close client socket, it might "
+                                     "already be closed"
+                                  << std::endl;
+                    }
+                }
+                _clients.clear();
+                _clientCounter = 0;
+                _clientID = 0;
                 _pacMan = std::make_unique<PacketManager>();
                 _isServer = false;
                 std::cout << "ENGINE: Connecting to server on port TCP:"
@@ -245,6 +277,7 @@ namespace Engine
                 cli.tcpSocket.initSocket(
                     TCP_port, System::Network::ISocket::CONNECT, ip);
                 addClient(cli);
+                _running = true;
                 std::thread(&NetworkingManager::runReadThread, this).detach();
                 std::thread(&NetworkingManager::runWriteThread, this).detach();
             }
@@ -257,6 +290,12 @@ namespace Engine
              * @param id: An ID
              */
             void setClientID(size_t id);
+
+            /**
+             * @brief Reset networking and clear all client lists.
+
+             */
+            void stopNetworking();
 
             /**
              * @brief Get the Client ID
@@ -319,10 +358,27 @@ namespace Engine
                 System::Network::ISocket::Type socketType,
                 const std::string &buffer);
 
+            /**
+             * @brief Checks if a client is still present.
+
+             * @param id: The id of the client.
+             * @return true: The client exists.
+             * @return false: The client does not exists.
+             */
+            bool hasClient(size_t id);
+
+            /**
+             * @brief Force disconnect a client.
+
+             * @param id: The client ID.
+             */
+            void disconnectClient(size_t id);
+
           protected:
             void engineOnStart(void) override;
             void engineOnTick(float deltaTimeSec) override;
             void engineOnStop(void) override;
+            void engineOnPostTick(float deltaTimeSec) override;
 
             NetClient &addClient(const NetClient &client);
             NetClient &getClient(size_t id);
@@ -343,7 +399,10 @@ namespace Engine
             bool _isServer = false;
             size_t _tcpPort = DEFAULT_TCP_PORT;
             size_t _updPort = DEFAULT_UDP_PORT;
-            std::mutex _globalMutex;
+            std::recursive_mutex _globalMutex;
+            std::mutex _writeFinished;
+            std::recursive_mutex _writeThreadTerminated;
+            std::recursive_mutex _readThreadTerminated;
             std::condition_variable _writeCondition;
             std::mutex _writeMutex;
             size_t _clientCounter = 0;
@@ -351,6 +410,7 @@ namespace Engine
             std::unordered_map<size_t, NetClient> _clients;
             System::Network::TCPSocket _SocketTCP;
             System::Network::UDPSocket _SocketUDP;
+            bool _running = true;
         };
 
     } // namespace Feature

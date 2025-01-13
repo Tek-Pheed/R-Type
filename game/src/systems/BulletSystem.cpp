@@ -11,6 +11,7 @@
 
 #include "Game.hpp"
 #include "GameSystems.hpp"
+#include "Components.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 
 using namespace RType;
@@ -54,7 +55,7 @@ void BulletSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         }
     }
     for (auto &bl : bulletToRemove) {
-        _game->refEntityManager.getCurrentLevel().destroyEntityById(
+        _game->refEntityManager.getCurrentLevel().markEntityForDeletion(
             bl.getID());
     }
 }

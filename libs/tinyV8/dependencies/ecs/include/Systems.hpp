@@ -18,6 +18,7 @@ namespace ecs
         virtual void initSystem(GameClass &gameRef) = 0;
         virtual void update(
             std::vector<ecs::Entity> &entity, float deltaTime) = 0;
+        virtual ~ISystem() = default;
     };
 } // namespace ecs
 

@@ -32,3 +32,9 @@ void AssetManager::engineOnStop(void)
 {
     return;
 }
+
+void engineOnPostTick(float deltaTimeSec)
+{
+    (void) deltaTimeSec;
+    return;
+}

@@ -7,7 +7,7 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <string>
 
 namespace ecs
@@ -71,29 +71,52 @@ namespace ecs
         int getHealth();
         void setHealth(int health);
 
+        int getOldHealth();
+        void setOldHealth(int oldHealth);
+
       private:
         int _health;
+        int _oldHealth;
     };
 
     class BossComponent : public Component {
       public:
-        explicit BossComponent();
+        explicit BossComponent(size_t bossID);
+
+        size_t getBossID() const;
+        void setBossID(size_t bossID);
+
+      private:
+        size_t _bossID;
     };
 
     class EnemyComponent : public Component {
       public:
-        explicit EnemyComponent(size_t enemyID);
+        explicit EnemyComponent(size_t enemyID, size_t type = 0);
 
         size_t getEnemyID() const;
         void setEnemyID(size_t enemyID);
 
+        size_t getType() const;
+        void setType(size_t type);
+
       private:
         size_t _enemyID;
+        // 0 for enemy, 1 for shooter, 2 for boss
+        size_t _type;
     };
 
     class RenderComponent : public Component {
       public:
-        enum ObjectType { CIRCLE, RECTANGLE, SPRITE, TEXT, SPRITEANDTEXT };
+        enum ObjectType {
+            CIRCLE,
+            RECTANGLE,
+            SPRITE,
+            TEXT,
+            SPRITEANDTEXT,
+            BUTTON,
+            INPUT
+        };
         explicit RenderComponent(ObjectType type);
 
         ObjectType getObjectType() const;
@@ -114,6 +137,28 @@ namespace ecs
       private:
         float _deltaCounter;
         const float _moveDelta;
+    };
+
+    template <typename musicType> class MusicComponent : public Component {
+      public:
+        explicit MusicComponent(musicType &music, std::string str)
+            : _music(music), _str(str)
+        {
+        }
+
+        musicType &getMusicType()
+        {
+            return this->_music;
+        }
+
+        void setMusicType(musicType &music)
+        {
+            _music = music;
+        }
+
+      private:
+        musicType _music;
+        std::string _str;
     };
 
     template <typename spriteType> class SpriteComponent : public Component {
@@ -250,21 +295,26 @@ namespace ecs
             this->_str = str;
         }
 
-      private:
         textType _text;
+
+      private:
         std::string _str;
     };
 
     class BulletComponent : public Component {
       public:
-        BulletComponent();
-        explicit BulletComponent(bool isFromPlayer);
+        explicit BulletComponent(bool isFromPlayer, size_t type = 0);
 
         bool getIsFromPlayer();
         void setIsFromPlayer(bool isFromPlayer);
 
+        size_t getType() const;
+        void setType(size_t type);
+
       private:
         bool _isFromPlayer;
+        // 0 for regular, 1 for boss
+        size_t _type;
     };
 
     class NameComponent : public Component {
@@ -276,6 +326,34 @@ namespace ecs
 
       private:
         std::string _name;
+    };
+
+    enum Bonus { RAPIDFIRE, DOUBLEFIRE, TRIPLEFIRE, ALLIES };
+
+    class BonusComponent : public Component {
+      public:
+        explicit BonusComponent(const Bonus &bonus);
+
+        Bonus getBonus();
+        void setBonus(const Bonus &bonus);
+
+      private:
+        Bonus _bonus;
+    };
+
+    class HitboxComponent : public Component {
+      public:
+        explicit HitboxComponent(float width, float height);
+
+        float getHeight() const;
+        float getWidth() const;
+
+        void setHeight(float height);
+        void setWidth(float width);
+
+      private:
+        float _height;
+        float _width;
     };
 
     // class ReplicationComponent : public Component {

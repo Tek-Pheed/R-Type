@@ -48,30 +48,44 @@ void PositionSystem::update(
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
-                float maxX = 0;
-                float maxY = 0;
+                float maxX = (float) this->_game->getWindow().getSize().x;
+                float maxY = (float) this->_game->getWindow().getSize().y;
 
                 if (sprite) {
                     maxX = (float) _game->getWindow().getSize().x
                         - (float) sprite->getSprite().getTextureRect().width
-                        - (float) sprite->getSprite().getScale().x;
+                            * (float) sprite->getSprite().getScale().x;
 
                     maxY = (float) _game->getWindow().getSize().y
                         - (float) sprite->getSprite().getTextureRect().height
-                        - (float) sprite->getSprite().getScale().y;
+                            * (float) sprite->getSprite().getScale().y;
                 }
 
-                if (positionComponent->getX() < 0) {
+                if (player && positionComponent->getX() < 0) {
                     positionComponent->setX(0);
                 }
-                if (positionComponent->getX() > maxX) {
+                if (player && positionComponent->getX() > maxX) {
                     positionComponent->setX(maxX);
                 }
-                if (positionComponent->getY() < 0) {
+                if (player && positionComponent->getY() < 0) {
                     positionComponent->setY(0);
                 }
-                if (positionComponent->getY() > maxY) {
+                if (player && positionComponent->getY() > maxY) {
                     positionComponent->setY(maxY);
+                }
+            } else {
+                auto enemy = entity.getComponent<ecs::EnemyComponent>();
+                if (enemy
+                    && (positionComponent->getOldX()
+                            != positionComponent->getX()
+                        || positionComponent->getOldY()
+                            != positionComponent->getY())) {
+                    _game->sendEnemyPosition(enemy->getEnemyID());
+                }
+                if (enemy
+                    && (positionComponent->getX() < GameInstance::KILLZONE
+                        || positionComponent->getY() < -GameInstance::KILLZONE)) {
+                    _game->deleteEnemy(enemy->getEnemyID());
                 }
             }
         }

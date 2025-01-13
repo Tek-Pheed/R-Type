@@ -13,6 +13,8 @@
 #define TINY_V8_ASSET_MANAGER
 
 #include <any>
+#include <exception>
+#include <stdexcept>
 #include <utility>
 #include "Engine.hpp"
 #include <unordered_map>
@@ -38,7 +40,7 @@ namespace Engine
           public:
             explicit AssetManager(Core &engineRef);
             AssetManager(AssetManager &&other) = default;
-            ~AssetManager();
+            ~AssetManager() override;
 
             /**
              * @brief Make the manager load an asset.
@@ -59,6 +61,8 @@ namespace Engine
 
              @note: The manager is responsible for constructing the backend
              object.
+             @note: The function will ignore the request if the asset
+             was already loaded.
              */
             template <typename BackendType, typename LoadFncType,
                 typename... Args>
@@ -66,6 +70,13 @@ namespace Engine
                 const std::string &identifier,
                 LoadFncType(BackendType::*function), Args... extraArgs)
             {
+                if (_assets.contains(typeid(BackendType))) {
+                    if (_assets[typeid(BackendType)].contains(identifier)) {
+                        BackendType *object = std::any_cast<BackendType>(
+                            &(_assets[typeid(BackendType)].at(identifier)));
+                        return (*object);
+                    }
+                }
                 _assets[typeid(BackendType)].insert(
                     std::make_pair<std::string, BackendType>(
                         std::string(identifier), BackendType()));
@@ -88,9 +99,17 @@ namespace Engine
             template <typename BackendType>
             BackendType &getAsset(const std::string &identifier)
             {
-                BackendType *object = std::any_cast<BackendType>(
-                    &(_assets[typeid(BackendType)].at(identifier)));
-                return (*object);
+                if (_assets.contains(typeid(BackendType))) {
+                    if (_assets[typeid(BackendType)].contains(identifier)) {
+                        BackendType *object = std::any_cast<BackendType>(
+                            &(_assets[typeid(BackendType)].at(identifier)));
+                        return (*object);
+                    }
+                }
+                throw std::out_of_range(THROW_ERROR_LOCATION
+                    "AssetManager: Unable to find requested asset: "
+                    + identifier
+                    + ", make sure to load the asset before requesting it !");
             }
 
             /**
@@ -117,6 +136,11 @@ namespace Engine
             void engineOnStart(void) override;
             void engineOnTick(float deltaTimeSec) override;
             void engineOnStop(void) override;
+            void engineOnPostTick(float deltaTimeSec) override
+            {
+                (void) deltaTimeSec;
+                return;
+            };
 
             std::unordered_map<std::type_index,
                 std::unordered_map<std::string, std::any>>

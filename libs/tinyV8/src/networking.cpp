@@ -23,6 +23,8 @@ NetworkingManager::NetworkingManager(Core &engineRef)
 
 NetworkingManager::~NetworkingManager()
 {
+    if (_running)
+        stopNetworking();
 }
 
 void NetworkingManager::engineOnStart(void)
@@ -38,6 +40,12 @@ void NetworkingManager::engineOnTick(float deltaTimeSec)
 
 void NetworkingManager::engineOnStop(void)
 {
+    return;
+}
+
+void NetworkingManager::engineOnPostTick(float deltaTimeSec)
+{
+    (void) deltaTimeSec;
     return;
 }
 
@@ -66,6 +74,16 @@ void NetworkingManager::setClientID(size_t id)
     _clientID = id;
 }
 
+void NetworkingManager::stopNetworking()
+{
+    _globalMutex.lock();
+    _running = false;
+    _globalMutex.unlock();
+    _writeCondition.notify_all();
+    std::unique_lock wlock(_writeThreadTerminated);
+    std::unique_lock rlock(_readThreadTerminated);
+}
+
 size_t NetworkingManager::getClientID(void) const
 {
     return (_clientID);
@@ -74,6 +92,7 @@ size_t NetworkingManager::getClientID(void) const
 std::vector<size_t> NetworkingManager::getAllClientsId(void)
 {
     std::vector<size_t> vect;
+    std::unique_lock lock(_globalMutex);
 
     for (const auto &[key, val] : _clients) {
         vect.emplace_back(key);
@@ -105,20 +124,17 @@ std::vector<std::string> NetworkingManager::readClientPackets(
 std::vector<std::string> NetworkingManager::readAllPackets()
 {
     std::vector<std::string> packets;
+    std::unique_lock lock(_globalMutex);
 
     if (_isServer) {
         for (auto &client : _clients) {
             auto packs = readClientPackets(client.second);
-            _globalMutex.lock();
             packets.insert(packets.end(), packs.begin(), packs.end());
-            _globalMutex.unlock();
         }
     } else {
         NetworkingManager::NetClient &cli = getClient(1);
         auto packs = readClientPackets(cli);
-        _globalMutex.lock();
         packets.insert(packets.end(), packs.begin(), packs.end());
-        _globalMutex.unlock();
     }
     return (packets);
 }
@@ -126,6 +142,8 @@ std::vector<std::string> NetworkingManager::readAllPackets()
 void NetworkingManager::sendToAll(
     System::Network::ISocket::Type socketType, const std::string &buffer)
 {
+    std::unique_lock lock(_globalMutex);
+
     for (auto &client : _clients) {
         writeToClient(client.second, buffer, socketType);
     }
@@ -134,6 +152,7 @@ void NetworkingManager::sendToAll(
 void NetworkingManager::sendToOthers(size_t except_id,
     System::Network::ISocket::Type socketType, const std::string &buffer)
 {
+    std::unique_lock lock(_globalMutex);
     for (auto &client : _clients) {
         if (client.first != except_id)
             writeToClient(client.second, buffer, socketType);
@@ -143,6 +162,7 @@ void NetworkingManager::sendToOthers(size_t except_id,
 void NetworkingManager::sendToOne(size_t id,
     System::Network::ISocket::Type socketType, const std::string &buffer)
 {
+    std::unique_lock lock(_globalMutex);
     for (auto &client : _clients) {
         if (client.first == id)
             writeToClient(client.second, buffer, socketType);
@@ -163,6 +183,13 @@ NetworkingManager::NetClient &NetworkingManager::addClient(
     return (_clients[_clientCounter]);
 }
 
+bool NetworkingManager::hasClient(size_t id)
+{
+    std::unique_lock lock(_globalMutex);
+
+    return (_clients.contains(id));
+}
+
 NetworkingManager::NetClient &NetworkingManager::getClient(size_t id)
 {
     std::unique_lock lock(_globalMutex);
@@ -177,6 +204,17 @@ void NetworkingManager::removeClient(size_t id)
     _clients.at(id).isDisconnected = true;
     std::cout << "ENGINE: Removed a client (" << id << ") from the server."
               << std::endl;
+}
+
+void NetworkingManager::disconnectClient(size_t id)
+{
+    _globalMutex.lock();
+    _clients.at(id).tcpSocket.closeSocket();
+    _clients.at(id).isDisconnected = true;
+    _globalMutex.unlock();
+    _writeCondition.notify_all();
+    std::cout << "ENGINE: Force disconnection of a client (" << id
+              << ") from the server." << std::endl;
 }
 
 ssize_t NetworkingManager::identifyClient(
@@ -206,9 +244,16 @@ ssize_t NetworkingManager::identifyClient(
 void NetworkingManager::writeToClient(NetworkingManager::NetClient &client,
     const std::string &data, System::Network::ISocket::Type socketType)
 {
+    _globalMutex.lock();
+    if (client.isDisconnected) {
+        _globalMutex.unlock();
+        return;
+    }
+    _globalMutex.unlock();
     _writeMutex.lock();
     std::ostringstream out;
-    _pacMan->serializeString(data, out);
+
+    _pacMan->serializeString(data, out, _pacMan->getKey());
     std::string serializedData = out.str();
     auto encoded = System::Network::encodeString(serializedData);
 

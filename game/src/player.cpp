@@ -9,71 +9,71 @@
     #define NOMINMAX
 #endif
 
+#include <cmath>
+#include <cstdint>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include "Components.hpp"
-#include "EngineNetworking.hpp"
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
+#include "Factory.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
+#include "LevelConfig.hpp"
 #include "system_network.hpp"
 
 using namespace RType;
 
-// If isLocalPlayer is set to false, then this function should only be
-// triggered by a request from the server
-ecs::Entity &RType::GameInstance::buildPlayer(bool isLocalPlayer, size_t id)
+void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
 {
-    std::cout << "Adding new player to the game" << std::endl;
-    auto &player = refEntityManager.getCurrentLevel().createEntity();
-    player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
-    player.addComponent(std::make_shared<ecs::PositionComponent>(100, 100));
-    player.addComponent(std::make_shared<ecs::HealthComponent>(100));
-    player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
-    if (!_isServer) {
-        auto &texture =
-            refAssetManager.getAsset<sf::Texture>(Asset::PLAYER_TEXTURE);
-        auto &font = refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
-
-        sf::Sprite sprite;
-        sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
-        sprite.setScale(sf::Vector2f(3, 3));
-        player.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
-        player.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
-
-        sf::Text text;
-        text.setFont(font);
-        text.setCharacterSize(10);
-        text.setString("Samy");
-        player.addComponent(
-            std::make_shared<ecs::TextComponent<sf::Text>>(text, "Samy"));
-    }
-    if (isLocalPlayer) {
-        _playerEntityID = (int) player.getID();
-    }
-    if ((isLocalPlayer && _isConnectedToServer) || _isServer) {
-        auto pos = player.getComponent<ecs::PositionComponent>();
-        if (pos) {
-            std::stringstream sss;
-            sss << P_CONN << " " << id << " " << pos->getX() << " "
-                << pos->getY() << PACKET_END;
-            if (!isServer()) {
+    switch (code) {
+        case Protocol::L_STARTGAME: {
+            _gameStarted = true;
+            if (_isServer) {
+                size_t id = (size_t) atoi(tokens[0].c_str());
+                std::stringstream sss;
+                sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
+                loadLevelContent(LEVEL_CONFIG_PATH);
             } else {
-                refNetworkManager.sendToOthers(
-                    id, System::Network::ISocket::Type::TCP, sss.str());
+                auto songEntity = refEntityManager.getPersistentLevel()
+                                      .findEntitiesByComponent<
+                                          ecs::MusicComponent<sf::Sound>>()[0];
+                auto currentSong =
+                    songEntity.get()
+                        .getComponent<ecs::MusicComponent<sf::Sound>>();
+                auto &newMusic = refAssetManager.getAsset<sf::SoundBuffer>(
+                    Asset::GAME_SONG);
+
+                if (currentSong->getMusicType().getStatus()
+                    == sf::SoundSource::Playing) {
+                    currentSong->getMusicType().stop();
+                    currentSong->getMusicType().setBuffer(newMusic);
+                    currentSong->getMusicType().play();
+                }
             }
+            break;
+        }
+        case Protocol::L_SETMAXPLAYRS: {
+            if (tokens.size() >= 2) {
+                _maxPlayers = (size_t) atoi(tokens[1].c_str());
+                if (_isServer) {
+                    std::stringstream sss;
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    sss << L_SETMAXPLAYRS << " " << id << PACKET_END;
+                    refNetworkManager.sendToOthers(
+                        id, System::Network::ISocket::Type::TCP, sss.str());
+                }
+            }
+            break;
+            default: break;
         }
     }
-    return (player);
 }
 
 void GameInstance::handleNetworkPlayers(
@@ -81,14 +81,14 @@ void GameInstance::handleNetworkPlayers(
 {
     switch (code) {
         case Protocol::P_CONN: {
-            if (tokens.size() >= 3) {
+            if (tokens.size() >= 4) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::shared_ptr<ecs::PositionComponent> pos;
                 if (isServer()) {
-                    auto &pl = buildPlayer(true, id);
+                    auto &pl = _factory.buildPlayer(true, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 } else {
-                    auto &pl = buildPlayer(false, id);
+                    auto &pl = _factory.buildPlayer(false, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 }
                 updatePlayerPosition(id, (float) std::atof(tokens[1].c_str()),
@@ -97,21 +97,35 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_POS: {
-            if (tokens.size() >= 3) {
-                size_t id = (size_t) atoi(tokens[0].c_str());
+            if (tokens.size() >= 4) {
+                uint64_t tick = (uint64_t) atoi(tokens[0].c_str());
+                size_t id = (size_t) atoi(tokens[1].c_str());
+                if (!isServer()) {
+                    if (tick < _lastNetTick) {
+                        return;
+                    } else {
+                        _lastNetTick = tick;
+                    }
+                } else {
+                    if (tick < _clientTicks[id]) {
+                        return;
+                    } else {
+                        _clientTicks[id] = tick;
+                    }
+                }
                 auto &player = getPlayerById(id);
                 auto pos = player.getComponent<ecs::PositionComponent>();
-                pos->setX((float) std::atof(tokens[1].c_str()));
-                pos->setY((float) std::atof(tokens[2].c_str()));
+                pos->setX((float) std::atof(tokens[2].c_str()));
+                pos->setY((float) std::atof(tokens[3].c_str()));
                 if (isServer()) {
                     std::stringstream ss;
-                    ss << P_POS << " "
+                    ss << P_POS << " " << _ticks << " "
                        << player.getComponent<ecs::PlayerComponent>()
                               ->getPlayerID()
                        << " " << pos->getX() << " " << pos->getY()
                        << PACKET_END;
                     refNetworkManager.sendToOthers(
-                        (size_t) std::atoi(tokens[0].c_str()),
+                        (size_t) std::atoi(tokens[1].c_str()),
                         System::Network::ISocket::Type::UDP, ss.str());
                 }
             }
@@ -129,9 +143,55 @@ void GameInstance::handleNetworkPlayers(
         case Protocol::P_SHOOT: {
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
-                playerShoot(id);
+                std::unique_lock lock(_gameLock);
+                _factory.buildBulletFromPlayer(id);
                 break;
             }
+            break;
+        }
+        case Protocol::P_DMG: {
+            if (tokens.size() >= 3) {
+                uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
+                size_t id = (size_t) atoi(tokens[1].c_str());
+                if (!_isServer) {
+                    if (tick < _lastNetTick) {
+                        return;
+                    } else {
+                        _lastNetTick = tick;
+                    }
+                } else {
+                    if (tick < _clientTicks[id]) {
+                        return;
+                    } else {
+                        _clientTicks[id] = tick;
+                    }
+                }
+                int health = atoi(tokens[2].c_str());
+                auto &player = getPlayerById(id);
+                auto healthComp = player.getComponent<ecs::HealthComponent>();
+                if (healthComp) {
+                    healthComp->setHealth(health);
+                }
+                if (!isServer()
+                    && player.getID() == getLocalPlayer().getID()) {
+                    auto healthEnt =
+                        refEntityManager.getCurrentLevel().getEntityById(
+                            getHealthId());
+                    auto healthText =
+                        healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
+                    if (healthText && health) {
+                        if (floor(healthComp->getHealth()) <= 0) {
+                            healthText->setStr("Health: Dead");
+                        } else
+                            healthText->setStr("Health: "
+                                + std::to_string(healthComp->getHealth()));
+                    } else if (healthText && !health) {
+                        healthText->setStr("Health: Dead");
+                    }
+                }
+                break;
+            }
+            break;
         }
         default: break;
     }
@@ -148,7 +208,7 @@ bool GameInstance::hasLocalPlayer(void) const
 ecs::Entity &GameInstance::getLocalPlayer()
 {
     if (!hasLocalPlayer())
-        throw ErrorClass("No player was attached to the client");
+        throw ErrorClass(THROW_ERROR_LOCATION "No player was attached to the client");
     return (refEntityManager.getCurrentLevel().getEntityById(
         (size_t) _playerEntityID));
 }
@@ -161,41 +221,59 @@ std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
 {
+    std::unique_lock lock(_gameLock);
     auto players = getAllPlayers();
 
     for (auto &pl : players) {
         if (pl.get().getComponent<ecs::PlayerComponent>()->getPlayerID() == id)
             return (pl.get());
     }
-    throw ErrorClass("Player not found id=" + std::to_string(id));
+    throw ErrorClass(THROW_ERROR_LOCATION "Player not found id=" + std::to_string(id));
 }
 
 void GameInstance::deletePlayer(size_t playerID)
 {
     if (isServer() || _isConnectedToServer) {
+        auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
-        refEntityManager.getCurrentLevel().destroyEntityById(pl.getID());
+        refEntityManager.getCurrentLevel().markEntityForDeletion(pl.getID());
         std::stringstream ss;
         ss << P_DEAD << " " << playerID << " " << PACKET_END;
         if (isServer()) {
-            refNetworkManager.sendToOthers(
-                playerID, System::Network::ISocket::Type::TCP, ss.str());
-        } else {
             refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, ss.str());
+        }
+        // Switch scene if no more players
+        // if (players.size() == 0) {}
+    }
+}
+
+void GameInstance::damagePlayer(size_t playerID, int damage)
+{
+    if (isServer() || _isConnectedToServer) {
+        auto &pl = getPlayerById(playerID);
+        auto health = pl.getComponent<ecs::HealthComponent>();
+
+        if (health) {
+            health->setHealth(health->getHealth() - damage);
+            if (isServer()) {
+                std::stringstream ss;
+                ss << P_DMG << " " << _ticks << " " << playerID << " "
+                   << health->getHealth() << PACKET_END;
+                refNetworkManager.sendToAll(
+                    System::Network::ISocket::Type::UDP, ss.str());
+            }
         }
     }
 }
 
-// transform to set send entity position
 void GameInstance::sendPlayerPosition(size_t playerID)
 {
     if (isServer() || _isConnectedToServer) {
         auto &player = getPlayerById(playerID);
         auto position = player.getComponent<ecs::PositionComponent>();
         std::stringstream ss;
-        ss << P_POS << " "
-           << player.getComponent<ecs::PlayerComponent>()->getPlayerID() << " "
+        ss << P_POS << " " << _ticks << " " << playerID << " "
            << position->getX() << " " << position->getY() << PACKET_END;
         if (isServer()) {
             refNetworkManager.sendToOthers(
@@ -210,6 +288,7 @@ void GameInstance::sendPlayerPosition(size_t playerID)
 void GameInstance::updatePlayerPosition(
     size_t playerID, float newX, float newY)
 {
+    std::unique_lock lock(_gameLock);
     auto &player = getPlayerById(playerID);
     auto position = player.getComponent<ecs::PositionComponent>();
 
@@ -230,44 +309,18 @@ void GameInstance::updatePlayerPosition(
     }
 }
 
-void GameInstance::playerShoot(size_t playerID)
-{
-    auto player = getPlayerById(playerID);
-    auto positionComp = player.getComponent<ecs::PositionComponent>();
-    if (!positionComp)
-        return;
-    auto &bullet = refEntityManager.getCurrentLevel().createEntity();
-    bullet.addComponent(std::make_shared<ecs::BulletComponent>(1));
-    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
-    bullet.addComponent(std::make_shared<ecs::PositionComponent>(
-        positionComp->getX() + 100, positionComp->getY() + 25));
-
-    std::stringstream ss;
-    ss << P_SHOOT << " " << playerID << " " << PACKET_END;
-    if (isServer()) {
-        refNetworkManager.sendToOthers(
-            playerID, System::Network::ISocket::Type::UDP, ss.str());
-    } else {
-        auto &texture =
-            refAssetManager.getAsset<sf::Texture>(Asset::BULLET_TEXTURE);
-        bullet.addComponent(std::make_shared<ecs::RenderComponent>(
-            ecs::RenderComponent::ObjectType::SPRITE));
-        sf::Sprite s;
-        s.setTexture(texture);
-        s.setTextureRect(sf::Rect(137, 153, 64, 16));
-        bullet.addComponent(
-            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 132, 33));
-        if (playerID == (size_t) _netClientID)
-            refNetworkManager.sendToAll(
-                System::Network::ISocket::Type::UDP, ss.str());
-    }
-}
-
 void GameInstance::playerAnimations(ecs::Entity &player)
 {
+    static std::unordered_map<size_t, sf::Clock> animationTimers;
     std::string direction = "";
     auto position = player.getComponent<ecs::PositionComponent>();
     auto renderComp = player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
+    size_t playerID =
+        player.getComponent<ecs::PlayerComponent>()->getPlayerID();
+
+    if (animationTimers[playerID].getElapsedTime().asMilliseconds() < 200) {
+        return;
+    }
 
     if (position->getY() < position->getOldY()) {
         direction = "top";
@@ -281,4 +334,21 @@ void GameInstance::playerAnimations(ecs::Entity &player)
     } else {
         renderComp->getSprite().setTextureRect(sf::Rect(66, 0, 33, 14));
     }
+
+    animationTimers[playerID].restart();
+}
+
+void GameInstance::setPlayerEntityID(int id)
+{
+    this->_playerEntityID = id;
+}
+
+size_t GameInstance::getHealthId()
+{
+    return _healthId;
+}
+
+void GameInstance::setHealthId(size_t id)
+{
+    _healthId = id;
 }

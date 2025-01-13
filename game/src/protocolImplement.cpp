@@ -9,16 +9,20 @@
     #define NOMINMAX
 #endif
 
+#include <cmath>
+#include <cstring>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include "GameProtocol.hpp"
+#include <vector>
 #include "Game.hpp"
+#include "GameProtocol.hpp"
 
 using namespace RType;
 
 int GameInstance::is_code_valid(int code)
 {
-    if (code >= P_CONN && code <= P_DISCONN)
+    if (code >= P_CONN && code <= P_NAME)
         return 0;
     if (code >= E_SPAWN && code <= E_DMG)
         return 1;
@@ -26,6 +30,10 @@ int GameInstance::is_code_valid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
+    if (code >= L_STARTGAME && code <= L_SETMAXPLAYRS)
+        return 24;
+    if (code >= B_SPAWN && code <= B_DMG)
+        return 4;
     if (code >= C_INIT_UDP && code <= C_AUTH)
         return 9;
     return -1;
@@ -48,16 +56,27 @@ std::vector<std::string> PacketHandler::splitPackets(
 
     if (bytes.size() > 1) {
         std::string buffer = System::Network::decodeString(bytes);
+        std::istringstream in(buffer);
 
-        for (size_t i = 1; i < buffer.size(); i++) {
-            if (buffer[i - 1] == PACKET_END[0] && buffer[i] == PACKET_END[1]) {
-                out.emplace_back(buffer.substr(start, i + 1));
-                start = i + 1;
+        while (in) {
+            try {
+                std::string packet =
+                    deserializeString(in, getKey(), buffer.size());
+                if (!packet.empty()) {
+                    std::cout << "Deserialized: " << packet << std::endl;
+                    out.push_back(packet);
+                    start = buffer.size();
+                }
+            } catch (const std::runtime_error &e) {
+                std::cerr << THROW_ERROR_LOCATION "Error deserializing packet: " << e.what()
+                          << std::endl;
+                break;
             }
         }
     }
+
     resultIndexEnd = start;
-    return (out);
+    return out;
 }
 
 // This will need to be more robust
@@ -78,23 +97,47 @@ ssize_t PacketHandler::identifyClient(const System::Network::byteArray &bytes)
     return (-1);
 }
 
-// This will need to be reworked
-void PacketHandler::serializeString(const std::string &str, std::ostream &out)
+void PacketHandler::obfuscateData(char *data, size_t size, char key)
 {
-    // size_t size = str.size();
-    // out.write(reinterpret_cast<const char *>(&size), sizeof(size));
-    // out.write(str.data(), static_cast<std::streamsize>(size));
-    out.write(str.data(), static_cast<std::streamsize>(str.size()));
+    for (size_t i = 0; i < size; ++i) {
+        data[i] ^= key;
+    }
 }
 
 // This will need to be reworked
-// Note: for now this function is unused be the interface function should be
-// called in the game engine networking threads.
-void PacketHandler::deserializeString(const std::ostream &in, std::string &out)
+void PacketHandler::serializeString(
+    const std::string &str, std::ostream &out, char key)
 {
-    std::stringstream ss;
-    ss << in.rdbuf();
-    out = ss.str();
+    size_t size = str.size();
+    std::cout << "Serializing: " << str << std::endl;
+    out.write(reinterpret_cast<const char *>(&size), sizeof(size));
+
+    std::vector<char> buffer(str.begin(), str.end());
+    obfuscateData(buffer.data(), size, key);
+    out.write(buffer.data(), static_cast<std::streamsize>(size));
+}
+
+std::string PacketHandler::deserializeString(
+    std::istream &in, char key, size_t size)
+{
+    size = 0;
+    in.clear();
+
+    if (!in.read(reinterpret_cast<char *>(&size), sizeof(size))) {
+        return "";
+    }
+
+    if (size > static_cast<size_t>(in.rdbuf()->in_avail())) {
+        return "";
+    }
+
+    std::vector<char> buffer(size);
+    if (!in.read(buffer.data(), static_cast<std::streamsize>(size))) {
+        return "";
+    }
+
+    obfuscateData(buffer.data(), size, key);
+    return std::string(buffer.begin(), buffer.end());
 }
 
 template <> std::string RType::makePacket(int protocolCode)
@@ -103,4 +146,9 @@ template <> std::string RType::makePacket(int protocolCode)
 
     pack += PACKET_END;
     return (pack);
+}
+
+char PacketHandler::getKey(void) const
+{
+    return 0x1A;
 }

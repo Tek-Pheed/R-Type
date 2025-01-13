@@ -5,25 +5,30 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 PROCS=$(nproc)
 
 cd $SCRIPTPATH/..
-printf "### Pulling dependent submodules\n"
+printf "### Pulling dependent submodules...\n"
 git submodule update --init --recursive
 
-printf "\n### Generating build files\n"
+printf "\n### Generating build files...\n"
 set -e
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fsanitize=address,leak,pointer-compare,pointer-subtract,null,bounds" -B build .
 cd build
-printf "\n### Building R-Type\n"
+printf "\n### Building R-Type...\n"
 make -j $PROCS
-printf "\n### Build done\n"
+printf "\n### Build done...\n"
 
 
 RELEASE_DIR=$SCRIPTPATH/../release/
 
-printf "\n### Copying shared libraries (.so files)\n"
+printf "\n### Copying produced binaries...\n"
 find . -type f \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} $RELEASE_DIR \;
 find . -type f \( -name "*.dylib" -o -name "*.dylib" \) -exec cp -P {} $RELEASE_DIR \;
 
 find . -type l \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} $RELEASE_DIR \;
 find . -type l \( -name "*.dylib" -o -name "*.dylib" \) -exec cp -P {} $RELEASE_DIR \;
 
-printf "\n### Shared libraries copied to release folder\n"
+if [ ! -d "$SCRIPTPATH/../release/assets" ]; then
+    printf "\n### Copying assets...\n"
+    cp -fR $SCRIPTPATH/../assets/ $SCRIPTPATH/../release/assets
+fi
+
+printf "\n### Done\n"

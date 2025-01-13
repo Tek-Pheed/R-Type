@@ -16,7 +16,7 @@ title, and frame rate, as well as events like closing the window.
   window until it is closed.
 - `playEvent()`: Catches and handles events, such as closing the window.
 
-#### Errors are managed thanks to the [ErrorClass](./errorclass.md)
+#### Errors are managed thanks to the [Error Class](./errorclass.md)
 
 ### Variables
 

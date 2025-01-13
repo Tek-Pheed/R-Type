@@ -13,3 +13,5 @@
     - [Error](client/errorclass.md)
     - [Config](client/configclass.md)
     - [Systems](ecs/system.md)
+    - [Events Manager](client/events.md)
+    - [Utils](client/utils.md)

@@ -17,6 +17,8 @@ jobs:
           submodules: true
       - name: build
         run: ./tools/build-linux.sh
+      - name: clean
+        run: ./tools/clean.sh
   check_program_compilation_windows:
     name: Build on windows
     runs-on: [ self-hosted, windows, x64 ]
@@ -28,6 +30,8 @@ jobs:
           submodules: true
       - name: build
         run: ./tools/build-windows.ps1
+      - name: clean
+        run: ./tools/clean.ps1
 
 
 

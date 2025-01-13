@@ -14,6 +14,7 @@
 #include <iostream>
 #include <vector>
 #include "ErrorClass.hpp"
+#include "Game.hpp"
 
 Config::Config(const std::string &filename) : _filename(filename)
 {
@@ -39,10 +40,12 @@ void Config::saveConfig()
     std::ofstream savefile(_filename);
 
     if (!savefile.is_open()) {
-        throw ErrorClass("RTC006 : Invalid file: file not found.");
+        throw ErrorClass(
+            THROW_ERROR_LOCATION "RTC006 : Invalid file: file not found.");
     }
     if (_configData.empty()) {
-        throw ErrorClass("RTC005 : Invalid config: the config file is empty.");
+        throw ErrorClass(THROW_ERROR_LOCATION
+            "RTC005 : Invalid config: the config file is empty.");
     }
     for (const auto &line : _configData) {
         savefile << line.second << std::endl;
@@ -57,7 +60,8 @@ void Config::validateOrCreateConfig()
     if (!infile.is_open()) {
         std::ofstream newfile(_filename);
         if (!newfile.is_open()) {
-            throw ErrorClass("RTC006 : Invalid file: could not create file.");
+            throw ErrorClass(THROW_ERROR_LOCATION
+                "RTC006 : Invalid file: could not create file.");
         }
         newfile << "MOVE_UP=sf::Keyboard::Up\n";
         newfile << "MOVE_RIGHT=sf::Keyboard::Right\n";
@@ -79,31 +83,34 @@ void Config::validateOrCreateConfig()
     while (std::getline(infile, line)) {
         if (lineCount >= expectedKeys.size()
             || line.find(expectedKeys[lineCount]) != 0) {
-            throw ErrorClass("RTC007 : Invalid config: file content does not "
-                             "match expected format.");
+            throw ErrorClass(THROW_ERROR_LOCATION
+                "RTC007 : Invalid config: file content does not "
+                "match expected format.");
         }
 
         if (lineCount == 4) {
             int volume =
                 std::stoi(line.substr(expectedKeys[lineCount].size()));
             if (volume < 0 || volume > 100) {
-                throw ErrorClass("RTC010 : Invalid config: SOUND_VOLUME must "
-                                 "be between 0 and 100.");
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "RTC010 : Invalid config: SOUND_VOLUME must "
+                    "be between 0 and 100.");
             }
         } else if (lineCount == 5) {
             std::string resolution =
                 line.substr(expectedKeys[lineCount].size());
             if (resolution != "1920x1080" && resolution != "3840x2160"
                 && resolution != "2560x1440" && resolution != "1280x720") {
-                throw ErrorClass(
+                throw ErrorClass(THROW_ERROR_LOCATION
                     "RTC011 : Invalid config: RESOLUTION must be 1920x1080 or "
                     "3840x2160 or 2560x1440 or 1280x720.");
             }
         } else if (lineCount == 6) {
             std::string autoFire = line.substr(expectedKeys[lineCount].size());
             if (autoFire != "true" && autoFire != "false") {
-                throw ErrorClass("RTC012 : Invalid config: AUTO_FIRE must be "
-                                 "true or false.");
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "RTC012 : Invalid config: AUTO_FIRE must be "
+                    "true or false.");
             }
         }
 
@@ -111,7 +118,7 @@ void Config::validateOrCreateConfig()
     }
 
     if (lineCount != expectedKeys.size()) {
-        throw ErrorClass(
+        throw ErrorClass(THROW_ERROR_LOCATION
             "RTC008 : Invalid config: file does not contain exactly 7 lines.");
     }
 
@@ -122,7 +129,8 @@ void Config::parseConfig()
 {
     std::ifstream infile(_filename);
     if (!infile.is_open()) {
-        throw ErrorClass("RTC006 : Invalid file: could not open file.");
+        throw ErrorClass(THROW_ERROR_LOCATION
+            "RTC006 : Invalid file: could not open file.");
     }
 
     std::string line;
@@ -138,10 +146,33 @@ void Config::updateConfigValue(
     const std::string &key, const std::string &newValue)
 {
     for (auto &line : _configData) {
-        if (line.second.find(key + "=") == 0) {
-            line.second = key + "=" + newValue;
+        if (line.second.find(key) == 0) {
+            line.second = key + newValue;
             return;
         }
     }
-    throw ErrorClass("RTC009 : Invalid config: key not found.");
+    throw ErrorClass(
+        THROW_ERROR_LOCATION "RTC009 : Invalid config: key not found.");
+}
+
+std::string Config::getKeyFromConfig(const std::string &key)
+{
+    for (const auto &line : _configData) {
+        if (line.second.find(key) == 0) {
+            return line.second.substr(key.size() + 1);
+        }
+    }
+    throw ErrorClass(
+        THROW_ERROR_LOCATION "RTC009 : Invalid config: key not found.");
+}
+
+bool Config::getAutoFireConfig()
+{
+    std::string autoFire = getKeyFromConfig("AUTO_FIRE");
+
+    if (autoFire == "true") {
+        return true;
+    } else {
+        return false;
+    }
 }
