@@ -238,10 +238,17 @@ void RType::GameInstance::levelLobbyMenu()
             "DIFFICULTY : EASY", 40, sf::Color::Black,
             ecs::ClickableType::DIFFICULTY);
 
+        _factory.buildButton(sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -2),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "LEVEL : 1", 40, sf::Color::Black,
+            ecs::ClickableType::LEVEL);
+
         _factory.buildButton(
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
-                    - (float) 75 * -2),
+                    - (float) 75 * -3),
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
             "BONUS : YES", 40, sf::Color::Black, ecs::ClickableType::BONUS);
 

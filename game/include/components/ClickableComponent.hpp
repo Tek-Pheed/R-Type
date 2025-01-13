@@ -26,7 +26,8 @@ namespace ecs
         DIFFICULTY,
         BONUS,
         NUMBER_OF_PLAYER,
-        LOBBY
+        LOBBY,
+        LEVEL
     };
 
     class ClickableComponent : public Component {
