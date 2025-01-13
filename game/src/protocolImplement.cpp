@@ -30,7 +30,7 @@ int GameInstance::is_code_valid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_GOVER)
         return 3;
-    if (code >= L_STARTGAME && code <= L_SETMAXPLAYRS)
+    if (code >= L_STARTGAME && code <= L_SETLEVEL)
         return 24;
     if (code >= B_SPAWN && code <= B_DMG)
         return 4;
@@ -68,8 +68,9 @@ std::vector<std::string> PacketHandler::splitPackets(
                     start = buffer.size();
                 }
             } catch (const std::runtime_error &e) {
-                std::cerr << THROW_ERROR_LOCATION "Error deserializing packet: " << e.what()
-                          << std::endl;
+                std::cerr << THROW_ERROR_LOCATION
+                    "Error deserializing packet: "
+                          << e.what() << std::endl;
                 break;
             }
         }

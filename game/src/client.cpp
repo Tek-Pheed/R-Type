@@ -171,8 +171,8 @@ void RType::GameInstance::launchGame()
         }
         std::string text = "Health: "
             + std::to_string(getLocalPlayer()
-                    .getComponent<ecs::HealthComponent>()
-                    ->getHealth());
+                                 .getComponent<ecs::HealthComponent>()
+                                 ->getHealth());
         setHealthId(getNewId());
         _factory.buildText(getHealthId(), 0, 0, text);
     } catch (const std::exception &e) {
@@ -246,7 +246,7 @@ void GameInstance::playEvent()
     std::unique_lock lock(_gameLock);
     sf::Event event;
     std::stringstream ss;
-    EventManager event_manager(*this, _factory);
+    EventManager event_manager(*this);
 
     bool autoFireEnabled = _gameConfig.getAutoFireConfig();
 

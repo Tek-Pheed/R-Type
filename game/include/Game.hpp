@@ -42,6 +42,7 @@ namespace RType
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
         static constexpr size_t DEFAULT_MAX_PLAYERS = 4U;
+        static constexpr size_t DEFAULT_DIFFICULTY = 1U;
 
         static constexpr size_t RESOLUTION_X = 1280U;
         static constexpr size_t RESOLUTION_Y = 720U;
@@ -141,8 +142,9 @@ namespace RType
         void handleNetworkPlayers(
             int code, const std::vector<std::string> &tokens);
         void serverSendGameState(size_t clientID);
-        void handleLoby(int code, const std::vector<std::string> &tokens);
+        void handleLobby(int code, const std::vector<std::string> &tokens);
         void launchGame();
+        size_t getHostClient();
 
         // Server Only Events
         void serverEventNewConn(
@@ -216,6 +218,9 @@ namespace RType
 
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
+        size_t _difficulty = DEFAULT_DIFFICULTY;
+        bool _bonus = false;
+        size_t _level = 1;
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
         bool _isServer;

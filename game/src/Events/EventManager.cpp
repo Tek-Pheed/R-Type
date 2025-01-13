@@ -9,10 +9,6 @@
 #include "Entity.hpp"
 #include "Events.hpp"
 
-namespace RType
+EventManager::EventManager(GameInstance &gameInstance) : _game(gameInstance)
 {
-    EventManager::EventManager(GameInstance &gameInstance, Factory &factory)
-        : _factory(factory), _game(gameInstance)
-    {
-    }
-} // namespace RType
+}
