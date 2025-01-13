@@ -19,16 +19,62 @@ void handleNumberOfPlayerButton(ecs::Entity &entity)
 
     std::string str = text->getStr();
     std::size_t separator = str.find(":");
+    std::stringstream ss;
 
     if (separator != std::string::npos) {
         std::string maxPlayer = str.substr(separator + 1);
-        std::size_t maxPlayerNB = std::atoi(maxPlayer.c_str());
-        if (maxPlayerNB > 10) {
-            maxPlayerNB = 1;
+        int maxPlayerNB = std::atoi(maxPlayer.c_str());
+        if (maxPlayerNB >= 10) {
+            maxPlayerNB = 4;
         } else {
             maxPlayerNB++;
         }
-        text->setStr("NUMBER OF PLAYER : " + maxPlayerNB);
+        ss << maxPlayerNB;
+        text->setStr("NUMBER OF PLAYER : " + ss.str());
+    }
+}
+
+void handleDifficultyButton(ecs::Entity &entity)
+{
+    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+    if (!text)
+        return;
+
+    std::string str = text->getStr();
+    std::size_t separator = str.find(":");
+    std::stringstream ss;
+
+    if (separator != std::string::npos) {
+        std::string difficulty = str.substr(separator + 1);
+        if (difficulty == "EASY") {
+            text->setStr("DIFFICULTY : MEDIUM");
+        } else if (difficulty == "MEDIUM") {
+            text->setStr("DIFFICULTY : HARD");
+        } else {
+            text->setStr("DIFFICULTY : EASY");
+        }
+    }
+}
+
+void handleBonusButton(ecs::Entity &entity)
+{
+    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+    if (!text)
+        return;
+
+    std::string str = text->getStr();
+    std::size_t separator = str.find(":");
+    std::stringstream ss;
+
+    if (separator != std::string::npos) {
+        std::string bonus = str.substr(separator + 1);
+        if (bonus == "ON") {
+            text->setStr("BONUS : NO");
+        } else {
+            text->setStr("BONUS : YES");
+        }
     }
 }
 
@@ -120,6 +166,12 @@ namespace RType
                         break;
                     case ecs::ClickableType::NUMBER_OF_PLAYER:
                         handleNumberOfPlayerButton(entity);
+                        break;
+                    case ecs::ClickableType::DIFFICULTY:
+                        _game.handleDifficultyButton(entity);
+                        break;
+                    case ecs::ClickableType::BONUS:
+                        _game.handleBonusButton(entity);
                         break;
                     default: break;
                 }
