@@ -78,6 +78,30 @@ void handleBonusButton(ecs::Entity &entity)
     }
 }
 
+void handleLevelButton(ecs::Entity &entity)
+{
+    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+
+    if (!text)
+        return;
+
+    std::string str = text->getStr();
+    std::size_t separator = str.find(":");
+    std::stringstream ss;
+
+    if (separator != std::string::npos) {
+        std::string level = str.substr(separator + 2);
+        int levelNB = std::atoi(level.c_str());
+        if (levelNB >= 3) {
+            levelNB = 1;
+        } else {
+            levelNB++;
+        }
+        ss << levelNB;
+        text->setStr("LEVEL : " + ss.str());
+    }
+}
+
 namespace RType
 {
     void EventManager::mouseClicked()
@@ -173,7 +197,12 @@ namespace RType
                     case ecs::ClickableType::BONUS:
                         handleBonusButton(entity);
                         break;
-                    case ecs::ClickableType::LAUNCH: _game.launchGame(); break;
+                    case ecs::ClickableType::LAUNCH:
+                        _game.launchGame();
+                        break;
+                    case ecs::ClickableType::LEVEL:
+                        handleLevelButton(entity);
+                        break;
                     default: break;
                 }
             }
