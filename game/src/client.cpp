@@ -67,13 +67,6 @@ void RType::GameInstance::clientHandlerConnection(
                     std::unique_lock lock(_gameLock);
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
-                    /*std::string text = "Health: "
-                        + std::to_string(getLocalPlayer()
-                                .getComponent<ecs::HealthComponent>()
-                                ->getHealth());
-                    setHealthId(getNewId());
-                    _factory.buildText(
-                        getHealthId(), 1800.0f - 40.0f, 50.0f - 50.0f, text);*/
                 } else {
                     std::cout << "The connection failed." << std::endl;
                 }
@@ -151,7 +144,8 @@ void RType::GameInstance::connectToGame()
         _isConnectedToServer = true;
 
     } catch (const std::exception &e) {
-        std::cout << CATCH_ERROR_LOCATION << "Failed to connect to server: IP=" << _ip
+        std::cout << CATCH_ERROR_LOCATION
+                  << "Failed to connect to server: IP=" << _ip
                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
                   << " with error: " << e.what() << std::endl;
         refEntityManager.switchLevel(currentLevel);
@@ -163,19 +157,24 @@ void RType::GameInstance::launchGame()
     std::unique_lock lock(_gameLock);
     try {
         clientStartLevel();
-        /*std::vector<size_t> entityToRemove;
         for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
             auto render = entity.get().getComponent<ecs::RenderComponent>();
             if (!render)
                 continue;
             if (render->getObjectType()
-                == ecs::RenderComponent::ObjectType::BUTTON) {
-                entityToRemove.push_back(entity.get().getID());
+                    == ecs::RenderComponent::ObjectType::BUTTON
+                || render->getObjectType()
+                    == ecs::RenderComponent::ObjectType::TEXT) {
+                refEntityManager.getCurrentLevel().markEntityForDeletion(
+                    entity.get().getID());
             }
         }
-        for (auto &entity : entityToRemove) {
-            refEntityManager.getCurrentLevel().destroyEntityById(entity);
-        }*/
+        std::string text = "Health: "
+            + std::to_string(getLocalPlayer()
+                    .getComponent<ecs::HealthComponent>()
+                    ->getHealth());
+        setHealthId(getNewId());
+        _factory.buildText(getHealthId(), 0, 0, text);
     } catch (const std::exception &e) {
         levelMainMenu();
     }
@@ -195,7 +194,8 @@ void RType::GameInstance::clientHandleDisconnected(
     _isConnectedToServer = false;
     _playerEntityID = -1;
     refNetworkManager.disconnectClient(1);
-    std::cout << CATCH_ERROR_LOCATION << "You are now disconnected from the game server, maybe the "
+    std::cout << CATCH_ERROR_LOCATION
+              << "You are now disconnected from the game server, maybe the "
                  "connection was unstable."
               << std::endl;
     refEntityManager.deleteAllLevel();
@@ -217,7 +217,8 @@ void RType::GameInstance::setupClient(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
     if (!_window->isOpen()) {
-        throw std::runtime_error(THROW_ERROR_LOCATION "Failed to create the SFML window.");
+        throw std::runtime_error(
+            THROW_ERROR_LOCATION "Failed to create the SFML window.");
     }
     refGameEngine.addEventBinding<RType::GameInstance>(
         Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);
@@ -258,9 +259,6 @@ void GameInstance::playEvent()
         if (event.type == sf::Event::KeyPressed) {
             event_manager.keyPressed(event);
             if (!_gameStarted) {
-                for (auto name : this->_playersConnectedToGame) {
-                    std::cout << name << std::endl;
-                }
                 if (event.key.code == sf::Keyboard::Tab) {
                     clientStartLevel();
                 }
@@ -268,8 +266,7 @@ void GameInstance::playEvent()
             if (hasLocalPlayer() && _gameStarted) {
                 auto &player = getLocalPlayer();
                 auto velocity = player.getComponent<ecs::VelocityComponent>();
-                if (!autoFireEnabled
-                    && event.key.code == sf::Keyboard::Space
+                if (!autoFireEnabled && event.key.code == sf::Keyboard::Space
                     && this->_fireClock.getElapsedTime().asSeconds() >= 0.5f) {
                     if (_netClientID >= 0) {
                         _factory.buildBulletFromPlayer((size_t) _netClientID);
