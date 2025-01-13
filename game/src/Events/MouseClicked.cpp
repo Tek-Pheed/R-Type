@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <sstream>
+#include "Components.hpp"
 #include "Config.hpp"
 #include "Events.hpp"
 #include "GameProtocol.hpp"
@@ -175,9 +176,10 @@ void EventManager::mouseClicked()
     sf::Vector2f mousePos = _game.getWindow().mapPixelToCoords(
         sf::Mouse::getPosition(_game.getWindow()));
     bool currentAutoFireValue = _game._gameConfig.getAutoFireConfig();
-    for (auto &entity :
-        _game.refEntityManager.getCurrentLevel().getEntities()) {
-        auto button = entity.get().getComponent<ecs::RenderComponent>();
+    for (size_t ent :
+        _game.refEntityManager.getCurrentLevel().findEntitiesIdByComponent<ecs::RenderComponent>()) {
+        auto &entity = _game.refEntityManager.getCurrentLevel().getEntityById(ent);
+        auto button = entity.getComponent<ecs::RenderComponent>();
         if (!button
             || (button->getObjectType()
                     != ecs::RenderComponent::ObjectType::BUTTON
@@ -186,8 +188,7 @@ void EventManager::mouseClicked()
             continue;
 
         auto rectangle =
-            entity.get()
-                .getComponent<ecs::RectangleComponent<sf::RectangleShape>>();
+            entity.getComponent<ecs::RectangleComponent<sf::RectangleShape>>();
         if (!rectangle)
             continue;
 
@@ -195,10 +196,9 @@ void EventManager::mouseClicked()
             rectangle->getRectangle().getGlobalBounds();
         if (currentHover.contains(mousePos)) {
             auto clickableType =
-                entity.get().getComponent<ecs::ClickableComponent>();
+                entity.getComponent<ecs::ClickableComponent>();
 
-            auto text =
-                entity.get().getComponent<ecs::TextComponent<sf::Text>>();
+            auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
             if (!clickableType)
                 continue;
 
@@ -232,23 +232,23 @@ void EventManager::mouseClicked()
                     return;
                 case ecs::ClickableType::MOVE_UP:
                     _game._isSettingsUpButtonClicked = true;
-                    _game._lastButtonIdClicked = entity.get().getID();
+                    _game._lastButtonIdClicked = entity.getID();
                     break;
                 case ecs::ClickableType::MOVE_DOWN:
                     _game._isSettingsDownButtonClicked = true;
-                    _game._lastButtonIdClicked = entity.get().getID();
+                    _game._lastButtonIdClicked = entity.getID();
                     break;
                 case ecs::ClickableType::MOVE_LEFT:
                     _game._isSettingsLeftButtonClicked = true;
-                    _game._lastButtonIdClicked = entity.get().getID();
+                    _game._lastButtonIdClicked = entity.getID();
                     break;
                 case ecs::ClickableType::MOVE_RIGHT:
                     _game._isSettingsRightButtonClicked = true;
-                    _game._lastButtonIdClicked = entity.get().getID();
+                    _game._lastButtonIdClicked = entity.getID();
                     break;
                 case ecs::ClickableType::INPUT:
                     _game._isSettingsNicknameButtonClicked = true;
-                    _game._lastInputIdClicked = entity.get().getID();
+                    _game._lastInputIdClicked = entity.getID();
                     _game._nicknameKeys.clear();
                     break;
                 case ecs::ClickableType::NUMBER_OF_PLAYER:
