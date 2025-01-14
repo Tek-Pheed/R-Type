@@ -9,6 +9,7 @@
     #define NOMINMAX
 #endif
 
+#include <sstream>
 #include "Components.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
