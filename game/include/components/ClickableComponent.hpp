@@ -27,7 +27,8 @@ namespace ecs
         BONUS,
         NUMBER_OF_PLAYER,
         LOBBY,
-        LEVEL
+        LEVEL,
+        GAMEMODE
     };
 
     class ClickableComponent : public Component {
