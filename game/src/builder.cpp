@@ -156,11 +156,12 @@ void RType::GameInstance::levelMainMenu()
                 .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
         auto currentSong =
             songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+        auto &musicSong =
+            this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
 
-        if (currentSong->getMusicType().getStatus()
-            != sf::SoundSource::Playing) {
-            currentSong->getMusicType().play();
-        }
+        currentSong->getMusicType().stop();
+        currentSong->getMusicType().setBuffer(musicSong);
+        currentSong->getMusicType().play();
 
         auto &title = refEntityManager.getCurrentLevel().createEntity();
         sf::Text text;
@@ -249,7 +250,7 @@ void RType::GameInstance::levelLobbyMenu()
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * 1),
-            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
             "GAMEMODE : WAVE", 40, sf::Color::Black,
             ecs::ClickableType::GAMEMODE);
 
@@ -257,7 +258,7 @@ void RType::GameInstance::levelLobbyMenu()
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * 0),
-            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
             "NUMBER OF PLAYER : 4", 40, sf::Color::Black,
             ecs::ClickableType::NUMBER_OF_PLAYER);
 
@@ -265,7 +266,7 @@ void RType::GameInstance::levelLobbyMenu()
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -1),
-            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
             "DIFFICULTY : EASY", 40, sf::Color::Black,
             ecs::ClickableType::DIFFICULTY);
 
@@ -273,21 +274,21 @@ void RType::GameInstance::levelLobbyMenu()
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -2),
-            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
             "LEVEL : 1", 40, sf::Color::Black, ecs::ClickableType::LEVEL);
 
         _factory.buildButton(
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -3),
-            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
             "BONUS : YES", 40, sf::Color::Black, ecs::ClickableType::BONUS);
 
         _factory.buildButton(
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -4),
-            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
             "LAUNCH GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
     }
 }
@@ -333,7 +334,7 @@ void RType::GameInstance::levelContinueMenu()
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -3),
-            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
             "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LOBBY);
         // sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
         //"PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
@@ -346,40 +347,6 @@ void RType::GameInstance::levelContinueMenu()
             40, sf::Color::Black, ecs::ClickableType::BACK);
     }
 }
-
-// void RType::GameInstance::levelLobbyMenu()
-// {
-//     auto &level = refEntityManager.createNewLevel("lobbyMenu");
-
-//     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
-//     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
-//     refEntityManager.switchLevel("lobbyMenu");
-
-//     if (!isServer()) {
-//         auto &players = refEntityManager.getCurrentLevel().createEntity();
-//         auto &title = refEntityManager.getCurrentLevel().createEntity();
-
-//         sf::Text text;
-//         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
-//         text.setCharacterSize(100);
-//         text.setFillColor(sf::Color::White);
-//         text.setString("LOBBY");
-
-//         float textWidth = text.getLocalBounds().width;
-//         float windowWidth = (float)this->_window->getSize().x;
-
-//         float posX = (windowWidth - textWidth) / 2;
-//         float posY = (float)this->_window->getSize().y / 8;
-
-//         title.addComponent(std::make_shared<ecs::RenderComponent>(
-//             ecs::RenderComponent::ObjectType::TEXT));
-//         title.addComponent(
-//             std::make_shared<ecs::PositionComponent>(posX, posY - 50));
-//         title.addComponent(
-//             std::make_shared<ecs::TextComponent<sf::Text>>(text, "LOBBY"));
-
-//     }
-// }
 
 void RType::GameInstance::levelSettingsMenu()
 {

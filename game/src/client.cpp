@@ -16,6 +16,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <filesystem>
 #include "Components.hpp"
 #include "Config.hpp"
 #include "Engine.hpp"
@@ -78,6 +79,18 @@ void RType::GameInstance::clientHandlerConnection(
     }
 }
 
+int RType::GameInstance::countTxtFiles(const std::string &path)
+{
+    int count = 0;
+
+    for (const auto &entry : std::filesystem::directory_iterator(path)) {
+        if (entry.path().extension() == ".txt") {
+            count++;
+        }
+    }
+    return count;
+}
+
 void RType::GameInstance::connectToGame()
 {
     if (_isConnectedToServer)
@@ -137,6 +150,14 @@ void RType::GameInstance::connectToGame()
         level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
         level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
         refEntityManager.switchLevel("mainLevel", false);
+
+        int nbTxtFiles = countTxtFiles("./assets/levels");
+        this->_nbTxtFiles = nbTxtFiles;
+        std::stringstream ss;
+
+        ss << L_SENDLEVELS << " " << nbTxtFiles << PACKET_END;
+
+        refNetworkManager.sendToAll(System::Network::ISocket::Type::TCP, ss.str());
 
         levelLobbyMenu();
 

@@ -15,6 +15,8 @@
 #include <exception>
 #include <mutex>
 #include <sstream>
+#include <filesystem>
+#include <regex>
 #include "Components.hpp"
 #include "Engine.hpp"
 #include "EngineNetworking.hpp"
@@ -22,6 +24,7 @@
 #include "GameProtocol.hpp"
 #include "SFML/Graphics/Text.hpp"
 #include "system_network.hpp"
+#include "ErrorClass.hpp"
 
 using namespace RType;
 
@@ -157,8 +160,30 @@ void RType::GameInstance::serverHanlderValidateConnection(
     }
 }
 
+std::vector<std::string> GameInstance::getTxtFiles(const std::string &path)
+{
+    std::vector<std::string> files;
+    std::regex levelPattern(R"(level([1-9][0-9]*)\.txt)");
+
+    for (const auto &entry : std::filesystem::directory_iterator(path)) {
+        std::string filename = entry.path().filename().string();
+        
+        if (entry.path().extension() == ".txt" && std::regex_match(filename, levelPattern)) {
+            files.push_back(filename);
+        }
+    }
+
+    return files;
+}
+
 void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
 {
+    std::vector<std::string> levelFiles = getTxtFiles("./assets/levels");
+
+    if (levelFiles.empty()) {
+        throw ErrorClass(THROW_ERROR_LOCATION "No level founds !");
+    }
+
     _isServer = true;
     _tcpPort = tcpPort;
     _udpPort = udpPort;
@@ -179,6 +204,7 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
+    
     refEntityManager.switchLevel("mainLevel");
 }
 
