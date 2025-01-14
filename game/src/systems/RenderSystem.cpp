@@ -207,9 +207,9 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 if (entity.getComponent<ecs::EnemyComponent>()) {
                     if (entity.getComponent<ecs::EnemyComponent>()->getWave()
                         == _game->currentWave)
-                        renderSprite(entity, _game->getWindow(), deltaTime);
+                        renderSprite(entity, _game->getWindow(), deltaTime, *_game);
                 } else {
-                    renderSprite(entity, _game->getWindow(), deltaTime);
+                    renderSprite(entity, _game->getWindow(), deltaTime, *_game);
                 }
                 break;
             case ecs::RenderComponent::ObjectType::SPRITEANDTEXT:
