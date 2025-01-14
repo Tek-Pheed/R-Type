@@ -30,7 +30,9 @@ ecs::Entity &RType::Factory::buildBoss(
     auto &boss = _game.refEntityManager.getCurrentLevel().createEntity();
     boss.addComponent(std::make_shared<ecs::EnemyComponent>(id, 2));
     boss.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
-    boss.addComponent(std::make_shared<ecs::HealthComponent>(health));
+    boss.addComponent(
+        std::make_shared<ecs::HealthComponent>(static_cast<float>(health)
+            * static_cast<float>(_game.getDifficulty())));
     boss.addComponent(std::make_shared<ecs::BulletComponent>(false));
     boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
     boss.addComponent(std::make_shared<ecs::HitboxComponent>(160.0f, 414.0f));

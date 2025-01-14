@@ -102,8 +102,8 @@ namespace RType
         void playerAnimations(ecs::Entity &player);
         void setPlayerEntityID(int id);
         void damagePlayer(size_t playerID, int damage);
-        size_t getHealthId();
-        void setHealthId(size_t id);
+        int getHealthId();
+        void setHealthId(int id);
 
         int countTxtFiles(const std::string &path);
 
@@ -178,31 +178,7 @@ namespace RType
         Engine::Feature::AssetManager &refAssetManager;
         Engine::Feature::NetworkingManager &refNetworkManager;
 
-        //     int createConnection(const char *ip, int portTCP, int portUDP);
-        //     void writeToServer(
-        //         const std::string &data, System::Network::ISocket::Type
-        //         socketType);
-        //     void receiveMessage();
-
-        //     void handleConnection(int code, std::vector<std::string>
-        //     &tokens); void handleEnemy(int code, std::vector<std::string>
-        //     &tokens); void handleTerrain(int code, std::vector<std::string>
-        //     &tokens); void handleMechs(int code, std::vector<std::string>
-        //     &tokens); void addEntity(ecs::Entity & entity);
-
-        //     // Player Management
-        //     void createNewPlayer(std::vector<std::string> &tokens);
-        //     void setNewPosition(std::vector<std::string> &tokens);
-        //     void playerDead(std::vector<std::string> &tokens);
-        //     void createProjectile(std::vector<std::string> &tokens);
-        //     void setPlayerHealth(std::vector<std::string> &tokens);
-        //     void playerDisconnection(std::vector<std::string> &tokens);
-
-        //     // Enemy Management
-        //     void createEnemy(std::vector<std::string> &tokens);
-        //     void enemyDead(std::vector<std::string> &tokens);
-        //     void enemyShoot(std::vector<std::string> &tokens);
-        //     void enemyDamage(std::vector<std::string> &tokens);
+        Config _gameConfig;
 
         bool _isSettingsUpButtonClicked = false;
         bool _isSettingsRightButtonClicked = false;
@@ -224,8 +200,10 @@ namespace RType
 
         // Ticks
         uint64_t getTicks() const;
-        Config _gameConfig;
         int currentWave = 0;
+
+        // Game Value
+        size_t getDifficulty() const;
 
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
@@ -255,6 +233,6 @@ namespace RType
         std::recursive_mutex _gameLock;
         std::unordered_map<size_t, uint64_t> _clientTicks;
         sf::Clock _fireClock;
-        size_t _healthId = -1;
+        int _healthId = -1;
     };
 }; // namespace RType
