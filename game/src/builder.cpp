@@ -548,11 +548,6 @@ void RType::GameInstance::handleInputButtons(
     }
 }
 
-void RType::GameInstance::levelPauseMenu()
-{
-    
-}
-
 void RType::GameInstance::handleConfigButtons(
     sf::Keyboard::Key pressedKey, int actionType)
 {
