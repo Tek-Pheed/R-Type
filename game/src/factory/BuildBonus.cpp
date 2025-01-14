@@ -74,6 +74,30 @@ void GameInstance::handleNetworkBonuses(
             }
             break;
         }
+        case Protocol::BN_GET: {
+            if (tokens.size() >= 3) {
+                std::cout << "Bonus " << tokens[1].c_str() << " "
+                          << tokens[2].c_str() << " get by "
+                          << tokens[0].c_str() << std::endl;
+                auto bonuses =
+                    refEntityManager.getCurrentLevel()
+                        .findEntitiesByComponent<ecs::BonusComponent>();
+                size_t bonusID = (size_t) std::atof(tokens[1].c_str());
+                size_t bonusIDE = 0;
+                for (auto &pl : bonuses) {
+                    if (pl.get()
+                            .getComponent<ecs::BonusComponent>()
+                            ->getBonusID()
+                        == bonusID) {
+                        bonusIDE = pl.get().getID();
+                        std::cout << bonusIDE << std::endl;
+                    }
+                }
+                refEntityManager.getCurrentLevel().markEntityForDeletion(
+                    bonusIDE);
+            }
+            break;
+        }
         default: break;
     }
 }

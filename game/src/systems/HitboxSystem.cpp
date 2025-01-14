@@ -12,6 +12,7 @@
 #include <cmath>
 #include "Components.hpp"
 #include "Game.hpp"
+#include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 
 using namespace RType;
@@ -243,6 +244,12 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
                     < (playerHalfWidth + bulletHalfWidth)
                 && std::abs(bulletCenterY - enemyCenterY)
                     < (playerHalfHeight + bulletHalfHeight)) {
+                std::stringstream sss;
+                sss << BN_GET << " " << player->getPlayerID() << " "
+                    << bonusComp->getBonusID() << " " << bonusComp->getBonus()
+                    << " " << PACKET_END;
+                _game->refNetworkManager.sendToAll(
+                    System::Network::ISocket::Type::TCP, sss.str());
                 _game->refEntityManager.getCurrentLevel()
                     .markEntityForDeletion(bonus.getID());
             }
@@ -283,7 +290,7 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             if (_game->isServer() && enemy && position && velocity && hitbox) {
                 EnemyCollision(entity, deltaTime);
             }
-            if (bonus && position && velocity && hitbox) {
+            if (bonus && position && velocity && hitbox && _game->isServer()) {
                 BonusCollision(entity);
             }
         } catch (const std::exception &e) {
