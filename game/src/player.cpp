@@ -43,7 +43,8 @@ void GameInstance::handleLobby(
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
-                loadLevelContent(LEVEL_CONFIG_PATH);
+                std::string levelFileName = "./assets/levels/level" + std::to_string(_level) + ".txt";;
+                loadLevelContent(levelFileName);
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -199,6 +200,13 @@ void GameInstance::handleLobby(
                 }
             }
             break;
+        }
+        case Protocol::L_SENDLEVELS: {
+            if (tokens.size() >= 2) {
+                if (!_isServer) {
+                    this->_nbTxtFiles = std::atoi(tokens[0].c_str());
+                }
+            }
         }
     }
 }

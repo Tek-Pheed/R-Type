@@ -106,11 +106,17 @@ namespace RType
         size_t getHealthId();
         void setHealthId(size_t id);
 
+        int countTxtFiles(const std::string &path);
+
         sf::Sound &getMusicPlayer();
+
+        std::vector<std::string> getTxtFiles(const std::string &path);
 
         std::vector<ecs::Entity> &getEntities();
 
         std::string _playerName;
+
+        int _nbTxtFiles;
 
         // Enemies
         ecs::Entity &buildEnemy(

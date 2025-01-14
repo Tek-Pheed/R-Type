@@ -64,6 +64,7 @@ namespace RType
         L_SETBONUS = 244,
         L_SETLEVEL = 245,
         L_GAMEMODE = 246,
+        L_SENDLEVELS = 247,
     };
 
     template <typename... Args>
