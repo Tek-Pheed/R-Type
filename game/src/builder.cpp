@@ -241,6 +241,14 @@ void RType::GameInstance::levelLobbyMenu()
         _factory.buildButton(
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 1),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "GAMEMODE : PVP", 40, sf::Color::Black,
+            ecs::ClickableType::GAMEMODE);
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * 0),
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
             "NUMBER OF PLAYER : 4", 40, sf::Color::Black,
