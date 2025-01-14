@@ -205,8 +205,9 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
     auto bonusPos = bonus.getComponent<ecs::PositionComponent>();
     auto bonusComp = bonus.getComponent<ecs::BonusComponent>();
     auto bonusHitB = bonus.getComponent<ecs::HitboxComponent>();
+    auto playerComp = bonus.getComponent<ecs::PlayerComponent>();
 
-    if (!bonusPos || !bonusComp || !bonusHitB)
+    if (!bonusPos || !bonusComp || !bonusHitB || playerComp)
         return;
 
     for (size_t id : _game->refEntityManager.getCurrentLevel()
