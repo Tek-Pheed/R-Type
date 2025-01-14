@@ -34,12 +34,12 @@ namespace ecs
         _type = type;
     }
 
-    size_t EnemyComponent::getWave() const
+    int EnemyComponent::getWave() const
     {
         return (_wave);
     }
 
-    void EnemyComponent::setWave(size_t wave)
+    void EnemyComponent::setWave(int wave)
     {
         _wave = wave;
     }
