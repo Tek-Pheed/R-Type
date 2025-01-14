@@ -184,20 +184,25 @@ void RType::GameInstance::levelMainMenu()
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
 
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Arnaud",
-            static_cast<size_t>(rand() % 4));
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Arnaud", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Lucas",
-            static_cast<size_t>(rand() % 4));
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Lucas", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Raphael",
-            static_cast<size_t>(rand() % 4));
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Raphael", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Samy",
-            static_cast<size_t>(rand() % 4));
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Samy", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100), static_cast<float>(rand() % 200 + 100)), "Alexandre",
-            static_cast<size_t>(rand() % 4));
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Alexandre", static_cast<size_t>(rand() % 4));
 
         _factory.buildButton(
             sf::Vector2f(
@@ -327,11 +332,11 @@ void RType::GameInstance::levelContinueMenu()
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
-           
+                    - (float) 75 * -3),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
             "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LOBBY);
-            //sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
-            //"PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
+        // sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
+        //"PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
