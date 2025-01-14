@@ -43,7 +43,9 @@ void GameInstance::handleLobby(
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
-                std::string levelFileName = "./assets/levels/level" + std::to_string(_level) + ".txt";;
+                std::string levelFileName =
+                    "./assets/levels/level" + std::to_string(_level) + ".txt";
+                ;
                 loadLevelContent(levelFileName);
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
@@ -311,7 +313,7 @@ void GameInstance::handleNetworkPlayers(
                     && player.getID() == getLocalPlayer().getID()) {
                     auto healthEnt =
                         refEntityManager.getCurrentLevel().getEntityById(
-                            getHealthId());
+                            static_cast<size_t>(getHealthId()));
                     auto healthText =
                         healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
                     if (healthText && health) {
