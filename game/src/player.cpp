@@ -311,6 +311,14 @@ void GameInstance::handleNetworkPlayers(
                 }
                 if (!isServer()
                     && player.getID() == getLocalPlayer().getID()) {
+                    try {
+                        refEntityManager.getCurrentLevel().getEntityById(
+                            static_cast<size_t>(getHealthId()));
+                    } catch (const std::exception &e) {
+                        std::cout << CATCH_ERROR_LOCATION << e.what()
+                                  << std::endl;
+                        return;
+                    }
                     auto healthEnt =
                         refEntityManager.getCurrentLevel().getEntityById(
                             static_cast<size_t>(getHealthId()));
@@ -347,6 +355,13 @@ ecs::Entity &GameInstance::getLocalPlayer()
     if (!hasLocalPlayer())
         throw ErrorClass(
             THROW_ERROR_LOCATION "No player was attached to the client");
+    try {
+        refEntityManager.getCurrentLevel().getEntityById(
+            (size_t) _playerEntityID);
+    } catch (const std::exception &e) {
+        throw ErrorClass(THROW_ERROR_LOCATION "Player entity not found: "
+            + std::string(e.what()));
+    }
     return (refEntityManager.getCurrentLevel().getEntityById(
         (size_t) _playerEntityID));
 }
@@ -390,10 +405,14 @@ void GameInstance::deletePlayer(size_t playerID)
     if (isServer() || _isConnectedToServer) {
         auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
-        if (!isServer())
+        if (!isServer()) {
             _factory.buildExplosionPlayer(
                 pl.getComponent<ecs::PositionComponent>()->getX(),
                 pl.getComponent<ecs::PositionComponent>()->getY());
+            if (pl.getID() == (size_t) _playerEntityID) {
+                _playerEntityID = -1;
+            }
+        }
         refEntityManager.getCurrentLevel().markEntityForDeletion(pl.getID());
         std::stringstream ss;
         ss << P_DEAD << " " << playerID << " " << PACKET_END;

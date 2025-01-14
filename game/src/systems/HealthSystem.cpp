@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include "Components.hpp"
+#include "Engine.hpp"
 #include "Game.hpp"
 #include "GameSystems.hpp"
 
@@ -26,6 +27,13 @@ void setNewHealth(GameInstance &game, ecs::Entity &player)
 {
     if (game.getHealthId() == -1)
         return;
+    try {
+        game.refEntityManager.getCurrentLevel().getEntityById(
+            static_cast<size_t>(game.getHealthId()));
+    } catch (const std::exception &e) {
+        std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+        return;
+    }
     auto &healthEnt = game.refEntityManager.getCurrentLevel().getEntityById(
         static_cast<size_t>(game.getHealthId()));
     auto healthText = healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
