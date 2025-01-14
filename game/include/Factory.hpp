@@ -46,7 +46,6 @@ namespace RType
             float health = 5000.0f, int wave = 0);
         ecs::Entity &getBossById(size_t bossID);
         void sendBossPosition(size_t bossID);
-        void deleteBoss(size_t bossID);
         void handleNetworkBosses(
             int code, const std::vector<std::string> &tokens);
         ecs::Entity &buildAIPlayer(sf::Vector2f velocity,

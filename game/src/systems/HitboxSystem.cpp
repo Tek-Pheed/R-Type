@@ -24,12 +24,30 @@ void HitboxSystem::initSystem(GameInstance &gameRef)
     _game = &gameRef;
 }
 
+static bool isInBounds(float firstCenterX, float firstCenterY,
+    float firstWidth, float firstHeight, float secondCenterX,
+    float secondCenterY, float secondWidth, float secondHeight)
+{
+    float firstLeft = firstCenterX - (firstWidth / 2.0f);
+    float firstRight = firstCenterX + (firstWidth / 2.0f);
+    float firstTop = firstCenterY - (firstHeight / 2.0f);
+    float firstBottom = firstCenterY + (firstHeight / 2.0f);
+    float secondLeft = secondCenterX - (secondWidth / 2.0f);
+    float secondRight = secondCenterX + (secondWidth / 2.0f);
+    float secondTop = secondCenterY - (secondHeight / 2.0f);
+    float secondBottom = secondCenterY + (secondHeight / 2.0f);
+
+    if (firstRight < secondLeft || firstLeft > secondRight
+        || firstBottom < secondTop || firstTop > secondBottom)
+        return (false);
+    return (true);
+}
+
 void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
 {
     auto enemyPos = enemy.getComponent<ecs::PositionComponent>();
     auto enemyComp = enemy.getComponent<ecs::EnemyComponent>();
     auto enemyHitB = enemy.getComponent<ecs::HitboxComponent>();
-    const float hitbox = 5.0f;
     const int E_DMG = 50 * static_cast<int>(_game->getDifficulty());
     const int B_DMG = 100 * static_cast<int>(_game->getDifficulty());
 
@@ -56,19 +74,10 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
             if (!position || !player || !playerHitbox)
                 continue;
 
-            float playerCenterX =
-                position->getX() + playerHitbox->getWidth() / 2;
-            float playerCenterY =
-                position->getY() + playerHitbox->getHeight() / 2;
-
-            if (enemyPos->getX() + enemyHitB->getWidth() / 2
-                    < playerCenterX + playerHitbox->getWidth() / 2 + hitbox
-                && enemyPos->getX() + enemyHitB->getWidth() / 2
-                    > playerCenterX - playerHitbox->getWidth() / 2 - hitbox
-                && enemyPos->getY() + enemyHitB->getHeight() / 2
-                    < playerCenterY + playerHitbox->getHeight() / 2 + hitbox
-                && enemyPos->getY() + enemyHitB->getHeight() / 2
-                    > playerCenterY - playerHitbox->getHeight() / 2 - hitbox) {
+            if (isInBounds(position->getX(), position->getY(),
+                    playerHitbox->getWidth(), playerHitbox->getHeight(),
+                    enemyPos->getX(), enemyPos->getY(), enemyHitB->getWidth(),
+                    enemyHitB->getHeight())) {
                 if (_game->isServer() && damageCooldown <= 0.0f
                     && enemyComp->getWave() == _game->currentWave) {
                     if (enemyComp->getType() == 0
@@ -98,7 +107,7 @@ void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
         return;
 
     for (size_t id : _game->refEntityManager.getCurrentLevel()
-             .findEntitiesIdByComponent<ecs::PositionComponent>()) {
+             .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
         try {
             auto &enti =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
@@ -111,27 +120,10 @@ void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
             if (enti.getID() == bullet.getID()
                 || enemy->getWave() != _game->currentWave)
                 continue;
-
-            float enemyCenterX =
-                position->getX() + enemyHitB->getWidth() / 2.0f;
-            float enemyCenterY =
-                position->getY() + enemyHitB->getHeight() / 2.0f;
-
-            float bulletCenterX =
-                bulletPos->getX() + bulletHitB->getWidth() / 2.0f;
-            float bulletCenterY =
-                bulletPos->getY() + bulletHitB->getHeight() / 2.0f;
-
-            float enemyHalfWidth = enemyHitB->getWidth() / 2;
-            float enemyHalfHeight = enemyHitB->getHeight() / 2;
-
-            float bulletHalfWidth = bulletHitB->getWidth() / 2;
-            float bulletHalfHeight = bulletHitB->getHeight() / 2;
-
-            if (std::abs(bulletCenterX - enemyCenterX)
-                    < (enemyHalfWidth + bulletHalfWidth)
-                && std::abs(bulletCenterY - enemyCenterY)
-                    < (enemyHalfHeight + bulletHalfHeight)) {
+            if (isInBounds(position->getX(), position->getY(),
+                    enemyHitB->getWidth(), enemyHitB->getHeight(),
+                    bulletPos->getX(), bulletPos->getY(),
+                    bulletHitB->getWidth(), bulletHitB->getHeight())) {
                 if (_game->isServer()) {
                     health->setHealth(health->getHealth() - 100);
                 }
@@ -155,7 +147,7 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
         return;
 
     for (size_t id : _game->refEntityManager.getCurrentLevel()
-             .findEntitiesIdByComponent<ecs::PositionComponent>()) {
+             .findEntitiesIdByComponent<ecs::PlayerComponent>()) {
         try {
             auto &enti =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
@@ -167,27 +159,10 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
                 continue;
             if (enti.getID() == bullet.getID())
                 continue;
-
-            float enemyCenterX =
-                position->getX() + playerHitb->getWidth() / 2.0f;
-            float enemyCenterY =
-                position->getY() + playerHitb->getHeight() / 2.0f;
-
-            float bulletCenterX =
-                bulletPos->getX() + bulletHitB->getWidth() / 2.0f;
-            float bulletCenterY =
-                bulletPos->getY() + bulletHitB->getHeight() / 2.0f;
-
-            float enemyHalfWidth = playerHitb->getWidth() / 2;
-            float enemyHalfHeight = playerHitb->getHeight() / 2;
-
-            float bulletHalfWidth = bulletHitB->getWidth() / 2;
-            float bulletHalfHeight = bulletHitB->getHeight() / 2;
-
-            if (std::abs(bulletCenterX - enemyCenterX)
-                    < (enemyHalfWidth + bulletHalfWidth)
-                && std::abs(bulletCenterY - enemyCenterY)
-                    < (enemyHalfHeight + bulletHalfHeight)) {
+            if (isInBounds(position->getX(), position->getY(),
+                    playerHitb->getWidth(), playerHitb->getHeight(),
+                    bulletPos->getX(), bulletPos->getY(),
+                    bulletHitB->getWidth(), bulletHitB->getHeight())) {
                 if (_game->isServer()) {
                     if (bulletComp->getType() == 0)
                         _game->damagePlayer(player->getPlayerID(), DMG);
@@ -214,7 +189,7 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
         return;
 
     for (size_t id : _game->refEntityManager.getCurrentLevel()
-             .findEntitiesIdByComponent<ecs::PositionComponent>()) {
+             .findEntitiesIdByComponent<ecs::PlayerComponent>()) {
         try {
             auto &enti =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
@@ -225,27 +200,10 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
                 continue;
             if (enti.getID() == bonus.getID())
                 continue;
-
-            float enemyCenterX =
-                position->getX() + playerHitB->getWidth() / 2.0f;
-            float enemyCenterY =
-                position->getY() + playerHitB->getHeight() / 2.0f;
-
-            float bulletCenterX =
-                bonusPos->getX() + bonusHitB->getWidth() / 2.0f;
-            float bulletCenterY =
-                bonusPos->getY() + bonusHitB->getHeight() / 2.0f;
-
-            float playerHalfWidth = playerHitB->getWidth() / 2;
-            float playerHalfHeight = playerHitB->getHeight() / 2;
-
-            float bulletHalfWidth = bonusHitB->getWidth() / 2;
-            float bulletHalfHeight = bonusHitB->getHeight() / 2;
-
-            if (std::abs(bulletCenterX - enemyCenterX)
-                    < (playerHalfWidth + bulletHalfWidth)
-                && std::abs(bulletCenterY - enemyCenterY)
-                    < (playerHalfHeight + bulletHalfHeight)) {
+            if (isInBounds(position->getX(), position->getY(),
+                    playerHitB->getWidth(), playerHitB->getHeight(),
+                    bonusPos->getX(), bonusPos->getY(), bonusHitB->getWidth(),
+                    bonusHitB->getHeight())) {
                 std::stringstream sss;
                 sss << BN_GET << " " << player->getPlayerID() << " "
                     << bonusComp->getBonusID() << " " << bonusComp->getBonus()

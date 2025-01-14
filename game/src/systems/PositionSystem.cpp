@@ -103,15 +103,15 @@ void PositionSystem::update(
                 if (enemy && positionComponent
                     && positionComponent->getX() < GameInstance::KILLZONE) {
                     positionComponent->setX(
-                        GameInstance::RESOLUTION_X - GameInstance::KILLZONE);
+                        GameInstance::DEFAULT_RESOLUTION_X - GameInstance::KILLZONE);
                 }
                 if (enemy && positionComponent
                     && positionComponent->getY() < GameInstance::KILLZONE) {
                     positionComponent->setY(
-                        GameInstance::RESOLUTION_Y - GameInstance::KILLZONE);
+                        GameInstance::DEFAULT_RESOLUTION_Y - GameInstance::KILLZONE);
                 }
                 if (enemy && positionComponent
-                    && positionComponent->getY() > GameInstance::RESOLUTION_Y
+                    && positionComponent->getY() > GameInstance::DEFAULT_RESOLUTION_Y
                             - GameInstance::KILLZONE) {
                     positionComponent->setY(GameInstance::KILLZONE);
                 }

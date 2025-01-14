@@ -97,8 +97,8 @@ void GameInstance::handleNetworkMechs(
 
                 ref.setRepeated(true);
                 comp->getSprite().setTextureRect(
-                    sf::Rect(0, 0, (int) GameInstance::RESOLUTION_X,
-                        (int) GameInstance::RESOLUTION_Y));
+                    sf::Rect(0, 0, (int) GameInstance::DEFAULT_RESOLUTION_X,
+                        (int) GameInstance::DEFAULT_RESOLUTION_Y));
                 comp->getSprite().setTexture(ref);
             }
             break;
@@ -279,7 +279,7 @@ void GameInstance::gameTick(
             float deltaTime_sec = std::any_cast<float>(arg);
             static float time = 0.0f;
             time += deltaTime_sec;
-            if (time >= 2.0f) {
+            if (time >= 1.0f) {
                 for (auto entID : refEntityManager.getCurrentLevel()
                          .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()

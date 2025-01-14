@@ -22,14 +22,16 @@ using namespace RType;
 ecs::Entity &Factory::buildBonus(
     size_t id, float posX, float posY, ecs::Bonus bonus)
 {
-    auto &bonusE = _game.refEntityManager.getCurrentLevel().createEntity();
+    constexpr auto velocity = -100.0f;
+    const float With = 0.04f * (float) _game.WindoScaleX;
+    const float Height = With;
 
+    auto &bonusE = _game.refEntityManager.getCurrentLevel().createEntity();
     bonusE.addComponent(std::make_shared<ecs::BonusComponent>(id, bonus));
     bonusE.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     bonusE.addComponent(
-        std::make_shared<ecs::VelocityComponent>(-100.0f, 0.0f));
-    bonusE.addComponent(
-        std::make_shared<ecs::HitboxComponent>(17.0f * 3, 18.0f * 3));
+        std::make_shared<ecs::VelocityComponent>(velocity, 0.0f));
+    bonusE.addComponent(std::make_shared<ecs::HitboxComponent>(With, Height));
 
     if (!_game.isServer()) {
         auto &texture =
@@ -38,7 +40,10 @@ ecs::Entity &Factory::buildBonus(
         sf::Sprite sprite;
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::Rect(0, 0, 17, 18));
-        sprite.setScale(sf::Vector2f(3, 3));
+        sprite.setScale(With / sprite.getLocalBounds().width,
+            Height / sprite.getLocalBounds().height);
+        sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
+            sprite.getLocalBounds().height / 2.0f);
         bonusE.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         bonusE.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
