@@ -38,7 +38,7 @@ namespace RType
         ecs::Entity &buildText(
             size_t id, float posX, float posY, std::string &content);
         ecs::Entity &buildMusic(sf::SoundBuffer &soundBuffer, std::string str);
-        ecs::Entity &buildSoundEffect(sf::SoundBuffer &soundBuffer, std::string str);
+        ecs::Entity &buildSoundEffect(sf::SoundBuffer &soundBuffer, std::string str, float volume);
         ecs::Entity &buildEnemyShooter(size_t id, float posX, float posY,
             float health = 100.0f, int wave = 0, float velocityX = -200.0f,
             float velocityY = 0.0f);

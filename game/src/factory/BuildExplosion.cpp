@@ -32,7 +32,7 @@ ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
     auto &explosionSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
         Asset::EXPLOSION_SOUND);
 
-    buildSoundEffect(explosionSound, "explosionSound");
+    buildSoundEffect(explosionSound, "explosionSound", 60.0f);
 
     sf::Sprite sprite;
     sprite.setTexture(texture);
@@ -61,7 +61,7 @@ ecs::Entity &Factory::buildExplosionPlayer(float posX, float posY)
     auto &explosionSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
         Asset::EXPLOSION_SOUND);
 
-    buildSoundEffect(explosionSound, "explosionSound");
+    buildSoundEffect(explosionSound, "explosionSound", 60.0f);
 
     sf::Sprite sprite;
     sprite.setTexture(texture);

@@ -42,7 +42,7 @@ namespace RType
                 _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
             sf::Sprite sprite;
             sprite.setTexture(texture);
-            sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
+            sprite.setTextureRect(sf::Rect(66, (17 * (rand() % 4)), 33, 18));
             sprite.setScale(With / sprite.getLocalBounds().width,
                 Height / sprite.getLocalBounds().height);
             sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,

@@ -106,6 +106,11 @@ void GameInstance::handleNetworkMechs(
         case Protocol::M_WAVE: {
             if (tokens.size() >= 1 && !isServer()) {
                 currentWave = std::atoi(tokens[0].c_str());
+                if (currentWave > 0) {
+                    auto &newWaveInComingSound = this->refAssetManager.getAsset<sf::SoundBuffer>(
+                        Asset::NEWWAVEINCOMING);
+                    _factory.buildSoundEffect(newWaveInComingSound, "newWaveInComingSound", 100.0f);
+                }
                 if (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Changing wave: " << currentWave << std::endl;
             }
