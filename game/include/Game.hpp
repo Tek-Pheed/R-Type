@@ -230,7 +230,7 @@ namespace RType
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
         size_t _difficulty = DEFAULT_DIFFICULTY;
-        bool _bonus = false;
+        bool _bonus = true;
         size_t _level = 1;
         // 0 for wave, 1 for pvp
         size_t _gamemode = 0;

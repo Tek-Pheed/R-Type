@@ -180,7 +180,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                     "loadLevelContent: Failed to set wave");
             wave = (size_t) std::atoi(value[0].c_str());
         }
-        if (key == BUILD_BONUS) {
+        if (key == BUILD_BONUS && _bonus) {
             if (value.size() < 3)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create bonus "
