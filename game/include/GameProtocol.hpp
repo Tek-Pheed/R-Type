@@ -59,7 +59,6 @@ namespace RType
         // Bonus
         BN_SPAWN = 151,
         BN_GET = 152,
-        BN_DEAD = 153,
 
         // Loby
         L_STARTGAME = 241,

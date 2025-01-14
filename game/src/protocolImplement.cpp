@@ -30,7 +30,7 @@ int GameInstance::isCodeValid(int code)
         return 2;
     if (code >= M_WAVE && code <= M_BG)
         return 3;
-    if (code >= BN_SPAWN && code <= BN_DEAD)
+    if (code >= BN_SPAWN && code <= BN_GET)
         return 4;
     if (code >= L_STARTGAME && code <= L_SENDLEVELS)
         return 24;
