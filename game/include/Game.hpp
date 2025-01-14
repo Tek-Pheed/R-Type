@@ -248,6 +248,6 @@ namespace RType
         std::recursive_mutex _gameLock;
         std::unordered_map<size_t, uint64_t> _clientTicks;
         sf::Clock _fireClock;
-        size_t _healthId;
+        size_t _healthId = -1;
     };
 }; // namespace RType
