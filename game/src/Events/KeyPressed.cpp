@@ -5,6 +5,10 @@
 ** KeyPressed.cpp
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "Config.hpp"
 #include "Events.hpp"
 #include "Factory.hpp"
@@ -74,6 +78,9 @@ void EventManager::keyPressed(sf::Event &event)
             }
         }
     }
+    if (event.key.code == sf::Keyboard::Escape) {
+        _game.refGameEngine.triggerEvent(Engine::Events::EVENT_DisconnectedFromServer);
+    }
     if (_game.hasLocalPlayer()) {
         auto &player = _game.getLocalPlayer();
         auto velocity = player.getComponent<ecs::VelocityComponent>();
@@ -85,8 +92,6 @@ void EventManager::keyPressed(sf::Event &event)
             velocity->setVx(200.0f);
         } else if (event.key.code == moveLeftKey) {
             velocity->setVx(-200.0f);
-        } else if (event.key.code == sf::Keyboard::Escape) {
-            _game.refGameEngine.triggerEvent(Engine::Events::EVENT_DisconnectedFromServer)
         }
     }
 }
