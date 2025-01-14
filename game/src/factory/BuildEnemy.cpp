@@ -28,8 +28,9 @@ using namespace RType;
 ecs::Entity &RType::Factory::buildEnemy(size_t id, float posX, float posY,
     float health, int wave, float velocityX, float velocityY)
 {
-    std::cout << "Adding new enemy (" << id << ") to the game at pos " << posX
-              << " " << posY << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Adding new enemy (" << id << ") to the game at pos "
+                  << posX << " " << posY << std::endl;
     auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
@@ -109,7 +110,8 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 void GameInstance::deleteEnemy(size_t enemyID)
 {
     std::unique_lock lock(_gameLock);
-    std::cout << "Deleting enemy: " << enemyID << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Deleting enemy: " << enemyID << std::endl;
     auto &ene = getEnemyById(enemyID);
     if (!isServer())
         _factory.buildExplosionEnemy(
@@ -134,8 +136,9 @@ void GameInstance::handleNetworkEnemies(
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     size_t type = (size_t) atoi(tokens[1].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
-                    std::cout << "Spawning enemy " << id << " with type "
-                              << type << std::endl;
+                    if (RType::GameInstance::DEBUG_LOGS)
+                        std::cout << "Spawning enemy " << id << " with type "
+                                  << type << std::endl;
                     if (type == 0 && tokens.size() >= 8)
                         _factory.buildEnemy(id,
                             (float) std::atof(tokens[2].c_str()),
@@ -194,7 +197,8 @@ void GameInstance::handleNetworkEnemies(
             if (tokens.size() >= 2) {
                 uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
                 if (_lastNetTick <= tick) {
-                    std::cout << "Enemy shoot" << std::endl;
+                    if (RType::GameInstance::DEBUG_LOGS)
+                        std::cout << "Enemy shoot" << std::endl;
                     _lastNetTick = tick;
                     size_t id = (size_t) atoi(tokens[1].c_str());
                     std::unique_lock lock(_gameLock);
@@ -215,8 +219,9 @@ void GameInstance::handleNetworkEnemies(
 ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     float posY, float health, int wave, float velocityX, float velocityY)
 {
-    std::cout << "Adding new enemy (" << id << ") to the game at pos " << posX
-              << " " << posY << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Adding new enemy (" << id << ") to the game at pos "
+                  << posX << " " << posY << std::endl;
     auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id, 1));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));

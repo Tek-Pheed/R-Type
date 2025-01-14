@@ -105,7 +105,8 @@ void GameInstance::handleNetworkMechs(
         case Protocol::M_WAVE: {
             if (tokens.size() >= 1 && !isServer()) {
                 currentWave = std::atoi(tokens[0].c_str());
-                std::cout << "Changing wave: " << currentWave << std::endl;
+                if (RType::GameInstance::DEBUG_LOGS)
+                    std::cout << "Changing wave: " << currentWave << std::endl;
             }
             break;
         }
@@ -161,7 +162,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
                                          "music from level config");
             std::stringstream ss;
             _musicName = value[0];
-            std::cout << "Set music: " << _musicName << std::endl;
+            if (RType::GameInstance::DEBUG_LOGS)
+                std::cout << "Set music: " << _musicName << std::endl;
             ss << M_MUSIC << " " << value[0] << " " << PACKET_END;
             refNetworkManager.sendToAll(
                 System::Network::ISocket::TCP, ss.str());
@@ -172,7 +174,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
                     THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
                                          "background from level config");
             std::stringstream ss;
-            std::cout << "Set background: " << _bgName << std::endl;
+            if (RType::GameInstance::DEBUG_LOGS)
+                std::cout << "Set background: " << _bgName << std::endl;
             _bgName = value[0];
             ss << M_BG << " " << value[0] << " " << PACKET_END;
             refNetworkManager.sendToAll(
@@ -183,7 +186,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to set wave");
             wave = std::atoi(value[0].c_str());
-            std::cout << "Set wave to: " << wave << std::endl;
+            if (RType::GameInstance::DEBUG_LOGS)
+                std::cout << "Set wave to: " << wave << std::endl;
         }
     }
 }
@@ -193,7 +197,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -259,9 +263,8 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 2.0f) {
-                for (auto entID :
-                    refEntityManager.getCurrentLevel()
-                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -309,7 +312,8 @@ void GameInstance::gamePostTick(
         if (next) {
             std::stringstream ss;
             currentWave += 1;
-            std::cout << "Changing wave: " << currentWave << std::endl;
+            if (RType::GameInstance::DEBUG_LOGS)
+                std::cout << "Changing wave: " << currentWave << std::endl;
             ss << M_WAVE << " " << currentWave << PACKET_END;
             refNetworkManager.sendToAll(
                 System::Network::ISocket::TCP, ss.str());
@@ -333,13 +337,15 @@ int RType::GameInstance::manageBuffers()
             int code_int = isCodeValid(code);
             std::vector<std::string> tokens;
             if (code_int == -1) {
-                std::cout << "Invalid packet: " << buffer << std::endl;
+                if (RType::GameInstance::DEBUG_LOGS)
+                    std::cout << "Invalid packet: " << buffer << std::endl;
                 return -1;
             }
             std::string str = buffer.substr(4, buffer.size() - 4);
             std::istringstream ss(str);
             std::string token;
-            std::cout << "Managing Buffer: " << buff << std::endl;
+            if (RType::GameInstance::DEBUG_LOGS)
+                std::cout << "Managing Buffer: " << buff << std::endl;
             while (std::getline(ss, token, ' ')) {
                 tokens.push_back(token);
             }

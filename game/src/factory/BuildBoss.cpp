@@ -26,7 +26,8 @@ using namespace RType;
 ecs::Entity &RType::Factory::buildBoss(
     size_t id, float posX, float posY, float health, int wave)
 {
-    std::cout << "Adding new boss to the game" << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Adding new boss to the game" << std::endl;
     auto &boss = _game.refEntityManager.getCurrentLevel().createEntity();
     boss.addComponent(std::make_shared<ecs::EnemyComponent>(id, 2));
     boss.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
@@ -96,7 +97,8 @@ void GameInstance::sendBossPosition(size_t bossID)
 void GameInstance::deleteBoss(size_t bossID)
 {
     std::unique_lock lock(_gameLock);
-    std::cout << "Deleting boss" << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Deleting boss" << std::endl;
     auto &ene = getBossById(bossID);
     refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
     if (isServer()) {

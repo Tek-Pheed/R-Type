@@ -33,7 +33,8 @@ void GameInstance::handleLobby(
     int code, const std::vector<std::string> &tokens)
 {
     EventManager eventManager(*this);
-    std::cout << "Handling lobby: " << code << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Handling lobby: " << code << std::endl;
     switch (code) {
         case Protocol::L_STARTGAME: {
             _gameStarted = true;
@@ -384,7 +385,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)

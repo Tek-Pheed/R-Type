@@ -63,13 +63,15 @@ std::vector<std::string> PacketHandler::splitPackets(
                 std::string packet =
                     deserializeString(in, getKey(), buffer.size());
                 if (!packet.empty()) {
-                    std::cout << "Deserialized: " << packet << std::endl;
+                    if (RType::GameInstance::DEBUG_LOGS)
+                        std::cout << "Deserialized: " << packet << std::endl;
                     out.push_back(packet);
                     start = buffer.size();
                 }
             } catch (const std::runtime_error &e) {
-                std::cerr << CATCH_ERROR_LOCATION "Error deserializing packet: " << e.what()
-                          << std::endl;
+                std::cerr << CATCH_ERROR_LOCATION
+                    "Error deserializing packet: "
+                          << e.what() << std::endl;
                 break;
             }
         }
@@ -109,7 +111,8 @@ void PacketHandler::serializeString(
     const std::string &str, std::ostream &out, char key)
 {
     size_t size = str.size();
-    std::cout << "Serializing: " << str << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Serializing: " << str << std::endl;
     out.write(reinterpret_cast<const char *>(&size), sizeof(size));
 
     std::vector<char> buffer(str.begin(), str.end());

@@ -33,6 +33,8 @@ namespace RType
 {
     class GameInstance {
       public:
+        static constexpr bool DEBUG_LOGS = false;
+
         static constexpr const char *USER_CONFIG_FILE = "config.cfg";
         static constexpr const char *LEVEL_CONFIG_PATH =
             "./assets/levels/level1.txt";

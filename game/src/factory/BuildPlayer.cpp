@@ -18,7 +18,8 @@ namespace RType
     ecs::Entity &Factory::buildPlayer(
         bool isLocalPlayer, size_t id, const std::string &name)
     {
-        std::cout << "Adding new player to the game" << std::endl;
+        if (RType::GameInstance::DEBUG_LOGS)
+            std::cout << "Adding new player to the game" << std::endl;
         auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(

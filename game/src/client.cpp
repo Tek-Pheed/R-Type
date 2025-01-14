@@ -11,12 +11,12 @@
 
 #include <cstdlib>
 #include <exception>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
-#include <filesystem>
 #include "Components.hpp"
 #include "Config.hpp"
 #include "Engine.hpp"
@@ -53,7 +53,8 @@ void RType::GameInstance::clientHandlerConnection(
                     refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::UDP, ss.str());
                 } else {
-                    std::cout << "Could not read client ID" << std::endl;
+                    if (RType::GameInstance::DEBUG_LOGS)
+                        std::cout << "Could not read client ID" << std::endl;
                 }
             }
             break;
@@ -63,13 +64,15 @@ void RType::GameInstance::clientHandlerConnection(
                 if (tokens[0].starts_with("OK") && _netClientID >= 0) {
                     // We can create the player here, or wait and create it
                     // later
-                    std::cout << "Build player with id:" << _netClientID
-                              << std::endl;
+                    if (RType::GameInstance::DEBUG_LOGS)
+                        std::cout << "Build player with id:" << _netClientID
+                                  << std::endl;
                     std::unique_lock lock(_gameLock);
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                 } else {
-                    std::cout << "The connection failed." << std::endl;
+                    if (RType::GameInstance::DEBUG_LOGS)
+                        std::cout << "The connection failed." << std::endl;
                 }
             }
             break;
@@ -157,7 +160,8 @@ void RType::GameInstance::connectToGame()
 
         ss << L_SENDLEVELS << " " << nbTxtFiles << PACKET_END;
 
-        refNetworkManager.sendToAll(System::Network::ISocket::Type::TCP, ss.str());
+        refNetworkManager.sendToAll(
+            System::Network::ISocket::Type::TCP, ss.str());
 
         levelLobbyMenu();
 
@@ -191,8 +195,8 @@ void RType::GameInstance::launchGame()
         }
         std::string text = "Health: "
             + std::to_string(getLocalPlayer()
-                                 .getComponent<ecs::HealthComponent>()
-                                 ->getHealth());
+                    .getComponent<ecs::HealthComponent>()
+                    ->getHealth());
         setHealthId(static_cast<int>(getNewId()));
         _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text);
     } catch (const std::exception &e) {
