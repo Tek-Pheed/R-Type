@@ -174,10 +174,24 @@ Removed a terrain, if its has been destroyed or went off the screen.
 
 # Game Management (240)
 
+- Launch Game (id) - 241 <-> TCP
 When in loby, launch the game. (Only the first connected player can send this, then the server replicates it to all connected clients).
-- Launch Game - 241 (id) <-> TCP
 
+- Set max player (id, max) - 242 <-> TCP
 Set max players.
-- Set max player 242 (id, max) - <- TCP
+
+- Set difficulty (id, diff) - 243 <-> TCP
+Set the difficulty of the game (1, for easy (default), 2 for medium, 3 for hard)
+
+- Set bonus (id, state) - 244 <-> TCP
+Set if bonus appears on the map (bool)
+
+- Set level (id, levelId)- 245 <-> TCP
+Set the level config map
+
+- Set game mode (id, mode) - 246 <-> TCP
+Set the game mode, 0 for wave, 1 for pvp
+
+
 
 # TODO: add bonus on/off

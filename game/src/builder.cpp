@@ -183,6 +183,27 @@ void RType::GameInstance::levelMainMenu()
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
 
+        _factory.buildAIPlayer(
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Arnaud", static_cast<size_t>(rand() % 4));
+        _factory.buildAIPlayer(
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Lucas", static_cast<size_t>(rand() % 4));
+        _factory.buildAIPlayer(
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Raphael", static_cast<size_t>(rand() % 4));
+        _factory.buildAIPlayer(
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Samy", static_cast<size_t>(rand() % 4));
+        _factory.buildAIPlayer(
+            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
+                static_cast<float>(rand() % 200 + 100)),
+            "Alexandre", static_cast<size_t>(rand() % 4));
+
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
@@ -206,6 +227,68 @@ void RType::GameInstance::levelMainMenu()
                     - (float) 75 * -2),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black, "EXIT",
             40, sf::Color::Black, ecs::ClickableType::EXIT);
+    }
+}
+
+void RType::GameInstance::levelLobbyMenu()
+{
+    if (!isServer()) {
+        std::string title = "GAME CONFIG";
+
+        auto &text = _factory.buildText(0, 0, 0, title);
+        auto titleText = text.getComponent<ecs::TextComponent<sf::Text>>();
+        auto titlePos = text.getComponent<ecs::PositionComponent>();
+
+        titlePos->setX(
+            (float) (static_cast<float>(_window->getSize().x - 350 / 2) - 50
+                - titleText->getText().getLocalBounds().width / 2));
+        titlePos->setY(
+            (float) (this->_window->getSize().y / 2 - 50 / 2 - 75 * 1));
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 1),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "GAMEMODE : WAVE", 40, sf::Color::Black,
+            ecs::ClickableType::GAMEMODE);
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 0),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "NUMBER OF PLAYER : 4", 40, sf::Color::Black,
+            ecs::ClickableType::NUMBER_OF_PLAYER);
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "DIFFICULTY : EASY", 40, sf::Color::Black,
+            ecs::ClickableType::DIFFICULTY);
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -2),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "LEVEL : 1", 40, sf::Color::Black, ecs::ClickableType::LEVEL);
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -3),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "BONUS : YES", 40, sf::Color::Black, ecs::ClickableType::BONUS);
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -4),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "LAUNCH GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
     }
 }
 
@@ -250,8 +333,10 @@ void RType::GameInstance::levelContinueMenu()
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -3),
-            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
-            "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Blue,
+            "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LOBBY);
+        // sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
+        //"PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LAUNCH);
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
@@ -261,6 +346,40 @@ void RType::GameInstance::levelContinueMenu()
             40, sf::Color::Black, ecs::ClickableType::BACK);
     }
 }
+
+// void RType::GameInstance::levelLobbyMenu()
+// {
+//     auto &level = refEntityManager.createNewLevel("lobbyMenu");
+
+//     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
+//     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
+//     refEntityManager.switchLevel("lobbyMenu");
+
+//     if (!isServer()) {
+//         auto &players = refEntityManager.getCurrentLevel().createEntity();
+//         auto &title = refEntityManager.getCurrentLevel().createEntity();
+
+//         sf::Text text;
+//         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
+//         text.setCharacterSize(100);
+//         text.setFillColor(sf::Color::White);
+//         text.setString("LOBBY");
+
+//         float textWidth = text.getLocalBounds().width;
+//         float windowWidth = (float)this->_window->getSize().x;
+
+//         float posX = (windowWidth - textWidth) / 2;
+//         float posY = (float)this->_window->getSize().y / 8;
+
+//         title.addComponent(std::make_shared<ecs::RenderComponent>(
+//             ecs::RenderComponent::ObjectType::TEXT));
+//         title.addComponent(
+//             std::make_shared<ecs::PositionComponent>(posX, posY - 50));
+//         title.addComponent(
+//             std::make_shared<ecs::TextComponent<sf::Text>>(text, "LOBBY"));
+
+//     }
+// }
 
 void RType::GameInstance::levelSettingsMenu()
 {

@@ -152,7 +152,6 @@ void renderButton(ecs::Entity &entity, sf::RenderWindow &window)
     text->getText().setString(text->getStr());
     text->getText().setPosition(position->getX()
             + (float) rectangle->getSizeX() / 2
-            - (float) text->getStr().length()
             - (float) text->getText().getLocalBounds().width / 2,
         position->getY() + (float) rectangle->getSizeY() / 2
             - (float) text->getText().getCharacterSize() / 2);
