@@ -14,6 +14,12 @@ namespace ecs
         this->_bonus = bonus;
     }
 
+    BonusComponent::BonusComponent(size_t bonusID, const ecs::Bonus &bonus)
+    {
+        this->_bonusID = bonusID;
+        this->_bonus = bonus;
+    }
+
     Bonus BonusComponent::getBonus()
     {
         return this->_bonus;
@@ -22,5 +28,15 @@ namespace ecs
     void BonusComponent::setBonus(const ecs::Bonus &bonus)
     {
         this->_bonus = bonus;
+    }
+
+    void BonusComponent::setBonusID(size_t bonusID)
+    {
+        this->_bonusID = bonusID;
+    }
+
+    size_t BonusComponent::getBonusID()
+    {
+        return this->_bonusID;
     }
 } // namespace ecs

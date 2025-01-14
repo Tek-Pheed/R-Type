@@ -45,6 +45,7 @@ constexpr auto BUILD_BOSS = "BOSS";
 constexpr auto CHANGE_MUSIC = "MUSIC";
 constexpr auto CHANGE_BACKGROUND = "BACKGROUND";
 constexpr auto CHANGE_WAVE = "WAVE";
+constexpr auto BUILD_BONUS = "BONUS";
 
 size_t RType::getNewId()
 {
@@ -189,6 +190,22 @@ void GameInstance::loadLevelContent(const std::string &filename)
             if (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "Set wave to: " << wave << std::endl;
         }
+        if (key == BUILD_BONUS && _bonus) {
+            if (value.size() < 3)
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "loadLevelContent: Failed to create bonus "
+                    "from level config");
+            _factory.buildBonus(getNewId(),
+                (float) std::atof(value[0].c_str()),
+                (float) std::atof(value[1].c_str()),
+                static_cast<ecs::Bonus>(std::atoi(value[2].c_str())));
+        }
+        // if (key == CHANGE_MUSIC) {
+        //     if (value.size() < 1)
+        //         throw ErrorClass("loadLevelContent: Failed to create music
+        //         from level config");
+
+        // }
     }
 }
 
@@ -354,6 +371,7 @@ int RType::GameInstance::manageBuffers()
                 case 1: handleNetworkEnemies(code, tokens); break;
                 // case 2: handle_terrain(code, tokens); break;
                 case 3: handleNetworkMechs(code, tokens); break;
+                case 4: handleNetworkBonuses(code, tokens); break;
                 case 24: handleLobby(code, tokens); break;
                 case 9:
                     if (isServer()) {

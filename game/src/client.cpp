@@ -282,37 +282,55 @@ void GameInstance::playEvent()
         }
         if (event.type == sf::Event::KeyPressed) {
             event_manager.keyPressed(event);
-            if (!_gameStarted) {
-                if (event.key.code == sf::Keyboard::Tab) {
-                    continue;
-                    // clientStartLevel();
-                }
-            }
-            if (hasLocalPlayer() && _gameStarted) {
-                auto &player = getLocalPlayer();
-                auto velocity = player.getComponent<ecs::VelocityComponent>();
-                if (!autoFireEnabled && event.key.code == sf::Keyboard::Space
-                    && this->_fireClock.getElapsedTime().asSeconds()
-                        >= 0.25f) {
-                    if (_netClientID >= 0) {
-                        _factory.buildBulletFromPlayer((size_t) _netClientID);
-                        this->_fireClock.restart();
+            if (hasLocalPlayer()) {
+                if (_gameStarted) {
+                    auto &player = getLocalPlayer();
+                    auto bonus = player.getComponent<ecs::BonusComponent>();
+                    if (!autoFireEnabled
+                        && event.key.code == sf::Keyboard::Space
+                        && this->_fireClock.getElapsedTime().asSeconds()
+                            >= (bonus->getBonus() == ecs::Bonus::RAPIDFIRE
+                                    ? 0.10f
+                                    : 0.25f)) {
+                        if (_netClientID >= 0) {
+                            _factory.buildBulletFromPlayer(
+                                (size_t) _netClientID);
+                            this->_fireClock.restart();
+                        }
                     }
                 }
             }
         }
+
         if (hasLocalPlayer() && event.type == sf::Event::KeyReleased) {
             event_manager.keyReleased(event);
         }
+
         if (event.type == sf::Event::MouseButtonPressed) {
             event_manager.mouseClicked();
         }
     }
-    if (hasLocalPlayer() && autoFireEnabled && _gameStarted
-        && this->_fireClock.getElapsedTime().asSeconds() >= 0.25f) {
-        if (_netClientID >= 0) {
-            _factory.buildBulletFromPlayer((size_t) _netClientID);
-            this->_fireClock.restart();
+
+    if (hasLocalPlayer()) {
+        auto &player = getLocalPlayer();
+        auto bonus = player.getComponent<ecs::BonusComponent>();
+
+        if (bonus->getBonus() == ecs::Bonus::NONE) {
+            this->_bonusClock.restart();
+        } else if (bonus->getBonus() != ecs::Bonus::NONE
+            && this->_bonusClock.getElapsedTime().asSeconds() >= 15.0f) {
+            bonus->setBonus(ecs::Bonus::NONE);
+            this->_bonusClock.restart();
+        }
+
+        if (autoFireEnabled && _gameStarted
+            && this->_fireClock.getElapsedTime().asSeconds()
+                >= (bonus->getBonus() == ecs::Bonus::RAPIDFIRE ? 0.10f
+                                                               : 0.25f)) {
+            if (_netClientID >= 0) {
+                _factory.buildBulletFromPlayer((size_t) _netClientID);
+                this->_fireClock.restart();
+            }
         }
     }
 }

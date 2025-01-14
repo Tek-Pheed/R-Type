@@ -176,6 +176,10 @@ namespace RType
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         bool isServer() const;
 
+        // Bonus
+        void handleNetworkBonuses(
+            int code, const std::vector<std::string> &tokens);
+
         Engine::Core &refGameEngine;
         Engine::Feature::LevelManager<GameInstance> &refEntityManager;
         Engine::Feature::AssetManager &refAssetManager;
@@ -211,7 +215,7 @@ namespace RType
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
         size_t _difficulty = DEFAULT_DIFFICULTY;
-        bool _bonus = false;
+        bool _bonus = true;
         size_t _level = 1;
         // 0 for wave, 1 for pvp
         size_t _gamemode = 0;
@@ -237,5 +241,6 @@ namespace RType
         std::unordered_map<size_t, uint64_t> _clientTicks;
         sf::Clock _fireClock;
         int _healthId = -1;
+        sf::Clock _bonusClock;
     };
 }; // namespace RType

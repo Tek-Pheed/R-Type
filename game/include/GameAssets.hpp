@@ -48,9 +48,12 @@ namespace RType
         constexpr auto EXPLOSION_SOUND = "explosionSound";
         constexpr auto EXPLOSION_TEXTURE = "explosionTexture";
         constexpr auto EXPLOSION_PLAYER = "explosionPlayer";
+		constexpr auto BONUS_TEXTURE = "bonusTexture";
 
         static const AssetStore assets[] = {
             {PLAYER_TEXTURE, "assets/sprites/r-typesheet42.gif",
+                typeid(sf::Texture)},
+            {BONUS_TEXTURE, "assets/sprites/r-typesheet3.gif",
                 typeid(sf::Texture)},
             {ENEMY_TEXTURE, "assets/sprites/r-typesheet31.gif",
                 typeid(sf::Texture)},
