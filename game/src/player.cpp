@@ -45,7 +45,7 @@ void GameInstance::handleLobby(
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
                 std::string levelFileName =
-                    "./assets/levels/level" + std::to_string(_level) + ".txt";
+                    "assets/levels/level" + std::to_string(_level) + ".txt";
                 ;
                 loadLevelContent(levelFileName);
             } else {
@@ -385,7 +385,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-            .findEntitiesByComponent<ecs::PlayerComponent>());
+                .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
