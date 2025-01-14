@@ -10,6 +10,7 @@
 #endif
 
 #include <cmath>
+#include <sstream>
 #include "Components.hpp"
 #include "Game.hpp"
 #include "GameProtocol.hpp"
@@ -211,8 +212,9 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
     if (!bonusPos || !bonusComp || !bonusHitB || playerComp)
         return;
 
-    for (size_t id : _game->refEntityManager.getCurrentLevel()
-             .findEntitiesIdByComponent<ecs::PositionComponent>()) {
+    for (size_t id :
+        _game->refEntityManager.getCurrentLevel()
+            .findEntitiesIdByComponent<ecs::PositionComponent>()) {
         try {
             auto &enti =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
