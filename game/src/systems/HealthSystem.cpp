@@ -24,10 +24,10 @@ void HealthSystem::initSystem(GameInstance &gameRef)
 
 void setNewHealth(GameInstance &game, ecs::Entity &player)
 {
-    if (game.getHealthId() == static_cast<size_t>(-1))
+    if (game.getHealthId() == -1)
         return;
     auto &healthEnt = game.refEntityManager.getCurrentLevel().getEntityById(
-        game.getHealthId());
+        static_cast<size_t>(game.getHealthId()));
     auto healthText = healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
     auto healthPlayer = player.getComponent<ecs::HealthComponent>();
 

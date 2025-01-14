@@ -102,8 +102,8 @@ namespace RType
         void playerAnimations(ecs::Entity &player);
         void setPlayerEntityID(int id);
         void damagePlayer(size_t playerID, int damage);
-        size_t getHealthId();
-        void setHealthId(size_t id);
+        int getHealthId();
+        void setHealthId(int id);
 
         sf::Sound &getMusicPlayer();
 
@@ -223,6 +223,9 @@ namespace RType
         // Ticks
         uint64_t getTicks() const;
 
+        // Game Value
+        size_t getDifficulty() const;
+
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
         size_t _difficulty = DEFAULT_DIFFICULTY;
@@ -248,6 +251,6 @@ namespace RType
         std::recursive_mutex _gameLock;
         std::unordered_map<size_t, uint64_t> _clientTicks;
         sf::Clock _fireClock;
-        size_t _healthId = -1;
+        int _healthId = -1;
     };
 }; // namespace RType

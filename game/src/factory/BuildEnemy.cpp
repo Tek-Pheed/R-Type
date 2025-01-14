@@ -33,7 +33,9 @@ ecs::Entity &RType::Factory::buildEnemy(
     auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
     enemy.addComponent(std::make_shared<ecs::EnemyComponent>(id));
     enemy.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
-    enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
+    enemy.addComponent(
+        std::make_shared<ecs::HealthComponent>(static_cast<float>(health)
+            * static_cast<float>(_game.getDifficulty())));
     enemy.addComponent(std::make_shared<ecs::VelocityComponent>(
         GameInstance::ENEMY_VELOCITY, 0.0f));
     enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));

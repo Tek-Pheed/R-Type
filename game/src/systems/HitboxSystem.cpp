@@ -28,6 +28,8 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
     auto enemyComp = enemy.getComponent<ecs::EnemyComponent>();
     auto enemyHitB = enemy.getComponent<ecs::HitboxComponent>();
     const float hitbox = 5.0f;
+    const int E_DMG = 50 * static_cast<int>(_game->getDifficulty());
+    const int B_DMG = 100 * static_cast<int>(_game->getDifficulty());
 
     if (!enemyPos || !enemyComp || !enemyHitB)
         return;
@@ -69,11 +71,11 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
                 if (_game->isServer() && damageCooldown <= 0.0f) {
                     if (enemyComp->getType() == 0
                         || enemyComp->getType() == 1) {
-                        _game->damagePlayer(player->getPlayerID(), 50);
+                        _game->damagePlayer(player->getPlayerID(), E_DMG);
                         _game->deleteEnemy(enemyComp->getEnemyID());
                     }
                     if (enemyComp->getType() == 2) {
-                        _game->damagePlayer(player->getPlayerID(), 100);
+                        _game->damagePlayer(player->getPlayerID(), B_DMG);
                     }
                     damageCooldown = 1.0f;
                 }
@@ -145,7 +147,7 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
     auto bulletPos = bullet.getComponent<ecs::PositionComponent>();
     auto bulletComp = bullet.getComponent<ecs::BulletComponent>();
     auto bulletHitB = bullet.getComponent<ecs::HitboxComponent>();
-    const int DMG = 20;
+    const int DMG = 20 * static_cast<int>(_game->getDifficulty());
 
     if (!bulletPos || !bulletComp || !bulletHitB)
         return;

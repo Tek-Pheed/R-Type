@@ -391,3 +391,8 @@ uint64_t GameInstance::getTicks() const
 {
     return _ticks;
 }
+
+size_t GameInstance::getDifficulty() const
+{
+    return _difficulty;
+}

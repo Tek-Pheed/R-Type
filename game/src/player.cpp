@@ -490,12 +490,12 @@ void GameInstance::setPlayerEntityID(int id)
     this->_playerEntityID = id;
 }
 
-size_t GameInstance::getHealthId()
+int GameInstance::getHealthId()
 {
     return _healthId;
 }
 
-void GameInstance::setHealthId(size_t id)
+void GameInstance::setHealthId(int id)
 {
     _healthId = id;
 }

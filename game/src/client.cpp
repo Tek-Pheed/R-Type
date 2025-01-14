@@ -172,8 +172,8 @@ void RType::GameInstance::launchGame()
             + std::to_string(getLocalPlayer()
                                  .getComponent<ecs::HealthComponent>()
                                  ->getHealth());
-        setHealthId(getNewId());
-        _factory.buildText(getHealthId(), 0, 0, text);
+        setHealthId(static_cast<int>(getNewId()));
+        _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text);
     } catch (const std::exception &e) {
         levelMainMenu();
     }
