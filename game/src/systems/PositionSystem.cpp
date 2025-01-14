@@ -29,7 +29,9 @@ void PositionSystem::update(
         auto positionComponent = entity.getComponent<ecs::PositionComponent>();
         auto velocityComponent = entity.getComponent<ecs::VelocityComponent>();
         auto bullet = entity.getComponent<ecs::BulletComponent>();
-
+        auto enemy = entity.getComponent<ecs::EnemyComponent>();
+        if (enemy && enemy->getWave() != _game->currentWave)
+            continue;
         if (positionComponent && velocityComponent && !bullet) {
             float newX = static_cast<float>(positionComponent->getX())
                 + static_cast<float>(velocityComponent->getVx()) * deltaTime;
@@ -75,7 +77,6 @@ void PositionSystem::update(
                 if (player && positionComponent->getY() > maxY) {
                     positionComponent->setY(maxY);
                 }
-
                 if (ai) {
                     if (positionComponent->getX() > maxX) {
                         velocityComponent->setVx(
@@ -99,19 +100,27 @@ void PositionSystem::update(
                 }
 
             } else {
-                auto enemy = entity.getComponent<ecs::EnemyComponent>();
+                if (enemy && positionComponent
+                    && positionComponent->getX() < GameInstance::KILLZONE) {
+                    positionComponent->setX(
+                        GameInstance::RESOLUTION_X - GameInstance::KILLZONE);
+                }
+                if (enemy && positionComponent
+                    && positionComponent->getY() < GameInstance::KILLZONE) {
+                    positionComponent->setY(
+                        GameInstance::RESOLUTION_Y - GameInstance::KILLZONE);
+                }
+                if (enemy && positionComponent
+                    && positionComponent->getY() > GameInstance::RESOLUTION_Y
+                            - GameInstance::KILLZONE) {
+                    positionComponent->setY(GameInstance::KILLZONE);
+                }
                 if (enemy
                     && (positionComponent->getOldX()
                             != positionComponent->getX()
                         || positionComponent->getOldY()
                             != positionComponent->getY())) {
                     _game->sendEnemyPosition(enemy->getEnemyID());
-                }
-                if (enemy
-                    && (positionComponent->getX() < GameInstance::KILLZONE
-                        || positionComponent->getY()
-                            < -GameInstance::KILLZONE)) {
-                    _game->deleteEnemy(enemy->getEnemyID());
                 }
             }
         }

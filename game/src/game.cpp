@@ -102,6 +102,13 @@ void GameInstance::handleNetworkMechs(
             }
             break;
         }
+        case Protocol::M_WAVE: {
+            if (tokens.size() >= 1 && !isServer()) {
+                currentWave = std::atoi(tokens[0].c_str());
+                std::cout << "Changing wave: " << currentWave << std::endl;
+            }
+            break;
+        }
         default: break;
     }
 }
@@ -111,7 +118,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
     std::unique_lock lock(_gameLock);
     LevelConfig l(filename);
     auto map = l.parseLevelConfig();
-    size_t wave = 0;
+    int wave = 0;
 
     for (auto &[key, value] : map) {
         if (key == BUILD_BASIC_ENEMY) {
@@ -119,39 +126,33 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create basic "
                     "enemy from level config");
-            auto &ene = _factory.buildEnemy(getNewId(),
+            _factory.buildEnemy(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
-                (float) std::atof(value[4].c_str()));
-            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
-            auto vel = ene.getComponent<ecs::VelocityComponent>();
-            vel->setVx((float) std::atof(value[2].c_str()));
-            vel->setVy((float) std::atof(value[3].c_str()));
+                (float) std::atof(value[4].c_str()), wave,
+                (float) std::atof(value[2].c_str()),
+                (float) std::atof(value[3].c_str()));
         }
         if (key == BUILD_SHOOTER_ENEMY) {
             if (value.size() < 5)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create shooter "
                     "enemy from level config");
-            auto &ene = _factory.buildEnemyShooter(getNewId(),
+            _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
-                (float) std::atof(value[4].c_str()));
-            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
-            auto vel = ene.getComponent<ecs::VelocityComponent>();
-            vel->setVx((float) std::atof(value[2].c_str()));
-            vel->setVy((float) std::atof(value[3].c_str()));
+                (float) std::atof(value[4].c_str()), wave,
+                (float) std::atof(value[2].c_str()),
+                (float) std::atof(value[3].c_str()));
         }
         if (key == BUILD_BOSS) {
             if (value.size() < 3)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create boss "
                     "from level config");
-            auto &ene = _factory.buildBoss(getNewId(),
-                (float) std::atof(value[0].c_str()),
+            _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
-                (float) std::atof(value[2].c_str()));
-            ene.getComponent<ecs::EnemyComponent>()->setWave(wave);
+                (float) std::atof(value[2].c_str()), wave);
         }
         if (key == CHANGE_MUSIC) {
             if (value.size() < 1)
@@ -159,6 +160,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
                     THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
                                          "music from level config");
             std::stringstream ss;
+            _musicName = value[0];
+            std::cout << "Set music: " << _musicName << std::endl;
             ss << M_MUSIC << " " << value[0] << " " << PACKET_END;
             refNetworkManager.sendToAll(
                 System::Network::ISocket::TCP, ss.str());
@@ -169,6 +172,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
                     THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
                                          "background from level config");
             std::stringstream ss;
+            std::cout << "Set background: " << _bgName << std::endl;
+            _bgName = value[0];
             ss << M_BG << " " << value[0] << " " << PACKET_END;
             refNetworkManager.sendToAll(
                 System::Network::ISocket::TCP, ss.str());
@@ -177,7 +182,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
             if (value.size() < 1)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to set wave");
-            wave = (size_t) std::atoi(value[0].c_str());
+            wave = std::atoi(value[0].c_str());
+            std::cout << "Set wave to: " << wave << std::endl;
         }
     }
 }
@@ -286,6 +292,28 @@ void GameInstance::gamePostTick(
 
     if (!isServer()) {
         getWindow().display();
+    } else {
+        bool next = true;
+        auto entVect = refEntityManager.getCurrentLevel()
+                           .findEntitiesByComponent<ecs::EnemyComponent>();
+        if (entVect.size() == 0) {
+            return;
+        }
+        for (auto &ent : entVect) {
+            if (ent.get().getComponent<ecs::EnemyComponent>()->getWave()
+                <= currentWave) {
+                next = false;
+                break;
+            }
+        }
+        if (next) {
+            std::stringstream ss;
+            currentWave += 1;
+            std::cout << "Changing wave: " << currentWave << std::endl;
+            ss << M_WAVE << " " << currentWave << PACKET_END;
+            refNetworkManager.sendToAll(
+                System::Network::ISocket::TCP, ss.str());
+        }
     }
 }
 
@@ -298,41 +326,47 @@ int RType::GameInstance::manageBuffers()
         return 0;
 
     for (auto &buff : packets) {
-        std::string buffer = buff;
-        std::string codeStr = buffer.substr(0, 3);
-        int code = atoi(codeStr.c_str());
-        int code_int = isCodeValid(code);
-        std::vector<std::string> tokens;
-        if (code_int == -1) {
-            std::cout << "Invalid packet: " << buffer << std::endl;
-            return -1;
-        }
-        std::string str = buffer.substr(4, buffer.size() - 4);
-        std::istringstream ss(str);
-        std::string token;
-        std::cout << "Managing Buffer: " << buff << std::endl;
-        while (std::getline(ss, token, ' ')) {
-            tokens.push_back(token);
-        }
-        switch (code_int) {
-            case 0: handleNetworkPlayers(code, tokens); break;
-            case 1: handleNetworkEnemies(code, tokens); break;
-            // case 2: handle_terrain(code, tokens); break;
-            case 3: handleNetworkMechs(code, tokens); break;
-            case 24: handleLobby(code, tokens); break;
-            case 9:
-                if (isServer()) {
-                    serverHanlderValidateConnection(code, tokens);
-                } else {
-                    clientHandlerConnection(code, tokens);
-                }
-                break;
-            default: {
+        try {
+            std::string buffer = buff;
+            std::string codeStr = buffer.substr(0, 3);
+            int code = atoi(codeStr.c_str());
+            int code_int = isCodeValid(code);
+            std::vector<std::string> tokens;
+            if (code_int == -1) {
                 std::cout << "Invalid packet: " << buffer << std::endl;
-                break;
+                return -1;
             }
+            std::string str = buffer.substr(4, buffer.size() - 4);
+            std::istringstream ss(str);
+            std::string token;
+            std::cout << "Managing Buffer: " << buff << std::endl;
+            while (std::getline(ss, token, ' ')) {
+                tokens.push_back(token);
+            }
+            switch (code_int) {
+                case 0: handleNetworkPlayers(code, tokens); break;
+                case 1: handleNetworkEnemies(code, tokens); break;
+                // case 2: handle_terrain(code, tokens); break;
+                case 3: handleNetworkMechs(code, tokens); break;
+                case 24: handleLobby(code, tokens); break;
+                case 9:
+                    if (isServer()) {
+                        serverHanlderValidateConnection(code, tokens);
+                    } else {
+                        clientHandlerConnection(code, tokens);
+                    }
+                    break;
+                default: {
+                    std::cout << "Invalid packet: " << buffer << std::endl;
+                    break;
+                }
+            }
+            ss.clear();
+        } catch (const std::exception &e) {
+            std::cout << CATCH_ERROR_LOCATION "Failed to handle packet: "
+                      << buff << " : " << e.what() << std::endl;
+            continue;
         }
-        ss.clear();
     }
     return 0;
 }

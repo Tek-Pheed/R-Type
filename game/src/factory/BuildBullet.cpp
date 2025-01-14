@@ -64,6 +64,9 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
     auto positionComp = enemy.getComponent<ecs::PositionComponent>();
     if (!positionComp)
         return;
+    if (enemy.getComponent<ecs::EnemyComponent>()->getWave()
+        != _game.currentWave)
+        return;
     auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
     bullet.addComponent(std::make_shared<ecs::BulletComponent>(false));
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(-350.0f, 0));
@@ -103,6 +106,9 @@ void Factory::buildBulletFromBoss(size_t bossId)
     auto &boss = _game.getEnemyById(bossId);
     auto positionComp = boss.getComponent<ecs::PositionComponent>();
     if (!positionComp)
+        return;
+    if (boss.getComponent<ecs::EnemyComponent>()->getWave()
+        != _game.currentWave)
         return;
     auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
     bullet.addComponent(std::make_shared<ecs::BulletComponent>(false, 1));
