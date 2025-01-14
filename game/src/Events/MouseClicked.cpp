@@ -101,18 +101,6 @@ void EventManager::handleBonusButton(ecs::Entity &entity, bool isHost)
     }
 }
 
-int countTxtFiles(const std::string &folderPath)
-{
-    int count = 0;
-
-    for (const auto &entry : std::filesystem::directory_iterator(folderPath)) {
-        if (entry.path().extension() == ".txt") {
-            count++;
-        }
-    }
-    return count;
-}
-
 void EventManager::handleLevelButton(ecs::Entity &entity, bool isHost)
 {
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
@@ -132,12 +120,10 @@ void EventManager::handleLevelButton(ecs::Entity &entity, bool isHost)
     if (separator != std::string::npos) {
         std::string level = str.substr(separator + 2);
         int levelNB = std::atoi(level.c_str());
-        int maxLevel = countTxtFiles("./assets/levels");
 
-        if (levelNB >= maxLevel) {
+        if (levelNB >= _game._nbTxtFiles) {
             levelNB = 1;
             ss << Protocol::L_SETLEVEL << " " << id << " " << 1 << PACKET_END;
-
         } else {
             levelNB++;
             ss << Protocol::L_SETLEVEL << " " << id << " " << levelNB

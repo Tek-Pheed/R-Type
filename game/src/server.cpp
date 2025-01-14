@@ -15,12 +15,16 @@
 #include <exception>
 #include <mutex>
 #include <sstream>
+#include <filesystem>
+#include <regex>
 #include "Components.hpp"
+#include "Engine.hpp"
 #include "EngineNetworking.hpp"
 #include "Game.hpp"
 #include "GameProtocol.hpp"
 #include "SFML/Graphics/Text.hpp"
 #include "system_network.hpp"
+#include "ErrorClass.hpp"
 
 using namespace RType;
 
@@ -87,7 +91,9 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
     for (auto &e : refEntityManager.getCurrentLevel()
              .findEntitiesByComponent<ecs::EnemyComponent>()) {
         auto pos = e.get().getComponent<ecs::PositionComponent>();
+        auto vel = e.get().getComponent<ecs::VelocityComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
+        auto hl = e.get().getComponent<ecs::HealthComponent>();
         if (!ec || !pos) {
             std::cout << "serverSendGameState: Failed to get enemy"
                       << std::endl;
@@ -95,10 +101,28 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         }
         std::stringstream sss;
         sss << E_SPAWN << " " << ec->getEnemyID() << " " << ec->getType()
-            << " " << pos->getX() << " " << pos->getY() << PACKET_END;
+            << " " << pos->getX() << " " << pos->getY() << " "
+            << hl->getHealth() << " " << ec->getWave() << " " << vel->getVx()
+            << " " << vel->getVy() << PACKET_END;
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
+    std::stringstream s;
+    if (_musicName != "") {
+        s << M_MUSIC << " " << _musicName << " " << PACKET_END;
+        refNetworkManager.sendToOne(
+            clientID, System::Network::ISocket::Type::TCP, s.str());
+    }
+    s.clear();
+    if (_bgName != "") {
+        s << M_BG << " " << _bgName << " " << PACKET_END;
+        refNetworkManager.sendToOne(
+            clientID, System::Network::ISocket::Type::TCP, s.str());
+    }
+    s.clear();
+    s << M_WAVE << " " << currentWave << PACKET_END;
+    refNetworkManager.sendToOne(
+        clientID, System::Network::ISocket::Type::TCP, s.str());
     if (_gameStarted) {
         std::stringstream sss;
         sss << L_STARTGAME << " " << 0 << PACKET_END;
@@ -136,8 +160,30 @@ void RType::GameInstance::serverHanlderValidateConnection(
     }
 }
 
+std::vector<std::string> GameInstance::getTxtFiles(const std::string &path)
+{
+    std::vector<std::string> files;
+    std::regex levelPattern(R"(level([1-9][0-9]*)\.txt)");
+
+    for (const auto &entry : std::filesystem::directory_iterator(path)) {
+        std::string filename = entry.path().filename().string();
+        
+        if (entry.path().extension() == ".txt" && std::regex_match(filename, levelPattern)) {
+            files.push_back(filename);
+        }
+    }
+
+    return files;
+}
+
 void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
 {
+    std::vector<std::string> levelFiles = getTxtFiles("./assets/levels");
+
+    if (levelFiles.empty()) {
+        throw ErrorClass(THROW_ERROR_LOCATION "No level founds !");
+    }
+
     _isServer = true;
     _tcpPort = tcpPort;
     _udpPort = udpPort;
@@ -151,11 +197,14 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnServerLostClient,
         &GameInstance::serverEventClosedConn, *this);
+    refGameEngine.addEventBinding<GameInstance>(
+        Engine::Events::EVENT_PostTick, &GameInstance::gamePostTick, *this);
     auto &level = refEntityManager.createNewLevel("mainLevel");
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
+    
     refEntityManager.switchLevel("mainLevel");
 }
 

@@ -5,6 +5,10 @@
 ** KeyPressed.cpp
 */
 
+#if defined(WIN32)
+    #define NOMINMAX
+#endif
+
 #include "Config.hpp"
 #include "Events.hpp"
 #include "Utils.hpp"
@@ -72,6 +76,9 @@ void EventManager::keyPressed(sf::Event &event)
                 _game.handleInputButtons(_game._nicknameKeys);
             }
         }
+    }
+    if (event.key.code == sf::Keyboard::Escape) {
+        _game.refGameEngine.triggerEvent(Engine::Events::EVENT_DisconnectedFromServer);
     }
     if (_game.hasLocalPlayer()) {
             auto &player = _game.getLocalPlayer();

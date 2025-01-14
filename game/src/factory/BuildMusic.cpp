@@ -31,4 +31,23 @@ namespace RType
         s.setVolume(GameInstance::MUSIC_VOLUME);
         return (music);
     }
+
+    ecs::Entity &Factory::buildSoundEffect(
+        sf::SoundBuffer &soundBuffer, std::string str)
+    {
+        auto &music =
+            _game.refEntityManager.getPersistentLevel().createEntity();
+
+        sf::Sound a;
+        music.addComponent(
+            std::make_shared<ecs::MusicComponent<sf::Sound>>(a, str));
+
+        auto &s = music.getComponent<ecs::MusicComponent<sf::Sound>>()
+                      ->getMusicType();
+
+        s.setBuffer(soundBuffer);
+        s.setVolume(GameInstance::EXPLOSION_VOLUME);
+        s.play();
+        return (music);
+    }
 } // namespace RType

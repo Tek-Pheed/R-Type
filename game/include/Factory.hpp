@@ -32,15 +32,23 @@ namespace RType
         void buildBulletFromPlayer(size_t playerID);
         void buildBulletFromEnemy(size_t enemyID);
         void buildBulletFromBoss(size_t bossID);
-        ecs::Entity &buildEnemy(
-            size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &buildEnemy(size_t id, float posX, float posY,
+            float health = 100.0f, int wave = 0, float velocityX = -200.0f,
+            float velocityY = 0.0f);
         ecs::Entity &buildText(
             size_t id, float posX, float posY, std::string &content);
         ecs::Entity &buildMusic(sf::SoundBuffer &soundBuffer, std::string str);
-        ecs::Entity &buildEnemyShooter(
-            size_t id, float posX, float posY, float health = 100.0f);
-        ecs::Entity &buildBoss(
-            size_t id, float posX, float posY, float health = 5000.0f);
+        ecs::Entity &buildSoundEffect(sf::SoundBuffer &soundBuffer, std::string str);
+        ecs::Entity &buildEnemyShooter(size_t id, float posX, float posY,
+            float health = 100.0f, int wave = 0, float velocityX = -200.0f,
+            float velocityY = 0.0f);
+        ecs::Entity &buildBoss(size_t id, float posX, float posY,
+            float health = 5000.0f, int wave = 0);
+        ecs::Entity &getBossById(size_t bossID);
+        void sendBossPosition(size_t bossID);
+        void deleteBoss(size_t bossID);
+        void handleNetworkBosses(
+            int code, const std::vector<std::string> &tokens);
         ecs::Entity &buildAIPlayer(sf::Vector2f velocity,
             const std::string &name, std::size_t skinID);
         ecs::Entity &buildExplosionEnemy(float posX, float posY);

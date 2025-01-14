@@ -45,6 +45,7 @@ namespace RType
         constexpr auto R_TYPE_FONT = "rTypeFont";
         constexpr auto BULLET_BOSS = "bossBullet";
         constexpr auto BULLET_BOSS_SOUND = "bossBulletSound";
+        constexpr auto EXPLOSION_SOUND = "explosionSound";
         constexpr auto EXPLOSION_TEXTURE = "explosionTexture";
         constexpr auto EXPLOSION_PLAYER = "explosionPlayer";
 		constexpr auto BONUS_TEXTURE = "bonusTexture";
@@ -79,15 +80,15 @@ namespace RType
             {R_TYPE_FONT, "assets/font/r-type.ttf", typeid(sf::Font)},
             {BULLET_BOSS, "assets/sprites/r-typesheet30a.gif",
                 typeid(sf::Texture)},
-            {
-                BULLET_BOSS_SOUND,
-                "assets/sounds/bossBullet.ogg",
+            {BULLET_BOSS_SOUND, "assets/sounds/bossBullet.ogg",
+                typeid(sf::SoundBuffer),
+            },
+            {EXPLOSION_SOUND, "assets/sounds/tnt.ogg",
                 typeid(sf::SoundBuffer),
             },
             {EXPLOSION_TEXTURE, "assets/sprites/r-typesheet43.gif",
                 typeid(sf::Texture)},
-            {
-                EXPLOSION_PLAYER,
+            {EXPLOSION_PLAYER,
                 "assets/sprites/r-typesheet16.gif",
                 typeid(sf::Texture),
             }};

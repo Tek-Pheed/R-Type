@@ -43,7 +43,10 @@ void GameInstance::handleLobby(
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
-                loadLevelContent(LEVEL_CONFIG_PATH);
+                std::string levelFileName =
+                    "./assets/levels/level" + std::to_string(_level) + ".txt";
+                ;
+                loadLevelContent(levelFileName);
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -200,6 +203,13 @@ void GameInstance::handleLobby(
             }
             break;
         }
+        case Protocol::L_SENDLEVELS: {
+            if (tokens.size() >= 2) {
+                if (!_isServer) {
+                    this->_nbTxtFiles = std::atoi(tokens[0].c_str());
+                }
+            }
+        }
     }
 }
 
@@ -303,7 +313,7 @@ void GameInstance::handleNetworkPlayers(
                     && player.getID() == getLocalPlayer().getID()) {
                     auto healthEnt =
                         refEntityManager.getCurrentLevel().getEntityById(
-                            getHealthId());
+                            static_cast<size_t>(getHealthId()));
                     auto healthText =
                         healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
                     if (healthText && health) {
@@ -490,12 +500,12 @@ void GameInstance::setPlayerEntityID(int id)
     this->_playerEntityID = id;
 }
 
-size_t GameInstance::getHealthId()
+int GameInstance::getHealthId()
 {
     return (size_t) _healthId;
 }
 
-void GameInstance::setHealthId(size_t id)
+void GameInstance::setHealthId(int id)
 {
     _healthId = (int) id;
 }
