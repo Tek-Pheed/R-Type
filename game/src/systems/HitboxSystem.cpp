@@ -10,8 +10,10 @@
 #endif
 
 #include <cmath>
+#include <sstream>
 #include "Components.hpp"
 #include "Game.hpp"
+#include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 
 using namespace RType;
@@ -36,6 +38,7 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
 
     static float damageCooldown = 0.0f;
     damageCooldown -= deltaTime;
+
     for (size_t id : _game->refEntityManager.getCurrentLevel()
              .findEntitiesIdByComponent<ecs::PositionComponent>()) {
         try {
@@ -200,6 +203,64 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
     }
 }
 
+void HitboxSystem::BonusCollision(ecs::Entity &bonus)
+{
+    auto bonusPos = bonus.getComponent<ecs::PositionComponent>();
+    auto bonusComp = bonus.getComponent<ecs::BonusComponent>();
+    auto bonusHitB = bonus.getComponent<ecs::HitboxComponent>();
+    auto playerComp = bonus.getComponent<ecs::PlayerComponent>();
+
+    if (!bonusPos || !bonusComp || !bonusHitB || playerComp)
+        return;
+
+    for (size_t id : _game->refEntityManager.getCurrentLevel()
+             .findEntitiesIdByComponent<ecs::PositionComponent>()) {
+        try {
+            auto &enti =
+                _game->refEntityManager.getCurrentLevel().getEntityById(id);
+            auto position = enti.getComponent<ecs::PositionComponent>();
+            auto player = enti.getComponent<ecs::PlayerComponent>();
+            auto playerHitB = enti.getComponent<ecs::HitboxComponent>();
+            if (!position || !player || !playerHitB)
+                continue;
+            if (enti.getID() == bonus.getID())
+                continue;
+
+            float enemyCenterX =
+                position->getX() + playerHitB->getWidth() / 2.0f;
+            float enemyCenterY =
+                position->getY() + playerHitB->getHeight() / 2.0f;
+
+            float bulletCenterX =
+                bonusPos->getX() + bonusHitB->getWidth() / 2.0f;
+            float bulletCenterY =
+                bonusPos->getY() + bonusHitB->getHeight() / 2.0f;
+
+            float playerHalfWidth = playerHitB->getWidth() / 2;
+            float playerHalfHeight = playerHitB->getHeight() / 2;
+
+            float bulletHalfWidth = bonusHitB->getWidth() / 2;
+            float bulletHalfHeight = bonusHitB->getHeight() / 2;
+
+            if (std::abs(bulletCenterX - enemyCenterX)
+                    < (playerHalfWidth + bulletHalfWidth)
+                && std::abs(bulletCenterY - enemyCenterY)
+                    < (playerHalfHeight + bulletHalfHeight)) {
+                std::stringstream sss;
+                sss << BN_GET << " " << player->getPlayerID() << " "
+                    << bonusComp->getBonusID() << " " << bonusComp->getBonus()
+                    << " " << PACKET_END;
+                _game->refNetworkManager.sendToAll(
+                    System::Network::ISocket::Type::TCP, sss.str());
+                _game->refEntityManager.getCurrentLevel()
+                    .markEntityForDeletion(bonus.getID());
+            }
+        } catch (const std::exception &e) {
+            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+        }
+    }
+}
+
 void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
 {
     (void) entities;
@@ -210,6 +271,7 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
             auto bullet = entity.getComponent<ecs::BulletComponent>();
             auto enemy = entity.getComponent<ecs::EnemyComponent>();
+            auto bonus = entity.getComponent<ecs::BonusComponent>();
 
             if (enemy && enemy->getWave() != _game->currentWave)
                 continue;
@@ -231,6 +293,9 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             }
             if (_game->isServer() && enemy && position && velocity && hitbox) {
                 EnemyCollision(entity, deltaTime);
+            }
+            if (bonus && position && velocity && hitbox && _game->isServer()) {
+                BonusCollision(entity);
             }
         } catch (const std::exception &e) {
             std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;

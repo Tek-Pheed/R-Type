@@ -369,16 +369,21 @@ namespace ecs
         std::string _name;
     };
 
-    enum Bonus { RAPIDFIRE, DOUBLEFIRE, TRIPLEFIRE, ALLIES };
+    enum Bonus { RAPIDFIRE = 0, SPEED = 1, HEAL = 2, NONE = -1 };
 
     class BonusComponent : public Component {
       public:
         explicit BonusComponent(const Bonus &bonus);
+        BonusComponent(size_t bonusID, const Bonus &bonus);
 
         Bonus getBonus();
         void setBonus(const Bonus &bonus);
 
+        void setBonusID(size_t bonusID);
+        size_t getBonusID();
+
       private:
+        size_t _bonusID;
         Bonus _bonus;
     };
 

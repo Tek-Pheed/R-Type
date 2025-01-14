@@ -384,7 +384,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
