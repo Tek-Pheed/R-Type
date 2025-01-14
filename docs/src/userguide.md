@@ -216,7 +216,7 @@ The settings menu contains six buttons :
 
 The host can modify six game settings :
 
-- Gamemode : WAVE (enemy waves) or PVP (1v1 player battle).
+- Gamemode : WAVE (enemy waves) or PVP (player battle).
 
 - Number of Players : Choose between 4 and 10.
 
