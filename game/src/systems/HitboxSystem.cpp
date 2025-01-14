@@ -34,7 +34,6 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
 
     static float damageCooldown = 0.0f;
     damageCooldown -= deltaTime;
-
     for (size_t id : _game->refEntityManager.getCurrentLevel()
              .findEntitiesIdByComponent<ecs::PositionComponent>()) {
         try {
@@ -210,6 +209,9 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             auto bullet = entity.getComponent<ecs::BulletComponent>();
             auto enemy = entity.getComponent<ecs::EnemyComponent>();
 
+            if (enemy && enemy->getWave() != _game->currentWave)
+                continue;
+
             auto hitbox = entity.getComponent<ecs::HitboxComponent>();
             auto position = entity.getComponent<ecs::PositionComponent>();
             auto velocity = entity.getComponent<ecs::VelocityComponent>();
@@ -225,7 +227,7 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 && bullet->getIsFromPlayer() == false) {
                 EnemyBulletCollision(entity);
             }
-            if (enemy && position && velocity && hitbox) {
+            if (_game->isServer() && enemy && position && velocity && hitbox) {
                 EnemyCollision(entity, deltaTime);
             }
         } catch (const std::exception &e) {

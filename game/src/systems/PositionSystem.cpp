@@ -12,6 +12,7 @@
 #include "Components.hpp"
 #include "Game.hpp"
 #include "GameSystems.hpp"
+#include "components/AIComponent.hpp"
 
 using namespace RType;
 using namespace GameSystems;
@@ -29,7 +30,6 @@ void PositionSystem::update(
         auto velocityComponent = entity.getComponent<ecs::VelocityComponent>();
         auto bullet = entity.getComponent<ecs::BulletComponent>();
         auto enemy = entity.getComponent<ecs::EnemyComponent>();
-
         if (enemy && enemy->getWave() != _game->currentWave)
             continue;
         if (positionComponent && velocityComponent && !bullet) {
@@ -41,6 +41,7 @@ void PositionSystem::update(
             positionComponent->setY(newY);
 
             auto player = entity.getComponent<ecs::PlayerComponent>();
+            auto ai = entity.getComponent<ecs::AIComponent>();
             if (player
                 && (positionComponent->getOldX() != positionComponent->getX()
                     || positionComponent->getOldY()
@@ -76,6 +77,28 @@ void PositionSystem::update(
                 if (player && positionComponent->getY() > maxY) {
                     positionComponent->setY(maxY);
                 }
+                if (ai) {
+                    if (positionComponent->getX() > maxX) {
+                        velocityComponent->setVx(
+                            velocityComponent->getVx() * -1);
+                    }
+
+                    if (positionComponent->getY() > maxY) {
+                        velocityComponent->setVy(
+                            velocityComponent->getVy() * -1);
+                    }
+
+                    if (positionComponent->getX() < 0) {
+                        velocityComponent->setVx(
+                            velocityComponent->getVx() * -1);
+                    }
+
+                    if (positionComponent->getY() < 0) {
+                        velocityComponent->setVy(
+                            velocityComponent->getVy() * -1);
+                    }
+                }
+
             } else {
                 if (enemy && positionComponent
                     && positionComponent->getX() < GameInstance::KILLZONE) {
@@ -99,12 +122,6 @@ void PositionSystem::update(
                             != positionComponent->getY())) {
                     _game->sendEnemyPosition(enemy->getEnemyID());
                 }
-                // if (enemy
-                //     && (positionComponent->getX() < GameInstance::KILLZONE
-                //         || positionComponent->getY() <
-                //         -GameInstance::KILLZONE)) {
-                //     _game->deleteEnemy(enemy->getEnemyID());
-                // }
             }
         }
     }

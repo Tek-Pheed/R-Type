@@ -5,15 +5,11 @@
 ** game
 */
 
-#include "GameProtocol.hpp"
-#include "SFML/Audio/Music.hpp"
-#include "SFML/Audio/SoundBuffer.hpp"
-#include "SFML/Graphics/Rect.hpp"
-#include "system_network.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "Game.hpp"
 #include <any>
 #include <cstdlib>
 #include <exception>
@@ -30,13 +26,16 @@
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
-#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
+#include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "LevelConfig.hpp"
+#include "SFML/Audio/SoundBuffer.hpp"
 #include "SFML/Graphics/Font.hpp"
+#include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Texture.hpp"
+#include "system_network.hpp"
 
 using namespace RType;
 
@@ -194,7 +193,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-        i++) {
+         i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -260,8 +259,9 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 2.0f) {
-                for (auto entID : refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID :
+                    refEntityManager.getCurrentLevel()
+                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -330,7 +330,7 @@ int RType::GameInstance::manageBuffers()
             std::string buffer = buff;
             std::string codeStr = buffer.substr(0, 3);
             int code = atoi(codeStr.c_str());
-            int code_int = is_code_valid(code);
+            int code_int = isCodeValid(code);
             std::vector<std::string> tokens;
             if (code_int == -1) {
                 std::cout << "Invalid packet: " << buffer << std::endl;
@@ -348,7 +348,7 @@ int RType::GameInstance::manageBuffers()
                 case 1: handleNetworkEnemies(code, tokens); break;
                 // case 2: handle_terrain(code, tokens); break;
                 case 3: handleNetworkMechs(code, tokens); break;
-                case 24: handleLoby(code, tokens); break;
+                case 24: handleLobby(code, tokens); break;
                 case 9:
                     if (isServer()) {
                         serverHanlderValidateConnection(code, tokens);

@@ -22,10 +22,12 @@ void RenderSystem::initSystem(GameInstance &gameRef)
     _game = &gameRef;
 }
 
-void renderSprite(ecs::Entity &entity, sf::RenderWindow &window)
+void renderSprite(
+    ecs::Entity &entity, sf::RenderWindow &window, float deltaTime)
 {
     auto position = entity.getComponent<ecs::PositionComponent>();
     auto sprite = entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
+    float elapsedTime = 0.0f;
 
     if (!position || !sprite) {
         throw ErrorClass(THROW_ERROR_LOCATION
@@ -33,6 +35,20 @@ void renderSprite(ecs::Entity &entity, sf::RenderWindow &window)
             "component: position or sprite !");
         return;
     }
+
+    elapsedTime = sprite->getElapsedTime() + deltaTime;
+    if (sprite->getSizeX() != 0) {
+        if (elapsedTime >= sprite->getDelay()) {
+            auto textureRect = sprite->getSprite().getTextureRect();
+            textureRect.left += sprite->getSizeX();
+            if (textureRect.left >= sprite->getMaxX()) {
+                textureRect.left = sprite->getStartX();
+            }
+            sprite->getSprite().setTextureRect(textureRect);
+            elapsedTime -= sprite->getDelay();
+        }
+    }
+    sprite->setElapsedTime(elapsedTime);
     sprite->getSprite().setPosition(position->getX(), position->getY());
     window.draw(sprite->getSprite());
 }
@@ -59,13 +75,13 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
             position->getY()
                 + static_cast<float>(
                     sprite->getSprite().getTextureRect().height)
-                + 25);
+                + 15);
     } else {
         text->getText().setPosition(position->getX()
                 + (float) sprite->getSprite().getTextureRect().width
                     * sprite->getSprite().getScale().x / 2
                 - (float) text->getText().getLocalBounds().width / 2,
-            position->getY() - 15);
+            position->getY() - 30);
     }
     window.draw(sprite->getSprite());
     window.draw(text->getText());
@@ -141,7 +157,6 @@ void renderButton(ecs::Entity &entity, sf::RenderWindow &window)
     text->getText().setString(text->getStr());
     text->getText().setPosition(position->getX()
             + (float) rectangle->getSizeX() / 2
-            - (float) text->getStr().length()
             - (float) text->getText().getLocalBounds().width / 2,
         position->getY() + (float) rectangle->getSizeY() / 2
             - (float) text->getText().getCharacterSize() / 2);
@@ -178,8 +193,6 @@ void renderInput(ecs::Entity &entity, sf::RenderWindow &window)
 
 void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
 {
-    (void) deltaTime;
-
     for (auto &entity : entities) {
         auto renderComponent = entity.getComponent<ecs::RenderComponent>();
 
@@ -190,9 +203,9 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 if (entity.getComponent<ecs::EnemyComponent>()) {
                     if (entity.getComponent<ecs::EnemyComponent>()->getWave()
                         == _game->currentWave)
-                        renderSprite(entity, _game->getWindow());
+                        renderSprite(entity, _game->getWindow(), deltaTime);
                 } else {
-                    renderSprite(entity, _game->getWindow());
+                    renderSprite(entity, _game->getWindow(), deltaTime);
                 }
                 break;
             case ecs::RenderComponent::ObjectType::SPRITEANDTEXT:

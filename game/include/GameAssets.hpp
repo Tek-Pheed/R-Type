@@ -51,7 +51,7 @@ namespace RType
                 typeid(sf::Texture)},
             {ENEMY_TEXTURE, "assets/sprites/r-typesheet31.gif",
                 typeid(sf::Texture)},
-            {SHOOTERENEMY_TEXTURE, "assets/sprites/r-typesheet9.gif",
+            {SHOOTERENEMY_TEXTURE, "assets/sprites/r-typesheet11.gif",
                 typeid(sf::Texture)},
             {BOSS_TEXTURE, "assets/sprites/r-typesheet30.gif",
                 typeid(sf::Texture)},

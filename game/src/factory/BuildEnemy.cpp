@@ -50,8 +50,8 @@ ecs::Entity &RType::Factory::buildEnemy(size_t id, float posX, float posY,
         sprite.setScale(sf::Vector2f(2, 2));
         enemy.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
-        enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 1.0, 1.0));
+        enemy.addComponent(
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
     } else {
         auto pos = enemy.getComponent<ecs::PositionComponent>();
         auto ene = enemy.getComponent<ecs::EnemyComponent>();
@@ -217,7 +217,8 @@ ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(std::make_shared<ecs::VelocityComponent>(
         GameInstance::ENEMY_SHOOTER_VELOCITY, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(64.0f, 64.0f));
+    enemy.addComponent(
+        std::make_shared<ecs::HitboxComponent>(33.0f * 2.0f, 34.0f * 2.0f));
     enemy.getComponent<ecs::EnemyComponent>()->setWave(wave);
     enemy.getComponent<ecs::VelocityComponent>()->setVx(velocityX);
     enemy.getComponent<ecs::VelocityComponent>()->setVy(velocityY);
@@ -227,12 +228,12 @@ ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
 
         sf::Sprite sprite;
         sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(0, 16, 32, 32));
+        sprite.setTextureRect(sf::Rect(0, 0, 33, 34));
         sprite.setScale(sf::Vector2f(2, 2));
         enemy.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         enemy.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 1.0, 1.0));
+            sprite, 33, 0, 33 * 3, 0.1f, 0));
         buildBulletFromEnemy(id);
     } else {
         auto pos = enemy.getComponent<ecs::PositionComponent>();

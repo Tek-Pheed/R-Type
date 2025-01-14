@@ -5,7 +5,6 @@
 ** server specific functions
 */
 
-#include "Engine.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -17,6 +16,7 @@
 #include <mutex>
 #include <sstream>
 #include "Components.hpp"
+#include "Engine.hpp"
 #include "EngineNetworking.hpp"
 #include "Game.hpp"
 #include "GameProtocol.hpp"
@@ -88,6 +88,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
     for (auto &e : refEntityManager.getCurrentLevel()
              .findEntitiesByComponent<ecs::EnemyComponent>()) {
         auto pos = e.get().getComponent<ecs::PositionComponent>();
+        auto vel = e.get().getComponent<ecs::VelocityComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
         auto hl = e.get().getComponent<ecs::HealthComponent>();
         if (!ec || !pos) {
@@ -98,7 +99,8 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         std::stringstream sss;
         sss << E_SPAWN << " " << ec->getEnemyID() << " " << ec->getType()
             << " " << pos->getX() << " " << pos->getY() << " "
-            << hl->getHealth() << " " << ec->getWave() << PACKET_END;
+            << hl->getHealth() << " " << ec->getWave() << " " << vel->getVx()
+            << " " << vel->getVy() << PACKET_END;
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }

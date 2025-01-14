@@ -48,6 +48,8 @@ namespace RType
         void deleteBoss(size_t bossID);
         void handleNetworkBosses(
             int code, const std::vector<std::string> &tokens);
+        ecs::Entity &buildAIPlayer(sf::Vector2f velocity,
+            const std::string &name, std::size_t skinID);
 
       private:
         GameInstance &_game;

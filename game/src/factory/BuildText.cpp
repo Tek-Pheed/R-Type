@@ -49,8 +49,8 @@ ecs::Entity &RType::Factory::buildText(
             posY = static_cast<float>(_game.getWindow().getSize().y)
                 - textRect.height;
         }
-        text.getComponent<ecs::PositionComponent>()->setX(posX - 40);
-        text.getComponent<ecs::PositionComponent>()->setY(posY - 50);
+        text.getComponent<ecs::PositionComponent>()->setX(posX);
+        text.getComponent<ecs::PositionComponent>()->setY(posY);
 
         text.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::TEXT));

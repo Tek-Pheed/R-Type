@@ -33,19 +33,19 @@ ecs::Entity &RType::Factory::buildBoss(
     boss.addComponent(std::make_shared<ecs::HealthComponent>(health));
     boss.addComponent(std::make_shared<ecs::BulletComponent>(false));
     boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
-    boss.addComponent(std::make_shared<ecs::HitboxComponent>(150.0f, 414.0f));
+    boss.addComponent(std::make_shared<ecs::HitboxComponent>(160.0f, 414.0f));
     boss.getComponent<ecs::EnemyComponent>()->setWave(wave);
     if (!_game.isServer()) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
         sf::Sprite sprite;
         sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(0, 0, 183, 207));
+        sprite.setTextureRect(sf::Rect(17, 640, 163, 207));
         sprite.setScale(sf::Vector2f(2, 2));
         boss.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         boss.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
+            sprite, 163, 0, 17 + (163 * 4), 0.5f, 17));
     }
     if (_game.isServer()) {
         auto pos = boss.getComponent<ecs::PositionComponent>();
