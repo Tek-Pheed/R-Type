@@ -50,6 +50,8 @@ namespace RType
             int code, const std::vector<std::string> &tokens);
         ecs::Entity &buildAIPlayer(sf::Vector2f velocity,
             const std::string &name, std::size_t skinID);
+        ecs::Entity &buildExplosionEnemy(float posX, float posY);
+        ecs::Entity &buildExplosionPlayer(float posX, float posY);
 
       private:
         GameInstance &_game;

@@ -22,8 +22,8 @@ void RenderSystem::initSystem(GameInstance &gameRef)
     _game = &gameRef;
 }
 
-void renderSprite(
-    ecs::Entity &entity, sf::RenderWindow &window, float deltaTime)
+void renderSprite(ecs::Entity &entity, sf::RenderWindow &window,
+    float deltaTime, GameInstance &game)
 {
     auto position = entity.getComponent<ecs::PositionComponent>();
     auto sprite = entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
@@ -42,7 +42,11 @@ void renderSprite(
             auto textureRect = sprite->getSprite().getTextureRect();
             textureRect.left += sprite->getSizeX();
             if (textureRect.left >= sprite->getMaxX()) {
-                textureRect.left = sprite->getStartX();
+                if (sprite->getOnce()) {
+                    game.refEntityManager.getCurrentLevel()
+                        .markEntityForDeletion(entity.getID());
+                } else
+                    textureRect.left = sprite->getStartX();
             }
             sprite->getSprite().setTextureRect(textureRect);
             elapsedTime -= sprite->getDelay();

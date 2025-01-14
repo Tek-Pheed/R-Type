@@ -109,6 +109,10 @@ void GameInstance::deleteEnemy(size_t enemyID)
     std::unique_lock lock(_gameLock);
     std::cout << "Deleting enemy: " << enemyID << std::endl;
     auto &ene = getEnemyById(enemyID);
+    if (!isServer())
+        _factory.buildExplosionEnemy(
+            ene.getComponent<ecs::PositionComponent>()->getX(),
+            ene.getComponent<ecs::PositionComponent>()->getY());
     refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
     if (isServer()) {
         std::stringstream ss;
