@@ -502,10 +502,10 @@ void GameInstance::setPlayerEntityID(int id)
 
 int GameInstance::getHealthId()
 {
-    return (size_t) _healthId;
+    return _healthId;
 }
 
 void GameInstance::setHealthId(int id)
 {
-    _healthId = (int) id;
+    _healthId = id;
 }
