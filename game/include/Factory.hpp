@@ -41,13 +41,10 @@ namespace RType
             size_t id, float posX, float posY, float health = 100.0f);
         ecs::Entity &buildBoss(
             size_t id, float posX, float posY, float health = 5000.0f);
-        ecs::Entity &getBossById(size_t bossID);
-        void sendBossPosition(size_t bossID);
-        void deleteBoss(size_t bossID);
-        void handleNetworkBosses(
-            int code, const std::vector<std::string> &tokens);
         ecs::Entity &buildAIPlayer(sf::Vector2f velocity,
             const std::string &name, std::size_t skinID);
+        ecs::Entity &buildExplosionEnemy(float posX, float posY);
+        ecs::Entity &buildExplosionPlayer(float posX, float posY);
 
       private:
         GameInstance &_game;

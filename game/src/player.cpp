@@ -380,6 +380,10 @@ void GameInstance::deletePlayer(size_t playerID)
     if (isServer() || _isConnectedToServer) {
         auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
+        if (!isServer())
+            _factory.buildExplosionPlayer(
+                pl.getComponent<ecs::PositionComponent>()->getX(),
+                pl.getComponent<ecs::PositionComponent>()->getY());
         refEntityManager.getCurrentLevel().markEntityForDeletion(pl.getID());
         std::stringstream ss;
         ss << P_DEAD << " " << playerID << " " << PACKET_END;
