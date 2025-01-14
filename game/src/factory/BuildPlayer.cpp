@@ -38,7 +38,7 @@ namespace RType
                 _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
             sf::Sprite sprite;
             sprite.setTexture(texture);
-            sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
+            sprite.setTextureRect(sf::Rect(66, (17 * (rand() % 4)), 33, 18));
             sprite.setScale(sf::Vector2f(3, 3));
             player.addComponent(std::make_shared<ecs::RenderComponent>(
                 ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
