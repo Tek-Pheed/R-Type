@@ -189,7 +189,6 @@ namespace RType
 
         // Ticks
         uint64_t getTicks() const;
-        Config _gameConfig;
         int currentWave = 0;
 
         // Game Value
