@@ -176,32 +176,6 @@ namespace RType
 
         Config _gameConfig;
 
-        //     int createConnection(const char *ip, int portTCP, int portUDP);
-        //     void writeToServer(
-        //         const std::string &data, System::Network::ISocket::Type
-        //         socketType);
-        //     void receiveMessage();
-
-        //     void handleConnection(int code, std::vector<std::string>
-        //     &tokens); void handleEnemy(int code, std::vector<std::string>
-        //     &tokens); void handleTerrain(int code, std::vector<std::string>
-        //     &tokens); void handleMechs(int code, std::vector<std::string>
-        //     &tokens); void addEntity(ecs::Entity & entity);
-
-        //     // Player Management
-        //     void createNewPlayer(std::vector<std::string> &tokens);
-        //     void setNewPosition(std::vector<std::string> &tokens);
-        //     void playerDead(std::vector<std::string> &tokens);
-        //     void createProjectile(std::vector<std::string> &tokens);
-        //     void setPlayerHealth(std::vector<std::string> &tokens);
-        //     void playerDisconnection(std::vector<std::string> &tokens);
-
-        //     // Enemy Management
-        //     void createEnemy(std::vector<std::string> &tokens);
-        //     void enemyDead(std::vector<std::string> &tokens);
-        //     void enemyShoot(std::vector<std::string> &tokens);
-        //     void enemyDamage(std::vector<std::string> &tokens);
-
         bool _isSettingsUpButtonClicked = false;
         bool _isSettingsRightButtonClicked = false;
         bool _isSettingsLeftButtonClicked = false;
