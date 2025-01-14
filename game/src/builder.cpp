@@ -250,7 +250,7 @@ void RType::GameInstance::levelLobbyMenu()
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * 1),
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
-            "GAMEMODE : PVP", 40, sf::Color::Black,
+            "GAMEMODE : WAVE", 40, sf::Color::Black,
             ecs::ClickableType::GAMEMODE);
 
         _factory.buildButton(
