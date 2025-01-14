@@ -549,43 +549,7 @@ void RType::GameInstance::handleInputButtons(
 
 void RType::GameInstance::levelPauseMenu()
 {
-    if (!isServer()) {
-        std::string title = "PAUSE";
-
-        auto &text = _factory.buildText(0, 0, 0, title);
-        auto titleText = text.getComponent<ecs::TextComponent<sf::Text>>();
-        auto titlePos = text.getComponent<ecs::PositionComponent>();
-
-        titlePos->setX(
-            (float) (static_cast<float>(_window->getSize().x - 700 / 2) - 50
-                - titleText->getText().getLocalBounds().width / 2));
-        titlePos->setY(
-            (float) (this->_window->getSize().y / 2 - 50 / 2 - 75 * 1));
-
-        _factory.buildButton(
-            sf::Vector2f(
-                (float) this->_window->getSize().x / 2 - (float) / 2,
-                (float) this->_window->getSize().y / 2 - (float) 50 / 2
-                    - (float) 75 * 0),
-            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black, "RESUME",
-            40, sf::Color::Black, ecs::ClickableType::MULTIPLAYER);
-
-        _factory.buildButton(
-            sf::Vector2f(
-                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
-                (float) this->_window->getSize().y / 2 - (float) 50 / 2
-                    - (float) 75 * -1),
-            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black, "SETTINGS",
-            40, sf::Color::Black, ecs::ClickableType::SETTINGS);
-
-        _factory.buildButton(
-            sf::Vector2f(
-                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
-                (float) this->_window->getSize().y / 2 - (float) 50 / 2
-                    - (float) 75 * -2),
-            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black, "EXIT",
-            40, sf::Color::Black, ecs::ClickableType::EXIT);
-    }
+    
 }
 
 void RType::GameInstance::handleConfigButtons(
