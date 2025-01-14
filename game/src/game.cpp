@@ -5,15 +5,11 @@
 ** game
 */
 
-#include "GameProtocol.hpp"
-#include "SFML/Audio/Music.hpp"
-#include "SFML/Audio/SoundBuffer.hpp"
-#include "SFML/Graphics/Rect.hpp"
-#include "system_network.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
 
+#include "Game.hpp"
 #include <any>
 #include <cstdlib>
 #include <exception>
@@ -30,13 +26,16 @@
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
-#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameEvents.hpp"
+#include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "LevelConfig.hpp"
+#include "SFML/Audio/SoundBuffer.hpp"
 #include "SFML/Graphics/Font.hpp"
+#include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Texture.hpp"
+#include "system_network.hpp"
 
 using namespace RType;
 
