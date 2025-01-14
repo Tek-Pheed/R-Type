@@ -50,8 +50,8 @@ namespace RType
         static constexpr auto ENEMY_VELOCITY = -200.0f;
         static constexpr auto ENEMY_SHOOTER_VELOCITY = -150.0f;
 
-        static constexpr float MUSIC_VOLUME = 15.0f;
-        static constexpr float EFFECT_VOLUME = 10.0f;
+        static constexpr float MUSIC_VOLUME = 25.0f;
+        static constexpr float EFFECT_VOLUME = 5.0f;
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
@@ -109,13 +109,6 @@ namespace RType
 
         std::string _playerName;
 
-        // Enemies
-        ecs::Entity &buildEnemy(
-            size_t id, float posX, float posY, float health);
-
-        ecs::Entity &buildEnemyShooter(
-            size_t id, float posX, float posY, float health);
-
         ecs::Entity &getEnemyById(size_t enemyID);
         void sendEnemyPosition(size_t enemyID);
         void deleteEnemy(size_t enemyID);
@@ -125,8 +118,8 @@ namespace RType
             int code, const std::vector<std::string> &tokens);
 
         // Boss
-        ecs::Entity &buildBoss(
-            size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &buildBoss(size_t id, float posX, float posY,
+            float health = 100.0f, int wave = 0);
         ecs::Entity &getBossById(size_t bossID);
         void sendBossPosition(size_t bossID);
         void deleteBoss(size_t bossID);
@@ -169,8 +162,6 @@ namespace RType
         Engine::Feature::LevelManager<GameInstance> &refEntityManager;
         Engine::Feature::AssetManager &refAssetManager;
         Engine::Feature::NetworkingManager &refNetworkManager;
-
-        Config _gameConfig;
 
         //     int createConnection(const char *ip, int portTCP, int portUDP);
         //     void writeToServer(
@@ -218,6 +209,8 @@ namespace RType
 
         // Ticks
         uint64_t getTicks() const;
+        Config _gameConfig;
+        int currentWave = 0;
 
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
@@ -231,6 +224,9 @@ namespace RType
         std::string _ip = DEFAULT_IP;
 
         Factory _factory;
+
+        std::string _musicName;
+        std::string _bgName;
 
         uint64_t _ticks = 0U;
         uint64_t _lastNetTick = 0U;

@@ -131,7 +131,7 @@ Sets the name of a player.
 
 This are the instructions used to manage the enemies
 
-- Enemy spawn (id, type, x, y) - 111 -> TCP
+- Enemy spawn (id, type, x, y, health, wave, velocityX, velocityY) - 111 -> TCP
 
 The type represent the enemy type (0 for basic, 1 for shooter)
 Sent by the server to all the clients to spawn an enemy at a specific position.
@@ -164,8 +164,7 @@ Removed a terrain, if its has been destroyed or went off the screen.
 
 # Game Mechanics (130)
 
-- New wave (waveNb) - 131 -> TCP
-- Wave over (waveNb) - 132 -> TCP
+- Set wave (waveNb) - 131 -> TCP
 - Win - 133 -> TCP
 - Lose - 134 -> TCP
 - Game Over - 135 -> TCP

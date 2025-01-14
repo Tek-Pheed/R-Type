@@ -5,6 +5,7 @@
 ** server specific functions
 */
 
+#include "Engine.hpp"
 #if defined(WIN32)
     #define NOMINMAX
 #endif
@@ -88,6 +89,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
              .findEntitiesByComponent<ecs::EnemyComponent>()) {
         auto pos = e.get().getComponent<ecs::PositionComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
+        auto hl = e.get().getComponent<ecs::HealthComponent>();
         if (!ec || !pos) {
             std::cout << "serverSendGameState: Failed to get enemy"
                       << std::endl;
@@ -95,10 +97,27 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         }
         std::stringstream sss;
         sss << E_SPAWN << " " << ec->getEnemyID() << " " << ec->getType()
-            << " " << pos->getX() << " " << pos->getY() << PACKET_END;
+            << " " << pos->getX() << " " << pos->getY() << " "
+            << hl->getHealth() << " " << ec->getWave() << PACKET_END;
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
+    std::stringstream s;
+    if (_musicName != "") {
+        s << M_MUSIC << " " << _musicName << " " << PACKET_END;
+        refNetworkManager.sendToOne(
+            clientID, System::Network::ISocket::Type::TCP, s.str());
+    }
+    s.clear();
+    if (_bgName != "") {
+        s << M_BG << " " << _bgName << " " << PACKET_END;
+        refNetworkManager.sendToOne(
+            clientID, System::Network::ISocket::Type::TCP, s.str());
+    }
+    s.clear();
+    s << M_WAVE << " " << currentWave << PACKET_END;
+    refNetworkManager.sendToOne(
+        clientID, System::Network::ISocket::Type::TCP, s.str());
     if (_gameStarted) {
         std::stringstream sss;
         sss << L_STARTGAME << " " << 0 << PACKET_END;
@@ -151,6 +170,8 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
     refGameEngine.addEventBinding<GameInstance>(
         Engine::Events::EVENT_OnServerLostClient,
         &GameInstance::serverEventClosedConn, *this);
+    refGameEngine.addEventBinding<GameInstance>(
+        Engine::Events::EVENT_PostTick, &GameInstance::gamePostTick, *this);
     auto &level = refEntityManager.createNewLevel("mainLevel");
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BulletSystem>().initSystem(*this);
