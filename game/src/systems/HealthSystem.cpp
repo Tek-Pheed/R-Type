@@ -62,7 +62,7 @@ void HealthSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 }
             }
         }
-        if (floor(health->getHealth()) <= 0) {
+        if (_game->isServer() && floor(health->getHealth()) <= 0) {
             if (entity.getComponent<ecs::PlayerComponent>()) {
                 _game->deletePlayer(
                     entity.getComponent<ecs::PlayerComponent>()
