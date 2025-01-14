@@ -212,7 +212,7 @@ int RType::GameInstance::manageBuffers()
         std::string buffer = buff;
         std::string codeStr = buffer.substr(0, 3);
         int code = atoi(codeStr.c_str());
-        int code_int = is_code_valid(code);
+        int code_int = isCodeValid(code);
         std::vector<std::string> tokens;
         if (code_int == -1) {
             std::cout << "Invalid packet: " << buffer << std::endl;

@@ -11,11 +11,27 @@
 #include <sstream>
 #include "Components.hpp"
 #include "Config.hpp"
+#include "Entity.hpp"
 #include "Events.hpp"
 #include "GameProtocol.hpp"
 #include "components/ClickableComponent.hpp"
 
 using namespace RType;
+
+void EventManager::handleStartButton(bool isHost)
+{
+    size_t id = _game.getLocalPlayer()
+                    .getComponent<ecs::PlayerComponent>()
+                    ->getPlayerID();
+    std::stringstream ss;
+    if (isHost && id != _game.getHostClient())
+        return;
+    if (isHost) {
+        ss << Protocol::L_STARTGAME << " " << id << " " << PACKET_END;
+        _game.refNetworkManager.sendToAll(
+            System::Network::ISocket::Type::TCP, ss.str());
+    }
+}
 
 void EventManager::handleDifficultyButton(ecs::Entity &entity, bool isHost)
 {
@@ -164,7 +180,6 @@ void EventManager::handleNumberOfPlayerButton(ecs::Entity &entity, bool isHost)
         }
         text->setStr("NUMBER OF PLAYER : " + std::to_string(maxPlayerNB));
         if (isHost) {
-            std::cout << "Sending to all " << ss.str() << std::endl;
             _game.refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, ss.str());
         }
@@ -188,20 +203,15 @@ void EventManager::handleGamemodeButton(ecs::Entity &entity, bool isHost)
     std::stringstream ss;
 
     if (separator != std::string::npos) {
-        std::string maxPlayer = str.substr(separator + 1);
-        int maxPlayerNB = std::atoi(maxPlayer.c_str());
-        if (maxPlayerNB >= 10) {
-            maxPlayerNB = 4;
-            ss << Protocol::L_SETMAXPLAYRS << " " << id << " " << 4
-               << PACKET_END;
+        std::string gameMode = str.substr(separator + 2);
+        if (gameMode == "WAVE") {
+            text->setStr("GAMEMODE : PVP");
+            ss << Protocol::L_GAMEMODE << " " << id << " " << 1 << PACKET_END;
         } else {
-            maxPlayerNB++;
-            ss << Protocol::L_SETMAXPLAYRS << " " << id << " " << maxPlayerNB
-               << PACKET_END;
+            text->setStr("GAMEMODE : WAVE");
+            ss << Protocol::L_GAMEMODE << " " << id << " " << 0 << PACKET_END;
         }
-        text->setStr("NUMBER OF PLAYER : " + std::to_string(maxPlayerNB));
         if (isHost) {
-            std::cout << "Sending to all " << ss.str() << std::endl;
             _game.refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, ss.str());
         }
@@ -213,9 +223,10 @@ void EventManager::mouseClicked()
     sf::Vector2f mousePos = _game.getWindow().mapPixelToCoords(
         sf::Mouse::getPosition(_game.getWindow()));
     bool currentAutoFireValue = _game._gameConfig.getAutoFireConfig();
-    for (size_t ent :
-        _game.refEntityManager.getCurrentLevel().findEntitiesIdByComponent<ecs::RenderComponent>()) {
-        auto &entity = _game.refEntityManager.getCurrentLevel().getEntityById(ent);
+    for (size_t ent : _game.refEntityManager.getCurrentLevel()
+                          .findEntitiesIdByComponent<ecs::RenderComponent>()) {
+        auto &entity =
+            _game.refEntityManager.getCurrentLevel().getEntityById(ent);
         auto button = entity.getComponent<ecs::RenderComponent>();
         if (!button
             || (button->getObjectType()
@@ -297,7 +308,9 @@ void EventManager::mouseClicked()
                 case ecs::ClickableType::BONUS:
                     handleBonusButton(entity, true);
                     break;
-                case ecs::ClickableType::LAUNCH: _game.launchGame(); break;
+                case ecs::ClickableType::LAUNCH:
+                    handleStartButton(true);
+                    break;
                 case ecs::ClickableType::LEVEL:
                     handleLevelButton(entity, true);
                     break;

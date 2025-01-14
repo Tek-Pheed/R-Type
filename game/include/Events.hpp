@@ -30,6 +30,7 @@ class EventManager {
     void handleDifficultyButton(ecs::Entity &entity, bool isHost);
     void handleBonusButton(ecs::Entity &entity, bool isHost);
     void handleLevelButton(ecs::Entity &entity, bool isHost);
+    void handleStartButton(bool isHost);
     void handleGamemodeButton(ecs::Entity &entity, bool isHost);
 
   protected:

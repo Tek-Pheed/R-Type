@@ -60,7 +60,8 @@ namespace RType
         L_SETMAXPLAYRS = 242,
         L_SETDIFFICULTY = 243,
         L_SETBONUS = 244,
-        L_SETLEVEL = 245
+        L_SETLEVEL = 245,
+        L_GAMEMODE = 246,
     };
 
     template <typename... Args>

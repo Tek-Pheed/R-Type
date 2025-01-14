@@ -60,6 +60,7 @@ void GameInstance::handleLobby(
                     currentSong->getMusicType().setBuffer(newMusic);
                     currentSong->getMusicType().play();
                 }
+                launchGame();
             }
             break;
         }
@@ -165,6 +166,33 @@ void GameInstance::handleLobby(
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     sss << L_SETLEVEL << " " << id << " " << _level << " "
+                        << PACKET_END;
+                    refNetworkManager.sendToOthers(
+                        id, System::Network::ISocket::Type::TCP, sss.str());
+                }
+            }
+            break;
+        }
+        case Protocol::L_GAMEMODE: {
+            if (tokens.size() >= 2) {
+                _gamemode = (size_t) atoi(tokens[1].c_str());
+                auto enti = refEntityManager.getCurrentLevel().getEntities();
+                if (!_isServer)
+                    for (auto &entity : enti) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        if (text
+                            && text->getStr().find("GAMEMODE")
+                                != std::string::npos) {
+                            eventManager.handleGamemodeButton(
+                                entity.get(), false);
+                        }
+                    }
+                if (_isServer) {
+                    std::stringstream sss;
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    sss << L_GAMEMODE << " " << id << " " << _gamemode << " "
                         << PACKET_END;
                     refNetworkManager.sendToOthers(
                         id, System::Network::ISocket::Type::TCP, sss.str());

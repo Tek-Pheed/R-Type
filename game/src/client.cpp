@@ -156,7 +156,6 @@ void RType::GameInstance::launchGame()
 {
     std::unique_lock lock(_gameLock);
     try {
-        clientStartLevel();
         for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
             auto render = entity.get().getComponent<ecs::RenderComponent>();
             if (!render)

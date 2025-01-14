@@ -131,7 +131,7 @@ namespace RType
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
 
         // Networking
-        int is_code_valid(int code);
+        int isCodeValid(int code);
         int manageBuffers();
         void connectToGame();
         void clientStartLevel();
@@ -221,6 +221,8 @@ namespace RType
         size_t _difficulty = DEFAULT_DIFFICULTY;
         bool _bonus = false;
         size_t _level = 1;
+        // 0 for wave, 1 for pvp
+        size_t _gamemode = 0;
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
         bool _isServer;
