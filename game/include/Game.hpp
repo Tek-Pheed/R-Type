@@ -93,6 +93,7 @@ namespace RType
         void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         void loadLevelContent(const std::string &filename);
+        void loadPvPLevel();
 
         // Player functions and utilities
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
@@ -211,6 +212,8 @@ namespace RType
 
         // Game Value
         size_t getDifficulty() const;
+        size_t getGameMode() const;
+        void setGameMode(size_t mode);
 
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;

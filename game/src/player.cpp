@@ -47,7 +47,11 @@ void GameInstance::handleLobby(
                 std::string levelFileName =
                     "assets/levels/level" + std::to_string(_level) + ".txt";
                 ;
-                loadLevelContent(levelFileName);
+                if (_gamemode == 0)
+                    loadLevelContent(levelFileName);
+                else
+                    loadPvPLevel();
+
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -64,6 +68,8 @@ void GameInstance::handleLobby(
                     currentSong->getMusicType().setBuffer(newMusic);
                     currentSong->getMusicType().play();
                 }
+                if (_gamemode == 1)
+                    loadPvPLevel();
                 launchGame();
             }
             break;

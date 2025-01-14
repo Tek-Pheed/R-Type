@@ -44,8 +44,12 @@ namespace ecs
         size_t getPlayerID() const;
         void setPlayerID(size_t playerID);
 
+        void setTeam(int team);
+        int getTeam() const;
+
       private:
         size_t _playerID;
+        int _team;
     };
 
     class VelocityComponent : public Component {
