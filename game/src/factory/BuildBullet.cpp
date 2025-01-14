@@ -69,7 +69,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(-350.0f, 0));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
         positionComp->getX(), positionComp->getY() + 25));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(33, 22));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(35, 22));
 
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << enemyID << PACKET_END;
