@@ -53,6 +53,7 @@ namespace RType
 
         static constexpr float MUSIC_VOLUME = 25.0f;
         static constexpr float EFFECT_VOLUME = 5.0f;
+        static constexpr float EXPLOSION_VOLUME = 60.0f;
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();

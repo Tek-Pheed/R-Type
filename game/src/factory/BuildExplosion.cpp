@@ -26,6 +26,10 @@ ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
         std::make_shared<ecs::PositionComponent>(posX, posY));
     auto &texture =
         _game.refAssetManager.getAsset<sf::Texture>(Asset::EXPLOSION_TEXTURE);
+    auto &explosionSound = 
+        _game.refAssetManager.getAsset<sf::SoundBuffer>(Asset::EXPLOSION_SOUND);
+
+    buildSoundEffect(explosionSound, "explosionSound");
 
     sf::Sprite sprite;
     sprite.setTexture(texture);
@@ -46,11 +50,16 @@ ecs::Entity &Factory::buildExplosionPlayer(float posX, float posY)
         std::make_shared<ecs::PositionComponent>(posX, posY));
     auto &texture =
         _game.refAssetManager.getAsset<sf::Texture>(Asset::EXPLOSION_PLAYER);
+    auto &explosionSound = 
+        _game.refAssetManager.getAsset<sf::SoundBuffer>(Asset::EXPLOSION_SOUND);
+
+    buildSoundEffect(explosionSound, "explosionSound");
 
     sf::Sprite sprite;
     sprite.setTexture(texture);
     sprite.setTextureRect(sf::Rect(168, 37, 33, 33));
     sprite.setScale(sf::Vector2f(3, 3));
+
 
     explosion.addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::RenderComponent::ObjectType::SPRITE));
