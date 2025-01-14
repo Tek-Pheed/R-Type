@@ -228,15 +228,9 @@ The host can modify six game settings :
 
 - Avoid getting hit (you have 100 HP).
 
-### In-Game Pause Menu
+### In-Game Exit
 
-Press Esc to open the pause menu with three options :
-
-- Back to Game : Resumes gameplay.
-
-- Settings : Adjust movement controls and auto fire.
-
-- Exit : Returns to the main menu (leaving the match but not closing the game).
+Press Esc to exit the current game and go back to the main menu.
 
 ### Game Objective
 

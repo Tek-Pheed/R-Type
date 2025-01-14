@@ -53,9 +53,8 @@ namespace RType
         static constexpr auto ENEMY_VELOCITY = -200.0f;
         static constexpr auto ENEMY_SHOOTER_VELOCITY = -150.0f;
 
-        static constexpr float MUSIC_VOLUME = 25.0f;
-        static constexpr float EFFECT_VOLUME = 5.0f;
-        static constexpr float EXPLOSION_VOLUME = 60.0f;
+        static constexpr float MUSIC_VOLUME = 18.0f;
+        static constexpr float BULLET_VOLUME = 5.0f;
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
