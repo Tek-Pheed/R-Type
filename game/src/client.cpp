@@ -11,12 +11,12 @@
 
 #include <cstdlib>
 #include <exception>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
-#include <filesystem>
 #include "Components.hpp"
 #include "Config.hpp"
 #include "Engine.hpp"
@@ -157,7 +157,8 @@ void RType::GameInstance::connectToGame()
 
         ss << L_SENDLEVELS << " " << nbTxtFiles << PACKET_END;
 
-        refNetworkManager.sendToAll(System::Network::ISocket::Type::TCP, ss.str());
+        refNetworkManager.sendToAll(
+            System::Network::ISocket::Type::TCP, ss.str());
 
         levelLobbyMenu();
 
@@ -191,8 +192,8 @@ void RType::GameInstance::launchGame()
         }
         std::string text = "Health: "
             + std::to_string(getLocalPlayer()
-                                 .getComponent<ecs::HealthComponent>()
-                                 ->getHealth());
+                    .getComponent<ecs::HealthComponent>()
+                    ->getHealth());
         setHealthId(static_cast<int>(getNewId()));
         _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text);
     } catch (const std::exception &e) {
@@ -286,7 +287,7 @@ void GameInstance::playEvent()
                         && event.key.code == sf::Keyboard::Space
                         && this->_fireClock.getElapsedTime().asSeconds()
                             >= (bonus->getBonus() == ecs::Bonus::RAPIDFIRE
-                                    ? 0.05f
+                                    ? 0.10f
                                     : 0.25f)) {
                         if (_netClientID >= 0) {
                             _factory.buildBulletFromPlayer(
@@ -321,7 +322,7 @@ void GameInstance::playEvent()
 
         if (autoFireEnabled && _gameStarted
             && this->_fireClock.getElapsedTime().asSeconds()
-                >= (bonus->getBonus() == ecs::Bonus::RAPIDFIRE ? 0.15f
+                >= (bonus->getBonus() == ecs::Bonus::RAPIDFIRE ? 0.10f
                                                                : 0.25f)) {
             if (_netClientID >= 0) {
                 _factory.buildBulletFromPlayer((size_t) _netClientID);
