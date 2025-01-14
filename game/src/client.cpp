@@ -259,7 +259,8 @@ void GameInstance::playEvent()
             event_manager.keyPressed(event);
             if (!_gameStarted) {
                 if (event.key.code == sf::Keyboard::Tab) {
-                    clientStartLevel();
+                    continue;
+                    // clientStartLevel();
                 }
             }
             if (hasLocalPlayer() && _gameStarted) {
