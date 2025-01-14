@@ -200,6 +200,57 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
     }
 }
 
+void HitboxSystem::BonusCollision(ecs::Entity &bonus)
+{
+    auto bonusPos = bonus.getComponent<ecs::PositionComponent>();
+    auto bonusComp = bonus.getComponent<ecs::BonusComponent>();
+    auto bonusHitB = bonus.getComponent<ecs::HitboxComponent>();
+
+    if (!bonusPos || !bonusComp || !bonusHitB)
+        return;
+
+    for (size_t id : _game->refEntityManager.getCurrentLevel()
+             .findEntitiesIdByComponent<ecs::PositionComponent>()) {
+        try {
+            auto &enti =
+                _game->refEntityManager.getCurrentLevel().getEntityById(id);
+            auto position = enti.getComponent<ecs::PositionComponent>();
+            auto player = enti.getComponent<ecs::PlayerComponent>();
+            auto playerHitB = enti.getComponent<ecs::HitboxComponent>();
+            if (!position || !player || !playerHitB)
+                continue;
+            if (enti.getID() == bonus.getID())
+                continue;
+
+            float enemyCenterX =
+                position->getX() + playerHitB->getWidth() / 2.0f;
+            float enemyCenterY =
+                position->getY() + playerHitB->getHeight() / 2.0f;
+
+            float bulletCenterX =
+                bonusPos->getX() + bonusHitB->getWidth() / 2.0f;
+            float bulletCenterY =
+                bonusPos->getY() + bonusHitB->getHeight() / 2.0f;
+
+            float playerHalfWidth = playerHitB->getWidth() / 2;
+            float playerHalfHeight = playerHitB->getHeight() / 2;
+
+            float bulletHalfWidth = bonusHitB->getWidth() / 2;
+            float bulletHalfHeight = bonusHitB->getHeight() / 2;
+
+            if (std::abs(bulletCenterX - enemyCenterX)
+                    < (playerHalfWidth + bulletHalfWidth)
+                && std::abs(bulletCenterY - enemyCenterY)
+                    < (playerHalfHeight + bulletHalfHeight)) {
+                _game->refEntityManager.getCurrentLevel()
+                    .markEntityForDeletion(bonus.getID());
+            }
+        } catch (const std::exception &e) {
+            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+        }
+    }
+}
+
 void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
 {
     (void) entities;
@@ -211,6 +262,7 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
             auto bullet = entity.getComponent<ecs::BulletComponent>();
             auto enemy = entity.getComponent<ecs::EnemyComponent>();
+            auto bonus = entity.getComponent<ecs::BonusComponent>();
 
             auto hitbox = entity.getComponent<ecs::HitboxComponent>();
             auto position = entity.getComponent<ecs::PositionComponent>();
@@ -229,6 +281,9 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             }
             if (_game->isServer() && enemy && position && velocity && hitbox) {
                 EnemyCollision(entity, deltaTime);
+            }
+            if (bonus && position && velocity && hitbox) {
+                BonusCollision(entity);
             }
         } catch (const std::exception &e) {
             std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;

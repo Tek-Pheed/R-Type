@@ -41,7 +41,7 @@ ecs::Entity &Factory::buildBonus(
         bonusE.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         bonusE.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 17, 0, 205, 0.1f, 0));
+            sprite, 17, 0, 17 * 12, 0.1f, 0));
     } else {
         auto pos = bonusE.getComponent<ecs::PositionComponent>();
         auto ene = bonusE.getComponent<ecs::BonusComponent>();
