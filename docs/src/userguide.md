@@ -150,6 +150,8 @@ When launching the client, three buttons appear :
 
 - EXIT
 
+![](images/mainmenu.png "Main Menu")
+
 ### Play Menu
 
 The PLAY button leads to another menu with four input fields and two buttons :
@@ -168,6 +170,8 @@ The PLAY button leads to another menu with four input fields and two buttons :
 
 - BACK button : Returns to the main menu.
 
+![](images/undermenu.png "Under Menu")
+
 ### Settings Menu
 
 The settings menu contains six buttons :
@@ -177,6 +181,8 @@ The settings menu contains six buttons :
 - One button to toggle Auto Fire.
 
 - BACK button to return to the main menu.
+
+![](images/settings.png "Settings Menu")
 
 #### To change movement controls :
 
@@ -204,6 +210,8 @@ The settings menu contains six buttons :
 
 - The Host can configure game settings.
 
+![](images/lobby.png "Lobby")
+
 ### Lobby Options
 
 The host can modify six game settings :
@@ -228,6 +236,8 @@ The host can modify six game settings :
 
 - Avoid getting hit (you have 100 HP).
 
+![](images/ingame.png "In Game")
+
 ### In-Game Exit
 
 Press Esc to exit the current game and go back to the main menu.
@@ -239,3 +249,27 @@ In Wave Mode, survive as long as possible and defeat enemy waves.
 In PVP Mode, challenge another player in a 1v1 battle and be the last one standing.
 
 *For feedback or suggestions, please contact us via LinkedIn or open an issue on the project repository.*
+
+## Elements in game
+
+### There's many entities in the game :
+
+- Player
+
+![](images/player.png "Player")
+
+- Basic Enemy
+
+![](images/enemy.png "Basic Enemy")
+
+- Shooter Enemy
+
+![](images/shooter.png "Shooter Enemy")
+
+- Boss
+
+![](images/boss.png "Boss")
+
+### There's also bonuses :
+
+![](images/bonus.png "Bonus")
