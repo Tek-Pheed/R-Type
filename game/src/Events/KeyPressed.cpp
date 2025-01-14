@@ -85,6 +85,8 @@ void EventManager::keyPressed(sf::Event &event)
             velocity->setVx(200.0f);
         } else if (event.key.code == moveLeftKey) {
             velocity->setVx(-200.0f);
+        } else if (event.key.code == sf::Keyboard::Escape) {
+            _game.levelPauseMenu();
         }
     }
 }

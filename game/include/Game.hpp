@@ -87,6 +87,7 @@ namespace RType
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
+        void levelPauseMenu();
         void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         void loadLevelContent(const std::string &filename);

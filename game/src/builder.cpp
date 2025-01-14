@@ -347,40 +347,6 @@ void RType::GameInstance::levelContinueMenu()
     }
 }
 
-// void RType::GameInstance::levelLobbyMenu()
-// {
-//     auto &level = refEntityManager.createNewLevel("lobbyMenu");
-
-//     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
-//     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
-//     refEntityManager.switchLevel("lobbyMenu");
-
-//     if (!isServer()) {
-//         auto &players = refEntityManager.getCurrentLevel().createEntity();
-//         auto &title = refEntityManager.getCurrentLevel().createEntity();
-
-//         sf::Text text;
-//         text.setFont(refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT));
-//         text.setCharacterSize(100);
-//         text.setFillColor(sf::Color::White);
-//         text.setString("LOBBY");
-
-//         float textWidth = text.getLocalBounds().width;
-//         float windowWidth = (float)this->_window->getSize().x;
-
-//         float posX = (windowWidth - textWidth) / 2;
-//         float posY = (float)this->_window->getSize().y / 8;
-
-//         title.addComponent(std::make_shared<ecs::RenderComponent>(
-//             ecs::RenderComponent::ObjectType::TEXT));
-//         title.addComponent(
-//             std::make_shared<ecs::PositionComponent>(posX, posY - 50));
-//         title.addComponent(
-//             std::make_shared<ecs::TextComponent<sf::Text>>(text, "LOBBY"));
-
-//     }
-// }
-
 void RType::GameInstance::levelSettingsMenu()
 {
     auto &level = refEntityManager.createNewLevel("settingsMenu");
@@ -578,6 +544,47 @@ void RType::GameInstance::handleInputButtons(
             }
             break;
         }
+    }
+}
+
+void RType::GameInstance::levelPauseMenu()
+{
+    if (!isServer()) {
+        std::string title = "PAUSE";
+
+        auto &text = _factory.buildText(0, 0, 0, title);
+        auto titleText = text.getComponent<ecs::TextComponent<sf::Text>>();
+        auto titlePos = text.getComponent<ecs::PositionComponent>();
+
+        titlePos->setX(
+            (float) (static_cast<float>(_window->getSize().x - 350 / 2) - 50
+                - titleText->getText().getLocalBounds().width / 2));
+        titlePos->setY(
+            (float) (this->_window->getSize().y / 2 - 50 / 2 - 75 * 1));
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 1),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "RESUME", 40, sf::Color::Black,
+            ecs::ClickableType::LAUNCH);
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * 0),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "SETTINGS", 40, sf::Color::Black,
+            ecs::ClickableType::SETTINGS);
+
+        _factory.buildButton(
+            sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -1),
+            sf::Vector2f(350, 50), sf::Color::White, sf::Color::Blue,
+            "EXIT", 40, sf::Color::Black,
+            ecs::ClickableType::EXIT);
     }
 }
 
