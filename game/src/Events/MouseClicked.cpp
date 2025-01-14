@@ -171,6 +171,43 @@ void EventManager::handleNumberOfPlayerButton(ecs::Entity &entity, bool isHost)
     }
 }
 
+void EventManager::handleGamemodeButton(ecs::Entity &entity, bool isHost)
+{
+    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+    size_t id = _game.getLocalPlayer()
+                    .getComponent<ecs::PlayerComponent>()
+                    ->getPlayerID();
+
+    if (!text)
+        return;
+    if (isHost && id != _game.getHostClient())
+        return;
+
+    std::string str = text->getStr();
+    std::size_t separator = str.find(":");
+    std::stringstream ss;
+
+    if (separator != std::string::npos) {
+        std::string maxPlayer = str.substr(separator + 1);
+        int maxPlayerNB = std::atoi(maxPlayer.c_str());
+        if (maxPlayerNB >= 10) {
+            maxPlayerNB = 4;
+            ss << Protocol::L_SETMAXPLAYRS << " " << id << " " << 4
+               << PACKET_END;
+        } else {
+            maxPlayerNB++;
+            ss << Protocol::L_SETMAXPLAYRS << " " << id << " " << maxPlayerNB
+               << PACKET_END;
+        }
+        text->setStr("NUMBER OF PLAYER : " + std::to_string(maxPlayerNB));
+        if (isHost) {
+            std::cout << "Sending to all " << ss.str() << std::endl;
+            _game.refNetworkManager.sendToAll(
+                System::Network::ISocket::Type::TCP, ss.str());
+        }
+    }
+}
+
 void EventManager::mouseClicked()
 {
     sf::Vector2f mousePos = _game.getWindow().mapPixelToCoords(
@@ -263,6 +300,9 @@ void EventManager::mouseClicked()
                 case ecs::ClickableType::LAUNCH: _game.launchGame(); break;
                 case ecs::ClickableType::LEVEL:
                     handleLevelButton(entity, true);
+                    break;
+                case ecs::ClickableType::GAMEMODE:
+                    handleGamemodeButton(entity, true);
                     break;
                 default: break;
             }
