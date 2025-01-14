@@ -7,7 +7,6 @@
 
 #include "Config.hpp"
 #include "Events.hpp"
-#include "Factory.hpp"
 #include "Utils.hpp"
 
 using namespace RType;
@@ -75,16 +74,34 @@ void EventManager::keyPressed(sf::Event &event)
         }
     }
     if (_game.hasLocalPlayer()) {
-        auto &player = _game.getLocalPlayer();
-        auto velocity = player.getComponent<ecs::VelocityComponent>();
-        if (event.key.code == moveUpKey) {
-            velocity->setVy(-200.0f);
-        } else if (event.key.code == moveDownKey) {
-            velocity->setVy(200.0f);
-        } else if (event.key.code == moveRightKey) {
-            velocity->setVx(200.0f);
-        } else if (event.key.code == moveLeftKey) {
-            velocity->setVx(-200.0f);
+            auto &player = _game.getLocalPlayer();
+            auto velocity = player.getComponent<ecs::VelocityComponent>();
+            auto bonus = player.getComponent<ecs::BonusComponent>();
+
+            if (event.key.code == moveUpKey) {
+                if (bonus->getBonus() == ecs::Bonus::SPEED) {
+                    velocity->setVy(-250.0f);
+                } else {
+                    velocity->setVy(-200.0f);
+                }
+            } else if (event.key.code == moveDownKey) {
+                if (bonus->getBonus() == ecs::Bonus::SPEED) {
+                    velocity->setVy(250.0f);
+                } else {
+                    velocity->setVy(200.0f);
+                }
+            } else if (event.key.code == moveRightKey) {
+                if (bonus->getBonus() == ecs::Bonus::SPEED) {
+                    velocity->setVx(250.0f);
+                } else {
+                    velocity->setVx(200.0f);
+                }
+            } else if (event.key.code == moveLeftKey) {
+                if (bonus->getBonus() == ecs::Bonus::SPEED) {
+                    velocity->setVx(-250.0f);
+                } else {
+                    velocity->setVx(-200.0f);
+                }
+            }
         }
-    }
 }

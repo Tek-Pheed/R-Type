@@ -90,11 +90,29 @@ void GameInstance::handleNetworkBonuses(
                             ->getBonusID()
                         == bonusID) {
                         bonusIDE = pl.get().getID();
-                        std::cout << bonusIDE << std::endl;
                     }
                 }
                 refEntityManager.getCurrentLevel().markEntityForDeletion(
                     bonusIDE);
+                auto &currentPlayer = getLocalPlayer();
+                if (currentPlayer.getComponent<ecs::PlayerComponent>()
+                        ->getPlayerID()
+                    == (size_t) std::atoi(tokens[0].c_str())) {
+                    auto currentPlayerBonus =
+                        currentPlayer.getComponent<ecs::BonusComponent>();
+                    if (std::atoi(tokens[2].c_str()) == 3) {
+                        auto health =
+                            currentPlayer.getComponent<ecs::HealthComponent>();
+                        damagePlayer(
+                            currentPlayer.getComponent<ecs::PlayerComponent>()
+                                ->getPlayerID(),
+                            (health->getHealth() - 100));
+                    }
+                    currentPlayerBonus->setBonus(
+                        static_cast<ecs::Bonus>(std::atoi(tokens[2].c_str())));
+                    std::cout << "set bonus " << currentPlayerBonus->getBonus()
+                              << std::endl;
+                }
             }
             break;
         }

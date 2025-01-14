@@ -369,7 +369,7 @@ namespace ecs
         std::string _name;
     };
 
-    enum Bonus { RAPIDFIRE, DAMAGE, SPEED, HEAL, NONE };
+    enum Bonus { RAPIDFIRE = 0, SPEED = 1, HEAL = 2, NONE = -1 };
 
     class BonusComponent : public Component {
       public:

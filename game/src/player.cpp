@@ -359,7 +359,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
@@ -492,10 +492,10 @@ void GameInstance::setPlayerEntityID(int id)
 
 size_t GameInstance::getHealthId()
 {
-    return _healthId;
+    return (size_t) _healthId;
 }
 
 void GameInstance::setHealthId(size_t id)
 {
-    _healthId = id;
+    _healthId = (int) id;
 }
