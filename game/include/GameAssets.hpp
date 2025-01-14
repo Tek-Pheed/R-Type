@@ -45,6 +45,8 @@ namespace RType
         constexpr auto R_TYPE_FONT = "rTypeFont";
         constexpr auto BULLET_BOSS = "bossBullet";
         constexpr auto BULLET_BOSS_SOUND = "bossBulletSound";
+        constexpr auto EXPLOSION_TEXTURE = "explosionTexture";
+        constexpr auto EXPLOSION_PLAYER = "explosionPlayer";
 
         static const AssetStore assets[] = {
             {PLAYER_TEXTURE, "assets/sprites/r-typesheet42.gif",
@@ -79,7 +81,13 @@ namespace RType
                 "assets/sounds/bossBullet.ogg",
                 typeid(sf::SoundBuffer),
             },
-        };
+            {EXPLOSION_TEXTURE, "assets/sprites/r-typesheet43.gif",
+                typeid(sf::Texture)},
+            {
+                EXPLOSION_PLAYER,
+                "assets/sprites/r-typesheet16.gif",
+                typeid(sf::Texture),
+            }};
 
         template <typename Type>
         const std::vector<const AssetStore *> getAllAssetsOfType()
