@@ -505,11 +505,14 @@ void GameInstance::playerAnimations(ecs::Entity &player)
         direction = "down";
     }
     if (direction == "top") {
-        renderComp->getSprite().setTextureRect(sf::Rect(132, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(sf::Rect(
+            132, renderComp->getSprite().getTextureRect().top, 33, 17));
     } else if (direction == "down") {
-        renderComp->getSprite().setTextureRect(sf::Rect(0, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(
+            sf::Rect(0, renderComp->getSprite().getTextureRect().top, 33, 17));
     } else {
-        renderComp->getSprite().setTextureRect(sf::Rect(66, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(sf::Rect(
+            66, renderComp->getSprite().getTextureRect().top, 33, 17));
     }
 
     animationTimers[playerID].restart();
