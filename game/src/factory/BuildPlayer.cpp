@@ -103,7 +103,10 @@ namespace RType
                 _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
             sf::Text text;
             text.setFont(font);
-            text.setCharacterSize(20);
+            text.setCharacterSize(35);
+            text.setFillColor(sf::Color::White);
+            text.setOutlineColor(sf::Color::Black);
+            text.setOutlineThickness(1.0f);
             text.setString(name);
             player.addComponent(
                 std::make_shared<ecs::TextComponent<sf::Text>>(text, name));

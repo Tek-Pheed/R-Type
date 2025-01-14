@@ -100,14 +100,14 @@ namespace ecs
         size_t getType() const;
         void setType(size_t type);
 
-        size_t getWave() const;
-        void setWave(size_t wave);
+        int getWave() const;
+        void setWave(int wave);
 
       private:
         size_t _enemyID;
         // 0 for enemy, 1 for shooter, 2 for boss
         size_t _type;
-        size_t _wave;
+        int _wave;
     };
 
     class RenderComponent : public Component {
@@ -168,9 +168,10 @@ namespace ecs
     template <typename spriteType> class SpriteComponent : public Component {
       public:
         SpriteComponent(spriteType &sprite, int offsetX = 0, int offsetY = 0,
-            int maxX = 0, float delay = 0.0f, int startX = 0)
+            int maxX = 0, float delay = 0.0f, int startX = 0,
+            bool once = false)
             : _sprite(sprite), _sizeX(offsetX), _sizeY(offsetY), _maxX(maxX),
-              _delay(delay), _startX(startX)
+              _delay(delay), _startX(startX), _once(once)
         {
             _elapsedTime = 0.0f;
         }
@@ -224,6 +225,10 @@ namespace ecs
         {
             return this->_elapsedTime;
         }
+        bool getOnce() const
+        {
+            return this->_once;
+        }
 
       private:
         spriteType _sprite;
@@ -233,6 +238,7 @@ namespace ecs
         float _delay;
         int _startX;
         float _elapsedTime;
+        bool _once;
     };
 
     template <typename circleType> class CircleComponent : public Component {

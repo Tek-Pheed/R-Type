@@ -64,12 +64,15 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
     auto positionComp = enemy.getComponent<ecs::PositionComponent>();
     if (!positionComp)
         return;
+    if (enemy.getComponent<ecs::EnemyComponent>()->getWave()
+        != _game.currentWave)
+        return;
     auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
     bullet.addComponent(std::make_shared<ecs::BulletComponent>(false));
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(-350.0f, 0));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
         positionComp->getX(), positionComp->getY() + 25));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(33, 22));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(35, 22));
 
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << enemyID << PACKET_END;
@@ -103,6 +106,9 @@ void Factory::buildBulletFromBoss(size_t bossId)
     auto &boss = _game.getEnemyById(bossId);
     auto positionComp = boss.getComponent<ecs::PositionComponent>();
     if (!positionComp)
+        return;
+    if (boss.getComponent<ecs::EnemyComponent>()->getWave()
+        != _game.currentWave)
         return;
     auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
     bullet.addComponent(std::make_shared<ecs::BulletComponent>(false, 1));

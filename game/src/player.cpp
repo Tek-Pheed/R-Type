@@ -305,7 +305,7 @@ void GameInstance::handleNetworkPlayers(
                 auto &player = getPlayerById(id);
                 auto healthComp = player.getComponent<ecs::HealthComponent>();
                 if (healthComp) {
-                    healthComp->setHealth(health);
+                    damagePlayer(id, healthComp->getHealth() - health);
                 }
                 if (!isServer()
                     && player.getID() == getLocalPlayer().getID()) {
@@ -388,6 +388,10 @@ void GameInstance::deletePlayer(size_t playerID)
     if (isServer() || _isConnectedToServer) {
         auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
+        if (!isServer())
+            _factory.buildExplosionPlayer(
+                pl.getComponent<ecs::PositionComponent>()->getX(),
+                pl.getComponent<ecs::PositionComponent>()->getY());
         refEntityManager.getCurrentLevel().markEntityForDeletion(pl.getID());
         std::stringstream ss;
         ss << P_DEAD << " " << playerID << " " << PACKET_END;
@@ -405,7 +409,6 @@ void GameInstance::damagePlayer(size_t playerID, int damage)
     if (isServer() || _isConnectedToServer) {
         auto &pl = getPlayerById(playerID);
         auto health = pl.getComponent<ecs::HealthComponent>();
-
         if (health) {
             health->setHealth(health->getHealth() - damage);
             if (isServer()) {
