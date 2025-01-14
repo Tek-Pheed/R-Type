@@ -85,9 +85,8 @@ int main(int argc, const char *argv[])
             return (result);
         gameEngine.mainLoop();
     } catch (const std::exception &e) {
-        std::cout << THROW_ERROR_LOCATION
-            "We are sorry, but an unhandled exception occured during "
-            "runtime: "
+        std::cout << CATCH_ERROR_LOCATION "We are sorry, but an unhandled exception occured during "
+                     "runtime: "
                   << std::endl
                   << e.what() << std::endl;
         return (84);

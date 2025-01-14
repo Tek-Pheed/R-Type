@@ -20,6 +20,8 @@
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "SFML/Audio/SoundSource.hpp"
+#include "SFML/Graphics/Texture.hpp"
 
 using namespace RType;
 
@@ -73,7 +75,8 @@ ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
             == enemyID)
             return (pl.get());
     }
-    throw ErrorClass(THROW_ERROR_LOCATION "Enemy not found id=" + std::to_string(enemyID));
+    throw ErrorClass(
+        THROW_ERROR_LOCATION "Enemy not found id=" + std::to_string(enemyID));
 }
 
 void GameInstance::sendEnemyPosition(size_t enemyID)

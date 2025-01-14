@@ -51,6 +51,9 @@ namespace RType
         static constexpr auto ENEMY_VELOCITY = -200.0f;
         static constexpr auto ENEMY_SHOOTER_VELOCITY = -150.0f;
 
+        static constexpr float MUSIC_VOLUME = 15.0f;
+        static constexpr float EFFECT_VOLUME = 10.0f;
+
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
 
@@ -102,6 +105,8 @@ namespace RType
         size_t getHealthId();
         void setHealthId(size_t id);
 
+        sf::Sound &getMusicPlayer();
+
         std::vector<ecs::Entity> &getEntities();
 
         std::string _playerName;
@@ -117,6 +122,8 @@ namespace RType
         void sendEnemyPosition(size_t enemyID);
         void deleteEnemy(size_t enemyID);
         void handleNetworkEnemies(
+            int code, const std::vector<std::string> &tokens);
+        void handleNetworkMechs(
             int code, const std::vector<std::string> &tokens);
 
         // Boss
