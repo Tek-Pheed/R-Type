@@ -142,6 +142,13 @@ ecs::Entity &RType::GameInstance::buildInput(std::string str, int buttonID)
     return input;
 }
 
+static float randrange(float max, float min)
+{
+    return (min
+        + static_cast<float>(rand())
+            / (static_cast<float>((float) RAND_MAX / (float) (max - min))));
+}
+
 void RType::GameInstance::levelMainMenu()
 {
     auto &level = refEntityManager.createNewLevel("mainMenu");
@@ -185,24 +192,19 @@ void RType::GameInstance::levelMainMenu()
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
 
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Arnaud", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Lucas", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Raphael", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
-            "Samy", static_cast<size_t>(rand() % 4));
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)), "Samy",
+            static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Alexandre", static_cast<size_t>(rand() % 4));
 
         _factory.buildButton(
@@ -241,10 +243,10 @@ void RType::GameInstance::levelLobbyMenu()
         auto titlePos = text.getComponent<ecs::PositionComponent>();
 
         titlePos->setX(
-            (float) (static_cast<float>(_window->getSize().x - 350 / 2) - 50
+            (float) (static_cast<float>(_window->getSize().x - 350.0 / 2) - 50
                 - titleText->getText().getLocalBounds().width / 2));
         titlePos->setY(
-            (float) (this->_window->getSize().y / 2 - 50 / 2 - 75 * 1));
+            (float) (this->_window->getSize().y / 2.0 - 50.0 / 2 - 75 * 1));
 
         _factory.buildButton(
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,

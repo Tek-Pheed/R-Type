@@ -53,7 +53,9 @@ void renderSprite(ecs::Entity &entity, sf::RenderWindow &window,
         }
     }
     sprite->setElapsedTime(elapsedTime);
-    sprite->getSprite().setPosition(position->getX(), position->getY());
+    sprite->getSprite().setPosition(
+        position->getX() * (float) game.WindoScaleX,
+        position->getY() * (float) game.WindoScaleY);
     window.draw(sprite->getSprite());
 }
 
@@ -69,23 +71,26 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
             "component: position or sprite or text !");
         return;
     }
-    sprite->getSprite().setPosition(position->getX(), position->getY());
+    sprite->getSprite().setPosition(
+        position->getX() * (float) window.getSize().x,
+        position->getY() * (float) window.getSize().y);
     text->getText().setString(text->getStr());
-    if (position->getY() < 15) {
-        text->getText().setPosition(position->getX()
+    if (position->getY() < 0.025f) {
+        text->getText().setPosition(position->getX() * (float) window.getSize().x
                 + (float) sprite->getSprite().getTextureRect().width
                     * sprite->getSprite().getScale().x / 2
                 - (float) text->getText().getLocalBounds().width / 2,
-            position->getY()
+            position->getY() * (float) window.getSize().y
                 + static_cast<float>(
                     sprite->getSprite().getTextureRect().height)
-                + 15);
+                + 0.025f);
     } else {
-        text->getText().setPosition(position->getX()
+        text->getText().setPosition(
+            (position->getX() * (float) window.getSize().x)
                 + (float) sprite->getSprite().getTextureRect().width
                     * sprite->getSprite().getScale().x / 2
                 - (float) text->getText().getLocalBounds().width / 2,
-            position->getY() - 30);
+            (position->getY() * (float) window.getSize().y) - 0.025f);
     }
     window.draw(sprite->getSprite());
     window.draw(text->getText());
@@ -207,9 +212,11 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 if (entity.getComponent<ecs::EnemyComponent>()) {
                     if (entity.getComponent<ecs::EnemyComponent>()->getWave()
                         == _game->currentWave)
-                        renderSprite(entity, _game->getWindow(), deltaTime, *_game);
+                        renderSprite(
+                            entity, _game->getWindow(), deltaTime, *_game);
                 } else {
-                    renderSprite(entity, _game->getWindow(), deltaTime, *_game);
+                    renderSprite(
+                        entity, _game->getWindow(), deltaTime, *_game);
                 }
                 break;
             case ecs::RenderComponent::ObjectType::SPRITEANDTEXT:

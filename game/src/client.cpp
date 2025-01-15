@@ -244,6 +244,8 @@ void RType::GameInstance::setupClient(
         throw std::runtime_error(
             THROW_ERROR_LOCATION "Failed to create the SFML window.");
     }
+    WindoScaleX = _window->getSize().x;
+    WindoScaleY = _window->getSize().y;
     refGameEngine.addEventBinding<RType::GameInstance>(
         Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);
     refGameEngine.addEventBinding<RType::GameInstance>(

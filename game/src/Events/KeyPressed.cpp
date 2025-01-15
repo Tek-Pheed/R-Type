@@ -87,27 +87,27 @@ void EventManager::keyPressed(sf::Event &event)
 
             if (event.key.code == moveUpKey) {
                 if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                    velocity->setVy(-250.0f);
+                    velocity->setVy(-0.30f);
                 } else {
-                    velocity->setVy(-200.0f);
+                    velocity->setVy(-0.30f);
                 }
             } else if (event.key.code == moveDownKey) {
                 if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                    velocity->setVy(250.0f);
+                    velocity->setVy(0.30f);
                 } else {
-                    velocity->setVy(200.0f);
+                    velocity->setVy(0.30f);
                 }
             } else if (event.key.code == moveRightKey) {
                 if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                    velocity->setVx(250.0f);
+                    velocity->setVx(0.16f);
                 } else {
-                    velocity->setVx(200.0f);
+                    velocity->setVx(0.16f);
                 }
             } else if (event.key.code == moveLeftKey) {
                 if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                    velocity->setVx(-250.0f);
+                    velocity->setVx(-0.16f);
                 } else {
-                    velocity->setVx(-200.0f);
+                    velocity->setVx(-0.16f);
                 }
             }
         }
