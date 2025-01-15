@@ -9,15 +9,15 @@
     #define NOMINMAX
 #endif
 
+#include "Components.hpp"
 #include "Game.hpp"
 #include "GameSystems.hpp"
-#include "Components.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 
 using namespace RType;
 using namespace GameSystems;
 
-constexpr auto bulletMaxTravel = 1500U;
+constexpr auto bulletMaxTravel = 1.1f;
 
 void BulletSystem::initSystem(GameInstance &gameRef)
 {
@@ -38,17 +38,15 @@ void BulletSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         position->setY(position->getY() + velocity->getVy() * deltaTime);
         if (_game->isServer()) {
             if (position->getX() >= (float) bulletMaxTravel
-                || position->getX() < 0
+                || position->getX() < 0.0f
                 || position->getY() >= (float) bulletMaxTravel
-                || position->getY() < 0) {
+                || position->getY() < 0.0f) {
                 bulletToRemove.push_back(entity);
                 continue;
             }
         } else {
-            if (position->getX() >= (float) _game->getWindow().getSize().x
-                || position->getX() < 0
-                || position->getY() >= (float) _game->getWindow().getSize().y
-                || position->getY() < 0) {
+            if (position->getX() >= 1.0f || position->getX() < 0.0f
+                || position->getY() >= 1.0f || position->getY() < 0.0f) {
                 bulletToRemove.push_back(entity);
                 continue;
             }

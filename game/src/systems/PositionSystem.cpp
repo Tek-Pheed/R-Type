@@ -52,71 +52,48 @@ void PositionSystem::update(
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
-                float maxX = (float) this->_game->getWindow().getSize().x;
-                float maxY = (float) this->_game->getWindow().getSize().y;
-                float minX = (float) 0;
-                float minY = (float) 0;
-
-                if (sprite) {
-                    maxX = (float) _game->getWindow().getSize().x
-                        - (float) sprite->getSprite().getTextureRect().width
-                            * (float) sprite->getSprite().getScale().x / 2;
-
-                    maxY = (float) _game->getWindow().getSize().y
-                        - (float) sprite->getSprite().getTextureRect().height
-                            * (float) sprite->getSprite().getScale().y / 2;
-
-                    minX = (float) sprite->getSprite().getTextureRect().width
-                        * (float) sprite->getSprite().getScale().x / 2;
-
-                    minY = (float) sprite->getSprite().getTextureRect().height
-                        * (float) sprite->getSprite().getScale().y / 2;
+                if (player && positionComponent->getX() < 0.0f) {
+                    positionComponent->setX(0.0f);
                 }
-
-                if (player && positionComponent->getX() < minX) {
-                    positionComponent->setX(minX);
+                if (player && positionComponent->getX() > 1.0f) {
+                    positionComponent->setX(1.0f);
                 }
-                if (player && positionComponent->getX() > maxX) {
-                    positionComponent->setX(maxX);
+                if (player && positionComponent->getY() < 0.0f) {
+                    positionComponent->setY(0.0f);
                 }
-                if (player && positionComponent->getY() < minY) {
-                    positionComponent->setY(minY);
-                }
-                if (player && positionComponent->getY() > maxY) {
-                    positionComponent->setY(maxY);
+                if (player && positionComponent->getY() > 1.0f) {
+                    positionComponent->setY(1.0f);
                 }
                 if (ai) {
-                    if (positionComponent->getX() > maxX) {
+                    if (positionComponent->getX() > 1.0f) {
                         velocityComponent->setVx(
-                            velocityComponent->getVx() * -1);
+                            velocityComponent->getVx() * -1.0f);
                     }
 
-                    if (positionComponent->getY() > maxY) {
+                    if (positionComponent->getY() > 1.0f) {
                         velocityComponent->setVy(
-                            velocityComponent->getVy() * -1);
+                            velocityComponent->getVy() * -1.0f);
                     }
 
                     if (positionComponent->getX() < 0) {
                         velocityComponent->setVx(
-                            velocityComponent->getVx() * -1);
+                            velocityComponent->getVx() * -1.0f);
                     }
 
                     if (positionComponent->getY() < 0) {
                         velocityComponent->setVy(
-                            velocityComponent->getVy() * -1);
+                            velocityComponent->getVy() * -1.0f);
                     }
                 }
 
             } else {
                 if (enemy && positionComponent
                     && positionComponent->getX() < GameInstance::KILLZONE) {
-                    positionComponent->setX(GameInstance::DEFAULT_RESOLUTION_X
-                        - GameInstance::KILLZONE);
+                    positionComponent->setX(1.0f - GameInstance::KILLZONE);
                 }
                 if (enemy && positionComponent
                     && positionComponent->getY() < GameInstance::KILLZONE) {
-                    positionComponent->setY(GameInstance::DEFAULT_RESOLUTION_Y
-                        - GameInstance::KILLZONE);
+                    positionComponent->setY(1.0f - GameInstance::KILLZONE);
                 }
                 if (enemy && positionComponent
                     && positionComponent->getY()

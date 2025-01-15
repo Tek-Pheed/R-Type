@@ -49,9 +49,9 @@ namespace RType
         static constexpr size_t DEFAULT_RESOLUTION_X = 1280U;
         static constexpr size_t DEFAULT_RESOLUTION_Y = 720U;
 
-        static constexpr auto KILLZONE = -100.0f;
-        static constexpr auto ENEMY_VELOCITY = -200.0f;
-        static constexpr auto ENEMY_SHOOTER_VELOCITY = -150.0f;
+        static constexpr auto KILLZONE = -0.1f;
+        static constexpr auto ENEMY_VELOCITY = -0.156f;
+        static constexpr auto ENEMY_SHOOTER_VELOCITY = -0.117f;
 
         static constexpr float MUSIC_VOLUME = 18.0f;
         static constexpr float BULLET_VOLUME = 5.0f;
@@ -59,8 +59,8 @@ namespace RType
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
 
-        const int WindoScaleX = 1280.0f;
-        const int WindoScaleY = 720.0f;
+        size_t WinScaleX = 1;
+        size_t WinScaleY = 1;
 
         bool getServerMode();
 
@@ -92,6 +92,7 @@ namespace RType
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
+        void handleResolutionButton(ecs::Entity &entity);
         void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         void loadLevelContent(const std::string &filename);

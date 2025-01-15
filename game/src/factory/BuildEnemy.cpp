@@ -28,8 +28,8 @@ using namespace RType;
 ecs::Entity &RType::Factory::buildEnemy(size_t id, float posX, float posY,
     float health, int wave, float velocityX, float velocityY)
 {
-    const float With = 0.05f * (float) _game.WindoScaleX;
-    const float Height = With;
+    const float Width = 0.05f * (float) _game.WinScaleX;
+    const float Height = Width;
 
     if (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new enemy (" << id << ") to the game at pos "
@@ -42,7 +42,7 @@ ecs::Entity &RType::Factory::buildEnemy(size_t id, float posX, float posY,
             * static_cast<float>(_game.getDifficulty())));
     enemy.addComponent(std::make_shared<ecs::VelocityComponent>(
         GameInstance::ENEMY_VELOCITY, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(With, Height));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(0.05f, 0.05f));
     enemy.getComponent<ecs::EnemyComponent>()->setWave(wave);
     enemy.getComponent<ecs::VelocityComponent>()->setVx(velocityX);
     enemy.getComponent<ecs::VelocityComponent>()->setVy(velocityY);
@@ -53,7 +53,7 @@ ecs::Entity &RType::Factory::buildEnemy(size_t id, float posX, float posY,
         sf::Sprite sprite;
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::Rect(0, 16, 32, 32));
-        sprite.setScale(With / sprite.getLocalBounds().width,
+        sprite.setScale(Width / sprite.getLocalBounds().width,
             Height / sprite.getLocalBounds().height);
         sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
             sprite.getLocalBounds().height / 2.0f);
@@ -100,9 +100,9 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 
         // Check if in frame (saves bandwith)
         if (position->getX() > KILLZONE
-            && position->getX() < DEFAULT_RESOLUTION_X - (float) KILLZONE
+            && position->getX() < 1.0f - (float) KILLZONE
             && position->getY() > KILLZONE
-            && position->getY() < DEFAULT_RESOLUTION_Y - (float) KILLZONE) {
+            && position->getY() < 1.0f - (float) KILLZONE) {
             std::stringstream ss;
             ss << E_POS << " " << _ticks << " " << enemyID << " "
                << position->getX() << " " << position->getY() << PACKET_END;
@@ -116,8 +116,8 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 void GameInstance::deleteEnemy(size_t enemyID)
 {
     std::unique_lock lock(_gameLock);
-    // if (RType::GameInstance::DEBUG_LOGS)
-    std::cout << "Deleting enemy: " << enemyID << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Deleting enemy: " << enemyID << std::endl;
     auto &ene = getEnemyById(enemyID);
     if (!isServer())
         _factory.buildExplosionEnemy(
@@ -225,8 +225,8 @@ void GameInstance::handleNetworkEnemies(
 ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     float posY, float health, int wave, float velocityX, float velocityY)
 {
-    const float With = 0.05f * (float) _game.WindoScaleX;
-    const float Height = 0.048f * (float) _game.WindoScaleY;
+    const float Width = 0.05f * (float) _game.WinScaleX;
+    const float Height = 0.120f * (float) _game.WinScaleY;
 
     if (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new enemy (" << id << ") to the game at pos "
@@ -237,7 +237,7 @@ ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(std::make_shared<ecs::VelocityComponent>(
         GameInstance::ENEMY_SHOOTER_VELOCITY, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(With, Height));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(0.05f, 0.120f));
     enemy.getComponent<ecs::EnemyComponent>()->setWave(wave);
     enemy.getComponent<ecs::VelocityComponent>()->setVx(velocityX);
     enemy.getComponent<ecs::VelocityComponent>()->setVy(velocityY);
@@ -248,7 +248,7 @@ ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
         sf::Sprite sprite;
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::Rect(0, 0, 33, 34));
-        sprite.setScale(With / sprite.getLocalBounds().width,
+        sprite.setScale(Width / sprite.getLocalBounds().width,
             Height / sprite.getLocalBounds().height);
         sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
             sprite.getLocalBounds().height / 2.0f);

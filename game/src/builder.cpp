@@ -143,6 +143,13 @@ ecs::Entity &RType::GameInstance::buildInput(std::string str, int buttonID)
     return input;
 }
 
+static float randrange(float max, float min)
+{
+    return (min
+        + static_cast<float>(rand())
+            / (static_cast<float>((float) RAND_MAX / (float) (max - min))));
+}
+
 void RType::GameInstance::levelMainMenu()
 {
     auto &level = refEntityManager.createNewLevel("mainMenu");
@@ -186,24 +193,19 @@ void RType::GameInstance::levelMainMenu()
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
 
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Arnaud", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Lucas", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Raphael", static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
-            "Samy", static_cast<size_t>(rand() % 4));
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)), "Samy",
+            static_cast<size_t>(rand() % 4));
         _factory.buildAIPlayer(
-            sf::Vector2f(static_cast<float>(rand() % 200 + 100),
-                static_cast<float>(rand() % 200 + 100)),
+            sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Alexandre", static_cast<size_t>(rand() % 4));
 
         _factory.buildButton(
@@ -242,10 +244,10 @@ void RType::GameInstance::levelLobbyMenu()
         auto titlePos = text.getComponent<ecs::PositionComponent>();
 
         titlePos->setX(
-            (float) (static_cast<float>(_window->getSize().x - 350 / 2) - 50
+            (float) (static_cast<float>(_window->getSize().x - 350.0 / 2) - 50
                 - titleText->getText().getLocalBounds().width / 2));
         titlePos->setY(
-            (float) (this->_window->getSize().y / 2 - 50 / 2 - 75 * 1));
+            (float) (this->_window->getSize().y / 2.0 - 50.0 / 2 - 75 * 1));
 
         _factory.buildButton(
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
@@ -388,12 +390,14 @@ void RType::GameInstance::levelSettingsMenu()
         std::string moveLeftAction = _gameConfig.getConfig().at(3);
         std::string moveDownAction = _gameConfig.getConfig().at(4);
         std::string autoFireAction = _gameConfig.getConfig().at(7);
+        std::string resolutionAction = _gameConfig.getConfig().at(6);
 
         std::string endUpMove = "";
         std::string endRightMove = "";
         std::string endLeftMove = "";
         std::string endDownMove = "";
         std::string endAutoFire = "";
+        std::string endResolution = "";
 
         size_t equalPosUp = moveUpAction.find("=");
         if (equalPosUp != std::string::npos) {
@@ -459,6 +463,15 @@ void RType::GameInstance::levelSettingsMenu()
                 + (afterAutoFireEqual == "true" ? "Yes" : "No");
         }
 
+        size_t equalPosResolution = resolutionAction.find("=");
+        if (equalPosResolution != std::string::npos) {
+            std::string beforeResolutionEqual = "RESOLUTION";
+            std::string afterResolutionEqual =
+                resolutionAction.substr(equalPosResolution + 1);
+            endResolution =
+                beforeResolutionEqual + " : " + afterResolutionEqual;
+        }
+
         _factory.buildButton(
             sf::Vector2f(
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
@@ -505,6 +518,15 @@ void RType::GameInstance::levelSettingsMenu()
                 (float) this->_window->getSize().x / 2 - (float) 700 / 2,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -3),
+            sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
+            endResolution, 40, sf::Color::Black,
+            ecs::ClickableType::RESOLUTION);
+
+        _factory.buildButton(
+            sf::Vector2f(
+                (float) this->_window->getSize().x / 2 - (float) 700 / 2,
+                (float) this->_window->getSize().y / 2 - (float) 50 / 2
+                    - (float) 75 * -4),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black, "BACK",
             40, sf::Color::Black, ecs::ClickableType::BACK);
     }
@@ -518,6 +540,30 @@ void RType::GameInstance::handleAutoFireButton(
     _gameConfig.saveConfig();
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
     text->setStr("AUTO FIRE : " + value);
+}
+
+void RType::GameInstance::handleResolutionButton(ecs::Entity &entity)
+{
+    static const std::vector<std::string> resolutions = {"1280x720",
+        "1600x900", "1920x1080", "2560x1440", "2880x1620", "3840x2160"};
+
+    std::string currentResolution = _gameConfig.getConfig().at(6);
+    size_t equalPos = currentResolution.find("=");
+    if (equalPos != std::string::npos)
+        currentResolution = currentResolution.substr(equalPos + 1);
+
+    auto it =
+        std::find(resolutions.begin(), resolutions.end(), currentResolution);
+    std::string newResolution =
+        (it != resolutions.end() && it + 1 != resolutions.end())
+        ? *(it + 1)
+        : resolutions.front();
+
+    _gameConfig.updateConfigValue("RESOLUTION=", newResolution);
+    _gameConfig.saveConfig();
+
+    auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
+    text->setStr("RESOLUTION : " + newResolution);
 }
 
 void RType::GameInstance::handleInputButtons(

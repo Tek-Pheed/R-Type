@@ -174,11 +174,13 @@ The PLAY button leads to another menu with four input fields and two buttons :
 
 ### Settings Menu
 
-The settings menu contains six buttons :
+The settings menu contains seven buttons :
 
 - Four buttons to configure movement controls.
 
 - One button to toggle Auto Fire.
+
+- One button to change resolution (works after restart).
 
 - BACK button to return to the main menu.
 
@@ -193,6 +195,10 @@ The settings menu contains six buttons :
 - For Auto Fire, it's disabled by default :
 
 - Click Auto Fire to toggle between "YES" and "NO".
+
+- For Resolution, it's in 720p per default :
+
+- Click on the Resolution button to switch from 720p to 1080p, 2k and 4k. The resolution change only works after restart.
 
 - Movement keys control ship movement, and auto fire allows automatic shooting. If auto fire is off, pressing the **Spacebar** is required to shoot.
 
@@ -247,6 +253,8 @@ Press Esc to exit the current game and go back to the main menu.
 In Wave Mode, survive as long as possible and defeat enemy waves.
 
 In PVP Mode, you’ll face off in team-based battles. The teams are formed based on the number of players in the lobby. For example, if there are three players, Player 1 and Player 3 will be on Team 1, and Player 2 will be on Team 2. If there are four players, Team 1 will consist of Player 1 and Player 3, while Team 2 will have Player 2 and Player 4. Each player starts with 300 HP, so you can take up to three hits before you’re out. Additionally, to prevent players from being eliminated too quickly, you can only be hit once per second. Be sure to avoid getting hit, as working with your team and staying alive is the key to victory.
+
+#### Window scaling : Your dekstop fractionnal scaling may affect the game true resolution
 
 *For feedback or suggestions, please contact us via LinkedIn or open an issue on the project repository.*
 
