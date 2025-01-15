@@ -26,8 +26,17 @@ void Factory::buildBulletFromPlayer(size_t playerID)
     float y = positionComp->getY() + 25;
 
     bullet.addComponent(std::make_shared<ecs::BulletComponent>(true));
-    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(350.0f, 0));
+    if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
+        && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
+        bullet.addComponent(
+            std::make_shared<ecs::VelocityComponent>(-350.0f, 0));
+    else
+        bullet.addComponent(
+            std::make_shared<ecs::VelocityComponent>(350.0f, 0));
     bullet.addComponent(std::make_shared<ecs::HitboxComponent>(54, 16));
+    if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
+        && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
+        x = positionComp->getX() - 100;
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(x, y));
 
     std::stringstream ss;
@@ -44,6 +53,10 @@ void Factory::buildBulletFromPlayer(size_t playerID)
 
         s.setTexture(texture);
         s.setTextureRect(sf::Rect(137, 153, 64, 16));
+        if (_game.getGameMode() == 1
+            && player.getComponent<ecs::PlayerComponent>()
+            && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
+            s.setScale(-1, 1);
         bullet.addComponent(
             std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 0));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
