@@ -276,7 +276,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -342,9 +342,8 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 1.0f) {
-                for (auto entID :
-                    refEntityManager.getCurrentLevel()
-                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -374,6 +373,17 @@ void GameInstance::gamePostTick(
     std::unique_lock lock(_gameLock);
 
     if (!isServer()) {
+        for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
+            auto player = entity.get().getComponent<ecs::PlayerComponent>();
+            auto pText =
+                entity.get().getComponent<ecs::TextComponent<sf::Text>>();
+            if (player && pText) {
+                if (getHostClient() == player->getPlayerID()
+                    && pText->getStr().find("host") == std::string::npos) {
+                    pText->setStr(pText->getStr() + " (host)");
+                }
+            }
+        }
         getWindow().display();
     } else {
         bool next = true;

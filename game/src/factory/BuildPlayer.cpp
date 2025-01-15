@@ -75,7 +75,7 @@ namespace RType
             if (pos) {
                 std::stringstream sss;
                 sss << P_CONN << " " << id << " " << pos->getX() << " "
-                    << pos->getY() << " " << n << PACKET_END;
+                    << pos->getY() << " " << n << " " << PACKET_END;
                 if (!_game.isServer()) {
                     _game.refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::TCP, sss.str());

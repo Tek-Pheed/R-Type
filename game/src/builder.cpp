@@ -13,6 +13,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <sstream>
 #include "Components.hpp"
 #include "Config.hpp"
 #include "Entity.hpp"
@@ -256,12 +257,14 @@ void RType::GameInstance::levelLobbyMenu()
             "GAMEMODE : WAVE", 40, sf::Color::Black,
             ecs::ClickableType::GAMEMODE);
 
+        std::stringstream ss;
+        ss << _maxPlayers;
         _factory.buildButton(
             sf::Vector2f((float) this->_window->getSize().x - 350 - 50,
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * 0),
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
-            "NUMBER OF PLAYER : 4", 40, sf::Color::Black,
+            "NUMBER OF PLAYER : " + ss.str(), 40, sf::Color::Black,
             ecs::ClickableType::NUMBER_OF_PLAYER);
 
         _factory.buildButton(

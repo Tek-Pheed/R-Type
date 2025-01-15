@@ -18,7 +18,6 @@
 #include <sstream>
 #include <string>
 #include "Components.hpp"
-#include "Config.hpp"
 #include "Engine.hpp"
 #include "EngineNetworking.hpp"
 #include "Events.hpp"
@@ -67,7 +66,6 @@ void RType::GameInstance::clientHandlerConnection(
                     if (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Build player with id:" << _netClientID
                                   << std::endl;
-                    std::unique_lock lock(_gameLock);
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                 } else {
