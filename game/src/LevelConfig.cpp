@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "Engine.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
 #include "Game.hpp"
@@ -28,16 +29,21 @@ LevelConfig::parseLevelConfig()
 {
     std::ifstream infile(_filename);
     if (!infile.is_open()) {
-        throw ErrorClass("RTC006 : Invalid file: could not open file.");
+        throw ErrorClass(THROW_ERROR_LOCATION
+            "RTC006 : Invalid file: could not open file.");
     }
     std::vector<std::pair<std::string, std::vector<std::string>>> map;
     std::string line;
     while (std::getline(infile, line)) {
+        if (line == "")
+            continue;
         if (line.size() > 0 && line[0] != '#') {
             if (line.find(')') == std::string::npos
                 || line.find('(') == std::string::npos) {
-                throw ErrorClass(
-                    "RTC008 : Invalid config: token ) or ( not found.");
+                throw ErrorClass(THROW_ERROR_LOCATION
+                    "RTC008 : Invalid config: token ) or ( not found for "
+                    "line: "
+                    + line);
             }
             std::stringstream sline;
             sline << line;

@@ -31,6 +31,7 @@
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "LevelConfig.hpp"
+#include "SFML/Audio/Sound.hpp"
 #include "SFML/Audio/SoundBuffer.hpp"
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Rect.hpp"
@@ -383,6 +384,14 @@ void GameInstance::gamePostTick(
                     pText->setStr(pText->getStr() + " (host)");
                 }
             }
+        }
+        for (auto &entity : refEntityManager.getCurrentLevel()
+                 .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
+            auto mus =
+                entity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+            if (mus->getMusicType().getStatus() != sf::Music::Playing)
+                refEntityManager.getCurrentLevel().markEntityForDeletion(
+                    entity.get().getID());
         }
         getWindow().display();
     } else {
