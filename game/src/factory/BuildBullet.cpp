@@ -70,8 +70,10 @@ void Factory::buildBulletFromPlayer(size_t playerID)
             s.getLocalBounds().width / 2.0f, s.getLocalBounds().height / 2.0f);
         if (_game.getGameMode() == 1
             && player.getComponent<ecs::PlayerComponent>()
-            && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
+            && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1) {
             s.setScale(-(With / s.getLocalBounds().width), 1);
+            s.setColor(sf::Color::Red);
+        }
         bullet.addComponent(
             std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 0));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
