@@ -71,21 +71,21 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
     }
     sprite->getSprite().setPosition(position->getX(), position->getY());
     text->getText().setString(text->getStr());
-    if (position->getY() < 15) {
+    if (position->getY() < 30) {
         text->getText().setPosition(position->getX()
-                + (float) sprite->getSprite().getTextureRect().width
-                    * sprite->getSprite().getScale().x / 2
                 - (float) text->getText().getLocalBounds().width / 2,
             position->getY()
                 + static_cast<float>(
-                    sprite->getSprite().getTextureRect().height)
-                + 15);
+                      sprite->getSprite().getTextureRect().height)
+                    / 2);
     } else {
         text->getText().setPosition(position->getX()
-                + (float) sprite->getSprite().getTextureRect().width
-                    * sprite->getSprite().getScale().x / 2
                 - (float) text->getText().getLocalBounds().width / 2,
-            position->getY() - 30);
+            position->getY()
+                - static_cast<float>(
+                      sprite->getSprite().getTextureRect().height)
+                    * 3 / 2
+                - 25);
     }
     window.draw(sprite->getSprite());
     window.draw(text->getText());
@@ -207,9 +207,11 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 if (entity.getComponent<ecs::EnemyComponent>()) {
                     if (entity.getComponent<ecs::EnemyComponent>()->getWave()
                         == _game->currentWave)
-                        renderSprite(entity, _game->getWindow(), deltaTime, *_game);
+                        renderSprite(
+                            entity, _game->getWindow(), deltaTime, *_game);
                 } else {
-                    renderSprite(entity, _game->getWindow(), deltaTime, *_game);
+                    renderSprite(
+                        entity, _game->getWindow(), deltaTime, *_game);
                 }
                 break;
             case ecs::RenderComponent::ObjectType::SPRITEANDTEXT:
