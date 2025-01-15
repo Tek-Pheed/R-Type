@@ -277,6 +277,14 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_DEAD: {
+            if (!_isServer && getLocalPlayer().getComponent<ecs::PlayerComponent>()->getPlayerID() == (size_t) atoi(tokens[0].c_str())) {
+                auto &youLoseSound = refAssetManager.getAsset<sf::SoundBuffer>(Asset::YOU_LOSE_SOUND);
+                _factory.buildSoundEffect(youLoseSound, "youLoseSound", 100.0f);
+                std::string title = "YOU ARE DEAD";
+                auto textWidth = title.size() * 20;
+                _factory.buildText(0, (float)getWindow().getSize().x / 2 - (float)textWidth,
+                    (float)getWindow().getSize().y / 2 - 50, title, sf::Color::Red, 100);
+            }
             if (_isServer)
                 return;
             if (tokens.size() >= 1) {

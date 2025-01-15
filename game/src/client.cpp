@@ -198,7 +198,7 @@ void RType::GameInstance::launchGame()
                     .getComponent<ecs::HealthComponent>()
                     ->getHealth());
         setHealthId(static_cast<int>(getNewId()));
-        _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text);
+        _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text, sf::Color::White, 48);
     } catch (const std::exception &e) {
         levelMainMenu();
     }
