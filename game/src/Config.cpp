@@ -99,11 +99,15 @@ void Config::validateOrCreateConfig()
         } else if (lineCount == 5) {
             std::string resolution =
                 line.substr(expectedKeys[lineCount].size());
-            if (resolution != "1920x1080" && resolution != "3840x2160"
-                && resolution != "2560x1440" && resolution != "1280x720") {
+            const std::vector<std::string> resolutions = {"1280x720",
+                "1600x900", "1920x1080", "2560x1440", "2880x1620",
+                "3840x2160"};
+            if (std::find(resolutions.begin(), resolutions.end(), resolution)
+                == resolutions.end()) {
                 throw ErrorClass(THROW_ERROR_LOCATION
-                    "RTC011 : Invalid config: RESOLUTION must be 1920x1080 or "
-                    "3840x2160 or 2560x1440 or 1280x720.");
+                    "RTC011 : Invalid config: RESOLUTION must be 1280x720, "
+                    "1600x900, 1920x1080, 2560x1440, 2880x1620, "
+                    "3840x2160");
             }
         } else if (lineCount == 6) {
             std::string autoFire = line.substr(expectedKeys[lineCount].size());

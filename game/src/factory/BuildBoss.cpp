@@ -27,8 +27,8 @@ using namespace RType;
 ecs::Entity &RType::Factory::buildBoss(
     size_t id, float posX, float posY, float health, int wave)
 {
-    const float With = 0.3f * (float) _game.WindoScaleX;
-    const float Height = 0.7f * (float) _game.WindoScaleY;
+    const float Width = 0.3f * (float) _game.WinScaleX;
+    const float Height = 0.7f * (float) _game.WinScaleY;
 
     if (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new boss to the game" << std::endl;
@@ -39,7 +39,7 @@ ecs::Entity &RType::Factory::buildBoss(
         std::make_shared<ecs::HealthComponent>(static_cast<float>(health)
             * static_cast<float>(_game.getDifficulty())));
     boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
-    boss.addComponent(std::make_shared<ecs::HitboxComponent>(With, Height));
+    boss.addComponent(std::make_shared<ecs::HitboxComponent>(0.3f, 0.7f));
     boss.getComponent<ecs::EnemyComponent>()->setWave(wave);
     if (!_game.isServer()) {
         auto &texture =
@@ -47,7 +47,7 @@ ecs::Entity &RType::Factory::buildBoss(
         sf::Sprite sprite;
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::Rect(20, 640, 162, 207));
-        sprite.setScale(With / sprite.getLocalBounds().width,
+        sprite.setScale(Width / sprite.getLocalBounds().width,
             Height / sprite.getLocalBounds().height);
         sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
             sprite.getLocalBounds().height / 2.0f);

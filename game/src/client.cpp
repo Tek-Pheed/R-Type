@@ -18,7 +18,6 @@
 #include <sstream>
 #include <string>
 #include "Components.hpp"
-#include "Config.hpp"
 #include "Engine.hpp"
 #include "EngineNetworking.hpp"
 #include "Events.hpp"
@@ -67,7 +66,6 @@ void RType::GameInstance::clientHandlerConnection(
                     if (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Build player with id:" << _netClientID
                                   << std::endl;
-                    std::unique_lock lock(_gameLock);
                     _factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                 } else {
@@ -235,8 +233,20 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
+
+    auto res = _gameConfig.getKeyFromConfig("RESOLUTION");
+    std::stringstream resStream(res);
+    std::string resX;
+    std::string resY;
+
+    std::getline(resStream, resX, 'x');
+    std::getline(resStream, resY, ' ');
+
+    WinScaleX = (size_t) std::atoi(resX.c_str());
+    WinScaleY = (size_t) std::atoi(resY.c_str());
+
     sf::VideoMode videoMode(
-        GameInstance::DEFAULT_RESOLUTION_X, GameInstance::DEFAULT_RESOLUTION_Y);
+        (unsigned int) WinScaleX, (unsigned int) WinScaleY);
     _window->create(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
@@ -244,6 +254,8 @@ void RType::GameInstance::setupClient(
         throw std::runtime_error(
             THROW_ERROR_LOCATION "Failed to create the SFML window.");
     }
+    WinScaleX = _window->getSize().x;
+    WinScaleY = _window->getSize().y;
     refGameEngine.addEventBinding<RType::GameInstance>(
         Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);
     refGameEngine.addEventBinding<RType::GameInstance>(

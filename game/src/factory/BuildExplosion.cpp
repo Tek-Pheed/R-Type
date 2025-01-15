@@ -21,8 +21,8 @@ using namespace RType;
 
 ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
 {
-    const float With = 0.05f * (float) _game.WindoScaleX;
-    const float Height = With;
+    const float Width = 0.08f * (float) _game.WinScaleX;
+    const float Height = Width;
 
     auto &explosion = _game.refEntityManager.getCurrentLevel().createEntity();
     explosion.addComponent(
@@ -37,7 +37,7 @@ ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
     sf::Sprite sprite;
     sprite.setTexture(texture);
     sprite.setTextureRect(sf::Rect(116, 17, 17, 17));
-    sprite.setScale(With / sprite.getLocalBounds().width,
+    sprite.setScale(Width / sprite.getLocalBounds().width,
         Height / sprite.getLocalBounds().height);
     sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
         sprite.getLocalBounds().height / 2.0f);
@@ -50,8 +50,8 @@ ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
 
 ecs::Entity &Factory::buildExplosionPlayer(float posX, float posY)
 {
-    const float With = 0.05f * (float) _game.WindoScaleX;
-    const float Height = With;
+    const float Width = 0.08f * (float) _game.WinScaleX;
+    const float Height = Width;
 
     auto &explosion = _game.refEntityManager.getCurrentLevel().createEntity();
     explosion.addComponent(
@@ -66,7 +66,7 @@ ecs::Entity &Factory::buildExplosionPlayer(float posX, float posY)
     sf::Sprite sprite;
     sprite.setTexture(texture);
     sprite.setTextureRect(sf::Rect(168, 37, 33, 33));
-    sprite.setScale(With / sprite.getLocalBounds().width,
+    sprite.setScale(Width / sprite.getLocalBounds().width,
         Height / sprite.getLocalBounds().height);
     sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
         sprite.getLocalBounds().height / 2.0f);

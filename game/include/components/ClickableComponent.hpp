@@ -22,6 +22,7 @@ namespace ecs
         MOVE_RIGHT,
         MOVE_LEFT,
         AUTO_FIRE,
+        RESOLUTION,
         BACK,
         DIFFICULTY,
         BONUS,

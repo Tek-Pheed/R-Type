@@ -18,17 +18,17 @@ using namespace RType;
 
 void Factory::buildBulletFromPlayer(size_t playerID)
 {
-    constexpr auto velocity = 350.0f;
-    const float With = 0.042f * (float) _game.WindoScaleX;
-    const float Height = 0.022f * (float) _game.WindoScaleY;
+    constexpr auto velocity = 0.35f;
+    const float Width = 0.042f * (float) _game.WinScaleX;
+    const float Height = 0.022f * (float) _game.WinScaleY;
 
     auto &player = _game.getPlayerById(playerID);
     auto positionComp = player.getComponent<ecs::PositionComponent>();
     if (!positionComp)
         return;
     auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
-    float x = positionComp->getX() + 70;
-    float y = positionComp->getY() + 10;
+    float x = positionComp->getX() + 0.05f;
+    float y = positionComp->getY();
 
     if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
         && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
@@ -40,14 +40,14 @@ void Factory::buildBulletFromPlayer(size_t playerID)
     if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
         && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
         bullet.addComponent(
-            std::make_shared<ecs::VelocityComponent>(-350.0f, 0));
+            std::make_shared<ecs::VelocityComponent>(-velocity, 0));
     else
         bullet.addComponent(
             std::make_shared<ecs::VelocityComponent>(velocity, 0));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(With, Height));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(0.042f, 0.022f));
     if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
         && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
-        x = positionComp->getX() - 70;
+        x = positionComp->getX() - 0.1f;
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(x, y));
 
     std::stringstream ss;
@@ -64,14 +64,14 @@ void Factory::buildBulletFromPlayer(size_t playerID)
 
         s.setTexture(texture);
         s.setTextureRect(sf::Rect(137, 153, 64, 16));
-        s.setScale(With / s.getLocalBounds().width,
+        s.setScale(Width / s.getLocalBounds().width,
             Height / s.getLocalBounds().height);
         s.setOrigin(
             s.getLocalBounds().width / 2.0f, s.getLocalBounds().height / 2.0f);
         if (_game.getGameMode() == 1
             && player.getComponent<ecs::PlayerComponent>()
             && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1) {
-            s.setScale(-(With / s.getLocalBounds().width), 1);
+            s.setScale(-(Width / s.getLocalBounds().width), 1);
             s.setColor(sf::Color::Red);
         }
         bullet.addComponent(
@@ -90,9 +90,9 @@ void Factory::buildBulletFromPlayer(size_t playerID)
 
 void Factory::buildBulletFromEnemy(size_t enemyID)
 {
-    constexpr auto velocity = -350.0f;
-    const float With = 0.027f * (float) _game.WindoScaleX;
-    const float Height = 0.03f * (float) _game.WindoScaleY;
+    constexpr auto velocity = -0.30f;
+    const float Width = 0.027f * (float) _game.WinScaleX;
+    const float Height = 0.03f * (float) _game.WinScaleY;
 
     auto &enemy = _game.getEnemyById(enemyID);
     auto positionComp = enemy.getComponent<ecs::PositionComponent>();
@@ -105,8 +105,8 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
     bullet.addComponent(std::make_shared<ecs::BulletComponent>(false));
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(velocity, 0));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
-        positionComp->getX(), positionComp->getY() + 25));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(With, Height));
+        positionComp->getX(), positionComp->getY() + 0.034f));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(0.027f, 0.03f));
 
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << enemyID << PACKET_END;
@@ -121,7 +121,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
         sf::Sprite s;
         s.setTexture(texture);
         s.setTextureRect(sf::Rect(300, 410, 35, 22));
-        s.setScale(With / s.getLocalBounds().width,
+        s.setScale(Width / s.getLocalBounds().width,
             Height / s.getLocalBounds().height);
         s.setOrigin(
             s.getLocalBounds().width / 2.0f, s.getLocalBounds().height / 2.0f);
@@ -141,9 +141,9 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
 
 void Factory::buildBulletFromBoss(size_t bossId)
 {
-    const float bulletVelocity = -0.3f * (float) _game.WindoScaleX;
-    const float With = 0.027f * (float) _game.WindoScaleX;
-    const float Height = With;
+    const float bulletVelocity = -0.4f;
+    const float Width = 0.1f * (float) _game.WinScaleY;
+    const float Height = Width;
 
     auto &boss = _game.getEnemyById(bossId);
     auto positionComp = boss.getComponent<ecs::PositionComponent>();
@@ -168,10 +168,9 @@ void Factory::buildBulletFromBoss(size_t bossId)
         velx = bulletVelocity;
     }
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(velx, vely));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(With, Height));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(0.1f, 0.1f));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
-        positionComp->getX() - (0.04f * (float) _game.WindoScaleX),
-        positionComp->getY() - ((0.065f * (float) _game.WindoScaleX))));
+        positionComp->getX() - 0.04f, positionComp->getY() - 0.065f));
 
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << bossId << PACKET_END;
@@ -186,11 +185,10 @@ void Factory::buildBulletFromBoss(size_t bossId)
         sf::Sprite s;
         s.setTexture(texture);
         s.setTextureRect(sf::Rect(0, 0, 34, 34));
-        s.setScale(With / s.getLocalBounds().width,
+        s.setScale(Width / s.getLocalBounds().width,
             Height / s.getLocalBounds().height);
         s.setOrigin(
             s.getLocalBounds().width / 2.0f, s.getLocalBounds().height / 2.0f);
-        s.setScale(sf::Vector2f(2, 2));
         bullet.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
             s, 34, 0, 34 * 3, 0.05f, 0));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(

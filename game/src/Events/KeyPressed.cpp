@@ -11,6 +11,7 @@
 
 #include "Config.hpp"
 #include "Events.hpp"
+#include "SFML/System/Vector2.hpp"
 #include "Utils.hpp"
 
 using namespace RType;
@@ -78,37 +79,38 @@ void EventManager::keyPressed(sf::Event &event)
         }
     }
     if (event.key.code == sf::Keyboard::Escape) {
-        _game.refGameEngine.triggerEvent(Engine::Events::EVENT_DisconnectedFromServer);
+        _game.refGameEngine.triggerEvent(
+            Engine::Events::EVENT_DisconnectedFromServer);
     }
     if (_game.hasLocalPlayer()) {
-            auto &player = _game.getLocalPlayer();
-            auto velocity = player.getComponent<ecs::VelocityComponent>();
-            auto bonus = player.getComponent<ecs::BonusComponent>();
+        auto &player = _game.getLocalPlayer();
+        auto velocity = player.getComponent<ecs::VelocityComponent>();
+        auto bonus = player.getComponent<ecs::BonusComponent>();
 
-            if (event.key.code == moveUpKey) {
-                if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                    velocity->setVy(-250.0f);
-                } else {
-                    velocity->setVy(-200.0f);
-                }
-            } else if (event.key.code == moveDownKey) {
-                if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                    velocity->setVy(250.0f);
-                } else {
-                    velocity->setVy(200.0f);
-                }
-            } else if (event.key.code == moveRightKey) {
-                if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                    velocity->setVx(250.0f);
-                } else {
-                    velocity->setVx(200.0f);
-                }
-            } else if (event.key.code == moveLeftKey) {
-                if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                    velocity->setVx(-250.0f);
-                } else {
-                    velocity->setVx(-200.0f);
-                }
+        if (event.key.code == moveUpKey) {
+            if (bonus->getBonus() == ecs::Bonus::SPEED) {
+                velocity->setVy(-0.30f);
+            } else {
+                velocity->setVy(-0.30f);
+            }
+        } else if (event.key.code == moveDownKey) {
+            if (bonus->getBonus() == ecs::Bonus::SPEED) {
+                velocity->setVy(0.30f);
+            } else {
+                velocity->setVy(0.30f);
+            }
+        } else if (event.key.code == moveRightKey) {
+            if (bonus->getBonus() == ecs::Bonus::SPEED) {
+                velocity->setVx(0.16f);
+            } else {
+                velocity->setVx(0.16f);
+            }
+        } else if (event.key.code == moveLeftKey) {
+            if (bonus->getBonus() == ecs::Bonus::SPEED) {
+                velocity->setVx(-0.16f);
+            } else {
+                velocity->setVx(-0.16f);
             }
         }
+    }
 }
