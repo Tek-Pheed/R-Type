@@ -228,6 +228,10 @@ void EventManager::mouseClicked()
         if (!rectangle)
             continue;
 
+        //TO DO : Add sound effect
+        //auto &buttonClikedSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(Asset::BUTTON_CLICKED_SOUND);
+        //_factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
+
         sf::FloatRect currentHover =
             rectangle->getRectangle().getGlobalBounds();
         if (currentHover.contains(mousePos)) {

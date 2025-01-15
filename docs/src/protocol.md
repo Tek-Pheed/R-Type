@@ -1,4 +1,5 @@
 ---
+
 title: "RFC999 - R-Type Protocol"
 abbrev: "R-Type Protocol"
 docname: r-type-protocol-latest
@@ -14,11 +15,11 @@ smart_quotes: no
 pi: [toc, sortrefs, symrefs]
 
 author:
- -
-    ins: R. Scandella
-    name: Raphael Scandella
-    organization: F-TYPE V8 444 CH, 0-100 km/h 3.7s, TOP SPEED 300 km/h
-    email: raphael.scandella@epitech.eu
+-
+ins: R. Scandella
+name: Raphael Scandella
+organization: F-TYPE V8 444 CH, 0-100 km/h 3.7s, TOP SPEED 300 km/h
+email: raphael.scandella@epitech.eu
 
 normative:
 
@@ -169,7 +170,12 @@ Removed a terrain, if its has been destroyed or went off the screen.
 - Lose - 134 -> TCP
 - Game Over - 135 -> TCP
 - Music change - 136 (filename) -> TCP
-- Background chnage - 137 (filename) -> TCP
+- Background change - 137 (filename) -> TCP
+
+# Bonus Management (150)
+
+- Spawn bonus - 151 -> TCP
+- Get bonus - 152 -> TCP
 
 # Game Management (240)
 

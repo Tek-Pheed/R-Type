@@ -97,8 +97,8 @@ void GameInstance::handleNetworkMechs(
 
                 ref.setRepeated(true);
                 comp->getSprite().setTextureRect(
-                    sf::Rect(0, 0, (int) GameInstance::RESOLUTION_X,
-                        (int) GameInstance::RESOLUTION_Y));
+                    sf::Rect(0, 0, (int) GameInstance::DEFAULT_RESOLUTION_X,
+                        (int) GameInstance::DEFAULT_RESOLUTION_Y));
                 comp->getSprite().setTexture(ref);
             }
             break;
@@ -106,6 +106,11 @@ void GameInstance::handleNetworkMechs(
         case Protocol::M_WAVE: {
             if (tokens.size() >= 1 && !isServer()) {
                 currentWave = std::atoi(tokens[0].c_str());
+                if (currentWave > 0) {
+                    auto &newWaveInComingSound = this->refAssetManager.getAsset<sf::SoundBuffer>(
+                        Asset::NEWWAVEINCOMING);
+                    _factory.buildSoundEffect(newWaveInComingSound, "newWaveInComingSound", 100.0f);
+                }
                 if (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Changing wave: " << currentWave << std::endl;
             }
@@ -324,10 +329,9 @@ void GameInstance::gameTick(
             float deltaTime_sec = std::any_cast<float>(arg);
             static float time = 0.0f;
             time += deltaTime_sec;
-            if (time >= 2.0f) {
-                for (auto entID :
-                    refEntityManager.getCurrentLevel()
-                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+            if (time >= 1.0f) {
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();

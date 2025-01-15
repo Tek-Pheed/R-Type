@@ -21,21 +21,26 @@ using namespace RType;
 
 ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
 {
+    const float With = 0.05f * (float) _game.WindoScaleX;
+    const float Height = With;
+
     auto &explosion = _game.refEntityManager.getCurrentLevel().createEntity();
     explosion.addComponent(
         std::make_shared<ecs::PositionComponent>(posX, posY));
     auto &texture =
         _game.refAssetManager.getAsset<sf::Texture>(Asset::EXPLOSION_TEXTURE);
-    auto &explosionSound = 
-        _game.refAssetManager.getAsset<sf::SoundBuffer>(Asset::EXPLOSION_SOUND);
+    auto &explosionSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
+        Asset::EXPLOSION_SOUND);
 
-    buildSoundEffect(explosionSound, "explosionSound");
+    buildSoundEffect(explosionSound, "explosionSound", 60.0f);
 
     sf::Sprite sprite;
     sprite.setTexture(texture);
     sprite.setTextureRect(sf::Rect(116, 17, 17, 17));
-    sprite.setScale(sf::Vector2f(5, 5));
-
+    sprite.setScale(With / sprite.getLocalBounds().width,
+        Height / sprite.getLocalBounds().height);
+    sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
+        sprite.getLocalBounds().height / 2.0f);
     explosion.addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::RenderComponent::ObjectType::SPRITE));
     explosion.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
@@ -45,22 +50,26 @@ ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
 
 ecs::Entity &Factory::buildExplosionPlayer(float posX, float posY)
 {
+    const float With = 0.05f * (float) _game.WindoScaleX;
+    const float Height = With;
+
     auto &explosion = _game.refEntityManager.getCurrentLevel().createEntity();
     explosion.addComponent(
         std::make_shared<ecs::PositionComponent>(posX, posY));
     auto &texture =
         _game.refAssetManager.getAsset<sf::Texture>(Asset::EXPLOSION_PLAYER);
-    auto &explosionSound = 
-        _game.refAssetManager.getAsset<sf::SoundBuffer>(Asset::EXPLOSION_SOUND);
+    auto &explosionSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
+        Asset::EXPLOSION_SOUND);
 
-    buildSoundEffect(explosionSound, "explosionSound");
+    buildSoundEffect(explosionSound, "explosionSound", 60.0f);
 
     sf::Sprite sprite;
     sprite.setTexture(texture);
     sprite.setTextureRect(sf::Rect(168, 37, 33, 33));
-    sprite.setScale(sf::Vector2f(3, 3));
-
-
+    sprite.setScale(With / sprite.getLocalBounds().width,
+        Height / sprite.getLocalBounds().height);
+    sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
+        sprite.getLocalBounds().height / 2.0f);
     explosion.addComponent(std::make_shared<ecs::RenderComponent>(
         ecs::RenderComponent::ObjectType::SPRITE));
     explosion.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(

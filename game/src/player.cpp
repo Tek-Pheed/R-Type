@@ -10,6 +10,7 @@
 #endif
 
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -357,6 +358,18 @@ bool GameInstance::hasLocalPlayer(void) const
     return (true);
 }
 
+ecs::Entity &GameInstance::getRandomPlayer(void)
+{
+    std::unique_lock lock(_gameLock);
+
+    auto ent = refEntityManager.getCurrentLevel()
+                   .findEntitiesByComponent<ecs::PlayerComponent>();
+
+    size_t range = (ent.size() - 1) - 0 + 1;
+    size_t num = ((size_t) rand()) % range;
+    return (ent[num]);
+}
+
 ecs::Entity &GameInstance::getLocalPlayer()
 {
     if (!hasLocalPlayer())
@@ -511,11 +524,14 @@ void GameInstance::playerAnimations(ecs::Entity &player)
         direction = "down";
     }
     if (direction == "top") {
-        renderComp->getSprite().setTextureRect(sf::Rect(132, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(sf::Rect(
+            132, renderComp->getSprite().getTextureRect().top, 33, 17));
     } else if (direction == "down") {
-        renderComp->getSprite().setTextureRect(sf::Rect(0, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(
+            sf::Rect(0, renderComp->getSprite().getTextureRect().top, 33, 17));
     } else {
-        renderComp->getSprite().setTextureRect(sf::Rect(66, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(sf::Rect(
+            66, renderComp->getSprite().getTextureRect().top, 33, 17));
     }
 
     animationTimers[playerID].restart();
