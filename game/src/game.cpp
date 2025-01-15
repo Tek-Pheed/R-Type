@@ -404,7 +404,7 @@ void GameInstance::gamePostTick(
             }
         }
         if (next) {
-            if (entVect.size() == 0 && !ended) {
+            if (entVect.size() == 0 && !ended && _gamemode != 1) {
                 if (_level < getTxtFiles("assets/levels").size()) {
                     std::cout << "Next level" << std::endl;
                     _level++;
