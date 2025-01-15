@@ -137,6 +137,13 @@ void GameInstance::loadPvPLevel()
         ss << M_MUSIC << " " << "pvp.ogg" << " " << PACKET_END;
         refNetworkManager.sendToAll(System::Network::ISocket::TCP, ss.str());
         ss.clear();
+
+        for (auto &entity : getAllPlayers()) {
+            auto &player = entity.get();
+            auto playerHealth = player.getComponent<ecs::HealthComponent>();
+            if (playerHealth)
+                playerHealth->setHealth(300);
+        }
     }
 
     if (!isServer()) {
