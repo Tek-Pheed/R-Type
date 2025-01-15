@@ -222,14 +222,12 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
 
 void HitboxSystem::PlayerPvPMode(ecs::Entity &bullet, float deltaTime)
 {
+    (void) deltaTime;
     auto bulletComp = bullet.getComponent<ecs::BulletComponent>();
     auto bulletPos = bullet.getComponent<ecs::PositionComponent>();
     auto bulletHitbox = bullet.getComponent<ecs::HitboxComponent>();
     const int DMG = 100;
     int team = bulletComp->getTeam();
-
-    static float damageCooldown = 0.0f;
-    damageCooldown -= deltaTime;
 
     if (!bulletComp || !bulletPos || !bulletHitbox)
         return;
@@ -253,12 +251,11 @@ void HitboxSystem::PlayerPvPMode(ecs::Entity &bullet, float deltaTime)
                     bulletHitbox->getWidth(), bulletHitbox->getHeight(),
                     position2->getX(), position2->getY(),
                     playerHitb2->getWidth(), playerHitb2->getHeight())) {
-                if (_game->isServer() && damageCooldown <= 0.0f) {
+                if (_game->isServer()) {
                     _game->damagePlayer(player2->getPlayerID(), DMG);
                 }
                 _game->refEntityManager.getCurrentLevel()
                     .markEntityForDeletion(bullet.getID());
-                damageCooldown = 1.0f;
             }
 
         } catch (const std::exception &e) {
