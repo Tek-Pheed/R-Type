@@ -22,11 +22,13 @@ void Factory::buildBulletFromPlayer(size_t playerID)
     const float Width = 0.042f * (float) _game.WinScaleX;
     const float Height = 0.022f * (float) _game.WinScaleY;
 
+    auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
     auto &player = _game.getPlayerById(playerID);
     auto positionComp = player.getComponent<ecs::PositionComponent>();
-    if (!positionComp)
+    if (!positionComp) {
+        _game.refEntityManager.getCurrentLevel().markEntityForDeletion(bullet.getID());
         return;
-    auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
+    }
     float x = positionComp->getX() + 0.05f;
     float y = positionComp->getY();
 
