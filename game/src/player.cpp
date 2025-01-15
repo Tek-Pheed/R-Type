@@ -79,7 +79,8 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _maxPlayers = (size_t) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
-                std::cout << "Max players set to : " << _maxPlayers << std::endl;
+                std::cout << "Max players set to : " << _maxPlayers
+                          << std::endl;
                 if (!_isServer)
                     for (auto &entity : enti) {
                         auto text =
@@ -88,15 +89,16 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("NUMBER OF PLAYER")
                                 != std::string::npos) {
-                            eventManager.handleNumberOfPlayerButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "NUMBER OF PLAYER : " << _maxPlayers;
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
-                    sss << L_SETMAXPLAYRS << " " << id << " " << _maxPlayers << " "
-                        << PACKET_END;
+                    sss << L_SETMAXPLAYRS << " " << id << " " << _maxPlayers
+                        << " " << PACKET_END;
                     refNetworkManager.sendToOthers(
                         id, System::Network::ISocket::Type::TCP, sss.str());
                 }
@@ -116,8 +118,12 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("DIFFICULTY")
                                 != std::string::npos) {
-                            eventManager.handleDifficultyButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "DIFFICULTY : "
+                               << (_difficulty == 3          ? "HARD"
+                                          : _difficulty == 2 ? "MEDIUM"
+                                                             : "EASY");
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
@@ -143,8 +149,9 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("BONUS")
                                 != std::string::npos) {
-                            eventManager.handleBonusButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "BONUS : " << (_bonus ? "YES" : "NO");
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
@@ -170,8 +177,9 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("LEVEL")
                                 != std::string::npos) {
-                            eventManager.handleLevelButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "LEVEL : " << _level;
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
@@ -197,8 +205,10 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("GAMEMODE")
                                 != std::string::npos) {
-                            eventManager.handleGamemodeButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "GAMEMODE : "
+                               << (_gamemode ? "PVP" : "WAVE");
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
@@ -405,7 +415,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::PlayerComponent>());
+            .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
