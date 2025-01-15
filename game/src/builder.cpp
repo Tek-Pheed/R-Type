@@ -238,7 +238,7 @@ void RType::GameInstance::levelLobbyMenu()
     if (!isServer()) {
         std::string title = "GAME CONFIG";
 
-        auto &text = _factory.buildText(0, 0, 0, title);
+        auto &text = _factory.buildText(0, 0, 0, title, sf::Color::White, 48);
         auto titleText = text.getComponent<ecs::TextComponent<sf::Text>>();
         auto titlePos = text.getComponent<ecs::PositionComponent>();
 

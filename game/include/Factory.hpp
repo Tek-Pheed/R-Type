@@ -36,7 +36,7 @@ namespace RType
             float health = 100.0f, int wave = 0, float velocityX = -200.0f,
             float velocityY = 0.0f);
         ecs::Entity &buildText(
-            size_t id, float posX, float posY, std::string &content);
+            size_t id, float posX, float posY, std::string &content, sf::Color color, unsigned int characterSize);
         ecs::Entity &buildMusic(sf::SoundBuffer &soundBuffer, std::string str);
         ecs::Entity &buildSoundEffect(sf::SoundBuffer &soundBuffer, std::string str, float volume);
         ecs::Entity &buildEnemyShooter(size_t id, float posX, float posY,

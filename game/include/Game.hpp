@@ -95,6 +95,7 @@ namespace RType
         void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         void loadLevelContent(const std::string &filename);
+        void loadPvPLevel();
 
         // Player functions and utilities
         ecs::Entity &getRandomPlayer(void);
@@ -208,6 +209,10 @@ namespace RType
 
         // Game Value
         size_t getDifficulty() const;
+        size_t getGameMode() const;
+        void setGameMode(size_t mode);
+
+        Factory _factory;
 
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
@@ -224,8 +229,6 @@ namespace RType
         uint16_t _udpPort = DEFAULT_UDP_PORT;
         uint16_t _tcpPort = DEFAULT_TCP_PORT;
         std::string _ip = DEFAULT_IP;
-
-        Factory _factory;
 
         std::string _musicName;
         std::string _bgName;

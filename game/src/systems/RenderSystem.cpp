@@ -75,22 +75,28 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
         position->getX() * (float) window.getSize().x,
         position->getY() * (float) window.getSize().y);
     text->getText().setString(text->getStr());
-    if (position->getY() < 0.025f) {
-        text->getText().setPosition(position->getX() * (float) window.getSize().x
+    if (position->getY() < 0.035f) {
+        text->getText().setPosition(
+            position->getX() * (float) window.getSize().x
                 + (float) sprite->getSprite().getTextureRect().width
                     * sprite->getSprite().getScale().x / 2
                 - (float) text->getText().getLocalBounds().width / 2,
             position->getY() * (float) window.getSize().y
                 + static_cast<float>(
-                    sprite->getSprite().getTextureRect().height)
-                + 0.025f);
+                    ((float) sprite->getSprite().getTextureRect().height
+                        + 0.025f)
+                    / 2));
     } else {
         text->getText().setPosition(
             (position->getX() * (float) window.getSize().x)
                 + (float) sprite->getSprite().getTextureRect().width
                     * sprite->getSprite().getScale().x / 2
                 - (float) text->getText().getLocalBounds().width / 2,
-            (position->getY() * (float) window.getSize().y) - 0.025f);
+            (position->getY() * (float) window.getSize().y)
+                - -static_cast<float>(
+                      sprite->getSprite().getTextureRect().height)
+                    * 3 / 2
+                - 0.025f);
     }
     window.draw(sprite->getSprite());
     window.draw(text->getText());

@@ -2,7 +2,7 @@
 
 ## Version
 
-1.3
+v8.0
 
 ## Last Updated
 
@@ -216,7 +216,7 @@ The settings menu contains six buttons :
 
 The host can modify six game settings :
 
-- Gamemode : WAVE (enemy waves) or PVP (player battle).
+- Gamemode : WAVE (enemy waves) or PVP (team-based battle).
 
 - Number of Players : Choose between 4 and 10.
 
@@ -246,7 +246,7 @@ Press Esc to exit the current game and go back to the main menu.
 
 In Wave Mode, survive as long as possible and defeat enemy waves.
 
-In PVP Mode, challenge another player in a 1v1 battle and be the last one standing.
+In PVP Mode, you’ll face off in team-based battles. The teams are formed based on the number of players in the lobby. For example, if there are three players, Player 1 and Player 3 will be on Team 1, and Player 2 will be on Team 2. If there are four players, Team 1 will consist of Player 1 and Player 3, while Team 2 will have Player 2 and Player 4. Each player starts with 300 HP, so you can take up to three hits before you’re out. Additionally, to prevent players from being eliminated too quickly, you can only be hit once per second. Be sure to avoid getting hit, as working with your team and staying alive is the key to victory.
 
 #### Window scaling : Your dekstop fractionnal scaling may affect the game true resolution
 

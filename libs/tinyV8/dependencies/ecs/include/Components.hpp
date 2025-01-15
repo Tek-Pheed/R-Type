@@ -44,8 +44,12 @@ namespace ecs
         size_t getPlayerID() const;
         void setPlayerID(size_t playerID);
 
+        void setTeam(int team);
+        int getTeam() const;
+
       private:
         size_t _playerID;
+        int _team;
     };
 
     class VelocityComponent : public Component {
@@ -344,7 +348,8 @@ namespace ecs
 
     class BulletComponent : public Component {
       public:
-        explicit BulletComponent(bool isFromPlayer, size_t type = 0);
+        explicit BulletComponent(
+            bool isFromPlayer, size_t type = 0, int team = 0);
 
         bool getIsFromPlayer();
         void setIsFromPlayer(bool isFromPlayer);
@@ -352,10 +357,14 @@ namespace ecs
         size_t getType() const;
         void setType(size_t type);
 
+        int getTeam() const;
+        void setTeam(int team);
+
       private:
         bool _isFromPlayer;
         // 0 for regular, 1 for boss
         size_t _type;
+        int _team;
     };
 
     class NameComponent : public Component {

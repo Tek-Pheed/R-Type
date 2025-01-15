@@ -46,9 +46,13 @@ void GameInstance::handleLobby(
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
                 std::string levelFileName =
-                    "./assets/levels/level" + std::to_string(_level) + ".txt";
+                    "assets/levels/level" + std::to_string(_level) + ".txt";
                 ;
-                loadLevelContent(levelFileName);
+                if (_gamemode == 0)
+                    loadLevelContent(levelFileName);
+                else
+                    loadPvPLevel();
+
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -65,6 +69,8 @@ void GameInstance::handleLobby(
                     currentSong->getMusicType().setBuffer(newMusic);
                     currentSong->getMusicType().play();
                 }
+                if (_gamemode == 1)
+                    loadPvPLevel();
                 launchGame();
             }
             break;
@@ -271,6 +277,14 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_DEAD: {
+            if (!_isServer && getLocalPlayer().getComponent<ecs::PlayerComponent>()->getPlayerID() == (size_t) atoi(tokens[0].c_str())) {
+                auto &youLoseSound = refAssetManager.getAsset<sf::SoundBuffer>(Asset::YOU_LOSE_SOUND);
+                _factory.buildSoundEffect(youLoseSound, "youLoseSound", 100.0f);
+                std::string title = "YOU ARE DEAD";
+                auto textWidth = title.size() * 20;
+                _factory.buildText(0, (float)getWindow().getSize().x / 2 - (float)textWidth,
+                    (float)getWindow().getSize().y / 2 - 50, title, sf::Color::Red, 100);
+            }
             if (_isServer)
                 return;
             if (tokens.size() >= 1) {
@@ -398,7 +412,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-            .findEntitiesByComponent<ecs::PlayerComponent>());
+                .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)

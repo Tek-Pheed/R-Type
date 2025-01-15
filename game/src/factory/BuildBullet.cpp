@@ -30,9 +30,24 @@ void Factory::buildBulletFromPlayer(size_t playerID)
     float x = positionComp->getX() + 0.1f;
     float y = positionComp->getY();
 
-    bullet.addComponent(std::make_shared<ecs::BulletComponent>(true));
-    bullet.addComponent(std::make_shared<ecs::VelocityComponent>(velocity, 0));
+    if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
+        && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
+        bullet.addComponent(
+            std::make_shared<ecs::BulletComponent>(true, 0, 1));
+    else
+        bullet.addComponent(
+            std::make_shared<ecs::BulletComponent>(true, 0, 0));
+    if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
+        && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
+        bullet.addComponent(
+            std::make_shared<ecs::VelocityComponent>(-velocity, 0));
+    else
+        bullet.addComponent(
+            std::make_shared<ecs::VelocityComponent>(velocity, 0));
     bullet.addComponent(std::make_shared<ecs::HitboxComponent>(0.042f, 0.022f));
+    if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
+        && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
+        x = positionComp->getX() - 0.1f;
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(x, y));
 
     std::stringstream ss;
@@ -53,6 +68,12 @@ void Factory::buildBulletFromPlayer(size_t playerID)
             Height / s.getLocalBounds().height);
         s.setOrigin(
             s.getLocalBounds().width / 2.0f, s.getLocalBounds().height / 2.0f);
+        if (_game.getGameMode() == 1
+            && player.getComponent<ecs::PlayerComponent>()
+            && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1) {
+            s.setScale(-(Width / s.getLocalBounds().width), 1);
+            s.setColor(sf::Color::Red);
+        }
         bullet.addComponent(
             std::make_shared<ecs::SpriteComponent<sf::Sprite>>(s, 0));
         auto &bulletSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(
