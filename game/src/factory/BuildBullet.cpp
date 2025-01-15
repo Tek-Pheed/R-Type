@@ -44,7 +44,8 @@ void Factory::buildBulletFromPlayer(size_t playerID)
     else
         bullet.addComponent(
             std::make_shared<ecs::VelocityComponent>(velocity, 0));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(0.042f, 0.022f));
+    bullet.addComponent(
+        std::make_shared<ecs::HitboxComponent>(0.042f, 0.022f));
     if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
         && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
         x = positionComp->getX() - 0.1f;
@@ -139,7 +140,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
     }
 }
 
-void Factory::buildBulletFromBoss(size_t bossId)
+void Factory::buildBulletFromBoss(size_t bossId, float velx, float vely)
 {
     const float bulletVelocity = -0.4f;
     const float Width = 0.1f * (float) _game.WinScaleY;
@@ -155,16 +156,14 @@ void Factory::buildBulletFromBoss(size_t bossId)
     auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
     bullet.addComponent(std::make_shared<ecs::BulletComponent>(false, 1));
 
-    float vely = 0.0f;
-    float velx = 0.0f;
-    if (_game.getAllPlayers().size() != 0) {
+    if (_game.isServer() && _game.getAllPlayers().size() != 0) {
         auto plv =
             _game.getRandomPlayer().getComponent<ecs::PositionComponent>();
         vely = std::clamp(plv->getY() - positionComp->getY(), bulletVelocity,
             -bulletVelocity);
         velx = std::clamp(plv->getX() - positionComp->getX(), bulletVelocity,
             -bulletVelocity);
-    } else {
+    } else if (velx == 0.0f && vely == 0.0f) {
         velx = bulletVelocity;
     }
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(velx, vely));
@@ -173,7 +172,8 @@ void Factory::buildBulletFromBoss(size_t bossId)
         positionComp->getX() - 0.04f, positionComp->getY() - 0.065f));
 
     std::stringstream ss;
-    ss << E_SHOOT << " " << _game.getTicks() << " " << bossId << PACKET_END;
+    ss << E_SHOOT << " " << _game.getTicks() << " " << bossId << " " << velx
+       << " " << vely << " " << PACKET_END;
     if (_game.isServer()) {
         _game.refNetworkManager.sendToAll(
             System::Network::ISocket::Type::UDP, ss.str());

@@ -213,8 +213,11 @@ void GameInstance::handleNetworkEnemies(
                         mob.getComponent<ecs::EnemyComponent>()->getType();
                     if (type == 1)
                         _factory.buildBulletFromEnemy(id);
-                    else if (type == 2)
-                        _factory.buildBulletFromBoss(id);
+                    else if (type == 2) {
+                        float velx = (float) std::atof(tokens[2].c_str());
+                        float vely = (float) std::atof(tokens[3].c_str());
+                        _factory.buildBulletFromBoss(id, velx, vely);
+                    }
                 }
             }
         }
