@@ -414,7 +414,14 @@ void GameInstance::gamePostTick(
                     currentWave = -1;
                 } else {
                     ended = true;
-                    std::cout << "Congrats ! You played all levels :)" << std::endl;
+                    std::cout << "Congrats ! You played all levels :)"
+                              << std::endl;
+                    std::cout << "Congrats ! You played all levels :)"
+                              << std::endl;
+                    std::cout << "Congrats ! You played all levels :)"
+                              << std::endl;
+                    std::cout << "Congrats ! You played all levels :)"
+                              << std::endl;
                     refGameEngine.stop();
                 }
             }
