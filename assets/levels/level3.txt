@@ -1,0 +1,18 @@
+# Level config file
+# Available commands:
+# WAVE(waveID): Declare a new wave
+# BASIC_ENEMY(posX, posY, velocityX, velocityY, Health): Create basic enemy
+# SHOOTER_ENEMY(posX, posY, velocityX, velocityY, Health): Create shooter enemy
+# BOSS(posX, posY, Health): Create a Boss
+# MUSIC(filename)
+# BACKGROUND(filename)
+# BONUS(posX, posY, type[0-3])
+
+MUSIC(streetFighter.ogg)
+BACKGROUND(clouds.jpg)
+
+WAVE(1)
+BASIC_ENEMY(0.8, 0.25, 0.0, 0.0, 500)
+BOSS(0.79, 0.46, 500)
+SHOOTER_ENEMY(0.73, 0.71, 0.0, 0.0, 500)
+

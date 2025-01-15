@@ -13,10 +13,10 @@ class LevelEditor:
     def __init__(self, root):
         self.root = root
         self.root.title("Level Editor")
-        self.root.geometry("1280x850")  # Set window size to 1280x720
+        self.root.geometry("1280x720")  # Set window size to 1280x720
 
         # Canvas for placing sprites
-        self.canvas = tk.Canvas(root, width=1280, height=720, bg="white")
+        self.canvas = tk.Canvas(root, width=1280, height=600, bg="white")
         self.canvas.pack()
 
         # Frame for controls
@@ -76,7 +76,7 @@ class LevelEditor:
             "speed_x": self.create_edit_field("X Velocity (0-1):", 0),
             "speed_y": self.create_edit_field("Y Velocity (0-1):", 0),
             "health": self.create_edit_field("Health:", 500),
-            "bonus_type": self.create_edit_field("Bonus Type (0-2):", 0)
+            "bonus_type": self.create_edit_field("Bonus Type (0-3):", 0)
         }
 
         # Button to apply changes
@@ -124,8 +124,8 @@ class LevelEditor:
         """Handle canvas click to place or select sprites."""
         canvas_width = self.canvas.winfo_width()
         canvas_height = self.canvas.winfo_height()
-        x_percent = event.x / canvas_width
-        y_percent = event.y / canvas_height
+        x_percent = round(event.x / canvas_width, 2)  # Round to 2 decimal places
+        y_percent = round(event.y / canvas_height, 2)  # Round to 2 decimal places
 
         # Check if a sprite is clicked
         for sprite in self.waves[-1]["sprites"]:  # Only check sprites in the current wave
@@ -151,13 +151,13 @@ class LevelEditor:
 
         sprite = self.selected_sprite
         self.edit_widgets["x"].delete(0, tk.END)
-        self.edit_widgets["x"].insert(0, str(sprite["x"]))
+        self.edit_widgets["x"].insert(0, str(round(sprite["x"], 2)))  # Round to 2 decimal places
         self.edit_widgets["y"].delete(0, tk.END)
-        self.edit_widgets["y"].insert(0, str(sprite["y"]))
+        self.edit_widgets["y"].insert(0, str(round(sprite["y"], 2)))  # Round to 2 decimal places
         self.edit_widgets["speed_x"].delete(0, tk.END)
-        self.edit_widgets["speed_x"].insert(0, str(sprite["speed_x"]))
+        self.edit_widgets["speed_x"].insert(0, str(round(sprite["speed_x"], 2)))  # Round to 2 decimal places
         self.edit_widgets["speed_y"].delete(0, tk.END)
-        self.edit_widgets["speed_y"].insert(0, str(sprite["speed_y"]))
+        self.edit_widgets["speed_y"].insert(0, str(round(sprite["speed_y"], 2)))  # Round to 2 decimal places
         self.edit_widgets["health"].delete(0, tk.END)
         self.edit_widgets["health"].insert(0, str(sprite["health"]))
         self.edit_widgets["bonus_type"].delete(0, tk.END)
@@ -172,10 +172,10 @@ class LevelEditor:
             return
 
         sprite = self.selected_sprite
-        sprite["x"] = float(self.edit_widgets["x"].get())
-        sprite["y"] = float(self.edit_widgets["y"].get())
-        sprite["speed_x"] = float(self.edit_widgets["speed_x"].get())
-        sprite["speed_y"] = float(self.edit_widgets["speed_y"].get())
+        sprite["x"] = round(float(self.edit_widgets["x"].get()), 2)  # Round to 2 decimal places
+        sprite["y"] = round(float(self.edit_widgets["y"].get()), 2)  # Round to 2 decimal places
+        sprite["speed_x"] = round(float(self.edit_widgets["speed_x"].get()), 2)  # Round to 2 decimal places
+        sprite["speed_y"] = round(float(self.edit_widgets["speed_y"].get()), 2)  # Round to 2 decimal places
         sprite["health"] = int(self.edit_widgets["health"].get())
         if sprite["type"] == "BONUS":
             sprite["bonus_type"] = int(self.edit_widgets["bonus_type"].get())
@@ -203,7 +203,7 @@ class LevelEditor:
                 file.write("# BOSS(posX, posY, Health): Create a Boss\n")
                 file.write("# MUSIC(filename)\n")
                 file.write("# BACKGROUND(filename)\n")
-                file.write("# BONUS(posX, posY, type[0-2])\n\n")
+                file.write("# BONUS(posX, posY, type[0-3])\n\n")
                 file.write("MUSIC(streetFighter.ogg)\n")
                 file.write("BACKGROUND(clouds.jpg)\n\n")
 
@@ -211,8 +211,8 @@ class LevelEditor:
                     file.write(f"WAVE({wave['wave_id']})\n")
                     for sprite in wave["sprites"]:
                         sprite_type = sprite["type"]
-                        x, y = sprite["x"], sprite["y"]
-                        speed_x, speed_y = sprite["speed_x"], sprite["speed_y"]
+                        x, y = round(sprite["x"], 2), round(sprite["y"], 2)  # Round to 2 decimal places
+                        speed_x, speed_y = round(sprite["speed_x"], 2), round(sprite["speed_y"], 2)  # Round to 2 decimal places
                         if sprite_type == "BONUS":
                             file.write(f"{sprite_type}({x}, {y}, {sprite['bonus_type']})\n")
                         elif sprite_type == "BOSS":
@@ -240,8 +240,8 @@ class LevelEditor:
                         self.current_wave = wave_id
                     elif line.startswith("BASIC_ENEMY") or line.startswith("SHOOTER_ENEMY"):
                         parts = line.split("(")[1].split(")")[0].split(",")
-                        x, y = float(parts[0]), float(parts[1])
-                        speed_x, speed_y = float(parts[2]), float(parts[3])
+                        x, y = round(float(parts[0]), 2), round(float(parts[1]), 2)  # Round to 2 decimal places
+                        speed_x, speed_y = round(float(parts[2]), 2), round(float(parts[3]), 2)  # Round to 2 decimal places
                         health = int(parts[4])
                         sprite_type = line.split("(")[0]
                         current_wave["sprites"].append({
@@ -254,7 +254,7 @@ class LevelEditor:
                         })
                     elif line.startswith("BOSS"):
                         parts = line.split("(")[1].split(")")[0].split(",")
-                        x, y = float(parts[0]), float(parts[1])
+                        x, y = round(float(parts[0]), 2), round(float(parts[1]), 2)  # Round to 2 decimal places
                         health = int(parts[2])
                         current_wave["sprites"].append({
                             "type": "BOSS",
@@ -264,7 +264,7 @@ class LevelEditor:
                         })
                     elif line.startswith("BONUS"):
                         parts = line.split("(")[1].split(")")[0].split(",")
-                        x, y = float(parts[0]), float(parts[1])
+                        x, y = round(float(parts[0]), 2), round(float(parts[1]), 2)  # Round to 2 decimal places
                         bonus_type = int(parts[2])
                         current_wave["sprites"].append({
                             "type": "BONUS",
