@@ -82,11 +82,6 @@ void EventManager::keyPressed(sf::Event &event)
         _game.refGameEngine.triggerEvent(
             Engine::Events::EVENT_DisconnectedFromServer);
     }
-    if (event.key.code == sf::Keyboard::Tab) {
-        _game.getWindow().setSize(sf::Vector2u(2560, 1440));
-        _game.WindoScaleX = 2560;
-        _game.WindoScaleY = 1440;
-    }
     if (_game.hasLocalPlayer()) {
         auto &player = _game.getLocalPlayer();
         auto velocity = player.getComponent<ecs::VelocityComponent>();

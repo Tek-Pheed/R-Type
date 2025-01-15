@@ -235,8 +235,20 @@ void RType::GameInstance::setupClient(
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
+
+    auto res = _gameConfig.getKeyFromConfig("RESOLUTION");
+    std::stringstream resStream(res);
+    std::string resX;
+    std::string resY;
+
+    std::getline(resStream, resX, 'x');
+    std::getline(resStream, resY, ' ');
+
+    WindoScaleX = (size_t) std::atoi(resX.c_str());
+    WindoScaleY = (size_t) std::atoi(resY.c_str());
+
     sf::VideoMode videoMode(
-        GameInstance::DEFAULT_RESOLUTION_X, GameInstance::DEFAULT_RESOLUTION_Y);
+        (unsigned int) WindoScaleX, (unsigned int) WindoScaleY);
     _window->create(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
