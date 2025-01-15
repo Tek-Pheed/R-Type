@@ -248,6 +248,8 @@ In Wave Mode, survive as long as possible and defeat enemy waves.
 
 In PVP Mode, challenge another player in a 1v1 battle and be the last one standing.
 
+#### Window scaling : Your dekstop fractionnal scaling may affect the game true resolution
+
 *For feedback or suggestions, please contact us via LinkedIn or open an issue on the project repository.*
 
 ## Elements in game
