@@ -79,6 +79,7 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _maxPlayers = (size_t) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
+                std::cout << "Max players set to : " << _maxPlayers << std::endl;
                 if (!_isServer)
                     for (auto &entity : enti) {
                         auto text =
@@ -94,7 +95,7 @@ void GameInstance::handleLobby(
                 if (_isServer) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
-                    sss << L_SETMAXPLAYRS << " " << id << _maxPlayers << " "
+                    sss << L_SETMAXPLAYRS << " " << id << " " << _maxPlayers << " "
                         << PACKET_END;
                     refNetworkManager.sendToOthers(
                         id, System::Network::ISocket::Type::TCP, sss.str());

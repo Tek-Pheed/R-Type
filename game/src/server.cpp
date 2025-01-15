@@ -135,6 +135,11 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
+    std::stringstream ss;
+    ss << L_SETMAXPLAYRS << " " << 0 << " " << _maxPlayers << " "
+                        << PACKET_END;
+    refNetworkManager.sendToOne(clientID, System::Network::ISocket::Type::TCP,
+        ss.str());
 }
 
 void RType::GameInstance::serverHanlderValidateConnection(
