@@ -269,6 +269,9 @@ void EventManager::mouseClicked()
                         currentAutoFireValue ? "false" : "true", entity);
                     _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
+                case ecs::ClickableType::RESOLUTION:
+                    _game.handleResolutionButton(entity);
+                    break;
                 case ecs::ClickableType::BACK:
                     _game._buttonList.clear();
                     _game._inputList.clear();

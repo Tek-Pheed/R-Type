@@ -174,11 +174,13 @@ The PLAY button leads to another menu with four input fields and two buttons :
 
 ### Settings Menu
 
-The settings menu contains six buttons :
+The settings menu contains seven buttons :
 
 - Four buttons to configure movement controls.
 
 - One button to toggle Auto Fire.
+
+- One button to change resolution (works after restart).
 
 - BACK button to return to the main menu.
 
@@ -193,6 +195,10 @@ The settings menu contains six buttons :
 - For Auto Fire, it's disabled by default :
 
 - Click Auto Fire to toggle between "YES" and "NO".
+
+- For Resolution, it's in 720p per default :
+
+- Click on the Resolution button to switch from 720p to 1080p, 2k and 4k. The resolution change only works after restart.
 
 - Movement keys control ship movement, and auto fire allows automatic shooting. If auto fire is off, pressing the **Spacebar** is required to shoot.
 

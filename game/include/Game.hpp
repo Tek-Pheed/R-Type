@@ -92,6 +92,7 @@ namespace RType
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
+        void handleResolutionButton(ecs::Entity &entity);
         void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         void loadLevelContent(const std::string &filename);
