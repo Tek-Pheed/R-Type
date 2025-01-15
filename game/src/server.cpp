@@ -89,7 +89,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         }
         std::stringstream sss;
         sss << P_CONN << " " << pl->getPlayerID() << " " << pos->getX() << " "
-            << pos->getY() << " " << n << PACKET_END;
+            << pos->getY() << " " << n << " " << PACKET_END;
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
@@ -113,28 +113,51 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
-    std::stringstream s;
     if (_musicName != "") {
-        s << M_MUSIC << " " << _musicName << " " << PACKET_END;
+        std::stringstream ss;
+        ss << M_MUSIC << " " << _musicName << " " << PACKET_END;
         refNetworkManager.sendToOne(
-            clientID, System::Network::ISocket::Type::TCP, s.str());
+            clientID, System::Network::ISocket::Type::TCP, ss.str());
     }
-    s.clear();
     if (_bgName != "") {
-        s << M_BG << " " << _bgName << " " << PACKET_END;
+        std::stringstream ss;
+        ss << M_BG << " " << _bgName << " " << PACKET_END;
         refNetworkManager.sendToOne(
-            clientID, System::Network::ISocket::Type::TCP, s.str());
+            clientID, System::Network::ISocket::Type::TCP, ss.str());
     }
-    s.clear();
-    s << M_WAVE << " " << currentWave << PACKET_END;
+    std::stringstream ss;
+    ss << M_WAVE << " " << currentWave << PACKET_END;
     refNetworkManager.sendToOne(
-        clientID, System::Network::ISocket::Type::TCP, s.str());
+        clientID, System::Network::ISocket::Type::TCP, ss.str());
     if (_gameStarted) {
         std::stringstream sss;
         sss << L_STARTGAME << " " << 0 << PACKET_END;
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
+    std::stringstream ssMaxPlayers;
+    ssMaxPlayers << L_SETMAXPLAYRS << " " << 0 << " " << _maxPlayers << " "
+                 << PACKET_END;
+    refNetworkManager.sendToOne(
+        clientID, System::Network::ISocket::Type::TCP, ssMaxPlayers.str());
+    std::stringstream ssGamemode;
+    ssGamemode << L_GAMEMODE << " " << 0 << " " << _gamemode << " "
+               << PACKET_END;
+    refNetworkManager.sendToOne(
+        clientID, System::Network::ISocket::Type::TCP, ssGamemode.str());
+    std::stringstream ssLevel;
+    ssLevel << L_SETLEVEL << " " << 0 << " " << _level << " " << PACKET_END;
+    refNetworkManager.sendToOne(
+        clientID, System::Network::ISocket::Type::TCP, ssLevel.str());
+    std::stringstream ssDifficulty;
+    ssDifficulty << L_SETDIFFICULTY << " " << 0 << " " << _difficulty << " "
+                 << PACKET_END;
+    refNetworkManager.sendToOne(
+        clientID, System::Network::ISocket::Type::TCP, ssDifficulty.str());
+    std::stringstream ssBonus;
+    ssBonus << L_SETBONUS << " " << 0 << " " << _bonus << " " << PACKET_END;
+    refNetworkManager.sendToOne(
+        clientID, System::Network::ISocket::Type::TCP, ssBonus.str());
 }
 
 void RType::GameInstance::serverHanlderValidateConnection(

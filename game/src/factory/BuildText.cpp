@@ -21,7 +21,7 @@
 using namespace RType;
 
 ecs::Entity &RType::Factory::buildText(
-    size_t id, float posX, float posY, std::string &content)
+    size_t id, float posX, float posY, std::string &content, sf::Color color, unsigned int characterSize)
 {
     auto &text = _game.refEntityManager.getCurrentLevel().createEntity();
     if (!_game.isServer()) {
@@ -34,8 +34,8 @@ ecs::Entity &RType::Factory::buildText(
         sf::Text sfText;
 
         sfText.setFont(font);
-        sfText.setCharacterSize(48);
-        sfText.setFillColor(sf::Color::White);
+        sfText.setCharacterSize(characterSize);
+        sfText.setFillColor(color);
         sfText.setString(content);
 
         sf::FloatRect textRect = sfText.getLocalBounds();

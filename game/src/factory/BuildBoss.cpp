@@ -20,12 +20,16 @@
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "SFML/Graphics/Texture.hpp"
 
 using namespace RType;
 
 ecs::Entity &RType::Factory::buildBoss(
     size_t id, float posX, float posY, float health, int wave)
 {
+    const float Width = 0.3f * (float) _game.WinScaleX;
+    const float Height = 0.7f * (float) _game.WinScaleY;
+
     if (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new boss to the game" << std::endl;
     auto &boss = _game.refEntityManager.getCurrentLevel().createEntity();
@@ -34,23 +38,26 @@ ecs::Entity &RType::Factory::buildBoss(
     boss.addComponent(
         std::make_shared<ecs::HealthComponent>(static_cast<float>(health)
             * static_cast<float>(_game.getDifficulty())));
-    boss.addComponent(std::make_shared<ecs::BulletComponent>(false));
     boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
-    boss.addComponent(std::make_shared<ecs::HitboxComponent>(160.0f, 414.0f));
+    boss.addComponent(std::make_shared<ecs::HitboxComponent>(0.3f, 0.7f));
     boss.getComponent<ecs::EnemyComponent>()->setWave(wave);
     if (!_game.isServer()) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
         sf::Sprite sprite;
         sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(17, 640, 163, 207));
-        sprite.setScale(sf::Vector2f(2, 2));
+        sprite.setTextureRect(sf::Rect(20, 640, 162, 207));
+        sprite.setScale(Width / sprite.getLocalBounds().width,
+            Height / sprite.getLocalBounds().height);
+        sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
+            sprite.getLocalBounds().height / 2.0f);
         boss.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
+        boss.addComponent(
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite));
         boss.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 163, 0, 17 + (163 * 4), 0.5f, 17));
-    }
-    if (_game.isServer()) {
+            sprite, 162, 0, 20 + (162 * 4), 0.25f, 20));
+    } else {
         auto pos = boss.getComponent<ecs::PositionComponent>();
         auto ene = boss.getComponent<ecs::EnemyComponent>();
         if (pos) {
@@ -120,7 +127,9 @@ void GameInstance::handleNetworkBosses(
                     std::shared_ptr<ecs::PositionComponent> pos;
                     _factory.buildBoss(id,
                         (float) std::atof(tokens[1].c_str()),
-                        (float) std::atof(tokens[2].c_str()));
+                        (float) std::atof(tokens[2].c_str()),
+                        (float) std::atof(tokens[3].c_str()),
+                        (int) std::atoi(tokens[4].c_str()));
                 }
             }
             break;

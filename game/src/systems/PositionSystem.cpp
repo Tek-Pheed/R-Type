@@ -52,27 +52,38 @@ void PositionSystem::update(
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
-                float maxX = (float) this->_game->getWindow().getSize().x;
-                float maxY = (float) this->_game->getWindow().getSize().y;
+                float maxX = 1;
+                float maxY = 1;
+                float minX = 0;
+                float minY = 0;
 
-                if (sprite) {
-                    maxX = (float) _game->getWindow().getSize().x
-                        - (float) sprite->getSprite().getTextureRect().width
-                            * (float) sprite->getSprite().getScale().x;
-
-                    maxY = (float) _game->getWindow().getSize().y
-                        - (float) sprite->getSprite().getTextureRect().height
-                            * (float) sprite->getSprite().getScale().y;
+                if (player || ai) {
+                    maxX = 1.0f
+                        - (((float) sprite->getSprite().getTextureRect().width
+                               * (float) sprite->getSprite().getScale().x)
+                            / (float) _game->getWindow().getSize().x / 2);
+                    maxY = 1.0f
+                        - (((float) sprite->getSprite().getTextureRect().height
+                               * (float) sprite->getSprite().getScale().y)
+                            / (float) _game->getWindow().getSize().y / 2);
+                    minX = 0.0f
+                        + (((float) sprite->getSprite().getTextureRect().width
+                               * (float) sprite->getSprite().getScale().x)
+                            / (float) _game->getWindow().getSize().x / 2);
+                    minY = 0.0f
+                        + (((float) sprite->getSprite().getTextureRect().height
+                               * (float) sprite->getSprite().getScale().y)
+                            / (float) _game->getWindow().getSize().y / 2);
                 }
 
-                if (player && positionComponent->getX() < 0) {
-                    positionComponent->setX(0);
+                if (player && positionComponent->getX() < minX) {
+                    positionComponent->setX(minX);
                 }
                 if (player && positionComponent->getX() > maxX) {
                     positionComponent->setX(maxX);
                 }
-                if (player && positionComponent->getY() < 0) {
-                    positionComponent->setY(0);
+                if (player && positionComponent->getY() < minY) {
+                    positionComponent->setY(minY);
                 }
                 if (player && positionComponent->getY() > maxY) {
                     positionComponent->setY(maxY);
@@ -80,38 +91,37 @@ void PositionSystem::update(
                 if (ai) {
                     if (positionComponent->getX() > maxX) {
                         velocityComponent->setVx(
-                            velocityComponent->getVx() * -1);
+                            velocityComponent->getVx() * -1.0f);
                     }
 
                     if (positionComponent->getY() > maxY) {
                         velocityComponent->setVy(
-                            velocityComponent->getVy() * -1);
+                            velocityComponent->getVy() * -1.0f);
                     }
 
-                    if (positionComponent->getX() < 0) {
+                    if (positionComponent->getX() < minX) {
                         velocityComponent->setVx(
-                            velocityComponent->getVx() * -1);
+                            velocityComponent->getVx() * -1.0f);
                     }
 
-                    if (positionComponent->getY() < 0) {
+                    if (positionComponent->getY() < minY) {
                         velocityComponent->setVy(
-                            velocityComponent->getVy() * -1);
+                            velocityComponent->getVy() * -1.0f);
                     }
                 }
 
             } else {
                 if (enemy && positionComponent
                     && positionComponent->getX() < GameInstance::KILLZONE) {
-                    positionComponent->setX(
-                        GameInstance::RESOLUTION_X - GameInstance::KILLZONE);
+                    positionComponent->setX(1.0f - GameInstance::KILLZONE);
                 }
                 if (enemy && positionComponent
                     && positionComponent->getY() < GameInstance::KILLZONE) {
-                    positionComponent->setY(
-                        GameInstance::RESOLUTION_Y - GameInstance::KILLZONE);
+                    positionComponent->setY(1.0f - GameInstance::KILLZONE);
                 }
                 if (enemy && positionComponent
-                    && positionComponent->getY() > GameInstance::RESOLUTION_Y
+                    && positionComponent->getY()
+                        > GameInstance::DEFAULT_RESOLUTION_Y
                             - GameInstance::KILLZONE) {
                     positionComponent->setY(GameInstance::KILLZONE);
                 }

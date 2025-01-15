@@ -31,6 +31,7 @@
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "LevelConfig.hpp"
+#include "SFML/Audio/Sound.hpp"
 #include "SFML/Audio/SoundBuffer.hpp"
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Rect.hpp"
@@ -97,8 +98,8 @@ void GameInstance::handleNetworkMechs(
 
                 ref.setRepeated(true);
                 comp->getSprite().setTextureRect(
-                    sf::Rect(0, 0, (int) GameInstance::RESOLUTION_X,
-                        (int) GameInstance::RESOLUTION_Y));
+                    sf::Rect(0, 0, (int) GameInstance::DEFAULT_RESOLUTION_X,
+                        (int) GameInstance::DEFAULT_RESOLUTION_Y));
                 comp->getSprite().setTexture(ref);
             }
             break;
@@ -106,10 +107,12 @@ void GameInstance::handleNetworkMechs(
         case Protocol::M_WAVE: {
             if (tokens.size() >= 1 && !isServer()) {
                 currentWave = std::atoi(tokens[0].c_str());
-                if (currentWave > 0) {
-                    auto &newWaveInComingSound = this->refAssetManager.getAsset<sf::SoundBuffer>(
-                        Asset::NEWWAVEINCOMING);
-                    _factory.buildSoundEffect(newWaveInComingSound, "newWaveInComingSound", 100.0f);
+                if (currentWave > 1) {
+                    auto &newWaveInComingSound =
+                        this->refAssetManager.getAsset<sf::SoundBuffer>(
+                            Asset::NEWWAVEINCOMING);
+                    _factory.buildSoundEffect(
+                        newWaveInComingSound, "newWaveInComingSound", 100.0f);
                 }
                 if (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Changing wave: " << currentWave << std::endl;
@@ -117,6 +120,69 @@ void GameInstance::handleNetworkMechs(
             break;
         }
         default: break;
+    }
+}
+
+void GameInstance::loadPvPLevel()
+{
+    std::unique_lock lock(_gameLock);
+    std::stringstream ss;
+
+    if (isServer()) {
+        // Change background
+        ss << M_BG << " " << "clouds.jpg" << " " << PACKET_END;
+        refNetworkManager.sendToAll(System::Network::ISocket::TCP, ss.str());
+        ss.clear();
+
+        // Change music
+        ss << M_MUSIC << " " << "pvp.ogg" << " " << PACKET_END;
+        refNetworkManager.sendToAll(System::Network::ISocket::TCP, ss.str());
+        ss.clear();
+
+        for (auto &entity : getAllPlayers()) {
+            auto &player = entity.get();
+            auto playerHealth = player.getComponent<ecs::HealthComponent>();
+            if (playerHealth)
+                playerHealth->setHealth(300);
+        }
+    }
+
+    if (!isServer()) {
+        for (auto &entity : getAllPlayers()) {
+            auto &player = entity.get();
+            auto playerComp = player.getComponent<ecs::PlayerComponent>();
+            auto playerHealth = player.getComponent<ecs::HealthComponent>();
+            if (playerComp && playerComp->getTeam() == 1) {
+                const float Width = 0.075f * (float) WinScaleX;
+                const float Height = 0.06f * (float) WinScaleY;
+                auto spriteComp =
+                    player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
+
+                spriteComp->getSprite().setScale(
+                    (Width / spriteComp->getSprite().getLocalBounds().width)
+                        * -1,
+                    Height / spriteComp->getSprite().getLocalBounds().height);
+                spriteComp->getSprite().setOrigin(
+                    spriteComp->getSprite().getLocalBounds().width / 2.0f,
+                    spriteComp->getSprite().getLocalBounds().height / 2.0f);
+            }
+            if (playerHealth)
+                playerHealth->setHealth(300);
+        }
+        auto songEntity =
+            refEntityManager.getPersistentLevel()
+                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong =
+            songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+        auto &newMusic =
+            refAssetManager.getAsset<sf::SoundBuffer>(Asset::PVP_SOUND);
+
+        if (currentSong->getMusicType().getStatus()
+            == sf::SoundSource::Playing) {
+            currentSong->getMusicType().stop();
+            currentSong->getMusicType().setBuffer(newMusic);
+            currentSong->getMusicType().play();
+        }
     }
 }
 
@@ -142,9 +208,10 @@ void GameInstance::loadLevelContent(const std::string &filename)
         }
         if (key == BUILD_SHOOTER_ENEMY) {
             if (value.size() < 5)
-                throw ErrorClass(THROW_ERROR_LOCATION
-                    "loadLevelContent: Failed to create shooter "
-                    "enemy from level config");
+                throw ErrorClass(
+                    THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
+                                         "shooter "
+                                         "enemy from level config");
             _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
@@ -205,12 +272,6 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 (float) std::atof(value[1].c_str()),
                 static_cast<ecs::Bonus>(std::atoi(value[2].c_str())));
         }
-        // if (key == CHANGE_MUSIC) {
-        //     if (value.size() < 1)
-        //         throw ErrorClass("loadLevelContent: Failed to create music
-        //         from level config");
-
-        // }
     }
 }
 
@@ -219,7 +280,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-        i++) {
+         i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -284,9 +345,10 @@ void GameInstance::gameTick(
             float deltaTime_sec = std::any_cast<float>(arg);
             static float time = 0.0f;
             time += deltaTime_sec;
-            if (time >= 2.0f) {
-                for (auto entID : refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+            if (time >= 1.0f) {
+                for (auto entID :
+                    refEntityManager.getCurrentLevel()
+                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -312,16 +374,37 @@ void GameInstance::gamePostTick(
     (void) event;
     (void) core;
     (void) arg;
+    static bool ended = false;
 
     std::unique_lock lock(_gameLock);
 
     if (!isServer()) {
+        for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
+            auto player = entity.get().getComponent<ecs::PlayerComponent>();
+            auto pText =
+                entity.get().getComponent<ecs::TextComponent<sf::Text>>();
+            if (player && pText) {
+                if (getHostClient() == player->getPlayerID()
+                    && pText->getStr().find("host") == std::string::npos) {
+                    pText->setStr(pText->getStr() + " (host)");
+                }
+            }
+        }
+        for (auto &entity :
+            refEntityManager.getCurrentLevel()
+                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
+            auto mus =
+                entity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+            if (mus->getMusicType().getStatus() != sf::Music::Playing)
+                refEntityManager.getCurrentLevel().markEntityForDeletion(
+                    entity.get().getID());
+        }
         getWindow().display();
-    } else {
+    } else if (_gamemode != 1) {
         bool next = true;
         auto entVect = refEntityManager.getCurrentLevel()
                            .findEntitiesByComponent<ecs::EnemyComponent>();
-        if (entVect.size() == 0) {
+        if (ended || !_gameStarted) {
             return;
         }
         for (auto &ent : entVect) {
@@ -332,6 +415,27 @@ void GameInstance::gamePostTick(
             }
         }
         if (next) {
+            if (entVect.size() == 0 && !ended) {
+                if (_level < getTxtFiles("assets/levels").size()) {
+                    std::cout << "Next level" << std::endl;
+                    _level++;
+                    std::string levelFileName = "assets/levels/level"
+                        + std::to_string(_level) + ".txt";
+                    loadLevelContent(levelFileName);
+                    currentWave = -1;
+                } else {
+                    ended = true;
+                    std::cout << "Congrats ! You played all levels :)"
+                              << std::endl;
+                    std::cout << "Congrats ! You played all levels :)"
+                              << std::endl;
+                    std::cout << "Congrats ! You played all levels :)"
+                              << std::endl;
+                    std::cout << "Congrats ! You played all levels :)"
+                              << std::endl;
+                    refGameEngine.stop();
+                }
+            }
             std::stringstream ss;
             currentWave += 1;
             if (RType::GameInstance::DEBUG_LOGS)
@@ -458,4 +562,14 @@ uint64_t GameInstance::getTicks() const
 size_t GameInstance::getDifficulty() const
 {
     return _difficulty;
+}
+
+size_t GameInstance::getGameMode() const
+{
+    return _gamemode;
+}
+
+void GameInstance::setGameMode(size_t mode)
+{
+    _gamemode = mode;
 }

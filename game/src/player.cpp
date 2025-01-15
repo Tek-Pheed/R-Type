@@ -10,6 +10,7 @@
 #endif
 
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -45,9 +46,13 @@ void GameInstance::handleLobby(
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
                 std::string levelFileName =
-                    "./assets/levels/level" + std::to_string(_level) + ".txt";
-                ;
-                loadLevelContent(levelFileName);
+                    "assets/levels/level" + std::to_string(_level) + ".txt";
+
+                if (_gamemode == 0)
+                    loadLevelContent(levelFileName);
+                else
+                    loadPvPLevel();
+
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -64,6 +69,8 @@ void GameInstance::handleLobby(
                     currentSong->getMusicType().setBuffer(newMusic);
                     currentSong->getMusicType().play();
                 }
+                if (_gamemode == 1)
+                    loadPvPLevel();
                 launchGame();
             }
             break;
@@ -72,6 +79,8 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _maxPlayers = (size_t) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
+                std::cout << "Max players set to : " << _maxPlayers
+                          << std::endl;
                 if (!_isServer)
                     for (auto &entity : enti) {
                         auto text =
@@ -80,15 +89,16 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("NUMBER OF PLAYER")
                                 != std::string::npos) {
-                            eventManager.handleNumberOfPlayerButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "NUMBER OF PLAYER : " << _maxPlayers;
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
-                    sss << L_SETMAXPLAYRS << " " << id << _maxPlayers << " "
-                        << PACKET_END;
+                    sss << L_SETMAXPLAYRS << " " << id << " " << _maxPlayers
+                        << " " << PACKET_END;
                     refNetworkManager.sendToOthers(
                         id, System::Network::ISocket::Type::TCP, sss.str());
                 }
@@ -108,8 +118,12 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("DIFFICULTY")
                                 != std::string::npos) {
-                            eventManager.handleDifficultyButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "DIFFICULTY : "
+                               << (_difficulty == 3          ? "HARD"
+                                          : _difficulty == 2 ? "MEDIUM"
+                                                             : "EASY");
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
@@ -135,8 +149,9 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("BONUS")
                                 != std::string::npos) {
-                            eventManager.handleBonusButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "BONUS : " << (_bonus ? "YES" : "NO");
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
@@ -162,8 +177,9 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("LEVEL")
                                 != std::string::npos) {
-                            eventManager.handleLevelButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "LEVEL : " << _level;
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
@@ -189,8 +205,10 @@ void GameInstance::handleLobby(
                         if (text
                             && text->getStr().find("GAMEMODE")
                                 != std::string::npos) {
-                            eventManager.handleGamemodeButton(
-                                entity.get(), false);
+                            std::stringstream ss;
+                            ss << "GAMEMODE : "
+                               << (_gamemode ? "PVP" : "WAVE");
+                            text->setStr(ss.str());
                         }
                     }
                 if (_isServer) {
@@ -270,6 +288,22 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_DEAD: {
+            if (!_isServer && hasLocalPlayer()
+                && getLocalPlayer()
+                        .getComponent<ecs::PlayerComponent>()
+                        ->getPlayerID()
+                    == (size_t) atoi(tokens[0].c_str())) {
+                auto &youLoseSound = refAssetManager.getAsset<sf::SoundBuffer>(
+                    Asset::YOU_LOSE_SOUND);
+                _factory.buildSoundEffect(
+                    youLoseSound, "youLoseSound", 100.0f);
+                std::string title = "YOU ARE DEAD";
+                auto textWidth = title.size() * 20;
+                _factory.buildText(0,
+                    (float) getWindow().getSize().x / 2 - (float) textWidth,
+                    (float) getWindow().getSize().y / 2 - 50, title,
+                    sf::Color::Red, 100);
+            }
             if (_isServer)
                 return;
             if (tokens.size() >= 1) {
@@ -310,7 +344,7 @@ void GameInstance::handleNetworkPlayers(
                 if (healthComp) {
                     damagePlayer(id, healthComp->getHealth() - health);
                 }
-                if (!isServer()
+                if (!isServer() && hasLocalPlayer()
                     && player.getID() == getLocalPlayer().getID()) {
                     try {
                         refEntityManager.getCurrentLevel().getEntityById(
@@ -351,6 +385,18 @@ bool GameInstance::hasLocalPlayer(void) const
     return (true);
 }
 
+ecs::Entity &GameInstance::getRandomPlayer(void)
+{
+    std::unique_lock lock(_gameLock);
+
+    auto ent = refEntityManager.getCurrentLevel()
+                   .findEntitiesByComponent<ecs::PlayerComponent>();
+
+    size_t range = (ent.size() - 1) - 0 + 1;
+    size_t num = ((size_t) rand()) % range;
+    return (ent[num]);
+}
+
 ecs::Entity &GameInstance::getLocalPlayer()
 {
     if (!hasLocalPlayer())
@@ -370,8 +416,11 @@ ecs::Entity &GameInstance::getLocalPlayer()
 size_t GameInstance::getHostClient()
 {
     auto players = getAllPlayers();
-    size_t host =
-        getLocalPlayer().getComponent<ecs::PlayerComponent>()->getPlayerID();
+    size_t host = 10000;
+    if (hasLocalPlayer())
+        host = getLocalPlayer()
+                   .getComponent<ecs::PlayerComponent>()
+                   ->getPlayerID();
 
     for (auto &pl : players) {
         auto playerID =

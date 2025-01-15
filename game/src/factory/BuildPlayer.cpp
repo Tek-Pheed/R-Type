@@ -18,16 +18,22 @@ namespace RType
     ecs::Entity &Factory::buildPlayer(
         bool isLocalPlayer, size_t id, const std::string &name)
     {
+        const float Width = 0.075f * (float) _game.WinScaleX;
+        const float Height = 0.06f * (float) _game.WinScaleY;
+
         if (RType::GameInstance::DEBUG_LOGS)
             std::cout << "Adding new player to the game" << std::endl;
         auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(
-            std::make_shared<ecs::PositionComponent>(100, 100));
-        player.addComponent(std::make_shared<ecs::HealthComponent>(100));
+            std::make_shared<ecs::PositionComponent>(0.1f, 0.1f));
+        if (_game.getGameMode() == 1)
+            player.addComponent(std::make_shared<ecs::HealthComponent>(300));
+        else
+            player.addComponent(std::make_shared<ecs::HealthComponent>(100));
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
         player.addComponent(
-            std::make_shared<ecs::HitboxComponent>(33 * 3, 14 * 3));
+            std::make_shared<ecs::HitboxComponent>(0.075f, 0.06f));
         std::string n = DEFAULT_PLAYER_NAME;
         if (!name.empty())
             n = name;
@@ -38,8 +44,11 @@ namespace RType
                 _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
             sf::Sprite sprite;
             sprite.setTexture(texture);
-            sprite.setTextureRect(sf::Rect(66, (17 * (rand() % 4)), 33, 18));
-            sprite.setScale(sf::Vector2f(3, 3));
+            sprite.setTextureRect(sf::Rect(66, (17 * (int) (id % 5)), 33, 18));
+            sprite.setScale(Width / sprite.getLocalBounds().width,
+                Height / sprite.getLocalBounds().height);
+            sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
+                sprite.getLocalBounds().height / 2.0f);
             player.addComponent(std::make_shared<ecs::RenderComponent>(
                 ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
             player.addComponent(
@@ -69,7 +78,7 @@ namespace RType
             if (pos) {
                 std::stringstream sss;
                 sss << P_CONN << " " << id << " " << pos->getX() << " "
-                    << pos->getY() << " " << n << PACKET_END;
+                    << pos->getY() << " " << n << " " << PACKET_END;
                 if (!_game.isServer()) {
                     _game.refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::TCP, sss.str());
@@ -85,9 +94,12 @@ namespace RType
     ecs::Entity &Factory::buildAIPlayer(
         sf::Vector2f velocity, const std::string &name, std::size_t skinID)
     {
+        const float Width = 0.075f * (float) _game.WinScaleX;
+        const float Height = 0.06f * (float) _game.WinScaleY;
+
         auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
-        player.addComponent(std::make_shared<ecs::PositionComponent>(
-            rand() % 100, rand() % 720));
+        player.addComponent(
+            std::make_shared<ecs::PositionComponent>(0.1f, 0.1f));
         player.addComponent(
             std::make_shared<ecs::VelocityComponent>(velocity.x, velocity.y));
         if (!_game.isServer()) {
@@ -96,7 +108,10 @@ namespace RType
             sf::Sprite sprite;
             sprite.setTexture(texture);
             sprite.setTextureRect(sf::Rect(66, (int) (17 * skinID), 33, 18));
-            sprite.setScale(sf::Vector2f(3, 3));
+            sprite.setScale(Width / sprite.getLocalBounds().width,
+                Height / sprite.getLocalBounds().height);
+            sprite.setOrigin(sprite.getLocalBounds().width / 2.0f,
+                sprite.getLocalBounds().height / 2.0f);
             player.addComponent(std::make_shared<ecs::RenderComponent>(
                 ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
             player.addComponent(
