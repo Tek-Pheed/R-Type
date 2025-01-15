@@ -13,19 +13,41 @@
 
 namespace RType
 {
-    ecs::Entity &Factory::buildMusic(sf::SoundBuffer &soundBuffer, std::string str)
+    ecs::Entity &Factory::buildMusic(
+        sf::SoundBuffer &soundBuffer, std::string str)
     {
-        auto &music = _game.refEntityManager.getPersistentLevel().createEntity();
+        auto &music =
+            _game.refEntityManager.getPersistentLevel().createEntity();
 
         sf::Sound a;
-        music.addComponent(std::make_shared<ecs::MusicComponent<sf::Sound>>(a, str));
+        music.addComponent(
+            std::make_shared<ecs::MusicComponent<sf::Sound>>(a, str));
 
         auto &s = music.getComponent<ecs::MusicComponent<sf::Sound>>()
-                     ->getMusicType();
+                      ->getMusicType();
 
         s.setBuffer(soundBuffer);
         s.setLoop(true);
-        s.setVolume(25.0f);
+        s.setVolume(GameInstance::MUSIC_VOLUME);
         return (music);
+    }
+
+    ecs::Entity &Factory::buildSoundEffect(
+        sf::SoundBuffer &soundBuffer, std::string str, float volume)
+    {
+        auto &sound =
+            _game.refEntityManager.getPersistentLevel().createEntity();
+
+        sf::Sound a;
+        sound.addComponent(
+            std::make_shared<ecs::MusicComponent<sf::Sound>>(a, str));
+
+        auto &s = sound.getComponent<ecs::MusicComponent<sf::Sound>>()
+                      ->getMusicType();
+
+        s.setBuffer(soundBuffer);
+        s.setVolume(volume);
+        s.play();
+        return (sound);
     }
 } // namespace RType

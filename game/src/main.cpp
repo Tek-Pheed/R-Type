@@ -74,7 +74,6 @@ int main(int argc, const char *argv[])
     gameEngine.loadFeature<Engine::Feature::NetworkingManager>();
 
     RType::GameInstance gameInstance(gameEngine);
-
     try {
         int result = 0;
 #if defined(RTYPE_SERVER)
@@ -86,7 +85,7 @@ int main(int argc, const char *argv[])
             return (result);
         gameEngine.mainLoop();
     } catch (const std::exception &e) {
-        std::cout << THROW_ERROR_LOCATION "We are sorry, but an unhandled exception occured during "
+        std::cout << CATCH_ERROR_LOCATION "We are sorry, but an unhandled exception occured during "
                      "runtime: "
                   << std::endl
                   << e.what() << std::endl;

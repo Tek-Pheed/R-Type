@@ -45,17 +45,27 @@ namespace RType
         constexpr auto R_TYPE_FONT = "rTypeFont";
         constexpr auto BULLET_BOSS = "bossBullet";
         constexpr auto BULLET_BOSS_SOUND = "bossBulletSound";
+        constexpr auto EXPLOSION_SOUND = "explosionSound";
+        constexpr auto EXPLOSION_TEXTURE = "explosionTexture";
+        constexpr auto EXPLOSION_PLAYER = "explosionPlayer";
+		constexpr auto BONUS_TEXTURE = "bonusTexture";
+        constexpr auto NEWWAVEINCOMING = "newWaveIncoming";
+        constexpr auto YOU_WIN_SOUND = "youWinSound";
+        constexpr auto YOU_LOSE_SOUND = "youLoseSound";
+        constexpr auto BUTTON_CLICKED_SOUND = "buttonClikedSound";
 
         static const AssetStore assets[] = {
             {PLAYER_TEXTURE, "assets/sprites/r-typesheet42.gif",
                 typeid(sf::Texture)},
+            {BONUS_TEXTURE, "assets/sprites/r-typesheet3.gif",
+                typeid(sf::Texture)},
             {ENEMY_TEXTURE, "assets/sprites/r-typesheet31.gif",
                 typeid(sf::Texture)},
-            {SHOOTERENEMY_TEXTURE, "assets/sprites/r-typesheet9.gif",
+            {SHOOTERENEMY_TEXTURE, "assets/sprites/r-typesheet11.gif",
                 typeid(sf::Texture)},
             {BOSS_TEXTURE, "assets/sprites/r-typesheet30.gif",
                 typeid(sf::Texture)},
-            {BACKGROUND_TEXTURE, "assets/background/background.png",
+            {BACKGROUND_TEXTURE, "assets/background/clouds.jpg",
                 typeid(sf::Texture)},
             {BULLET_TEXTURE, "assets/sprites/r-typesheet1.gif",
                 typeid(sf::Texture)},
@@ -67,19 +77,37 @@ namespace RType
                 typeid(sf::SoundBuffer)},
             {LOBBY_SONG, "assets/sounds/lobbyMusic.ogg",
                 typeid(sf::SoundBuffer)},
-            {GAME_SONG, "assets/sounds/gameMusic.ogg",
+            {GAME_SONG, "assets/sounds/streetFighter.ogg",
                 typeid(sf::SoundBuffer)},
             {BOSS_SONG, "assets/sounds/bossMusic.ogg",
                 typeid(sf::SoundBuffer)},
             {R_TYPE_FONT, "assets/font/r-type.ttf", typeid(sf::Font)},
             {BULLET_BOSS, "assets/sprites/r-typesheet30a.gif",
                 typeid(sf::Texture)},
-            {
-                BULLET_BOSS_SOUND,
-                "assets/sounds/bossBullet.ogg",
+            {BULLET_BOSS_SOUND, "assets/sounds/bossBullet.ogg",
                 typeid(sf::SoundBuffer),
             },
-        };
+            {EXPLOSION_SOUND, "assets/sounds/tnt.ogg",
+                typeid(sf::SoundBuffer),
+            },
+            {NEWWAVEINCOMING, "assets/sounds/newWaveIncoming.ogg",
+                typeid(sf::SoundBuffer),
+            },
+            {YOU_WIN_SOUND, "assets/sounds/youWin.ogg",
+                typeid(sf::SoundBuffer),
+            },
+            {YOU_LOSE_SOUND, "assets/sounds/youLose.ogg",
+                typeid(sf::SoundBuffer),
+            },
+            {BUTTON_CLICKED_SOUND, "assets/sounds/minecraftButtonClick.ogg",
+                typeid(sf::SoundBuffer),
+            },
+            {EXPLOSION_TEXTURE, "assets/sprites/r-typesheet43.gif",
+                typeid(sf::Texture)},
+            {EXPLOSION_PLAYER,
+                "assets/sprites/r-typesheet16.gif",
+                typeid(sf::Texture),
+            }};
 
         template <typename Type>
         const std::vector<const AssetStore *> getAllAssetsOfType()

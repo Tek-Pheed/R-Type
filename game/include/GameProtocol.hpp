@@ -43,10 +43,11 @@ namespace RType
 
         // Mechs
         M_WAVE = 131,
-        M_WOVER = 132,
         M_WIN = 133,
         M_LOSE = 134,
         M_GOVER = 135,
+        M_MUSIC = 136,
+        M_BG = 137,
 
         // Boss
         B_SPAWN = 141,
@@ -55,9 +56,18 @@ namespace RType
         B_SHOOT = 144,
         B_DMG = 145,
 
+        // Bonus
+        BN_SPAWN = 151,
+        BN_GET = 152,
+
         // Loby
         L_STARTGAME = 241,
         L_SETMAXPLAYRS = 242,
+        L_SETDIFFICULTY = 243,
+        L_SETBONUS = 244,
+        L_SETLEVEL = 245,
+        L_GAMEMODE = 246,
+        L_SENDLEVELS = 247,
     };
 
     template <typename... Args>

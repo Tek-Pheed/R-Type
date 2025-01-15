@@ -33,6 +33,8 @@ namespace RType
 {
     class GameInstance {
       public:
+        static constexpr bool DEBUG_LOGS = false;
+
         static constexpr const char *USER_CONFIG_FILE = "config.cfg";
         static constexpr const char *LEVEL_CONFIG_PATH =
             "./assets/levels/level1.txt";
@@ -42,6 +44,7 @@ namespace RType
         static constexpr uint16_t DEFAULT_TCP_PORT = 8081;
         static constexpr const char *DEFAULT_IP = "127.0.0.1";
         static constexpr size_t DEFAULT_MAX_PLAYERS = 4U;
+        static constexpr size_t DEFAULT_DIFFICULTY = 1U;
 
         static constexpr size_t RESOLUTION_X = 1280U;
         static constexpr size_t RESOLUTION_Y = 720U;
@@ -49,6 +52,9 @@ namespace RType
         static constexpr auto KILLZONE = -100.0f;
         static constexpr auto ENEMY_VELOCITY = -200.0f;
         static constexpr auto ENEMY_SHOOTER_VELOCITY = -150.0f;
+
+        static constexpr float MUSIC_VOLUME = 18.0f;
+        static constexpr float BULLET_VOLUME = 5.0f;
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
@@ -79,6 +85,7 @@ namespace RType
         void createPersistentLevel();
         void levelSettingsMenu();
         void levelContinueMenu();
+        void levelLobbyMenu();
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
@@ -97,29 +104,37 @@ namespace RType
         void playerAnimations(ecs::Entity &player);
         void setPlayerEntityID(int id);
         void damagePlayer(size_t playerID, int damage);
-        size_t getHealthId();
-        void setHealthId(size_t id);
+        int getHealthId();
+        void setHealthId(int id);
+
+        int countTxtFiles(const std::string &path);
+
+        sf::Sound &getMusicPlayer();
+
+        std::vector<std::string> getTxtFiles(const std::string &path);
 
         std::vector<ecs::Entity> &getEntities();
 
         std::string _playerName;
 
+        int _nbTxtFiles;
+
         // Enemies
         ecs::Entity &buildEnemy(
             size_t id, float posX, float posY, float health);
-
         ecs::Entity &buildEnemyShooter(
             size_t id, float posX, float posY, float health);
-
         ecs::Entity &getEnemyById(size_t enemyID);
         void sendEnemyPosition(size_t enemyID);
         void deleteEnemy(size_t enemyID);
         void handleNetworkEnemies(
             int code, const std::vector<std::string> &tokens);
+        void handleNetworkMechs(
+            int code, const std::vector<std::string> &tokens);
 
         // Boss
-        ecs::Entity &buildBoss(
-            size_t id, float posX, float posY, float health = 100.0f);
+        ecs::Entity &buildBoss(size_t id, float posX, float posY,
+            float health = 100.0f, int wave = 0);
         ecs::Entity &getBossById(size_t bossID);
         void sendBossPosition(size_t bossID);
         void deleteBoss(size_t bossID);
@@ -129,7 +144,7 @@ namespace RType
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
 
         // Networking
-        int is_code_valid(int code);
+        int isCodeValid(int code);
         int manageBuffers();
         void connectToGame();
         void clientStartLevel();
@@ -140,7 +155,9 @@ namespace RType
         void handleNetworkPlayers(
             int code, const std::vector<std::string> &tokens);
         void serverSendGameState(size_t clientID);
-        void handleLoby(int code, const std::vector<std::string> &tokens);
+        void handleLobby(int code, const std::vector<std::string> &tokens);
+        void launchGame();
+        size_t getHostClient();
 
         // Server Only Events
         void serverEventNewConn(
@@ -158,38 +175,16 @@ namespace RType
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         bool isServer() const;
 
+        // Bonus
+        void handleNetworkBonuses(
+            int code, const std::vector<std::string> &tokens);
+
         Engine::Core &refGameEngine;
         Engine::Feature::LevelManager<GameInstance> &refEntityManager;
         Engine::Feature::AssetManager &refAssetManager;
         Engine::Feature::NetworkingManager &refNetworkManager;
 
         Config _gameConfig;
-
-        //     int createConnection(const char *ip, int portTCP, int portUDP);
-        //     void writeToServer(
-        //         const std::string &data, System::Network::ISocket::Type
-        //         socketType);
-        //     void receiveMessage();
-
-        //     void handleConnection(int code, std::vector<std::string>
-        //     &tokens); void handleEnemy(int code, std::vector<std::string>
-        //     &tokens); void handleTerrain(int code, std::vector<std::string>
-        //     &tokens); void handleMechs(int code, std::vector<std::string>
-        //     &tokens); void addEntity(ecs::Entity & entity);
-
-        //     // Player Management
-        //     void createNewPlayer(std::vector<std::string> &tokens);
-        //     void setNewPosition(std::vector<std::string> &tokens);
-        //     void playerDead(std::vector<std::string> &tokens);
-        //     void createProjectile(std::vector<std::string> &tokens);
-        //     void setPlayerHealth(std::vector<std::string> &tokens);
-        //     void playerDisconnection(std::vector<std::string> &tokens);
-
-        //     // Enemy Management
-        //     void createEnemy(std::vector<std::string> &tokens);
-        //     void enemyDead(std::vector<std::string> &tokens);
-        //     void enemyShoot(std::vector<std::string> &tokens);
-        //     void enemyDamage(std::vector<std::string> &tokens);
 
         bool _isSettingsUpButtonClicked = false;
         bool _isSettingsRightButtonClicked = false;
@@ -211,9 +206,18 @@ namespace RType
 
         // Ticks
         uint64_t getTicks() const;
+        int currentWave = 0;
+
+        // Game Value
+        size_t getDifficulty() const;
 
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
+        size_t _difficulty = DEFAULT_DIFFICULTY;
+        bool _bonus = true;
+        size_t _level = 1;
+        // 0 for wave, 1 for pvp
+        size_t _gamemode = 0;
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
         bool _isServer;
@@ -225,6 +229,9 @@ namespace RType
 
         Factory _factory;
 
+        std::string _musicName;
+        std::string _bgName;
+
         uint64_t _ticks = 0U;
         uint64_t _lastNetTick = 0U;
         ssize_t _clientGameMasterId = -1;
@@ -232,6 +239,7 @@ namespace RType
         std::recursive_mutex _gameLock;
         std::unordered_map<size_t, uint64_t> _clientTicks;
         sf::Clock _fireClock;
-        size_t _healthId;
+        int _healthId = -1;
+        sf::Clock _bonusClock;
     };
 }; // namespace RType

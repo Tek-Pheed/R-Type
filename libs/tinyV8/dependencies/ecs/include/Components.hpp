@@ -100,10 +100,14 @@ namespace ecs
         size_t getType() const;
         void setType(size_t type);
 
+        int getWave() const;
+        void setWave(int wave);
+
       private:
         size_t _enemyID;
         // 0 for enemy, 1 for shooter, 2 for boss
         size_t _type;
+        int _wave;
     };
 
     class RenderComponent : public Component {
@@ -163,9 +167,13 @@ namespace ecs
 
     template <typename spriteType> class SpriteComponent : public Component {
       public:
-        SpriteComponent(spriteType &sprite, int sizeX, int sizeY)
-            : _sprite(sprite), _sizeX(sizeX), _sizeY(sizeY)
+        SpriteComponent(spriteType &sprite, int offsetX = 0, int offsetY = 0,
+            int maxX = 0, float delay = 0.0f, int startX = 0,
+            bool once = false)
+            : _sprite(sprite), _sizeX(offsetX), _sizeY(offsetY), _maxX(maxX),
+              _delay(delay), _startX(startX), _once(once)
         {
+            _elapsedTime = 0.0f;
         }
 
         void setSprite(spriteType &sprite)
@@ -180,6 +188,14 @@ namespace ecs
         {
             this->_sizeY = sizeY;
         }
+        void setMaxX(int maxX)
+        {
+            this->_maxX = maxX;
+        }
+        void setElapsedTime(float elapsedTime)
+        {
+            this->_elapsedTime = elapsedTime;
+        }
 
         spriteType &getSprite()
         {
@@ -193,11 +209,36 @@ namespace ecs
         {
             return this->_sizeY;
         }
+        int getMaxX() const
+        {
+            return this->_maxX;
+        }
+        float getDelay() const
+        {
+            return this->_delay;
+        }
+        int getStartX() const
+        {
+            return this->_startX;
+        }
+        float getElapsedTime() const
+        {
+            return this->_elapsedTime;
+        }
+        bool getOnce() const
+        {
+            return this->_once;
+        }
 
       private:
         spriteType _sprite;
         int _sizeX;
         int _sizeY;
+        int _maxX;
+        float _delay;
+        int _startX;
+        float _elapsedTime;
+        bool _once;
     };
 
     template <typename circleType> class CircleComponent : public Component {
@@ -328,16 +369,21 @@ namespace ecs
         std::string _name;
     };
 
-    enum Bonus { RAPIDFIRE, DOUBLEFIRE, TRIPLEFIRE, ALLIES };
+    enum Bonus { RAPIDFIRE = 0, SPEED = 1, HEAL = 2, NONE = -1 };
 
     class BonusComponent : public Component {
       public:
         explicit BonusComponent(const Bonus &bonus);
+        BonusComponent(size_t bonusID, const Bonus &bonus);
 
         Bonus getBonus();
         void setBonus(const Bonus &bonus);
 
+        void setBonusID(size_t bonusID);
+        size_t getBonusID();
+
       private:
+        size_t _bonusID;
         Bonus _bonus;
     };
 

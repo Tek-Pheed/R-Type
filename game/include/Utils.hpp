@@ -14,6 +14,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include "Components.hpp"
 
 class Utils {
   public:

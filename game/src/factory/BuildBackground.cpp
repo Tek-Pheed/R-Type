@@ -25,8 +25,8 @@ namespace RType
             Asset::BACKGROUND_TEXTURE));
         bg.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
-        bg.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
+        bg.addComponent(
+            std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
         bg.addComponent(std::make_shared<ecs::PositionComponent>(0, 0));
         bg.addComponent(std::make_shared<ecs::BackgroundComponent>(0.01f));
         return (bg);

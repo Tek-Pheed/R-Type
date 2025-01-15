@@ -11,13 +11,15 @@
 #include "Factory.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
+#include "components/AIComponent.hpp"
 
 namespace RType
 {
     ecs::Entity &Factory::buildPlayer(
         bool isLocalPlayer, size_t id, const std::string &name)
     {
-        std::cout << "Adding new player to the game" << std::endl;
+        if (RType::GameInstance::DEBUG_LOGS)
+            std::cout << "Adding new player to the game" << std::endl;
         auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(
@@ -27,7 +29,7 @@ namespace RType
         player.addComponent(
             std::make_shared<ecs::HitboxComponent>(33 * 3, 14 * 3));
         std::string n = DEFAULT_PLAYER_NAME;
-        if (name != "")
+        if (!name.empty())
             n = name;
         if (!_game.isServer()) {
             auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
@@ -36,20 +38,24 @@ namespace RType
                 _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
             sf::Sprite sprite;
             sprite.setTexture(texture);
-            sprite.setTextureRect(sf::Rect(66, 0, 33, 14));
+            sprite.setTextureRect(sf::Rect(66, (17 * (rand() % 4)), 33, 18));
             sprite.setScale(sf::Vector2f(3, 3));
             player.addComponent(std::make_shared<ecs::RenderComponent>(
                 ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
             player.addComponent(
-                std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-                    sprite, 3.0, 3.0));
+                std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
 
             sf::Text text;
             text.setFont(font);
-            text.setCharacterSize(20);
+            text.setCharacterSize(35);
+            text.setFillColor(sf::Color::White);
+            text.setOutlineColor(sf::Color::Black);
+            text.setOutlineThickness(1.0f);
             text.setString(n);
             player.addComponent(
                 std::make_shared<ecs::TextComponent<sf::Text>>(text, n));
+            player.addComponent(
+                std::make_shared<ecs::BonusComponent>(ecs::Bonus::NONE));
         } else {
             player.addComponent(
                 std::make_shared<ecs::TextComponent<std::string>>(n, name));
@@ -72,6 +78,42 @@ namespace RType
                         id, System::Network::ISocket::Type::TCP, sss.str());
                 }
             }
+        }
+        return (player);
+    }
+
+    ecs::Entity &Factory::buildAIPlayer(
+        sf::Vector2f velocity, const std::string &name, std::size_t skinID)
+    {
+        auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
+        player.addComponent(std::make_shared<ecs::PositionComponent>(
+            rand() % 100, rand() % 720));
+        player.addComponent(
+            std::make_shared<ecs::VelocityComponent>(velocity.x, velocity.y));
+        if (!_game.isServer()) {
+            auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
+                Asset::PLAYER_TEXTURE);
+            sf::Sprite sprite;
+            sprite.setTexture(texture);
+            sprite.setTextureRect(sf::Rect(66, (int) (17 * skinID), 33, 18));
+            sprite.setScale(sf::Vector2f(3, 3));
+            player.addComponent(std::make_shared<ecs::RenderComponent>(
+                ecs::RenderComponent::ObjectType::SPRITEANDTEXT));
+            player.addComponent(
+                std::make_shared<ecs::SpriteComponent<sf::Sprite>>(sprite, 0));
+
+            auto &font =
+                _game.refAssetManager.getAsset<sf::Font>(Asset::R_TYPE_FONT);
+            sf::Text text;
+            text.setFont(font);
+            text.setCharacterSize(35);
+            text.setFillColor(sf::Color::White);
+            text.setOutlineColor(sf::Color::Black);
+            text.setOutlineThickness(1.0f);
+            text.setString(name);
+            player.addComponent(
+                std::make_shared<ecs::TextComponent<sf::Text>>(text, name));
+            player.addComponent(std::make_shared<ecs::AIComponent>());
         }
         return (player);
     }

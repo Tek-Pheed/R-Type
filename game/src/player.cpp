@@ -18,6 +18,7 @@
 #include "Components.hpp"
 #include "Entity.hpp"
 #include "ErrorClass.hpp"
+#include "Events.hpp"
 #include "Factory.hpp"
 #include "Game.hpp"
 #include "GameAssets.hpp"
@@ -28,8 +29,12 @@
 
 using namespace RType;
 
-void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
+void GameInstance::handleLobby(
+    int code, const std::vector<std::string> &tokens)
 {
+    EventManager eventManager(*this);
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Handling lobby: " << code << std::endl;
     switch (code) {
         case Protocol::L_STARTGAME: {
             _gameStarted = true;
@@ -39,7 +44,10 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                 sss << L_STARTGAME << " " << id << PACKET_END;
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
-                loadLevelContent(LEVEL_CONFIG_PATH);
+                std::string levelFileName =
+                    "./assets/levels/level" + std::to_string(_level) + ".txt";
+                ;
+                loadLevelContent(levelFileName);
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -56,22 +64,152 @@ void GameInstance::handleLoby(int code, const std::vector<std::string> &tokens)
                     currentSong->getMusicType().setBuffer(newMusic);
                     currentSong->getMusicType().play();
                 }
+                launchGame();
             }
             break;
         }
         case Protocol::L_SETMAXPLAYRS: {
             if (tokens.size() >= 2) {
                 _maxPlayers = (size_t) atoi(tokens[1].c_str());
+                auto enti = refEntityManager.getCurrentLevel().getEntities();
+                if (!_isServer)
+                    for (auto &entity : enti) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        if (text
+                            && text->getStr().find("NUMBER OF PLAYER")
+                                != std::string::npos) {
+                            eventManager.handleNumberOfPlayerButton(
+                                entity.get(), false);
+                        }
+                    }
                 if (_isServer) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
-                    sss << L_SETMAXPLAYRS << " " << id << PACKET_END;
+                    sss << L_SETMAXPLAYRS << " " << id << _maxPlayers << " "
+                        << PACKET_END;
                     refNetworkManager.sendToOthers(
                         id, System::Network::ISocket::Type::TCP, sss.str());
                 }
             }
             break;
             default: break;
+        }
+        case Protocol::L_SETDIFFICULTY: {
+            if (tokens.size() >= 2) {
+                _difficulty = (size_t) atoi(tokens[1].c_str());
+                auto enti = refEntityManager.getCurrentLevel().getEntities();
+                if (!_isServer)
+                    for (auto &entity : enti) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        if (text
+                            && text->getStr().find("DIFFICULTY")
+                                != std::string::npos) {
+                            eventManager.handleDifficultyButton(
+                                entity.get(), false);
+                        }
+                    }
+                if (_isServer) {
+                    std::stringstream sss;
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    sss << L_SETDIFFICULTY << " " << id << " " << _difficulty
+                        << " " << PACKET_END;
+                    refNetworkManager.sendToOthers(
+                        id, System::Network::ISocket::Type::TCP, sss.str());
+                }
+            }
+            break;
+        }
+        case Protocol::L_SETBONUS: {
+            if (tokens.size() >= 2) {
+                _bonus = (bool) atoi(tokens[1].c_str());
+                auto enti = refEntityManager.getCurrentLevel().getEntities();
+                if (!_isServer)
+                    for (auto &entity : enti) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        if (text
+                            && text->getStr().find("BONUS")
+                                != std::string::npos) {
+                            eventManager.handleBonusButton(
+                                entity.get(), false);
+                        }
+                    }
+                if (_isServer) {
+                    std::stringstream sss;
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    sss << L_SETBONUS << " " << id << " " << _bonus << " "
+                        << PACKET_END;
+                    refNetworkManager.sendToOthers(
+                        id, System::Network::ISocket::Type::TCP, sss.str());
+                }
+            }
+            break;
+        }
+        case Protocol::L_SETLEVEL: {
+            if (tokens.size() >= 2) {
+                _level = (size_t) atoi(tokens[1].c_str());
+                auto enti = refEntityManager.getCurrentLevel().getEntities();
+                if (!_isServer)
+                    for (auto &entity : enti) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        if (text
+                            && text->getStr().find("LEVEL")
+                                != std::string::npos) {
+                            eventManager.handleLevelButton(
+                                entity.get(), false);
+                        }
+                    }
+                if (_isServer) {
+                    std::stringstream sss;
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    sss << L_SETLEVEL << " " << id << " " << _level << " "
+                        << PACKET_END;
+                    refNetworkManager.sendToOthers(
+                        id, System::Network::ISocket::Type::TCP, sss.str());
+                }
+            }
+            break;
+        }
+        case Protocol::L_GAMEMODE: {
+            if (tokens.size() >= 2) {
+                _gamemode = (size_t) atoi(tokens[1].c_str());
+                auto enti = refEntityManager.getCurrentLevel().getEntities();
+                if (!_isServer)
+                    for (auto &entity : enti) {
+                        auto text =
+                            entity.get()
+                                .getComponent<ecs::TextComponent<sf::Text>>();
+                        if (text
+                            && text->getStr().find("GAMEMODE")
+                                != std::string::npos) {
+                            eventManager.handleGamemodeButton(
+                                entity.get(), false);
+                        }
+                    }
+                if (_isServer) {
+                    std::stringstream sss;
+                    size_t id = (size_t) atoi(tokens[0].c_str());
+                    sss << L_GAMEMODE << " " << id << " " << _gamemode << " "
+                        << PACKET_END;
+                    refNetworkManager.sendToOthers(
+                        id, System::Network::ISocket::Type::TCP, sss.str());
+                }
+            }
+            break;
+        }
+        case Protocol::L_SENDLEVELS: {
+            if (tokens.size() >= 2) {
+                if (!_isServer) {
+                    this->_nbTxtFiles = std::atoi(tokens[0].c_str());
+                }
+            }
         }
     }
 }
@@ -170,13 +308,21 @@ void GameInstance::handleNetworkPlayers(
                 auto &player = getPlayerById(id);
                 auto healthComp = player.getComponent<ecs::HealthComponent>();
                 if (healthComp) {
-                    healthComp->setHealth(health);
+                    damagePlayer(id, healthComp->getHealth() - health);
                 }
                 if (!isServer()
                     && player.getID() == getLocalPlayer().getID()) {
+                    try {
+                        refEntityManager.getCurrentLevel().getEntityById(
+                            static_cast<size_t>(getHealthId()));
+                    } catch (const std::exception &e) {
+                        std::cout << CATCH_ERROR_LOCATION << e.what()
+                                  << std::endl;
+                        return;
+                    }
                     auto healthEnt =
                         refEntityManager.getCurrentLevel().getEntityById(
-                            getHealthId());
+                            static_cast<size_t>(getHealthId()));
                     auto healthText =
                         healthEnt.getComponent<ecs::TextComponent<sf::Text>>();
                     if (healthText && health) {
@@ -208,9 +354,32 @@ bool GameInstance::hasLocalPlayer(void) const
 ecs::Entity &GameInstance::getLocalPlayer()
 {
     if (!hasLocalPlayer())
-        throw ErrorClass(THROW_ERROR_LOCATION "No player was attached to the client");
+        throw ErrorClass(
+            THROW_ERROR_LOCATION "No player was attached to the client");
+    try {
+        refEntityManager.getCurrentLevel().getEntityById(
+            (size_t) _playerEntityID);
+    } catch (const std::exception &e) {
+        throw ErrorClass(THROW_ERROR_LOCATION "Player entity not found: "
+            + std::string(e.what()));
+    }
     return (refEntityManager.getCurrentLevel().getEntityById(
         (size_t) _playerEntityID));
+}
+
+size_t GameInstance::getHostClient()
+{
+    auto players = getAllPlayers();
+    size_t host =
+        getLocalPlayer().getComponent<ecs::PlayerComponent>()->getPlayerID();
+
+    for (auto &pl : players) {
+        auto playerID =
+            pl.get().getComponent<ecs::PlayerComponent>()->getPlayerID();
+        if (playerID < host)
+            host = playerID;
+    }
+    return host;
 }
 
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
@@ -228,7 +397,8 @@ ecs::Entity &GameInstance::getPlayerById(size_t id)
         if (pl.get().getComponent<ecs::PlayerComponent>()->getPlayerID() == id)
             return (pl.get());
     }
-    throw ErrorClass(THROW_ERROR_LOCATION "Player not found id=" + std::to_string(id));
+    throw ErrorClass(
+        THROW_ERROR_LOCATION "Player not found id=" + std::to_string(id));
 }
 
 void GameInstance::deletePlayer(size_t playerID)
@@ -236,6 +406,14 @@ void GameInstance::deletePlayer(size_t playerID)
     if (isServer() || _isConnectedToServer) {
         auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
+        if (!isServer()) {
+            _factory.buildExplosionPlayer(
+                pl.getComponent<ecs::PositionComponent>()->getX(),
+                pl.getComponent<ecs::PositionComponent>()->getY());
+            if (pl.getID() == (size_t) _playerEntityID) {
+                _playerEntityID = -1;
+            }
+        }
         refEntityManager.getCurrentLevel().markEntityForDeletion(pl.getID());
         std::stringstream ss;
         ss << P_DEAD << " " << playerID << " " << PACKET_END;
@@ -253,7 +431,6 @@ void GameInstance::damagePlayer(size_t playerID, int damage)
     if (isServer() || _isConnectedToServer) {
         auto &pl = getPlayerById(playerID);
         auto health = pl.getComponent<ecs::HealthComponent>();
-
         if (health) {
             health->setHealth(health->getHealth() - damage);
             if (isServer()) {
@@ -328,11 +505,14 @@ void GameInstance::playerAnimations(ecs::Entity &player)
         direction = "down";
     }
     if (direction == "top") {
-        renderComp->getSprite().setTextureRect(sf::Rect(132, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(sf::Rect(
+            132, renderComp->getSprite().getTextureRect().top, 33, 17));
     } else if (direction == "down") {
-        renderComp->getSprite().setTextureRect(sf::Rect(0, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(
+            sf::Rect(0, renderComp->getSprite().getTextureRect().top, 33, 17));
     } else {
-        renderComp->getSprite().setTextureRect(sf::Rect(66, 0, 33, 14));
+        renderComp->getSprite().setTextureRect(sf::Rect(
+            66, renderComp->getSprite().getTextureRect().top, 33, 17));
     }
 
     animationTimers[playerID].restart();
@@ -343,12 +523,12 @@ void GameInstance::setPlayerEntityID(int id)
     this->_playerEntityID = id;
 }
 
-size_t GameInstance::getHealthId()
+int GameInstance::getHealthId()
 {
     return _healthId;
 }
 
-void GameInstance::setHealthId(size_t id)
+void GameInstance::setHealthId(int id)
 {
     _healthId = id;
 }

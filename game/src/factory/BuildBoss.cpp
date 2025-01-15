@@ -24,27 +24,31 @@
 using namespace RType;
 
 ecs::Entity &RType::Factory::buildBoss(
-    size_t id, float posX, float posY, float health)
+    size_t id, float posX, float posY, float health, int wave)
 {
-    std::cout << "Adding new boss to the game" << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Adding new boss to the game" << std::endl;
     auto &boss = _game.refEntityManager.getCurrentLevel().createEntity();
     boss.addComponent(std::make_shared<ecs::EnemyComponent>(id, 2));
     boss.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
-    boss.addComponent(std::make_shared<ecs::HealthComponent>(health));
+    boss.addComponent(
+        std::make_shared<ecs::HealthComponent>(static_cast<float>(health)
+            * static_cast<float>(_game.getDifficulty())));
     boss.addComponent(std::make_shared<ecs::BulletComponent>(false));
     boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
-    boss.addComponent(std::make_shared<ecs::HitboxComponent>(150.0f, 414.0f));
+    boss.addComponent(std::make_shared<ecs::HitboxComponent>(160.0f, 414.0f));
+    boss.getComponent<ecs::EnemyComponent>()->setWave(wave);
     if (!_game.isServer()) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
         sf::Sprite sprite;
         sprite.setTexture(texture);
-        sprite.setTextureRect(sf::Rect(0, 0, 183, 207));
+        sprite.setTextureRect(sf::Rect(17, 640, 163, 207));
         sprite.setScale(sf::Vector2f(2, 2));
         boss.addComponent(std::make_shared<ecs::RenderComponent>(
             ecs::RenderComponent::ObjectType::SPRITE));
         boss.addComponent(std::make_shared<ecs::SpriteComponent<sf::Sprite>>(
-            sprite, 3.0, 3.0));
+            sprite, 163, 0, 17 + (163 * 4), 0.5f, 17));
     }
     if (_game.isServer()) {
         auto pos = boss.getComponent<ecs::PositionComponent>();
@@ -52,7 +56,8 @@ ecs::Entity &RType::Factory::buildBoss(
         if (pos) {
             std::stringstream sss;
             sss << E_SPAWN << " " << ene->getEnemyID() << " 2 " << pos->getX()
-                << " " << pos->getY() << PACKET_END;
+                << " " << pos->getY() << " " << health << " " << wave
+                << PACKET_END;
             _game.refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, sss.str());
         }
@@ -70,7 +75,8 @@ ecs::Entity &GameInstance::getBossById(size_t bossID)
         if (pl.get().getComponent<ecs::BossComponent>()->getBossID() == bossID)
             return (pl.get());
     }
-    throw ErrorClass(THROW_ERROR_LOCATION "Boss not found id=" + std::to_string(bossID));
+    throw ErrorClass(
+        THROW_ERROR_LOCATION "Boss not found id=" + std::to_string(bossID));
 }
 
 void GameInstance::sendBossPosition(size_t bossID)
@@ -91,7 +97,8 @@ void GameInstance::sendBossPosition(size_t bossID)
 void GameInstance::deleteBoss(size_t bossID)
 {
     std::unique_lock lock(_gameLock);
-    std::cout << "Deleting boss" << std::endl;
+    if (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Deleting boss" << std::endl;
     auto &ene = getBossById(bossID);
     refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
     if (isServer()) {
@@ -107,7 +114,7 @@ void GameInstance::handleNetworkBosses(
 {
     switch (code) {
         case Protocol::E_SPAWN: {
-            if (tokens.size() >= 3) {
+            if (tokens.size() >= 6) {
                 if (!isServer()) {
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;

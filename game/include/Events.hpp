@@ -12,27 +12,29 @@
     #define NOMINMAX
 #endif
 
-#include <memory>
 #include <Entity.hpp>
 #include <memory>
 #include <vector>
 #include "Game.hpp"
 
-namespace RType
-{
-    class EventManager {
-      public:
-        explicit EventManager(GameInstance &gameInstance, Factory &factory);
+using namespace RType;
 
-        void keyPressed(sf::Event &event);
-        void keyReleased(sf::Event &event);
-        void mouseClicked();
+class EventManager {
+  public:
+    explicit EventManager(GameInstance &gameInstance);
 
-      protected:
-        Factory &_factory;
-        GameInstance &_game;
-    };
+    void keyPressed(sf::Event &event);
+    void keyReleased(sf::Event &event);
+    void mouseClicked();
+    void handleNumberOfPlayerButton(ecs::Entity &entity, bool isHost);
+    void handleDifficultyButton(ecs::Entity &entity, bool isHost);
+    void handleBonusButton(ecs::Entity &entity, bool isHost);
+    void handleLevelButton(ecs::Entity &entity, bool isHost);
+    void handleStartButton(bool isHost);
+    void handleGamemodeButton(ecs::Entity &entity, bool isHost);
 
-} // namespace RType
+  protected:
+    GameInstance &_game;
+};
 
 #endif /* !EVENTCLASS_HPP_ */

@@ -1,4 +1,5 @@
 ---
+
 title: "RFC999 - R-Type Protocol"
 abbrev: "R-Type Protocol"
 docname: r-type-protocol-latest
@@ -14,11 +15,11 @@ smart_quotes: no
 pi: [toc, sortrefs, symrefs]
 
 author:
- -
-    ins: R. Scandella
-    name: Raphael Scandella
-    organization: F-TYPE V8 444 CH, 0-100 km/h 3.7s, TOP SPEED 300 km/h
-    email: raphael.scandella@epitech.eu
+-
+ins: R. Scandella
+name: Raphael Scandella
+organization: F-TYPE V8 444 CH, 0-100 km/h 3.7s, TOP SPEED 300 km/h
+email: raphael.scandella@epitech.eu
 
 normative:
 
@@ -131,7 +132,7 @@ Sets the name of a player.
 
 This are the instructions used to manage the enemies
 
-- Enemy spawn (id, type, x, y) - 111 -> TCP
+- Enemy spawn (id, type, x, y, health, wave, velocityX, velocityY) - 111 -> TCP
 
 The type represent the enemy type (0 for basic, 1 for shooter)
 Sent by the server to all the clients to spawn an enemy at a specific position.
@@ -164,19 +165,38 @@ Removed a terrain, if its has been destroyed or went off the screen.
 
 # Game Mechanics (130)
 
-- New wave (waveNb) - 131 -> TCP
-- Wave over (waveNb) - 132 -> TCP
+- Set wave (waveNb) - 131 -> TCP
 - Win - 133 -> TCP
 - Lose - 134 -> TCP
 - Game Over - 135 -> TCP
 - Music change - 136 (filename) -> TCP
+- Background change - 137 (filename) -> TCP
+
+# Bonus Management (150)
+
+- Spawn bonus - 151 -> TCP
+- Get bonus - 152 -> TCP
 
 # Game Management (240)
 
+- Launch Game (id) - 241 <-> TCP
 When in loby, launch the game. (Only the first connected player can send this, then the server replicates it to all connected clients).
-- Launch Game - 241 (id) <-> TCP
 
+- Set max player (id, max) - 242 <-> TCP
 Set max players.
-- Set max player 242 (id, max) - <- TCP
+
+- Set difficulty (id, diff) - 243 <-> TCP
+Set the difficulty of the game (1, for easy (default), 2 for medium, 3 for hard)
+
+- Set bonus (id, state) - 244 <-> TCP
+Set if bonus appears on the map (bool)
+
+- Set level (id, levelId)- 245 <-> TCP
+Set the level config map
+
+- Set game mode (id, mode) - 246 <-> TCP
+Set the game mode, 0 for wave, 1 for pvp
+
+
 
 # TODO: add bonus on/off
