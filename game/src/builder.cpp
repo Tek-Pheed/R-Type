@@ -465,7 +465,8 @@ void RType::GameInstance::levelSettingsMenu()
             std::string beforeResolutionEqual = "RESOLUTION";
             std::string afterResolutionEqual =
                 resolutionAction.substr(equalPosResolution + 1);
-            endResolution = beforeResolutionEqual + " : " + afterResolutionEqual;
+            endResolution =
+                beforeResolutionEqual + " : " + afterResolutionEqual;
         }
 
         _factory.buildButton(
@@ -490,7 +491,8 @@ void RType::GameInstance::levelSettingsMenu()
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * 0),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
-            endRightMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_RIGHT);
+            endRightMove, 40, sf::Color::Black,
+            ecs::ClickableType::MOVE_RIGHT);
 
         _factory.buildButton(
             sf::Vector2f(
@@ -514,7 +516,8 @@ void RType::GameInstance::levelSettingsMenu()
                 (float) this->_window->getSize().y / 2 - (float) 50 / 2
                     - (float) 75 * -3),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
-            endResolution, 40, sf::Color::Black, ecs::ClickableType::RESOLUTION);
+            endResolution, 40, sf::Color::Black,
+            ecs::ClickableType::RESOLUTION);
 
         _factory.buildButton(
             sf::Vector2f(
@@ -538,19 +541,20 @@ void RType::GameInstance::handleAutoFireButton(
 
 void RType::GameInstance::handleResolutionButton(ecs::Entity &entity)
 {
-    static const std::vector<std::string> resolutions = {
-        "1280x720", "1920x1080", "2560x1440", "3840x2160"
-    };
+    static const std::vector<std::string> resolutions = {"1280x720",
+        "1600x900", "1920x1080", "2560x1440", "2880x1620", "3840x2160"};
 
     std::string currentResolution = _gameConfig.getConfig().at(6);
     size_t equalPos = currentResolution.find("=");
     if (equalPos != std::string::npos)
         currentResolution = currentResolution.substr(equalPos + 1);
 
-    auto it = std::find(resolutions.begin(), resolutions.end(), currentResolution);
-    std::string newResolution = (it != resolutions.end() && it + 1 != resolutions.end())
-                                    ? *(it + 1)
-                                    : resolutions.front();
+    auto it =
+        std::find(resolutions.begin(), resolutions.end(), currentResolution);
+    std::string newResolution =
+        (it != resolutions.end() && it + 1 != resolutions.end())
+        ? *(it + 1)
+        : resolutions.front();
 
     _gameConfig.updateConfigValue("RESOLUTION=", newResolution);
     _gameConfig.saveConfig();
