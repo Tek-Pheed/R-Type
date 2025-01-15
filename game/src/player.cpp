@@ -288,13 +288,21 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_DEAD: {
-            if (!_isServer && getLocalPlayer().getComponent<ecs::PlayerComponent>()->getPlayerID() == (size_t) atoi(tokens[0].c_str())) {
-                auto &youLoseSound = refAssetManager.getAsset<sf::SoundBuffer>(Asset::YOU_LOSE_SOUND);
-                _factory.buildSoundEffect(youLoseSound, "youLoseSound", 100.0f);
+            if (!_isServer && hasLocalPlayer()
+                && getLocalPlayer()
+                        .getComponent<ecs::PlayerComponent>()
+                        ->getPlayerID()
+                    == (size_t) atoi(tokens[0].c_str())) {
+                auto &youLoseSound = refAssetManager.getAsset<sf::SoundBuffer>(
+                    Asset::YOU_LOSE_SOUND);
+                _factory.buildSoundEffect(
+                    youLoseSound, "youLoseSound", 100.0f);
                 std::string title = "YOU ARE DEAD";
                 auto textWidth = title.size() * 20;
-                _factory.buildText(0, (float)getWindow().getSize().x / 2 - (float)textWidth,
-                    (float)getWindow().getSize().y / 2 - 50, title, sf::Color::Red, 100);
+                _factory.buildText(0,
+                    (float) getWindow().getSize().x / 2 - (float) textWidth,
+                    (float) getWindow().getSize().y / 2 - 50, title,
+                    sf::Color::Red, 100);
             }
             if (_isServer)
                 return;
@@ -336,7 +344,7 @@ void GameInstance::handleNetworkPlayers(
                 if (healthComp) {
                     damagePlayer(id, healthComp->getHealth() - health);
                 }
-                if (!isServer()
+                if (!isServer() && hasLocalPlayer()
                     && player.getID() == getLocalPlayer().getID()) {
                     try {
                         refEntityManager.getCurrentLevel().getEntityById(
@@ -408,8 +416,11 @@ ecs::Entity &GameInstance::getLocalPlayer()
 size_t GameInstance::getHostClient()
 {
     auto players = getAllPlayers();
-    size_t host =
-        getLocalPlayer().getComponent<ecs::PlayerComponent>()->getPlayerID();
+    size_t host = 10000;
+    if (hasLocalPlayer())
+        host = getLocalPlayer()
+                   .getComponent<ecs::PlayerComponent>()
+                   ->getPlayerID();
 
     for (auto &pl : players) {
         auto playerID =
@@ -423,7 +434,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-            .findEntitiesByComponent<ecs::PlayerComponent>());
+                .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
