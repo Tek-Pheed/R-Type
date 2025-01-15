@@ -6,7 +6,7 @@
 # BOSS(posX, posY, Health): Create a Boss
 # MUSIC(filename)
 # BACKGROUND(filename)
-# BONUS(posX, posY, type[0-3])
+# BONUS(posX, posY, type[0-2])
 
 MUSIC(streetFighter.ogg)
 BACKGROUND(clouds.jpg)

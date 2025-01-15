@@ -6,13 +6,34 @@
 # BOSS(posX, posY, Health): Create a Boss
 # MUSIC(filename)
 # BACKGROUND(filename)
-# BONUS(posX, posY, type[0-3])
+# BONUS(posX, posY, type[0-2])
 
 MUSIC(streetFighter.ogg)
 BACKGROUND(clouds.jpg)
 
 WAVE(1)
-BASIC_ENEMY(0.8, 0.25, 0.0, 0.0, 500)
-BOSS(0.79, 0.46, 500)
-SHOOTER_ENEMY(0.73, 0.71, 0.0, 0.0, 500)
+BASIC_ENEMY(0.8, 0.2, -0.1, 0.0, 100)
+SHOOTER_ENEMY(0.9, 0.5, -0.1, 0.0, 100)
+BASIC_ENEMY(0.8, 0.8, -0.1, 0.0, 100)
 
+WAVE(2)
+BASIC_ENEMY(0.7, 0.2, -0.1, 0.0, 150)
+BASIC_ENEMY(0.75, 0.3, -0.1, 0.0, 150)
+SHOOTER_ENEMY(0.8, 0.4, -0.1, 0.0, 150)
+SHOOTER_ENEMY(0.9, 0.5, -0.1, 0.0, 150)
+BONUS(0.85, 0.5, 0)
+SHOOTER_ENEMY(0.8, 0.6, -0.1, 0.0, 150)
+BASIC_ENEMY(0.75, 0.7, -0.1, 0.0, 150)
+BASIC_ENEMY(0.7, 0.8, -0.1, 0.0, 150)
+
+WAVE(3)
+BASIC_ENEMY(0.7, 0.2, -0.2, 0.0, 200)
+BASIC_ENEMY(0.8, 0.3, -0.2, 0.0, 200)
+BASIC_ENEMY(0.9, 0.4, -0.2, 0.0, 200)
+SHOOTER_ENEMY(0.75, 0.4, -0.1, 0.0, 200)
+SHOOTER_ENEMY(0.85, 0.5, -0.1, 0.0, 200)
+BONUS(0.85, 0.5, 1);
+SHOOTER_ENEMY(0.75, 0.6, -0.1, 0.0, 200)
+BASIC_ENEMY(0.7, 0.7, -0.2, 0.0, 200)
+BASIC_ENEMY(0.8, 0.8, -0.2, 0.0, 200)
+BASIC_ENEMY(0.9, 0.9, -0.2, 0.0, 200)

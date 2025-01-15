@@ -76,7 +76,7 @@ class LevelEditor:
             "speed_x": self.create_edit_field("X Velocity (0-1):", 0),
             "speed_y": self.create_edit_field("Y Velocity (0-1):", 0),
             "health": self.create_edit_field("Health:", 500),
-            "bonus_type": self.create_edit_field("Bonus Type (0-3):", 0)
+            "bonus_type": self.create_edit_field("Bonus Type (0-2):", 0)
         }
 
         # Button to apply changes
@@ -204,7 +204,7 @@ class LevelEditor:
                     file.write("# BOSS(posX, posY, Health): Create a Boss\n")
                     file.write("# MUSIC(filename)\n")
                     file.write("# BACKGROUND(filename)\n")
-                    file.write("# BONUS(posX, posY, type[0-3])\n\n")
+                    file.write("# BONUS(posX, posY, type[0-2])\n\n")
                     file.write("MUSIC(streetFighter.ogg)\n")
                     file.write("BACKGROUND(clouds.jpg)\n\n")
     
