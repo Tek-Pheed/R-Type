@@ -389,7 +389,7 @@ void GameInstance::gamePostTick(
                     entity.get().getID());
         }
         getWindow().display();
-    } else {
+    } else if (_gamemode != 1) {
         bool next = true;
         auto entVect = refEntityManager.getCurrentLevel()
                            .findEntitiesByComponent<ecs::EnemyComponent>();
@@ -404,7 +404,7 @@ void GameInstance::gamePostTick(
             }
         }
         if (next) {
-            if (entVect.size() == 0 && !ended && _gamemode != 1) {
+            if (entVect.size() == 0 && !ended) {
                 if (_level < getTxtFiles("assets/levels").size()) {
                     std::cout << "Next level" << std::endl;
                     _level++;
