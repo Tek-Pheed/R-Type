@@ -10,6 +10,7 @@
 #endif
 
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -45,9 +46,13 @@ void GameInstance::handleLobby(
                 refNetworkManager.sendToAll(
                     System::Network::ISocket::Type::TCP, sss.str());
                 std::string levelFileName =
-                    "./assets/levels/level" + std::to_string(_level) + ".txt";
+                    "assets/levels/level" + std::to_string(_level) + ".txt";
                 ;
-                loadLevelContent(levelFileName);
+                if (_gamemode == 0)
+                    loadLevelContent(levelFileName);
+                else
+                    loadPvPLevel();
+
             } else {
                 auto songEntity = refEntityManager.getPersistentLevel()
                                       .findEntitiesByComponent<
@@ -64,6 +69,8 @@ void GameInstance::handleLobby(
                     currentSong->getMusicType().setBuffer(newMusic);
                     currentSong->getMusicType().play();
                 }
+                if (_gamemode == 1)
+                    loadPvPLevel();
                 launchGame();
             }
             break;
@@ -351,6 +358,18 @@ bool GameInstance::hasLocalPlayer(void) const
     return (true);
 }
 
+ecs::Entity &GameInstance::getRandomPlayer(void)
+{
+    std::unique_lock lock(_gameLock);
+
+    auto ent = refEntityManager.getCurrentLevel()
+                   .findEntitiesByComponent<ecs::PlayerComponent>();
+
+    size_t range = (ent.size() - 1) - 0 + 1;
+    size_t num = ((size_t) rand()) % range;
+    return (ent[num]);
+}
+
 ecs::Entity &GameInstance::getLocalPlayer()
 {
     if (!hasLocalPlayer())
@@ -385,7 +404,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-            .findEntitiesByComponent<ecs::PlayerComponent>());
+                .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)

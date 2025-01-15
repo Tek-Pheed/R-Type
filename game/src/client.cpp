@@ -236,7 +236,7 @@ void RType::GameInstance::setupClient(
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
     sf::VideoMode videoMode(
-        GameInstance::RESOLUTION_X, GameInstance::RESOLUTION_Y);
+        GameInstance::DEFAULT_RESOLUTION_X, GameInstance::DEFAULT_RESOLUTION_Y);
     _window->create(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());

@@ -84,6 +84,7 @@ namespace RType
             void EnemyBulletCollision(ecs::Entity &bullet);
             void EnemyCollision(ecs::Entity &enemy, float deltaTime);
             void BonusCollision(ecs::Entity &bonus);
+            void PlayerPvPMode(ecs::Entity &bullet, float deltaTime);
 
           protected:
             GameInstance *_game = nullptr;

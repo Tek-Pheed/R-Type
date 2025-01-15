@@ -46,8 +46,8 @@ namespace RType
         static constexpr size_t DEFAULT_MAX_PLAYERS = 4U;
         static constexpr size_t DEFAULT_DIFFICULTY = 1U;
 
-        static constexpr size_t RESOLUTION_X = 1280U;
-        static constexpr size_t RESOLUTION_Y = 720U;
+        static constexpr size_t DEFAULT_RESOLUTION_X = 1280U;
+        static constexpr size_t DEFAULT_RESOLUTION_Y = 720U;
 
         static constexpr auto KILLZONE = -100.0f;
         static constexpr auto ENEMY_VELOCITY = -200.0f;
@@ -58,6 +58,9 @@ namespace RType
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
+
+        const int WindoScaleX = 1280.0f;
+        const int WindoScaleY = 720.0f;
 
         bool getServerMode();
 
@@ -92,8 +95,10 @@ namespace RType
         void handleInputButtons(const std::vector<sf::Keyboard::Key> &keys);
 
         void loadLevelContent(const std::string &filename);
+        void loadPvPLevel();
 
         // Player functions and utilities
+        ecs::Entity &getRandomPlayer(void);
         std::vector<std::reference_wrapper<ecs::Entity>> getAllPlayers();
         bool hasLocalPlayer(void) const;
         ecs::Entity &getLocalPlayer();
@@ -120,10 +125,6 @@ namespace RType
         int _nbTxtFiles;
 
         // Enemies
-        ecs::Entity &buildEnemy(
-            size_t id, float posX, float posY, float health);
-        ecs::Entity &buildEnemyShooter(
-            size_t id, float posX, float posY, float health);
         ecs::Entity &getEnemyById(size_t enemyID);
         void sendEnemyPosition(size_t enemyID);
         void deleteEnemy(size_t enemyID);
@@ -133,8 +134,6 @@ namespace RType
             int code, const std::vector<std::string> &tokens);
 
         // Boss
-        ecs::Entity &buildBoss(size_t id, float posX, float posY,
-            float health = 100.0f, int wave = 0);
         ecs::Entity &getBossById(size_t bossID);
         void sendBossPosition(size_t bossID);
         void deleteBoss(size_t bossID);
@@ -210,6 +209,8 @@ namespace RType
 
         // Game Value
         size_t getDifficulty() const;
+        size_t getGameMode() const;
+        void setGameMode(size_t mode);
 
         Factory _factory;
 

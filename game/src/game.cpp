@@ -97,8 +97,8 @@ void GameInstance::handleNetworkMechs(
 
                 ref.setRepeated(true);
                 comp->getSprite().setTextureRect(
-                    sf::Rect(0, 0, (int) GameInstance::RESOLUTION_X,
-                        (int) GameInstance::RESOLUTION_Y));
+                    sf::Rect(0, 0, (int) GameInstance::DEFAULT_RESOLUTION_X,
+                        (int) GameInstance::DEFAULT_RESOLUTION_Y));
                 comp->getSprite().setTexture(ref);
             }
             break;
@@ -107,9 +107,11 @@ void GameInstance::handleNetworkMechs(
             if (tokens.size() >= 1 && !isServer()) {
                 currentWave = std::atoi(tokens[0].c_str());
                 if (currentWave > 0) {
-                    auto &newWaveInComingSound = this->refAssetManager.getAsset<sf::SoundBuffer>(
-                        Asset::NEWWAVEINCOMING);
-                    _factory.buildSoundEffect(newWaveInComingSound, "newWaveInComingSound", 100.0f);
+                    auto &newWaveInComingSound =
+                        this->refAssetManager.getAsset<sf::SoundBuffer>(
+                            Asset::NEWWAVEINCOMING);
+                    _factory.buildSoundEffect(
+                        newWaveInComingSound, "newWaveInComingSound", 100.0f);
                 }
                 if (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Changing wave: " << currentWave << std::endl;
@@ -117,6 +119,60 @@ void GameInstance::handleNetworkMechs(
             break;
         }
         default: break;
+    }
+}
+
+void GameInstance::loadPvPLevel()
+{
+    std::unique_lock lock(_gameLock);
+    std::stringstream ss;
+
+    if (isServer()) {
+        // Change background
+        ss << M_BG << " " << "clouds.jpg" << " " << PACKET_END;
+        refNetworkManager.sendToAll(System::Network::ISocket::TCP, ss.str());
+        ss.clear();
+
+        // Change music
+        ss << M_MUSIC << " " << "pvp.ogg" << " " << PACKET_END;
+        refNetworkManager.sendToAll(System::Network::ISocket::TCP, ss.str());
+        ss.clear();
+
+        for (auto &entity : getAllPlayers()) {
+            auto &player = entity.get();
+            auto playerHealth = player.getComponent<ecs::HealthComponent>();
+            if (playerHealth)
+                playerHealth->setHealth(300);
+        }
+    }
+
+    if (!isServer()) {
+        for (auto &entity : getAllPlayers()) {
+            auto &player = entity.get();
+            auto playerComp = player.getComponent<ecs::PlayerComponent>();
+            auto playerHealth = player.getComponent<ecs::HealthComponent>();
+            if (playerComp && playerComp->getTeam() == 1) {
+                auto spriteComp =
+                    player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
+                spriteComp->getSprite().setScale(-3, 3);
+            }
+            if (playerHealth)
+                playerHealth->setHealth(300);
+        }
+        auto songEntity =
+            refEntityManager.getPersistentLevel()
+                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];
+        auto currentSong =
+            songEntity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
+        auto &newMusic =
+            refAssetManager.getAsset<sf::SoundBuffer>(Asset::PVP_SOUND);
+
+        if (currentSong->getMusicType().getStatus()
+            == sf::SoundSource::Playing) {
+            currentSong->getMusicType().stop();
+            currentSong->getMusicType().setBuffer(newMusic);
+            currentSong->getMusicType().play();
+        }
     }
 }
 
@@ -142,9 +198,10 @@ void GameInstance::loadLevelContent(const std::string &filename)
         }
         if (key == BUILD_SHOOTER_ENEMY) {
             if (value.size() < 5)
-                throw ErrorClass(THROW_ERROR_LOCATION
-                    "loadLevelContent: Failed to create shooter "
-                    "enemy from level config");
+                throw ErrorClass(
+                    THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
+                                         "shooter "
+                                         "enemy from level config");
             _factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
@@ -207,8 +264,8 @@ void GameInstance::loadLevelContent(const std::string &filename)
         }
         // if (key == CHANGE_MUSIC) {
         //     if (value.size() < 1)
-        //         throw ErrorClass("loadLevelContent: Failed to create music
-        //         from level config");
+        //         throw ErrorClass("loadLevelContent: Failed
+        //         to create music from level config");
 
         // }
     }
@@ -219,7 +276,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-        i++) {
+         i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -284,9 +341,10 @@ void GameInstance::gameTick(
             float deltaTime_sec = std::any_cast<float>(arg);
             static float time = 0.0f;
             time += deltaTime_sec;
-            if (time >= 2.0f) {
-                for (auto entID : refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+            if (time >= 1.0f) {
+                for (auto entID :
+                    refEntityManager.getCurrentLevel()
+                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -458,4 +516,14 @@ uint64_t GameInstance::getTicks() const
 size_t GameInstance::getDifficulty() const
 {
     return _difficulty;
+}
+
+size_t GameInstance::getGameMode() const
+{
+    return _gamemode;
+}
+
+void GameInstance::setGameMode(size_t mode)
+{
+    _gamemode = mode;
 }

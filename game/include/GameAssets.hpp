@@ -48,10 +48,11 @@ namespace RType
         constexpr auto EXPLOSION_SOUND = "explosionSound";
         constexpr auto EXPLOSION_TEXTURE = "explosionTexture";
         constexpr auto EXPLOSION_PLAYER = "explosionPlayer";
-		constexpr auto BONUS_TEXTURE = "bonusTexture";
+        constexpr auto BONUS_TEXTURE = "bonusTexture";
         constexpr auto NEWWAVEINCOMING = "newWaveIncoming";
         constexpr auto YOU_WIN_SOUND = "youWinSound";
         constexpr auto YOU_LOSE_SOUND = "youLoseSound";
+        constexpr auto PVP_SOUND = "pvpSound";
         constexpr auto BUTTON_CLICKED_SOUND = "buttonClikedSounud";
         constexpr auto BONUS_GET = "bonusGet";
 
@@ -85,10 +86,14 @@ namespace RType
             {R_TYPE_FONT, "assets/font/r-type.ttf", typeid(sf::Font)},
             {BULLET_BOSS, "assets/sprites/r-typesheet30a.gif",
                 typeid(sf::Texture)},
-            {BULLET_BOSS_SOUND, "assets/sounds/bossBullet.ogg",
+            {
+                BULLET_BOSS_SOUND,
+                "assets/sounds/bossBullet.ogg",
                 typeid(sf::SoundBuffer),
             },
-            {EXPLOSION_SOUND, "assets/sounds/tnt.ogg",
+            {
+                EXPLOSION_SOUND,
+                "assets/sounds/tnt.ogg",
                 typeid(sf::SoundBuffer),
             },
             {NEWWAVEINCOMING, "assets/sounds/newWaveIncoming.ogg",
@@ -108,10 +113,12 @@ namespace RType
             },
             {EXPLOSION_TEXTURE, "assets/sprites/r-typesheet43.gif",
                 typeid(sf::Texture)},
-            {EXPLOSION_PLAYER,
+            {
+                EXPLOSION_PLAYER,
                 "assets/sprites/r-typesheet16.gif",
                 typeid(sf::Texture),
-            }};
+            },
+            {PVP_SOUND, "assets/sounds/pvp.ogg", typeid(sf::SoundBuffer)}};
 
         template <typename Type>
         const std::vector<const AssetStore *> getAllAssetsOfType()

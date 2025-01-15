@@ -194,9 +194,11 @@ void EventManager::handleGamemodeButton(ecs::Entity &entity, bool isHost)
         if (gameMode == "WAVE") {
             text->setStr("GAMEMODE : PVP");
             ss << Protocol::L_GAMEMODE << " " << id << " " << 1 << PACKET_END;
+            _game.setGameMode(1);
         } else {
             text->setStr("GAMEMODE : WAVE");
             ss << Protocol::L_GAMEMODE << " " << id << " " << 0 << PACKET_END;
+            _game.setGameMode(0);
         }
         if (isHost) {
             _game.refNetworkManager.sendToAll(
