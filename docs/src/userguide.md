@@ -2,7 +2,7 @@
 
 ## Version
 
-1.3
+v8.0
 
 ## Last Updated
 
