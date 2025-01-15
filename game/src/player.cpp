@@ -47,7 +47,7 @@ void GameInstance::handleLobby(
                     System::Network::ISocket::Type::TCP, sss.str());
                 std::string levelFileName =
                     "assets/levels/level" + std::to_string(_level) + ".txt";
-                ;
+
                 if (_gamemode == 0)
                     loadLevelContent(levelFileName);
                 else

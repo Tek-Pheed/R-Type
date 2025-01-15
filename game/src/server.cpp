@@ -113,22 +113,22 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
-    std::stringstream s;
     if (_musicName != "") {
-        s << M_MUSIC << " " << _musicName << " " << PACKET_END;
+        std::stringstream ss;
+        ss << M_MUSIC << " " << _musicName << " " << PACKET_END;
         refNetworkManager.sendToOne(
-            clientID, System::Network::ISocket::Type::TCP, s.str());
+            clientID, System::Network::ISocket::Type::TCP, ss.str());
     }
-    s.clear();
     if (_bgName != "") {
-        s << M_BG << " " << _bgName << " " << PACKET_END;
+        std::stringstream ss;
+        ss << M_BG << " " << _bgName << " " << PACKET_END;
         refNetworkManager.sendToOne(
-            clientID, System::Network::ISocket::Type::TCP, s.str());
+            clientID, System::Network::ISocket::Type::TCP, ss.str());
     }
-    s.clear();
-    s << M_WAVE << " " << currentWave << PACKET_END;
+    std::stringstream ss;
+    ss << M_WAVE << " " << currentWave << PACKET_END;
     refNetworkManager.sendToOne(
-        clientID, System::Network::ISocket::Type::TCP, s.str());
+        clientID, System::Network::ISocket::Type::TCP, ss.str());
     if (_gameStarted) {
         std::stringstream sss;
         sss << L_STARTGAME << " " << 0 << PACKET_END;

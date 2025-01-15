@@ -263,12 +263,6 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 (float) std::atof(value[1].c_str()),
                 static_cast<ecs::Bonus>(std::atoi(value[2].c_str())));
         }
-        // if (key == CHANGE_MUSIC) {
-        //     if (value.size() < 1)
-        //         throw ErrorClass("loadLevelContent: Failed
-        //         to create music from level config");
-
-        // }
     }
 }
 
@@ -370,6 +364,7 @@ void GameInstance::gamePostTick(
     (void) event;
     (void) core;
     (void) arg;
+    static bool ended = false;
 
     std::unique_lock lock(_gameLock);
 
@@ -398,7 +393,7 @@ void GameInstance::gamePostTick(
         bool next = true;
         auto entVect = refEntityManager.getCurrentLevel()
                            .findEntitiesByComponent<ecs::EnemyComponent>();
-        if (entVect.size() == 0) {
+        if (ended || !_gameStarted) {
             return;
         }
         for (auto &ent : entVect) {
@@ -409,6 +404,20 @@ void GameInstance::gamePostTick(
             }
         }
         if (next) {
+            if (entVect.size() == 0 && !ended) {
+                if (_level < getTxtFiles("assets/levels").size()) {
+                    std::cout << "Next level" << std::endl;
+                    _level++;
+                    std::string levelFileName = "assets/levels/level"
+                        + std::to_string(_level) + ".txt";
+                    loadLevelContent(levelFileName);
+                    currentWave = -1;
+                } else {
+                    ended = true;
+                    std::cout << "Congrats ! You played all levels :)" << std::endl;
+                    refGameEngine.stop();
+                }
+            }
             std::stringstream ss;
             currentWave += 1;
             if (RType::GameInstance::DEBUG_LOGS)
