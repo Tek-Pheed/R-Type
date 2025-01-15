@@ -89,7 +89,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         }
         std::stringstream sss;
         sss << P_CONN << " " << pl->getPlayerID() << " " << pos->getX() << " "
-            << pos->getY() << " " << n << PACKET_END;
+            << pos->getY() << " " << n << " " << PACKET_END;
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
