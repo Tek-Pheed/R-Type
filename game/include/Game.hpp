@@ -46,8 +46,8 @@ namespace RType
         static constexpr size_t DEFAULT_MAX_PLAYERS = 4U;
         static constexpr size_t DEFAULT_DIFFICULTY = 1U;
 
-        static constexpr size_t DEFAULT_RESOLUTION_X = 1280U;
-        static constexpr size_t DEFAULT_RESOLUTION_Y = 720U;
+        static constexpr size_t DEFAULT_RESOLUTION_X = 2560U;
+        static constexpr size_t DEFAULT_RESOLUTION_Y = 1440U;
 
         static constexpr auto KILLZONE = -0.1f;
         static constexpr auto ENEMY_VELOCITY = -0.156f;

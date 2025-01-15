@@ -226,7 +226,7 @@ ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     float posY, float health, int wave, float velocityX, float velocityY)
 {
     const float Width = 0.05f * (float) _game.WindoScaleX;
-    const float Height = 0.048f * (float) _game.WindoScaleY;
+    const float Height = 0.120f * (float) _game.WindoScaleY;
 
     if (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new enemy (" << id << ") to the game at pos "
@@ -237,7 +237,7 @@ ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     enemy.addComponent(std::make_shared<ecs::HealthComponent>(health));
     enemy.addComponent(std::make_shared<ecs::VelocityComponent>(
         GameInstance::ENEMY_SHOOTER_VELOCITY, 0.0f));
-    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(0.05f, 0.048f));
+    enemy.addComponent(std::make_shared<ecs::HitboxComponent>(0.05f, 0.120f));
     enemy.getComponent<ecs::EnemyComponent>()->setWave(wave);
     enemy.getComponent<ecs::VelocityComponent>()->setVx(velocityX);
     enemy.getComponent<ecs::VelocityComponent>()->setVy(velocityY);

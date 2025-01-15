@@ -39,7 +39,7 @@ ecs::Entity &RType::Factory::buildBoss(
         std::make_shared<ecs::HealthComponent>(static_cast<float>(health)
             * static_cast<float>(_game.getDifficulty())));
     boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
-    boss.addComponent(std::make_shared<ecs::HitboxComponent>(Width, Height));
+    boss.addComponent(std::make_shared<ecs::HitboxComponent>(0.3f, 0.7f));
     boss.getComponent<ecs::EnemyComponent>()->setWave(wave);
     if (!_game.isServer()) {
         auto &texture =

@@ -18,7 +18,7 @@ using namespace RType;
 
 void Factory::buildBulletFromPlayer(size_t playerID)
 {
-    constexpr auto velocity = 0.027f;
+    constexpr auto velocity = 0.35f;
     const float Width = 0.042f * (float) _game.WindoScaleX;
     const float Height = 0.022f * (float) _game.WindoScaleY;
 
@@ -69,7 +69,7 @@ void Factory::buildBulletFromPlayer(size_t playerID)
 
 void Factory::buildBulletFromEnemy(size_t enemyID)
 {
-    constexpr auto velocity = -0.027f;
+    constexpr auto velocity = -0.30f;
     const float Width = 0.027f * (float) _game.WindoScaleX;
     const float Height = 0.03f * (float) _game.WindoScaleY;
 
@@ -120,8 +120,8 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
 
 void Factory::buildBulletFromBoss(size_t bossId)
 {
-    const float bulletVelocity = -0.3f;
-    const float Width = 0.027f * (float) _game.WindoScaleX;
+    const float bulletVelocity = -0.4f;
+    const float Width = 0.1f * (float) _game.WindoScaleY;
     const float Height = Width;
 
     auto &boss = _game.getEnemyById(bossId);
@@ -147,7 +147,7 @@ void Factory::buildBulletFromBoss(size_t bossId)
         velx = bulletVelocity;
     }
     bullet.addComponent(std::make_shared<ecs::VelocityComponent>(velx, vely));
-    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(0.027f, 0.027f));
+    bullet.addComponent(std::make_shared<ecs::HitboxComponent>(0.1f, 0.1f));
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(
         positionComp->getX() - 0.04f, positionComp->getY() - 0.065f));
 
