@@ -191,37 +191,40 @@ class LevelEditor:
         self.update_canvas()
 
     def save_level(self):
-        """Save the level data to a file with the updated format."""
+        """Save the level data to a file with the updated format in ASCII."""
         file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
         if file_path:
-            with open(file_path, "w") as file:
-                file.write("# Level config file\n")
-                file.write("# Available commands:\n")
-                file.write("# WAVE(waveID): Declare a new wave\n")
-                file.write("# BASIC_ENEMY(posX, posY, velocityX, velocityY, Health): Create basic enemy\n")
-                file.write("# SHOOTER_ENEMY(posX, posY, velocityX, velocityY, Health): Create shooter enemy\n")
-                file.write("# BOSS(posX, posY, Health): Create a Boss\n")
-                file.write("# MUSIC(filename)\n")
-                file.write("# BACKGROUND(filename)\n")
-                file.write("# BONUS(posX, posY, type[0-3])\n\n")
-                file.write("MUSIC(streetFighter.ogg)\n")
-                file.write("BACKGROUND(clouds.jpg)\n\n")
-
-                for wave in self.waves:
-                    file.write(f"WAVE({wave['wave_id']})\n")
-                    for sprite in wave["sprites"]:
-                        sprite_type = sprite["type"]
-                        x, y = round(sprite["x"], 2), round(sprite["y"], 2)  # Round to 2 decimal places
-                        speed_x, speed_y = round(sprite["speed_x"], 2), round(sprite["speed_y"], 2)  # Round to 2 decimal places
-                        if sprite_type == "BONUS":
-                            file.write(f"{sprite_type}({x}, {y}, {sprite['bonus_type']})\n")
-                        elif sprite_type == "BOSS":
-                            file.write(f"{sprite_type}({x}, {y}, {sprite['health']})\n")
-                        else:
-                            health = sprite["health"]
-                            file.write(f"{sprite_type}({x}, {y}, {speed_x}, {speed_y}, {health})\n")
-                    file.write("\n")
-            print(f"Level saved to: {file_path}")
+            try:
+                with open(file_path, "w", encoding='ascii') as file:
+                    file.write("# Level config file\n")
+                    file.write("# Available commands:\n")
+                    file.write("# WAVE(waveID): Declare a new wave\n")
+                    file.write("# BASIC_ENEMY(posX, posY, velocityX, velocityY, Health): Create basic enemy\n")
+                    file.write("# SHOOTER_ENEMY(posX, posY, velocityX, velocityY, Health): Create shooter enemy\n")
+                    file.write("# BOSS(posX, posY, Health): Create a Boss\n")
+                    file.write("# MUSIC(filename)\n")
+                    file.write("# BACKGROUND(filename)\n")
+                    file.write("# BONUS(posX, posY, type[0-3])\n\n")
+                    file.write("MUSIC(streetFighter.ogg)\n")
+                    file.write("BACKGROUND(clouds.jpg)\n\n")
+    
+                    for wave in self.waves:
+                        file.write(f"WAVE({wave['wave_id']})\n")
+                        for sprite in wave["sprites"]:
+                            sprite_type = sprite["type"]
+                            x, y = round(sprite["x"], 2), round(sprite["y"], 2)  # Round to 2 decimal places
+                            speed_x, speed_y = round(sprite["speed_x"], 2), round(sprite["speed_y"], 2)  # Round to 2 decimal places
+                            if sprite_type == "BONUS":
+                                file.write(f"{sprite_type}({x}, {y}, {sprite['bonus_type']})\n")
+                            elif sprite_type == "BOSS":
+                                file.write(f"{sprite_type}({x}, {y}, {sprite['health']})\n")
+                            else:
+                                health = sprite["health"]
+                                file.write(f"{sprite_type}({x}, {y}, {speed_x}, {speed_y}, {health})\n")
+                        file.write("\n")
+                print(f"Level saved to: {file_path}")
+            except UnicodeEncodeError:
+                print("Error: Non-ASCII characters detected. File could not be saved in ASCII format.")
 
     def load_level(self):
         """Load an existing level file."""
@@ -273,7 +276,7 @@ class LevelEditor:
                             "bonus_type": bonus_type
                         })
             print(f"Loaded level from: {file_path}")
-            self.update_canvas()
+        self.update_canvas()
 
     def update_canvas(self):
         """Update the canvas with the current sprites."""
