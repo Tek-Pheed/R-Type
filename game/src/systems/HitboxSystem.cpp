@@ -303,9 +303,8 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             if (bonus && position && velocity && hitbox && _game->isServer()) {
                 BonusCollision(entity);
             }
-            if (_game->isServer() && _game->getGameMode() == 1 && bullet
-                && position && velocity && hitbox
-                && bullet->getIsFromPlayer() == true)
+            if (_game->getGameMode() == 1 && bullet && position && velocity
+                && hitbox && bullet->getIsFromPlayer() == true)
                 PlayerPvPMode(entity, deltaTime);
         } catch (const std::exception &e) {
             std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
