@@ -50,7 +50,7 @@ void Factory::buildBulletFromPlayer(size_t playerID)
         std::make_shared<ecs::HitboxComponent>(0.042f, 0.022f));
     if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
         && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
-        x = positionComp->getX() - 0.1f;
+        x = positionComp->getX() - 0.05f;
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(x, y));
 
     std::stringstream ss;
