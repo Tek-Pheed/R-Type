@@ -107,9 +107,11 @@ void GameInstance::handleNetworkMechs(
             if (tokens.size() >= 1 && !isServer()) {
                 currentWave = std::atoi(tokens[0].c_str());
                 if (currentWave > 0) {
-                    auto &newWaveInComingSound = this->refAssetManager.getAsset<sf::SoundBuffer>(
-                        Asset::NEWWAVEINCOMING);
-                    _factory.buildSoundEffect(newWaveInComingSound, "newWaveInComingSound", 100.0f);
+                    auto &newWaveInComingSound =
+                        this->refAssetManager.getAsset<sf::SoundBuffer>(
+                            Asset::NEWWAVEINCOMING);
+                    _factory.buildSoundEffect(
+                        newWaveInComingSound, "newWaveInComingSound", 100.0f);
                 }
                 if (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Changing wave: " << currentWave << std::endl;
@@ -141,11 +143,14 @@ void GameInstance::loadPvPLevel()
         for (auto &entity : getAllPlayers()) {
             auto &player = entity.get();
             auto playerComp = player.getComponent<ecs::PlayerComponent>();
+            auto playerHealth = player.getComponent<ecs::HealthComponent>();
             if (playerComp && playerComp->getTeam() == 1) {
                 auto spriteComp =
                     player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
                 spriteComp->getSprite().setScale(-3, 3);
             }
+            if (playerHealth)
+                playerHealth->setHealth(300);
         }
         auto songEntity =
             refEntityManager.getPersistentLevel()
@@ -330,8 +335,9 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 1.0f) {
-                for (auto entID : refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID :
+                    refEntityManager.getCurrentLevel()
+                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
