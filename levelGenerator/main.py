@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 
+# Constants for sprite types
 SPRITE_TYPES = {
     "BASIC_ENEMY": "sprites/enemy.png",
     "SHOOTER_ENEMY": "sprites/shooter.png",
@@ -12,59 +13,77 @@ class LevelEditor:
     def __init__(self, root):
         self.root = root
         self.root.title("Level Editor")
-        self.root.geometry("1280x850")
+        self.root.geometry("1280x850")  # Set window size to 1280x720
 
+        # Canvas for placing sprites
         self.canvas = tk.Canvas(root, width=1280, height=720, bg="white")
         self.canvas.pack()
 
+        # Frame for controls
         self.control_frame = tk.Frame(root)
         self.control_frame.pack()
 
+        # Dropdown for sprite selection
         self.sprite_var = tk.StringVar(value="BASIC_ENEMY")
         self.sprite_menu = tk.OptionMenu(self.control_frame, self.sprite_var, *SPRITE_TYPES.keys())
         self.sprite_menu.pack(side=tk.LEFT)
 
+        # Button to add sprite
         self.add_button = tk.Button(self.control_frame, text="Add Sprite", command=self.add_sprite)
         self.add_button.pack(side=tk.LEFT)
 
+        # Button to save level
         self.save_button = tk.Button(self.control_frame, text="Save Level", command=self.save_level)
         self.save_button.pack(side=tk.LEFT)
 
+        # Button to add new wave
         self.wave_button = tk.Button(self.control_frame, text="Add Wave", command=self.add_wave)
         self.wave_button.pack(side=tk.LEFT)
 
+        # Button to load level
         self.load_button = tk.Button(self.control_frame, text="Load Level", command=self.load_level)
         self.load_button.pack(side=tk.LEFT)
-        
-        self.waves = []
 
+        # List to store wave data
+        self.waves = []  # Each wave is a dictionary: {"wave_id": int, "sprites": list}
+
+        # Current wave ID
         self.current_wave = 1
 
+        # Dictionary to store PhotoImage objects
         self.images = {}
 
+        # Bind canvas click event
         self.canvas.bind("<Button-1>", self.canvas_click)
 
+        # Selected sprite for editing
         self.selected_sprite = None
 
+        # Load sprite images
         self.load_sprite_images()
 
+        # Initialize with default wave 1
         self.waves.append({"wave_id": self.current_wave, "sprites": []})
 
+        # Frame for sprite editing
         self.edit_frame = tk.Frame(root)
         self.edit_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
+        # Widgets for sprite editing
         self.edit_widgets = {
-            "x": self.create_edit_field("X Position:", 0),
-            "y": self.create_edit_field("Y Position:", 0),
-            "speed_x": self.create_edit_field("X Speed:", 0),
-            "speed_y": self.create_edit_field("Y Speed:", 0),
-            "health": self.create_edit_field("Health:", 0),
+            "x": self.create_edit_field("X Position (0-1):", 0.5),
+            "y": self.create_edit_field("Y Position (0-1):", 0.5),
+            "speed_x": self.create_edit_field("X Velocity (0-1):", 0),
+            "speed_y": self.create_edit_field("Y Velocity (0-1):", 0),
+            "health": self.create_edit_field("Health:", 500),
             "bonus_type": self.create_edit_field("Bonus Type (0-3):", 0)
         }
 
+        # Button to apply changes
         self.apply_button = tk.Button(self.edit_frame, text="Apply Changes", command=self.apply_changes)
         self.apply_button.pack(side=tk.LEFT)
 
+        # Hide edit frame initially
         self.edit_frame.pack_forget()
 
     def create_edit_field(self, label, default_value):
@@ -90,33 +109,39 @@ class LevelEditor:
         sprite_type = self.sprite_var.get()
         new_sprite = {
             "type": sprite_type,
-            "x": 100,
-            "y": 100,
-            "speed_x": -200.0,
+            "x": 0.5,  # Default position (center of the canvas)
+            "y": 0.5,
+            "speed_x": 0.0,  # Default velocity (0% of canvas width/height per second)
             "speed_y": 0.0,
             "health": 500,
-            "bonus_type": 0
+            "bonus_type": 0  # Default bonus type
         }
-        self.waves[-1]["sprites"].append(new_sprite)
+        self.waves[-1]["sprites"].append(new_sprite)  # Add sprite to the current wave
         print(f"Added sprite: {new_sprite}")
         self.update_canvas()
 
     def canvas_click(self, event):
         """Handle canvas click to place or select sprites."""
-        x, y = event.x, event.y
+        canvas_width = self.canvas.winfo_width()
+        canvas_height = self.canvas.winfo_height()
+        x_percent = event.x / canvas_width
+        y_percent = event.y / canvas_height
 
-        for sprite in self.waves[-1]["sprites"]:
-            sprite_x, sprite_y = sprite["x"], sprite["y"]
-            if abs(sprite_x - x) < 20 and abs(sprite_y - y) < 20:
+        # Check if a sprite is clicked
+        for sprite in self.waves[-1]["sprites"]:  # Only check sprites in the current wave
+            sprite_x = sprite["x"] * canvas_width
+            sprite_y = sprite["y"] * canvas_height
+            if abs(sprite_x - event.x) < 20 and abs(sprite_y - event.y) < 20:  # Check if click is near a sprite
                 self.selected_sprite = sprite
                 print(f"Selected sprite: {sprite}")
                 self.show_edit_fields()
                 return
 
+        # If no sprite is clicked, place a new sprite
         if self.waves[-1]["sprites"]:
-            self.waves[-1]["sprites"][-1]["x"] = x
-            self.waves[-1]["sprites"][-1]["y"] = y
-            print(f"Placed sprite at: ({x}, {y})")
+            self.waves[-1]["sprites"][-1]["x"] = x_percent
+            self.waves[-1]["sprites"][-1]["y"] = y_percent
+            print(f"Placed sprite at: ({x_percent}, {y_percent})")
             self.update_canvas()
 
     def show_edit_fields(self):
@@ -138,6 +163,7 @@ class LevelEditor:
         self.edit_widgets["bonus_type"].delete(0, tk.END)
         self.edit_widgets["bonus_type"].insert(0, str(sprite["bonus_type"]))
 
+        # Show the edit frame
         self.edit_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
     def apply_changes(self):
@@ -160,7 +186,7 @@ class LevelEditor:
     def add_wave(self):
         """Add a new wave to the level data."""
         self.current_wave += 1
-        self.waves.append({"wave_id": self.current_wave, "sprites": []})
+        self.waves.append({"wave_id": self.current_wave, "sprites": []})  # Add a new wave with an empty sprite list
         print(f"Added wave: {self.current_wave}")
         self.update_canvas()
 
@@ -186,12 +212,12 @@ class LevelEditor:
                     for sprite in wave["sprites"]:
                         sprite_type = sprite["type"]
                         x, y = sprite["x"], sprite["y"]
+                        speed_x, speed_y = sprite["speed_x"], sprite["speed_y"]
                         if sprite_type == "BONUS":
                             file.write(f"{sprite_type}({x}, {y}, {sprite['bonus_type']})\n")
                         elif sprite_type == "BOSS":
                             file.write(f"{sprite_type}({x}, {y}, {sprite['health']})\n")
                         else:
-                            speed_x, speed_y = sprite["speed_x"], sprite["speed_y"]
                             health = sprite["health"]
                             file.write(f"{sprite_type}({x}, {y}, {speed_x}, {speed_y}, {health})\n")
                     file.write("\n")
@@ -253,8 +279,11 @@ class LevelEditor:
         """Update the canvas with the current sprites."""
         self.canvas.delete("all")
         if self.waves:
-            for sprite in self.waves[-1]["sprites"]:
-                x, y = sprite["x"], sprite["y"]
+            canvas_width = self.canvas.winfo_width()
+            canvas_height = self.canvas.winfo_height()
+            for sprite in self.waves[-1]["sprites"]:  # Only display sprites from the current wave
+                x = sprite["x"] * canvas_width
+                y = sprite["y"] * canvas_height
                 sprite_type = sprite["type"]
                 if sprite_type in self.images:
                     self.canvas.create_image(x, y, image=self.images[sprite_type])

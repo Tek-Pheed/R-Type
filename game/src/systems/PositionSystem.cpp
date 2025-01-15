@@ -51,7 +51,7 @@ void PositionSystem::update(
             if (!this->_game->isServer()) {
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
-
+              
                 if (player && positionComponent->getX() < 0.0f) {
                     positionComponent->setX(0.0f);
                 }
