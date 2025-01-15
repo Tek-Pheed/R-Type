@@ -108,6 +108,8 @@ void GameInstance::handleNetworkBonuses(
                                 ->getPlayerID(),
                             (health->getHealth() - 100));
                     }
+                    auto &bonusSound = refAssetManager.getAsset<sf::SoundBuffer>(Asset::BONUS_GET);
+                    _factory.buildSoundEffect(bonusSound, "bonusSound", 100.0f);
                     currentPlayerBonus->setBonus(
                         static_cast<ecs::Bonus>(std::atoi(tokens[2].c_str())));
                     std::cout << "set bonus " << currentPlayerBonus->getBonus()

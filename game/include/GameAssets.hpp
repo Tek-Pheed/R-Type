@@ -52,7 +52,8 @@ namespace RType
         constexpr auto NEWWAVEINCOMING = "newWaveIncoming";
         constexpr auto YOU_WIN_SOUND = "youWinSound";
         constexpr auto YOU_LOSE_SOUND = "youLoseSound";
-        constexpr auto BUTTON_CLICKED_SOUND = "buttonClikedSound";
+        constexpr auto BUTTON_CLICKED_SOUND = "buttonClikedSounud";
+        constexpr auto BONUS_GET = "bonusGet";
 
         static const AssetStore assets[] = {
             {PLAYER_TEXTURE, "assets/sprites/r-typesheet42.gif",
@@ -100,6 +101,9 @@ namespace RType
                 typeid(sf::SoundBuffer),
             },
             {BUTTON_CLICKED_SOUND, "assets/sounds/minecraftButtonClick.ogg",
+                typeid(sf::SoundBuffer),
+            },
+            {BONUS_GET, "assets/sounds/bonus.ogg",
                 typeid(sf::SoundBuffer),
             },
             {EXPLOSION_TEXTURE, "assets/sprites/r-typesheet43.gif",
