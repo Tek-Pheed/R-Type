@@ -27,8 +27,8 @@ using namespace RType;
 ecs::Entity &RType::Factory::buildBoss(
     size_t id, float posX, float posY, float health, int wave)
 {
-    const float Width = 0.3f * (float) _game.WindoScaleX;
-    const float Height = 0.7f * (float) _game.WindoScaleY;
+    const float Width = 0.3f * (float) _game.WinScaleX;
+    const float Height = 0.7f * (float) _game.WinScaleY;
 
     if (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new boss to the game" << std::endl;

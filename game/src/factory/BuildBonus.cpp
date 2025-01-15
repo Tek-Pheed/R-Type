@@ -23,7 +23,7 @@ ecs::Entity &Factory::buildBonus(
     size_t id, float posX, float posY, ecs::Bonus bonus)
 {
     constexpr auto velocity = -0.08f;
-    const float Width = 0.04f * (float) _game.WindoScaleX;
+    const float Width = 0.04f * (float) _game.WinScaleX;
     const float Height = Width;
 
     auto &bonusE = _game.refEntityManager.getCurrentLevel().createEntity();

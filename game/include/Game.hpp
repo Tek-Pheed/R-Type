@@ -59,8 +59,8 @@ namespace RType
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
 
-        size_t WindoScaleX = 1;
-        size_t WindoScaleY = 1;
+        size_t WinScaleX = 1;
+        size_t WinScaleY = 1;
 
         bool getServerMode();
 

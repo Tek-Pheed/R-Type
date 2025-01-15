@@ -18,8 +18,8 @@ namespace RType
     ecs::Entity &Factory::buildPlayer(
         bool isLocalPlayer, size_t id, const std::string &name)
     {
-        const float Width = 0.075f * (float) _game.WindoScaleX;
-        const float Height = 0.06f * (float) _game.WindoScaleY;
+        const float Width = 0.075f * (float) _game.WinScaleX;
+        const float Height = 0.06f * (float) _game.WinScaleY;
 
         if (RType::GameInstance::DEBUG_LOGS)
             std::cout << "Adding new player to the game" << std::endl;
@@ -91,8 +91,8 @@ namespace RType
     ecs::Entity &Factory::buildAIPlayer(
         sf::Vector2f velocity, const std::string &name, std::size_t skinID)
     {
-        const float Width = 0.075f * (float) _game.WindoScaleX;
-        const float Height = 0.06f * (float) _game.WindoScaleY;
+        const float Width = 0.075f * (float) _game.WinScaleX;
+        const float Height = 0.06f * (float) _game.WinScaleY;
 
         auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(

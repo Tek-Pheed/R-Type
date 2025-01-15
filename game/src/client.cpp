@@ -244,11 +244,11 @@ void RType::GameInstance::setupClient(
     std::getline(resStream, resX, 'x');
     std::getline(resStream, resY, ' ');
 
-    WindoScaleX = (size_t) std::atoi(resX.c_str());
-    WindoScaleY = (size_t) std::atoi(resY.c_str());
+    WinScaleX = (size_t) std::atoi(resX.c_str());
+    WinScaleY = (size_t) std::atoi(resY.c_str());
 
     sf::VideoMode videoMode(
-        (unsigned int) WindoScaleX, (unsigned int) WindoScaleY);
+        (unsigned int) WinScaleX, (unsigned int) WinScaleY);
     _window->create(
         videoMode, "R-Type", sf::Style::Titlebar | sf::Style::Close);
     _window->setFramerateLimit(refGameEngine.getTickRate());
@@ -256,8 +256,8 @@ void RType::GameInstance::setupClient(
         throw std::runtime_error(
             THROW_ERROR_LOCATION "Failed to create the SFML window.");
     }
-    WindoScaleX = _window->getSize().x;
-    WindoScaleY = _window->getSize().y;
+    WinScaleX = _window->getSize().x;
+    WinScaleY = _window->getSize().y;
     refGameEngine.addEventBinding<RType::GameInstance>(
         Engine::Events::EVENT_OnTick, &RType::GameInstance::gameTick, *this);
     refGameEngine.addEventBinding<RType::GameInstance>(

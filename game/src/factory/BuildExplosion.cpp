@@ -21,7 +21,7 @@ using namespace RType;
 
 ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
 {
-    const float Width = 0.08f * (float) _game.WindoScaleX;
+    const float Width = 0.08f * (float) _game.WinScaleX;
     const float Height = Width;
 
     auto &explosion = _game.refEntityManager.getCurrentLevel().createEntity();
@@ -50,7 +50,7 @@ ecs::Entity &Factory::buildExplosionEnemy(float posX, float posY)
 
 ecs::Entity &Factory::buildExplosionPlayer(float posX, float posY)
 {
-    const float Width = 0.08f * (float) _game.WindoScaleX;
+    const float Width = 0.08f * (float) _game.WinScaleX;
     const float Height = Width;
 
     auto &explosion = _game.refEntityManager.getCurrentLevel().createEntity();

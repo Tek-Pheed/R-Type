@@ -54,8 +54,8 @@ void renderSprite(ecs::Entity &entity, sf::RenderWindow &window,
     }
     sprite->setElapsedTime(elapsedTime);
     sprite->getSprite().setPosition(
-        position->getX() * (float) game.WindoScaleX,
-        position->getY() * (float) game.WindoScaleY);
+        position->getX() * (float) game.WinScaleX,
+        position->getY() * (float) game.WinScaleY);
     window.draw(sprite->getSprite());
 }
 

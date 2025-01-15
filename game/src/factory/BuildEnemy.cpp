@@ -28,7 +28,7 @@ using namespace RType;
 ecs::Entity &RType::Factory::buildEnemy(size_t id, float posX, float posY,
     float health, int wave, float velocityX, float velocityY)
 {
-    const float Width = 0.05f * (float) _game.WindoScaleX;
+    const float Width = 0.05f * (float) _game.WinScaleX;
     const float Height = Width;
 
     if (RType::GameInstance::DEBUG_LOGS)
@@ -225,8 +225,8 @@ void GameInstance::handleNetworkEnemies(
 ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     float posY, float health, int wave, float velocityX, float velocityY)
 {
-    const float Width = 0.05f * (float) _game.WindoScaleX;
-    const float Height = 0.120f * (float) _game.WindoScaleY;
+    const float Width = 0.05f * (float) _game.WinScaleX;
+    const float Height = 0.120f * (float) _game.WinScaleY;
 
     if (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new enemy (" << id << ") to the game at pos "

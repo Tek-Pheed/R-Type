@@ -19,8 +19,8 @@ using namespace RType;
 void Factory::buildBulletFromPlayer(size_t playerID)
 {
     constexpr auto velocity = 0.35f;
-    const float Width = 0.042f * (float) _game.WindoScaleX;
-    const float Height = 0.022f * (float) _game.WindoScaleY;
+    const float Width = 0.042f * (float) _game.WinScaleX;
+    const float Height = 0.022f * (float) _game.WinScaleY;
 
     auto &player = _game.getPlayerById(playerID);
     auto positionComp = player.getComponent<ecs::PositionComponent>();
@@ -91,8 +91,8 @@ void Factory::buildBulletFromPlayer(size_t playerID)
 void Factory::buildBulletFromEnemy(size_t enemyID)
 {
     constexpr auto velocity = -0.30f;
-    const float Width = 0.027f * (float) _game.WindoScaleX;
-    const float Height = 0.03f * (float) _game.WindoScaleY;
+    const float Width = 0.027f * (float) _game.WinScaleX;
+    const float Height = 0.03f * (float) _game.WinScaleY;
 
     auto &enemy = _game.getEnemyById(enemyID);
     auto positionComp = enemy.getComponent<ecs::PositionComponent>();
@@ -142,7 +142,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
 void Factory::buildBulletFromBoss(size_t bossId)
 {
     const float bulletVelocity = -0.4f;
-    const float Width = 0.1f * (float) _game.WindoScaleY;
+    const float Width = 0.1f * (float) _game.WinScaleY;
     const float Height = Width;
 
     auto &boss = _game.getEnemyById(bossId);
