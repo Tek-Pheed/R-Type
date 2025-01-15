@@ -1,0 +1,71 @@
+# Level config file
+# Available commands:
+# WAVE(waveID): Decalre a new wave
+# BASIC_ENEMY(posX, posY, velocityX, velocityY, Health): Create basic enemy
+# SHOOTER_ENEMY(posX, posY, velocityX, velocityY, Health): Create shooter enemy
+# BOSS(posX, posY, Health): Create a Boss
+# MUSIC(filename)
+# BACKGROUND(filename)
+# BONUS(posX, posY, type[0-3])
+
+MUSIC(streetFighter.ogg)
+BACKGROUND(clouds.jpg)
+
+WAVE(0)
+
+BASIC_ENEMY(1.1,0.2,-0.1,0.0,500)
+BASIC_ENEMY(1.3,0.15, -0.025, 0.0, 500)
+BASIC_ENEMY(1.8,0.3, -0.1, 0.01, 500)
+BASIC_ENEMY(2.3,0.5, -0.1, -0.02, 500)
+BASIC_ENEMY(1.6,0.4, -0.25, 0.012, 500)
+BASIC_ENEMY(2.1,0.8, -0.1, 0.0, 500)
+BASIC_ENEMY(2.25,0.15, -0.1, 0.015, 500)
+SHOOTER_ENEMY(1.2,0.25, -0.1, 0.03, 100)
+
+
+BONUS(1.5, 0.5, 0)
+BONUS(2.5, 0.6, 1)
+
+WAVE(1)
+
+SHOOTER_ENEMY(1.2,0.25, -0.1, 0.03, 100)
+SHOOTER_ENEMY(1.6,0.8, -0.1, 0.005, 100)
+SHOOTER_ENEMY(1.4,0.7, -0.1, 0.023, 100)
+SHOOTER_ENEMY(1.8,0.3, -0.1, -0.12, 100)
+SHOOTER_ENEMY(1.1,0.25, -0.1, 0.08, 100)
+
+BONUS(1.8, 0.3, 0)
+BONUS(3.0, 0.7, 1)
+
+WAVE(2)
+
+BASIC_ENEMY(1.3, 0.2, -0.1, 0.05, 500)
+BASIC_ENEMY(1.5,0.26, -0.1, 0.3, 500)
+BASIC_ENEMY(1.9,0.32, -0.1, 0.25, 500)
+BASIC_ENEMY(2.2,0.42, -0.1, -0.13, 500)
+BASIC_ENEMY(3.0,0.5, -0.1, 0.05, 500)
+BASIC_ENEMY(2.4,0.2, -0.1, 0.02, 500)
+BASIC_ENEMY(1.7,0.4, -0.1, 0.0, 500)
+BASIC_ENEMY(1.26,0.6, -0.1, 0.0, 500)
+BASIC_ENEMY(1.78,0.8, -0.1, 0.01, 500)
+BASIC_ENEMY(1.32,0.64, -0.1, 0.06, 500)
+
+BOSS(0.85, 0.5, 5000)
+
+#BASIC_ENEMY(2300.0,264, -0.1, 0.0, 500)
+#BASIC_ENEMY(1500.7,100.5, -0.1, 0.0, 500)
+#BASIC_ENEMY(1400.1,100.7, -0.1, 0.0, 500)
+#BASIC_ENEMY(1901.4,200.4, -0.1, 0.0, 500)
+#BASIC_ENEMY(1532.4,400.4, -0.1, 0.0, 500)
+#BASIC_ENEMY(3005.4,500.2, -0.1, 0.0, 500)
+
+#BONUS(1400, 400, 0)
+#BONUS(4058, 600, 1)
+
+#WAVE(3)
+#BASIC_ENEMY(1500.7, 100.5, -0.1, 2.0, 500)
+
+#SHOOTER_ENEMY(1267.0,459, -0.1, 0.0, 100)
+#SHOOTER_ENEMY(1633.0,256, -0.1, 0.0, 100)
+#SHOOTER_ENEMY(1123.0,562, -0.1, 0.0, 100)
+#BOSS(1100, 100, 5000)
