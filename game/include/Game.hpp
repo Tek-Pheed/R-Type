@@ -211,6 +211,8 @@ namespace RType
         // Game Value
         size_t getDifficulty() const;
 
+        Factory _factory;
+
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
         size_t _difficulty = DEFAULT_DIFFICULTY;
@@ -226,8 +228,6 @@ namespace RType
         uint16_t _udpPort = DEFAULT_UDP_PORT;
         uint16_t _tcpPort = DEFAULT_TCP_PORT;
         std::string _ip = DEFAULT_IP;
-
-        Factory _factory;
 
         std::string _musicName;
         std::string _bgName;

@@ -14,6 +14,7 @@
 #include "Entity.hpp"
 #include "Events.hpp"
 #include "GameProtocol.hpp"
+#include "GameAssets.hpp"
 #include "components/ClickableComponent.hpp"
 
 using namespace RType;
@@ -226,9 +227,7 @@ void EventManager::mouseClicked()
         if (!rectangle)
             continue;
 
-        //TO DO : Add sound effect
-        //auto &buttonClikedSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(Asset::BUTTON_CLICKED_SOUND);
-        //_factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
+        auto &buttonClikedSound = _game.refAssetManager.getAsset<sf::SoundBuffer>(Asset::BUTTON_CLICKED_SOUND);
 
         sf::FloatRect currentHover =
             rectangle->getRectangle().getGlobalBounds();
@@ -245,69 +244,87 @@ void EventManager::mouseClicked()
                     _game._buttonList.clear();
                     _game._inputList.clear();
                     _game.levelContinueMenu();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     return;
                 case ecs::ClickableType::LOBBY:
                     _game._buttonList.clear();
                     _game.connectToGame();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::EXIT:
                     _game.getWindow().close();
                     _game.refGameEngine.stop();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::SETTINGS:
                     _game._buttonList.clear();
                     _game._inputList.clear();
                     _game.levelSettingsMenu();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     return;
                 case ecs::ClickableType::AUTO_FIRE:
                     _game.handleAutoFireButton(
                         currentAutoFireValue ? "false" : "true", entity);
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::BACK:
                     _game._buttonList.clear();
                     _game._inputList.clear();
                     _game.levelMainMenu();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     return;
                 case ecs::ClickableType::MOVE_UP:
                     _game._isSettingsUpButtonClicked = true;
                     _game._lastButtonIdClicked = entity.getID();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::MOVE_DOWN:
                     _game._isSettingsDownButtonClicked = true;
                     _game._lastButtonIdClicked = entity.getID();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::MOVE_LEFT:
                     _game._isSettingsLeftButtonClicked = true;
                     _game._lastButtonIdClicked = entity.getID();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::MOVE_RIGHT:
                     _game._isSettingsRightButtonClicked = true;
                     _game._lastButtonIdClicked = entity.getID();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::INPUT:
                     _game._isSettingsNicknameButtonClicked = true;
                     _game._lastInputIdClicked = entity.getID();
                     _game._nicknameKeys.clear();
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::NUMBER_OF_PLAYER:
                     handleNumberOfPlayerButton(entity, true);
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::DIFFICULTY:
                     handleDifficultyButton(entity, true);
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::BONUS:
                     handleBonusButton(entity, true);
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::LAUNCH:
                     handleStartButton(true);
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::LEVEL:
                     handleLevelButton(entity, true);
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
                 case ecs::ClickableType::GAMEMODE:
                     handleGamemodeButton(entity, true);
+                    _game._factory.buildSoundEffect(buttonClikedSound, "buttonClikedSound", 100.0f);
                     break;
-                default: break;
+                default:
+                    break;
             }
         }
     }
