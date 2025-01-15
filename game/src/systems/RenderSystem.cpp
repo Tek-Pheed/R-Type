@@ -79,7 +79,7 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
         text->getText().setPosition(
             spriteX - text->getText().getLocalBounds().width / 2,
             spriteY + (float) sprite->getSprite().getTextureRect().height / 2
-                + 0.005f * (float) window.getSize().y);
+                + 0.01f * (float) window.getSize().y);
     } else {
         text->getText().setPosition(
             spriteX - text->getText().getLocalBounds().width / 2,
