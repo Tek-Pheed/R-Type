@@ -153,9 +153,18 @@ void GameInstance::loadPvPLevel()
             auto playerComp = player.getComponent<ecs::PlayerComponent>();
             auto playerHealth = player.getComponent<ecs::HealthComponent>();
             if (playerComp && playerComp->getTeam() == 1) {
+                const float Width = 0.075f * (float) WinScaleX;
+                const float Height = 0.06f * (float) WinScaleY;
                 auto spriteComp =
                     player.getComponent<ecs::SpriteComponent<sf::Sprite>>();
-                spriteComp->getSprite().setScale(-3, 3);
+
+                spriteComp->getSprite().setScale(
+                    (Width / spriteComp->getSprite().getLocalBounds().width)
+                        * -1,
+                    Height / spriteComp->getSprite().getLocalBounds().height);
+                spriteComp->getSprite().setOrigin(
+                    spriteComp->getSprite().getLocalBounds().width / 2.0f,
+                    spriteComp->getSprite().getLocalBounds().height / 2.0f);
             }
             if (playerHealth)
                 playerHealth->setHealth(300);
@@ -271,7 +280,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-        i++) {
+         i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -337,8 +346,9 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 1.0f) {
-                for (auto entID : refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID :
+                    refEntityManager.getCurrentLevel()
+                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -380,8 +390,9 @@ void GameInstance::gamePostTick(
                 }
             }
         }
-        for (auto &entity : refEntityManager.getCurrentLevel()
-                 .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
+        for (auto &entity :
+            refEntityManager.getCurrentLevel()
+                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
             auto mus =
                 entity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
             if (mus->getMusicType().getStatus() != sf::Music::Playing)

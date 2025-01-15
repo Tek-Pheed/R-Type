@@ -27,7 +27,10 @@ namespace RType
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
         player.addComponent(
             std::make_shared<ecs::PositionComponent>(0.1f, 0.1f));
-        player.addComponent(std::make_shared<ecs::HealthComponent>(100));
+        if (_game.getGameMode() == 1)
+            player.addComponent(std::make_shared<ecs::HealthComponent>(300));
+        else
+            player.addComponent(std::make_shared<ecs::HealthComponent>(100));
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
         player.addComponent(
             std::make_shared<ecs::HitboxComponent>(0.075f, 0.06f));
