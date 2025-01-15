@@ -52,25 +52,14 @@ void PositionSystem::update(
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 
-                float minX = (float) 0;
-                float minY = (float) 0;
-
-                if (sprite) {
-                    minX = (float) sprite->getSprite().getTextureRect().width
-                        * (float) sprite->getSprite().getScale().x / 2;
-
-                    minY = (float) sprite->getSprite().getTextureRect().height
-                        * (float) sprite->getSprite().getScale().y / 2;
-                }
-
-                if (player && positionComponent->getX() < minX) {
-                    positionComponent->setX(minX);
+                if (player && positionComponent->getX() < 0.0f) {
+                    positionComponent->setX(0.0f);
                 }
                 if (player && positionComponent->getX() > 1.0f) {
                     positionComponent->setX(1.0f);
                 }
-                if (player && positionComponent->getY() < minY) {
-                    positionComponent->setY(minY);
+                if (player && positionComponent->getY() < 0.0f) {
+                    positionComponent->setY(0.0f);
                 }
                 if (player && positionComponent->getY() > 1.0f) {
                     positionComponent->setY(1.0f);
@@ -107,8 +96,6 @@ void PositionSystem::update(
                     positionComponent->setY(1.0f - GameInstance::KILLZONE);
                 }
                 if (enemy && positionComponent
-                    && positionComponent->getY()
-                        > GameInstance::DEFAULT_RESOLUTION_Y
                     && positionComponent->getY()
                         > GameInstance::DEFAULT_RESOLUTION_Y
                             - GameInstance::KILLZONE) {
