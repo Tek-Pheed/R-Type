@@ -27,7 +27,7 @@ void Factory::buildBulletFromPlayer(size_t playerID)
     if (!positionComp)
         return;
     auto &bullet = _game.refEntityManager.getCurrentLevel().createEntity();
-    float x = positionComp->getX() + 0.1f;
+    float x = positionComp->getX() + 0.05f;
     float y = positionComp->getY();
 
     if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
