@@ -53,8 +53,7 @@ void renderSprite(ecs::Entity &entity, sf::RenderWindow &window,
         }
     }
     sprite->setElapsedTime(elapsedTime);
-    sprite->getSprite().setPosition(
-        position->getX() * (float) game.WinScaleX,
+    sprite->getSprite().setPosition(position->getX() * (float) game.WinScaleX,
         position->getY() * (float) game.WinScaleY);
     window.draw(sprite->getSprite());
 }
@@ -71,32 +70,19 @@ void renderSpriteAndText(ecs::Entity &entity, sf::RenderWindow &window)
             "component: position or sprite or text !");
         return;
     }
-    sprite->getSprite().setPosition(
-        position->getX() * (float) window.getSize().x,
-        position->getY() * (float) window.getSize().y);
+    float spriteX = position->getX() * (float) window.getSize().x;
+    float spriteY = position->getY() * (float) window.getSize().y;
+    sprite->getSprite().setPosition(spriteX, spriteY);
     text->getText().setString(text->getStr());
-    if (position->getY() < 0.035f) {
+    if (position->getY() < 0.05f) {
         text->getText().setPosition(
-            position->getX() * (float) window.getSize().x
-                + (float) sprite->getSprite().getTextureRect().width
-                    * sprite->getSprite().getScale().x / 2
-                - (float) text->getText().getLocalBounds().width / 2,
-            position->getY() * (float) window.getSize().y
-                + static_cast<float>(
-                    ((float) sprite->getSprite().getTextureRect().height
-                        + 0.025f)
-                    / 2));
+            spriteX - text->getText().getLocalBounds().width / 2,
+            spriteY + (float) sprite->getSprite().getTextureRect().height / 2);
     } else {
         text->getText().setPosition(
-            (position->getX() * (float) window.getSize().x)
-                + (float) sprite->getSprite().getTextureRect().width
-                    * sprite->getSprite().getScale().x / 2
-                - (float) text->getText().getLocalBounds().width / 2,
-            (position->getY() * (float) window.getSize().y)
-                - -static_cast<float>(
-                      sprite->getSprite().getTextureRect().height)
-                    * 3 / 2
-                - 0.025f);
+            spriteX - text->getText().getLocalBounds().width / 2,
+            spriteY - (float) sprite->getSprite().getTextureRect().height / 2
+                - 45);
     }
     window.draw(sprite->getSprite());
     window.draw(text->getText());

@@ -51,36 +51,60 @@ void PositionSystem::update(
             if (!this->_game->isServer()) {
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
-              
-                if (player && positionComponent->getX() < 0.0f) {
-                    positionComponent->setX(0.0f);
+
+                float maxX = 1;
+                float maxY = 1;
+                float minX = 0;
+                float minY = 0;
+
+                if (player || ai) {
+                    maxX = 1.0f
+                        - (((float) sprite->getSprite().getTextureRect().width
+                               * (float) sprite->getSprite().getScale().x)
+                            / (float) _game->getWindow().getSize().x / 2);
+                    maxY = 1.0f
+                        - (((float) sprite->getSprite().getTextureRect().height
+                               * (float) sprite->getSprite().getScale().y)
+                            / (float) _game->getWindow().getSize().y / 2);
+                    minX = 0.0f
+                        + (((float) sprite->getSprite().getTextureRect().width
+                               * (float) sprite->getSprite().getScale().x)
+                            / (float) _game->getWindow().getSize().x / 2);
+                    minY = 0.0f
+                        + (((float) sprite->getSprite().getTextureRect().height
+                               * (float) sprite->getSprite().getScale().y)
+                            / (float) _game->getWindow().getSize().y / 2);
                 }
-                if (player && positionComponent->getX() > 1.0f) {
-                    positionComponent->setX(1.0f);
+
+                if (player && positionComponent->getX() < minX) {
+                    positionComponent->setX(minX);
                 }
-                if (player && positionComponent->getY() < 0.0f) {
-                    positionComponent->setY(0.0f);
+                if (player && positionComponent->getX() > maxX) {
+                    positionComponent->setX(maxX);
                 }
-                if (player && positionComponent->getY() > 1.0f) {
-                    positionComponent->setY(1.0f);
+                if (player && positionComponent->getY() < minY) {
+                    positionComponent->setY(minY);
+                }
+                if (player && positionComponent->getY() > maxY) {
+                    positionComponent->setY(maxY);
                 }
                 if (ai) {
-                    if (positionComponent->getX() > 1.0f) {
+                    if (positionComponent->getX() > maxX) {
                         velocityComponent->setVx(
                             velocityComponent->getVx() * -1.0f);
                     }
 
-                    if (positionComponent->getY() > 1.0f) {
+                    if (positionComponent->getY() > maxY) {
                         velocityComponent->setVy(
                             velocityComponent->getVy() * -1.0f);
                     }
 
-                    if (positionComponent->getX() < 0) {
+                    if (positionComponent->getX() < minX) {
                         velocityComponent->setVx(
                             velocityComponent->getVx() * -1.0f);
                     }
 
-                    if (positionComponent->getY() < 0) {
+                    if (positionComponent->getY() < minY) {
                         velocityComponent->setVy(
                             velocityComponent->getVy() * -1.0f);
                     }
