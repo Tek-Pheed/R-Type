@@ -152,8 +152,8 @@ void RType::GameInstance::connectToGame()
         level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
         refEntityManager.switchLevel("mainLevel", false);
 
-        int nbTxtFiles = countTxtFiles("./assets/levels");
-        this->nbTxtFiles = nbTxtFiles;
+        int TempnbTxtFiles = countTxtFiles("assets/levels");
+        this->nbTxtFiles = TempnbTxtFiles;
         std::stringstream ss;
 
         ss << L_SENDLEVELS << " " << nbTxtFiles << PACKET_END;
