@@ -176,22 +176,22 @@ namespace RType
 
         Config _gameConfig;
 
-        bool _isSettingsUpButtonClicked = false;
-        bool _isSettingsRightButtonClicked = false;
-        bool _isSettingsLeftButtonClicked = false;
-        bool _isSettingsDownButtonClicked = false;
+        bool isSettingsUpButtonClicked = false;
+        bool isSettingsRightButtonClicked = false;
+        bool isSettingsLeftButtonClicked = false;
+        bool isSettingsDownButtonClicked = false;
 
-        bool _isSettingsNicknameButtonClicked = false;
-        std::vector<sf::Keyboard::Key> _nicknameKeys;
+        bool isSettingsNicknameButtonClicked = false;
+        std::vector<sf::Keyboard::Key> nicknameKeys;
 
         // MENU
-        std::vector<ecs::Entity> _buttonList;
-        size_t _lastButtonIdClicked;
+        std::vector<ecs::Entity> buttonList;
+        size_t lastButtonIdClicked;
 
-        std::vector<ecs::Entity> _inputList;
-        size_t _lastInputIdClicked;
+        std::vector<ecs::Entity> inputList;
+        size_t lastInputIdClicked;
 
-        sf::Sound _currentMusic;
+        sf::Sound currentMusic;
 
         // Ticks
         uint64_t getTicks() const;
@@ -201,11 +201,11 @@ namespace RType
         size_t getDifficulty() const;
         size_t getGameMode() const;
         void setGameMode(size_t mode);
+        size_t getMaxPlayers() const;
 
 
-        Factory _factory;
-        Levels _levels;
-        size_t getMaxPlayers();
+        Factory factory;
+        Levels levels;
 
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;

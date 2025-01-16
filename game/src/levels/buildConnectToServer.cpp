@@ -44,11 +44,11 @@ void Levels::buildConnectToServerMenu()
         title.addComponent(std::make_shared<ecs::TextComponent<sf::Text>>(
             text, "CONNECTION TO SERVER"));
 
-        _game._factory.buildInput("NICKNAME", 2);
-        _game._factory.buildInput("IP ADDRESS", 1);
-        _game._factory.buildInput("8081", 0);
-        _game._factory.buildInput("8082", -1);
-        _game._factory.buildButton(
+        _game.factory.buildInput("NICKNAME", 2);
+        _game.factory.buildInput("IP ADDRESS", 1);
+        _game.factory.buildInput("8081", 0);
+        _game.factory.buildInput("8082", -1);
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -56,7 +56,7 @@ void Levels::buildConnectToServerMenu()
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
             "PLAY GAME", 40, sf::Color::Black, ecs::ClickableType::LOBBY);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2

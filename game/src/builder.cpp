@@ -58,7 +58,7 @@ void RType::GameInstance::createPersistentLevel()
     auto &level = refEntityManager.getPersistentLevel();
 
     if (!isServer())
-        _factory.buildBackground();
+        factory.buildBackground();
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::BackgroundSystem>().initSystem(*this);
@@ -66,7 +66,7 @@ void RType::GameInstance::createPersistentLevel()
     level.createSubsystem<GameSystems::HitboxSystem>().initSystem(*this);
     auto &musicSong =
         this->refAssetManager.getAsset<sf::SoundBuffer>(Asset::MENU_SONG);
-    _factory.buildMusic(musicSong, "menuSong");
+    factory.buildMusic(musicSong, "menuSong");
 }
 
 void RType::GameInstance::handleAutoFireButton(
@@ -123,7 +123,7 @@ void RType::GameInstance::handleInputButtons(
     for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
         auto text = entity.get().getComponent<ecs::TextComponent<sf::Text>>();
 
-        if (text && entity.get().getID() == _lastInputIdClicked) {
+        if (text && entity.get().getID() == lastInputIdClicked) {
             if (nickname.empty()) {
                 text->setStr("");
             } else {
@@ -151,7 +151,7 @@ void RType::GameInstance::handleConfigButtons(
                 _gameConfig.updateConfigValue("MOVE_UP=", newValue);
                 for (auto &entity :
                     refEntityManager.getCurrentLevel().getEntities()) {
-                    if (entity.get().getID() == _lastButtonIdClicked) {
+                    if (entity.get().getID() == lastButtonIdClicked) {
                         auto text =
                             entity.get()
                                 .getComponent<ecs::TextComponent<sf::Text>>();
@@ -171,7 +171,7 @@ void RType::GameInstance::handleConfigButtons(
                 _gameConfig.updateConfigValue("MOVE_RIGHT=", newValue);
                 for (auto &entity :
                     refEntityManager.getCurrentLevel().getEntities()) {
-                    if (entity.get().getID() == _lastButtonIdClicked) {
+                    if (entity.get().getID() == lastButtonIdClicked) {
                         auto text =
                             entity.get()
                                 .getComponent<ecs::TextComponent<sf::Text>>();
@@ -190,7 +190,7 @@ void RType::GameInstance::handleConfigButtons(
                 _gameConfig.updateConfigValue("MOVE_LEFT=", newValue);
                 for (auto &entity :
                     refEntityManager.getCurrentLevel().getEntities()) {
-                    if (entity.get().getID() == _lastButtonIdClicked) {
+                    if (entity.get().getID() == lastButtonIdClicked) {
                         auto text =
                             entity.get()
                                 .getComponent<ecs::TextComponent<sf::Text>>();
@@ -209,7 +209,7 @@ void RType::GameInstance::handleConfigButtons(
                 _gameConfig.updateConfigValue("MOVE_DOWN=", newValue);
                 for (auto &entity :
                     refEntityManager.getCurrentLevel().getEntities()) {
-                    if (entity.get().getID() == _lastButtonIdClicked) {
+                    if (entity.get().getID() == lastButtonIdClicked) {
                         auto text =
                             entity.get()
                                 .getComponent<ecs::TextComponent<sf::Text>>();

@@ -240,10 +240,10 @@ void GameInstance::handleNetworkPlayers(
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::shared_ptr<ecs::PositionComponent> pos;
                 if (isServer()) {
-                    auto &pl = _factory.buildPlayer(true, id, tokens[3]);
+                    auto &pl = factory.buildPlayer(true, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 } else {
-                    auto &pl = _factory.buildPlayer(false, id, tokens[3]);
+                    auto &pl = factory.buildPlayer(false, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 }
                 updatePlayerPosition(id, (float) std::atof(tokens[1].c_str()),
@@ -294,11 +294,11 @@ void GameInstance::handleNetworkPlayers(
                     == (size_t) atoi(tokens[0].c_str())) {
                 auto &youLoseSound = refAssetManager.getAsset<sf::SoundBuffer>(
                     Asset::YOU_LOSE_SOUND);
-                _factory.buildSoundEffect(
+                factory.buildSoundEffect(
                     youLoseSound, "youLoseSound", 100.0f);
                 std::string title = "YOU ARE DEAD";
                 auto textWidth = title.size() * 20;
-                _factory.buildText(0,
+                factory.buildText(0,
                     (float) getWindow().getSize().x / 2 - (float) textWidth,
                     (float) getWindow().getSize().y / 2 - 50, title,
                     sf::Color::Red, 100);
@@ -315,7 +315,7 @@ void GameInstance::handleNetworkPlayers(
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::unique_lock lock(_gameLock);
-                _factory.buildBulletFromPlayer(id);
+                factory.buildBulletFromPlayer(id);
                 break;
             }
             break;
@@ -455,7 +455,7 @@ void GameInstance::deletePlayer(size_t playerID)
         auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
         if (!isServer()) {
-            _factory.buildExplosionPlayer(
+            factory.buildExplosionPlayer(
                 pl.getComponent<ecs::PositionComponent>()->getX(),
                 pl.getComponent<ecs::PositionComponent>()->getY());
             if (pl.getID() == (size_t) _playerEntityID) {

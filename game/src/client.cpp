@@ -66,7 +66,7 @@ void RType::GameInstance::clientHandlerConnection(
                     if (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Build player with id:" << _netClientID
                                   << std::endl;
-                    _factory.buildPlayer(
+                    factory.buildPlayer(
                         true, (size_t) _netClientID, _playerName);
                 } else {
                     if (RType::GameInstance::DEBUG_LOGS)
@@ -100,7 +100,7 @@ void RType::GameInstance::connectToGame()
     try {
         size_t count = 0;
 
-        for (auto &entity : _inputList) {
+        for (auto &entity : inputList) {
             count++;
             auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
@@ -161,7 +161,7 @@ void RType::GameInstance::connectToGame()
         refNetworkManager.sendToAll(
             System::Network::ISocket::Type::TCP, ss.str());
 
-        _levels.buildLobby();
+        levels.buildLobby();
 
         _playerEntityID = -1;
         _isConnectedToServer = true;
@@ -196,10 +196,10 @@ void RType::GameInstance::launchGame()
                     .getComponent<ecs::HealthComponent>()
                     ->getHealth());
         setHealthId(static_cast<int>(getNewId()));
-        _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text,
+        factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text,
             sf::Color::White, 48);
     } catch (const std::exception &e) {
-        _levels.buildMainMenu();
+        levels.buildMainMenu();
     }
 }
 
@@ -222,7 +222,7 @@ void RType::GameInstance::clientHandleDisconnected(
                  "connection was unstable."
               << std::endl;
     refEntityManager.deleteAllLevel();
-    _levels.buildMainMenu();
+    levels.buildMainMenu();
 }
 
 void RType::GameInstance::setupClient(
@@ -270,7 +270,7 @@ void RType::GameInstance::setupClient(
         &RType::GameInstance::clientHandleDisconnected, *this);
     loadAssets();
     createPersistentLevel();
-    _levels.buildMainMenu();
+    levels.buildMainMenu();
 }
 
 sf::RenderWindow &GameInstance::getWindow()
@@ -306,7 +306,7 @@ void GameInstance::playEvent()
                                     ? 0.10f
                                     : 0.25f)) {
                         if (_netClientID >= 0) {
-                            _factory.buildBulletFromPlayer(
+                            factory.buildBulletFromPlayer(
                                 (size_t) _netClientID);
                             this->_fireClock.restart();
                         }
@@ -341,7 +341,7 @@ void GameInstance::playEvent()
                 >= (bonus->getBonus() == ecs::Bonus::RAPIDFIRE ? 0.10f
                                                                : 0.25f)) {
             if (_netClientID >= 0) {
-                _factory.buildBulletFromPlayer((size_t) _netClientID);
+                factory.buildBulletFromPlayer((size_t) _netClientID);
                 this->_fireClock.restart();
             }
         }

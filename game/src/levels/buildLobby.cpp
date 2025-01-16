@@ -17,7 +17,7 @@ void Levels::buildLobby()
         std::string title = "GAME CONFIG";
 
         auto &text =
-            _game._factory.buildText(0, 0, 0, title, sf::Color::White, 48);
+            _game.factory.buildText(0, 0, 0, title, sf::Color::White, 48);
         auto titleText = text.getComponent<ecs::TextComponent<sf::Text>>();
         auto titlePos = text.getComponent<ecs::PositionComponent>();
 
@@ -27,7 +27,7 @@ void Levels::buildLobby()
         titlePos->setY((float) (this->_game.getWindow().getSize().y / 2.0
             - 50.0 / 2 - 75 * 1));
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) this->_game.getWindow().getSize().x - 350 - 50,
                 (float) this->_game.getWindow().getSize().y / 2
@@ -38,7 +38,7 @@ void Levels::buildLobby()
 
         std::stringstream ss;
         ss << _game.getMaxPlayers();
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) this->_game.getWindow().getSize().x - 350 - 50,
                 (float) this->_game.getWindow().getSize().y / 2
@@ -47,7 +47,7 @@ void Levels::buildLobby()
             "NUMBER OF PLAYER : " + ss.str(), 40, sf::Color::Black,
             ecs::ClickableType::NUMBER_OF_PLAYER);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) this->_game.getWindow().getSize().x - 350 - 50,
                 (float) this->_game.getWindow().getSize().y / 2
@@ -56,7 +56,7 @@ void Levels::buildLobby()
             "DIFFICULTY : EASY", 40, sf::Color::Black,
             ecs::ClickableType::DIFFICULTY);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) this->_game.getWindow().getSize().x - 350 - 50,
                 (float) this->_game.getWindow().getSize().y / 2
@@ -64,7 +64,7 @@ void Levels::buildLobby()
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
             "LEVEL : 1", 40, sf::Color::Black, ecs::ClickableType::LEVEL);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) this->_game.getWindow().getSize().x - 350 - 50,
                 (float) this->_game.getWindow().getSize().y / 2
@@ -72,7 +72,7 @@ void Levels::buildLobby()
             sf::Vector2f(350, 50), sf::Color::White, sf::Color::Black,
             "BONUS : YES", 40, sf::Color::Black, ecs::ClickableType::BONUS);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) this->_game.getWindow().getSize().x - 350 - 50,
                 (float) this->_game.getWindow().getSize().y / 2

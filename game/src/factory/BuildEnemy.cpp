@@ -120,7 +120,7 @@ void GameInstance::deleteEnemy(size_t enemyID)
         std::cout << "Deleting enemy: " << enemyID << std::endl;
     auto &ene = getEnemyById(enemyID);
     if (!isServer())
-        _factory.buildExplosionEnemy(
+        factory.buildExplosionEnemy(
             ene.getComponent<ecs::PositionComponent>()->getX(),
             ene.getComponent<ecs::PositionComponent>()->getY());
     refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
@@ -146,7 +146,7 @@ void GameInstance::handleNetworkEnemies(
                         std::cout << "Spawning enemy " << id << " with type "
                                   << type << std::endl;
                     if (type == 0 && tokens.size() >= 8)
-                        _factory.buildEnemy(id,
+                        factory.buildEnemy(id,
                             (float) std::atof(tokens[2].c_str()),
                             (float) std::atof(tokens[3].c_str()),
                             (float) std::atof(tokens[4].c_str()),
@@ -154,7 +154,7 @@ void GameInstance::handleNetworkEnemies(
                             (float) std::atof(tokens[6].c_str()),
                             (float) std::atof(tokens[7].c_str()));
                     if (type == 1 && tokens.size() >= 8)
-                        _factory.buildEnemyShooter(id,
+                        factory.buildEnemyShooter(id,
                             (float) std::atof(tokens[2].c_str()),
                             (float) std::atof(tokens[3].c_str()),
                             (float) std::atof(tokens[4].c_str()),
@@ -162,7 +162,7 @@ void GameInstance::handleNetworkEnemies(
                             (float) std::atof(tokens[6].c_str()),
                             (float) std::atof(tokens[7].c_str()));
                     if (type == 2)
-                        _factory.buildBoss(id,
+                        factory.buildBoss(id,
                             (float) std::atof(tokens[2].c_str()),
                             (float) std::atof(tokens[3].c_str()),
                             (float) std::atof(tokens[4].c_str()),
@@ -212,11 +212,11 @@ void GameInstance::handleNetworkEnemies(
                     size_t type =
                         mob.getComponent<ecs::EnemyComponent>()->getType();
                     if (type == 1)
-                        _factory.buildBulletFromEnemy(id);
+                        factory.buildBulletFromEnemy(id);
                     else if (type == 2) {
                         float velx = (float) std::atof(tokens[2].c_str());
                         float vely = (float) std::atof(tokens[3].c_str());
-                        _factory.buildBulletFromBoss(id, velx, vely);
+                        factory.buildBulletFromBoss(id, velx, vely);
                     }
                 }
             }

@@ -42,7 +42,7 @@ ecs::Entity &Factory::buildInput(const std::string &str, int buttonID)
     input.addComponent(
         std::make_shared<ecs::ClickableComponent>(ecs::ClickableType::INPUT));
 
-    _game._inputList.push_back(input);
+    _game.inputList.push_back(input);
 
     return input;
 }

@@ -131,7 +131,7 @@ void Levels::buildSettingsMenu()
                 beforeResolutionEqual + " : " + afterResolutionEqual;
         }
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -139,7 +139,7 @@ void Levels::buildSettingsMenu()
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
             endUpMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_UP);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -147,7 +147,7 @@ void Levels::buildSettingsMenu()
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
             endDownMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_DOWN);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -156,7 +156,7 @@ void Levels::buildSettingsMenu()
             endRightMove, 40, sf::Color::Black,
             ecs::ClickableType::MOVE_RIGHT);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -164,7 +164,7 @@ void Levels::buildSettingsMenu()
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
             endLeftMove, 40, sf::Color::Black, ecs::ClickableType::MOVE_LEFT);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -172,7 +172,7 @@ void Levels::buildSettingsMenu()
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
             endAutoFire, 40, sf::Color::Black, ecs::ClickableType::AUTO_FIRE);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -181,7 +181,7 @@ void Levels::buildSettingsMenu()
             endResolution, 40, sf::Color::Black,
             ecs::ClickableType::RESOLUTION);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2

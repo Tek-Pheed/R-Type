@@ -61,23 +61,23 @@ void Levels::buildMainMenu()
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "F TypeV8"));
 
-        _game._factory.buildAIPlayer(
+        _game.factory.buildAIPlayer(
             sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Arnaud", static_cast<size_t>(rand() % 4));
-        _game._factory.buildAIPlayer(
+        _game.factory.buildAIPlayer(
             sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Lucas", static_cast<size_t>(rand() % 4));
-        _game._factory.buildAIPlayer(
+        _game.factory.buildAIPlayer(
             sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Raphael", static_cast<size_t>(rand() % 4));
-        _game._factory.buildAIPlayer(
+        _game.factory.buildAIPlayer(
             sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)), "Samy",
             static_cast<size_t>(rand() % 4));
-        _game._factory.buildAIPlayer(
+        _game.factory.buildAIPlayer(
             sf::Vector2f(randrange(0.4f, 0.1f), randrange(0.4f, 0.1f)),
             "Alexandre", static_cast<size_t>(rand() % 4));
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -85,7 +85,7 @@ void Levels::buildMainMenu()
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black, "PLAY",
             40, sf::Color::Black, ecs::ClickableType::MULTIPLAYER);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2
@@ -93,7 +93,7 @@ void Levels::buildMainMenu()
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black,
             "SETTINGS", 40, sf::Color::Black, ecs::ClickableType::SETTINGS);
 
-        _game._factory.buildButton(
+        _game.factory.buildButton(
             sf::Vector2f(
                 (float) _game.getWindow().getSize().x / 2 - (float) 700 / 2,
                 (float) _game.getWindow().getSize().y / 2 - (float) 50 / 2

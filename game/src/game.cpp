@@ -109,7 +109,7 @@ void GameInstance::handleNetworkMechs(
                     auto &newWaveInComingSound =
                         this->refAssetManager.getAsset<sf::SoundBuffer>(
                             Asset::NEWWAVEINCOMING);
-                    _factory.buildSoundEffect(
+                    factory.buildSoundEffect(
                         newWaveInComingSound, "newWaveInComingSound", 100.0f);
                 }
                 if (RType::GameInstance::DEBUG_LOGS)
@@ -197,7 +197,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create basic "
                     "enemy from level config");
-            _factory.buildEnemy(getNewId(),
+            factory.buildEnemy(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[4].c_str()), wave,
@@ -210,7 +210,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                     THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
                                          "shooter "
                                          "enemy from level config");
-            _factory.buildEnemyShooter(getNewId(),
+            factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[4].c_str()), wave,
@@ -222,7 +222,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create boss "
                     "from level config");
-            _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
+            factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()), wave);
         }
@@ -265,7 +265,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create bonus "
                     "from level config");
-            _factory.buildBonus(getNewId(),
+            factory.buildBonus(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 static_cast<ecs::Bonus>(std::atoi(value[2].c_str())));
@@ -350,10 +350,10 @@ void GameInstance::gameTick(
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
                     if (enemy && (enemy->getType() == 1)) {
-                        _factory.buildBulletFromEnemy(enemy->getEnemyID());
+                        factory.buildBulletFromEnemy(enemy->getEnemyID());
                     }
                     if (enemy && enemy->getType() == 2) {
-                        _factory.buildBulletFromBoss(enemy->getEnemyID());
+                        factory.buildBulletFromBoss(enemy->getEnemyID());
                     }
                 }
                 time = 0.0f;
@@ -525,8 +525,8 @@ GameInstance::GameInstance(Engine::Core &engineRef)
       refAssetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
       refNetworkManager(
           engineRef.getFeature<Engine::Feature::NetworkingManager>()),
-      _gameConfig(Config(getConfigPath())), _factory(Factory(*this)),
-      _levels(Levels(*this))
+      _gameConfig(Config(getConfigPath())), factory(Factory(*this)),
+      levels(Levels(*this))
 {
 }
 
@@ -566,7 +566,8 @@ void GameInstance::setGameMode(size_t mode)
     _gamemode = mode;
 }
 
-size_t GameInstance::getMaxPlayers()
+size_t GameInstance::getMaxPlayers() const
 {
     return _maxPlayers;
 }
+
