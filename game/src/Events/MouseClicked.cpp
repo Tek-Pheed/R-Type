@@ -122,7 +122,7 @@ void EventManager::handleLevelButton(ecs::Entity &entity, bool isHost)
         std::string level = str.substr(separator + 2);
         int levelNB = std::atoi(level.c_str());
 
-        if (levelNB >= _game._nbTxtFiles) {
+        if (levelNB >= _game.nbTxtFiles) {
             levelNB = 1;
             ss << Protocol::L_SETLEVEL << " " << id << " " << 1 << PACKET_END;
         } else {
@@ -211,7 +211,7 @@ void EventManager::mouseClicked()
 {
     sf::Vector2f mousePos = _game.getWindow().mapPixelToCoords(
         sf::Mouse::getPosition(_game.getWindow()));
-    bool currentAutoFireValue = _game._gameConfig.getAutoFireConfig();
+    bool currentAutoFireValue = _game.gameConfig.getAutoFireConfig();
     for (size_t ent : _game.refEntityManager.getCurrentLevel()
              .findEntitiesIdByComponent<ecs::RenderComponent>()) {
         auto &entity =

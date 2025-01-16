@@ -44,12 +44,12 @@ void Levels::buildSettingsMenu()
         title.addComponent(
             std::make_shared<ecs::TextComponent<sf::Text>>(text, "SETTINGS"));
 
-        std::string moveUpAction = _game._gameConfig.getConfig().at(1);
-        std::string moveRightAction = _game._gameConfig.getConfig().at(2);
-        std::string moveLeftAction = _game._gameConfig.getConfig().at(3);
-        std::string moveDownAction = _game._gameConfig.getConfig().at(4);
-        std::string autoFireAction = _game._gameConfig.getConfig().at(7);
-        std::string resolutionAction = _game._gameConfig.getConfig().at(6);
+        std::string moveUpAction = _game.gameConfig.getConfig().at(1);
+        std::string moveRightAction = _game.gameConfig.getConfig().at(2);
+        std::string moveLeftAction = _game.gameConfig.getConfig().at(3);
+        std::string moveDownAction = _game.gameConfig.getConfig().at(4);
+        std::string autoFireAction = _game.gameConfig.getConfig().at(7);
+        std::string resolutionAction = _game.gameConfig.getConfig().at(6);
 
         std::string endUpMove = "";
         std::string endRightMove = "";

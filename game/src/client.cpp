@@ -67,7 +67,7 @@ void RType::GameInstance::clientHandlerConnection(
                         std::cout << "Build player with id:" << _netClientID
                                   << std::endl;
                     factory.buildPlayer(
-                        true, (size_t) _netClientID, _playerName);
+                        true, (size_t) _netClientID, playerName);
                 } else {
                     if (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "The connection failed." << std::endl;
@@ -111,7 +111,7 @@ void RType::GameInstance::connectToGame()
                 continue;
 
             switch (count) {
-                case 1: _playerName = text->getStr(); break;
+                case 1: playerName = text->getStr(); break;
                 case 2: _ip = text->getStr(); break;
                 case 3:
                     _tcpPort = (uint16_t) std::atoi(text->getStr().c_str());
@@ -153,7 +153,7 @@ void RType::GameInstance::connectToGame()
         refEntityManager.switchLevel("mainLevel", false);
 
         int nbTxtFiles = countTxtFiles("./assets/levels");
-        this->_nbTxtFiles = nbTxtFiles;
+        this->nbTxtFiles = nbTxtFiles;
         std::stringstream ss;
 
         ss << L_SENDLEVELS << " " << nbTxtFiles << PACKET_END;
@@ -235,7 +235,7 @@ void RType::GameInstance::setupClient(
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
 
-    auto res = _gameConfig.getKeyFromConfig("RESOLUTION");
+    auto res = gameConfig.getKeyFromConfig("RESOLUTION");
     std::stringstream resStream(res);
     std::string resX;
     std::string resY;
@@ -285,7 +285,7 @@ void GameInstance::playEvent()
     std::stringstream ss;
     EventManager event_manager(*this);
 
-    bool autoFireEnabled = _gameConfig.getAutoFireConfig();
+    bool autoFireEnabled = gameConfig.getAutoFireConfig();
 
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {

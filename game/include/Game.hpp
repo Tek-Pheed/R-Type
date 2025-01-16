@@ -111,9 +111,9 @@ namespace RType
 
         std::vector<ecs::Entity> &getEntities();
 
-        std::string _playerName;
+        std::string playerName;
 
-        int _nbTxtFiles;
+        int nbTxtFiles;
 
         // Enemies
         ecs::Entity &getEnemyById(size_t enemyID);
@@ -174,7 +174,7 @@ namespace RType
         Engine::Feature::AssetManager &refAssetManager;
         Engine::Feature::NetworkingManager &refNetworkManager;
 
-        Config _gameConfig;
+        Config gameConfig;
 
         bool isSettingsUpButtonClicked = false;
         bool isSettingsRightButtonClicked = false;

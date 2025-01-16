@@ -224,7 +224,7 @@ void GameInstance::handleLobby(
         case Protocol::L_SENDLEVELS: {
             if (tokens.size() >= 2) {
                 if (!_isServer) {
-                    this->_nbTxtFiles = std::atoi(tokens[0].c_str());
+                    this->nbTxtFiles = std::atoi(tokens[0].c_str());
                 }
             }
         }

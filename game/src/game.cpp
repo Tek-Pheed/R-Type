@@ -525,7 +525,7 @@ GameInstance::GameInstance(Engine::Core &engineRef)
       refAssetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
       refNetworkManager(
           engineRef.getFeature<Engine::Feature::NetworkingManager>()),
-      _gameConfig(Config(getConfigPath())), factory(Factory(*this)),
+      gameConfig(Config(getConfigPath())), factory(Factory(*this)),
       levels(Levels(*this))
 {
 }
