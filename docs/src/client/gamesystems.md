@@ -1,4 +1,4 @@
-# Systems
+# Game Systems
 
 The systems are used to update various game data such as collisions, positions,
 display, life and projectiles.
