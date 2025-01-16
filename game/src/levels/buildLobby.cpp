@@ -37,7 +37,7 @@ void Levels::buildLobby()
             ecs::ClickableType::GAMEMODE);
 
         std::stringstream ss;
-        ss << _game._maxPlayers;
+        ss << _game.getMaxPlayers();
         _game._factory.buildButton(
             sf::Vector2f(
                 (float) this->_game.getWindow().getSize().x - 350 - 50,

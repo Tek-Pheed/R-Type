@@ -202,11 +202,13 @@ namespace RType
         size_t getGameMode() const;
         void setGameMode(size_t mode);
 
+
         Factory _factory;
         Levels _levels;
-        size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
+        size_t getMaxPlayers();
 
       private:
+        size_t _maxPlayers = DEFAULT_MAX_PLAYERS;
         size_t _difficulty = DEFAULT_DIFFICULTY;
         bool _bonus = true;
         size_t _level = 1;

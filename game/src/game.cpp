@@ -565,3 +565,8 @@ void GameInstance::setGameMode(size_t mode)
 {
     _gamemode = mode;
 }
+
+size_t GameInstance::getMaxPlayers()
+{
+    return _maxPlayers;
+}
