@@ -3,7 +3,7 @@
 1. [Introduction](./intro.md)
 2. [User Guide](./userguide.md)
 3. [Benchmarks](./benchmarks.md)
-5. [Building](./building.md)
+4. [Building](./building.md)
 5. [Protocol](./protocol.md)
 6. [ECS](ecs/ecs.md)
     - [Entity](ecs/entity.md)
@@ -16,3 +16,4 @@
     - [Systems](ecs/system.md)
     - [Events Manager](client/events.md)
     - [Utils](client/utils.md)
+9. [Level Creation](levelGenerator.md)

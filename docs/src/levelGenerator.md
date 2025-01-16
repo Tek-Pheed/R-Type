@@ -7,6 +7,7 @@ This guide will walk you through the installation and usage of the **Level Edito
 ---
 
 ## Table of Contents
+
 1. [Installation](#installation)
 2. [Getting Started](#getting-started)
 3. [User Interface Overview](#user-interface-overview)
@@ -23,6 +24,7 @@ This guide will walk you through the installation and usage of the **Level Edito
 ## Installation
 
 ### Prerequisites
+
 - **Python 3.x**: Ensure Python is installed on your system. You can download it from [python.org](https://www.python.org/).
 - **Tkinter**: This is included with Python by default. If it’s missing, install it using your package manager.
 
@@ -35,6 +37,7 @@ This guide will walk you through the installation and usage of the **Level Edito
    - Open a terminal or command prompt.
    - Navigate to the folder where `main.py.py` is located.
    - Run the following command:
+
      ```bash
      python main.py.py
      ```
@@ -44,6 +47,7 @@ This guide will walk you through the installation and usage of the **Level Edito
 ## Getting Started
 
 Once the Level Editor is running, you’ll see the main window with the following components:
+
 - **Canvas**: The area where you place and edit sprites.
 - **Control Panel**: Contains buttons and dropdowns for adding sprites, waves, and saving/loading levels.
 - **Edit Panel**: Allows you to modify sprite properties.
@@ -53,10 +57,12 @@ Once the Level Editor is running, you’ll see the main window with the followin
 ## User Interface Overview
 
 ### Canvas
+
 - The canvas is where you place and visualize sprites.
 - The blue dashed rectangle represents the **play area** (the player's screen).
 
 ### Control Panel
+
 - **Sprite Dropdown**: Select the type of sprite to add (e.g., Basic Enemy, Shooter Enemy, Boss, Bonus).
 - **Background Dropdown**: Choose the background for the level.
 - **Music Dropdown**: Select the music for the level.
@@ -67,6 +73,7 @@ Once the Level Editor is running, you’ll see the main window with the followin
 - **Load Button**: Load a level from a file.
 
 ### Edit Panel
+
 - Displays fields for editing the selected sprite’s properties:
   - **X Position**: Horizontal position (0-1 inside the play area, >1 or <0 outside).
   - **Y Position**: Vertical position (0-1 inside the play area, >1 or <0 outside).
@@ -80,6 +87,7 @@ Once the Level Editor is running, you’ll see the main window with the followin
 ## Creating Levels
 
 ### Adding Sprites
+
 1. Select a sprite type from the **Sprite Dropdown**.
 2. Click the **Add Sprite** button.
 3. Click on the canvas to place the sprite. You can place it inside or outside the play area.
@@ -87,6 +95,7 @@ Once the Level Editor is running, you’ll see the main window with the followin
 ![Add Sprite](https://i.imgur.com/PIvyKAA.png)
 
 ### Editing Sprites
+
 1. Click on a sprite to select it.
 2. Modify its properties in the **Edit Panel**.
 3. Click **Apply Changes** to save your edits.
@@ -94,12 +103,14 @@ Once the Level Editor is running, you’ll see the main window with the followin
 ![Edit Sprite](https://i.imgur.com/rKkcF0L.png)
 
 ### Adding Waves
+
 1. Click the **Add Wave** button to create a new wave.
 2. The new wave will be added to the **Wave Selector** dropdown.
 
 ![Add Wave](https://i.imgur.com/hQOZoyk.png)
 
 ### Selecting Waves
+
 1. Use the **Wave Selector** dropdown to switch between waves.
 2. The canvas will update to show the sprites for the selected wave.
 
@@ -110,11 +121,13 @@ Once the Level Editor is running, you’ll see the main window with the followin
 ## Saving and Loading Levels
 
 ### Saving a Level
+
 1. Click the **Save Button**.
 2. Choose a location and filename for your level file (e.g., `level1.txt`).
 3. The level will be saved with the selected background, music, and wave data.
 
 ### Loading a Level
+
 1. Click the **Load Button**.
 2. Select a level file (e.g., `level1.txt`).
 3. The level will be loaded, and you can continue editing it.
@@ -126,6 +139,7 @@ Once the Level Editor is running, you’ll see the main window with the followin
 ## Troubleshooting
 
 ### Common Issues
+
 1. **Sprites Not Appearing**:
    - Ensure the sprite images are in the `sprites` folder.
    - Check the console for error messages.
