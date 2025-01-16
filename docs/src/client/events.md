@@ -2,7 +2,7 @@
 
 This class is used for manage all event catch by the ``sf::Event``.
 
-This class is built by GameManager pointer in parameter.
+This class is built by GameManager reference in parameter.
 
 ## Event list
 

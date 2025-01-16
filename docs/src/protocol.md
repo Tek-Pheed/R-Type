@@ -197,6 +197,5 @@ Set the level config map
 - Set game mode (id, mode) - 246 <-> TCP
 Set the game mode, 0 for wave, 1 for pvp
 
-
-
-# TODO: add bonus on/off
+- Send levels (id, mode) - 247 <-> TCP
+Send number of levels available in assets/levels
