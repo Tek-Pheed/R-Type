@@ -46,7 +46,10 @@ The project is developed using the following libraries:
 
 ## 3. How to Launch
 
-### Build and launch R-Type
+### Manual/Native build
+[Check out this page on our documentation](https://r-type.leafs-studio.com/building.html)
+
+### Build and launch R-Type with docker
 
 This projet works with Dockerfile.
 
