@@ -183,7 +183,6 @@ namespace RType
 
         bool _isSettingsNicknameButtonClicked = false;
         std::vector<sf::Keyboard::Key> _nicknameKeys;
-        ecs::Entity *_nicknameInputEntity = nullptr;
 
         // MENU
         std::vector<ecs::Entity> _buttonList;
