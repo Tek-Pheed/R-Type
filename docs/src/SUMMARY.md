@@ -18,6 +18,7 @@
     - [Config](client/configclass.md)
     - [Events](client/events.md)
     - [Factory](client/factory.md)
+    - [Levels](client/level.md)
     - [Game](client/game.md)
     - [Game Assets](client/gameassets.md)
     - [Game Systems](client/gamesystems.md)
