@@ -12,8 +12,6 @@
 #include <vector>
 #include "Engine.hpp"
 #include "ErrorClass.hpp"
-#include "Factory.hpp"
-#include "Game.hpp"
 #include <unordered_map>
 
 LevelConfig::LevelConfig(const std::string &filename) : _filename(filename)

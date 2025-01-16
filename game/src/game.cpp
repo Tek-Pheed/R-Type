@@ -23,11 +23,9 @@
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
-#include "Entity.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
 #include "GameAssets.hpp"
-#include "GameEvents.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "LevelConfig.hpp"
@@ -280,7 +278,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -346,9 +344,8 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 1.0f) {
-                for (auto entID :
-                    refEntityManager.getCurrentLevel()
-                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -390,9 +387,8 @@ void GameInstance::gamePostTick(
                 }
             }
         }
-        for (auto &entity :
-            refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
+        for (auto &entity : refEntityManager.getCurrentLevel()
+                 .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
             auto mus =
                 entity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
             if (mus->getMusicType().getStatus() != sf::Music::Playing)
@@ -529,7 +525,8 @@ GameInstance::GameInstance(Engine::Core &engineRef)
       refAssetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
       refNetworkManager(
           engineRef.getFeature<Engine::Feature::NetworkingManager>()),
-      _gameConfig(Config(getConfigPath())), _factory(Factory(*this))
+      _gameConfig(Config(getConfigPath())), _factory(Factory(*this)),
+      _levels(Levels(*this))
 {
 }
 
@@ -537,11 +534,6 @@ GameInstance::~GameInstance()
 {
     refNetworkManager.stopNetworking();
     refGameEngine.stop();
-}
-
-bool GameInstance::getServerMode()
-{
-    return _isServer;
 }
 
 bool GameInstance::isServer() const

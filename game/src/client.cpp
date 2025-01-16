@@ -107,7 +107,7 @@ void RType::GameInstance::connectToGame()
             if (!text)
                 continue;
 
-            if (text->getStr().empty() || text->getStr() == "IP ADRESS")
+            if (text->getStr().empty() || text->getStr() == "IP ADDRESS")
                 continue;
 
             switch (count) {
@@ -161,7 +161,7 @@ void RType::GameInstance::connectToGame()
         refNetworkManager.sendToAll(
             System::Network::ISocket::Type::TCP, ss.str());
 
-        levelLobbyMenu();
+        _levels.buildLobby();
 
         _playerEntityID = -1;
         _isConnectedToServer = true;
@@ -196,9 +196,10 @@ void RType::GameInstance::launchGame()
                     .getComponent<ecs::HealthComponent>()
                     ->getHealth());
         setHealthId(static_cast<int>(getNewId()));
-        _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text, sf::Color::White, 48);
+        _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text,
+            sf::Color::White, 48);
     } catch (const std::exception &e) {
-        levelMainMenu();
+        _levels.buildMainMenu();
     }
 }
 
@@ -221,7 +222,7 @@ void RType::GameInstance::clientHandleDisconnected(
                  "connection was unstable."
               << std::endl;
     refEntityManager.deleteAllLevel();
-    levelMainMenu();
+    _levels.buildMainMenu();
 }
 
 void RType::GameInstance::setupClient(
@@ -269,7 +270,7 @@ void RType::GameInstance::setupClient(
         &RType::GameInstance::clientHandleDisconnected, *this);
     loadAssets();
     createPersistentLevel();
-    levelMainMenu();
+    _levels.buildMainMenu();
 }
 
 sf::RenderWindow &GameInstance::getWindow()
