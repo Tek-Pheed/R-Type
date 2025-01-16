@@ -6,6 +6,7 @@
 */
 
 #include "LevelConfig.hpp"
+#include <algorithm>
 #include <sstream>
 #include <string>
 #include <utility>
