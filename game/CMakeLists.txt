@@ -20,7 +20,7 @@ target_link_libraries(client tinyV8)
 
 add_executable(server ${SRC} ${APP})
 target_include_directories(server PRIVATE include)
-target_include_directories(server PUBLIC ../dependencies/SFML/include)
+target_link_libraries(server sfml-system sfml-window sfml-graphics sfml-audio)
 target_link_libraries(server tinyV8)
 
 set_target_properties(client PROPERTIES
