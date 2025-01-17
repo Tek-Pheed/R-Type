@@ -202,17 +202,15 @@ void RenderSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
         if (!renderComponent)
             continue;
         switch (renderComponent->getObjectType()) {
-            case ecs::RenderComponent::ObjectType::SPRITE:
-                if (entity.getComponent<ecs::EnemyComponent>()) {
-                    if (entity.getComponent<ecs::EnemyComponent>()->getWave()
-                        == _game->currentWave)
-                        renderSprite(
-                            entity, _game->getWindow(), deltaTime, *_game);
-                } else {
-                    renderSprite(
-                        entity, _game->getWindow(), deltaTime, *_game);
-                }
+            case ecs::RenderComponent::ObjectType::SPRITE: {
+                auto bonus = entity.getComponent<ecs::BonusComponent>();
+                auto enemy = entity.getComponent<ecs::EnemyComponent>();
+                if ((enemy && enemy->getWave() != _game->currentWave)
+                    || (bonus && bonus->getWave() != _game->currentWave))
+                    break;
+                renderSprite(entity, _game->getWindow(), deltaTime, *_game);
                 break;
+            }
             case ecs::RenderComponent::ObjectType::SPRITEANDTEXT:
                 renderSpriteAndText(entity, _game->getWindow());
                 break;

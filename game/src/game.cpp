@@ -268,7 +268,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
             factory.buildBonus(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
-                static_cast<ecs::Bonus>(std::atoi(value[2].c_str())));
+                static_cast<ecs::Bonus>(std::atoi(value[2].c_str())), wave);
         }
     }
 }

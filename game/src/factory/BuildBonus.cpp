@@ -20,14 +20,15 @@
 using namespace RType;
 
 ecs::Entity &Factory::buildBonus(
-    size_t id, float posX, float posY, ecs::Bonus bonus)
+    size_t id, float posX, float posY, int type, int wave)
 {
     constexpr auto velocity = -0.08f;
     const float Width = 0.04f * (float) _game.WinScaleX;
     const float Height = Width;
 
     auto &bonusE = _game.refEntityManager.getCurrentLevel().createEntity();
-    bonusE.addComponent(std::make_shared<ecs::BonusComponent>(id, bonus));
+    bonusE.addComponent(std::make_shared<ecs::BonusComponent>(
+        id, static_cast<ecs::Bonus>(type), wave));
     bonusE.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     bonusE.addComponent(
         std::make_shared<ecs::VelocityComponent>(velocity, 0.0f));
@@ -54,7 +55,7 @@ ecs::Entity &Factory::buildBonus(
         if (pos) {
             std::stringstream sss;
             sss << BN_SPAWN << " " << id << " " << pos->getX() << " "
-                << pos->getY() << PACKET_END;
+                << pos->getY() << " " << wave << PACKET_END;
             _game.refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, sss.str());
         }
@@ -73,8 +74,8 @@ void GameInstance::handleNetworkBonuses(
                     std::shared_ptr<ecs::PositionComponent> pos;
                     factory.buildBonus(id,
                         (float) std::atof(tokens[1].c_str()),
-                        (float) std::atof(tokens[2].c_str()),
-                        ecs::Bonus::NONE);
+                        (float) std::atof(tokens[2].c_str()), ecs::Bonus::NONE,
+                        std::atoi(tokens[3].c_str()));
                 }
             }
             break;
@@ -111,9 +112,11 @@ void GameInstance::handleNetworkBonuses(
                         damagePlayer(
                             currentPlayer.getComponent<ecs::PlayerComponent>()
                                 ->getPlayerID(),
-                            (-50));
+                            (health->getHealth() - 100));
                     }
-                    auto &bonusSound = refAssetManager.getAsset<sf::SoundBuffer>(Asset::BONUS_GET);
+                    auto &bonusSound =
+                        refAssetManager.getAsset<sf::SoundBuffer>(
+                            Asset::BONUS_GET);
                     factory.buildSoundEffect(bonusSound, "bonusSound", 100.0f);
                     currentPlayerBonus->setBonus(
                         static_cast<ecs::Bonus>(std::atoi(tokens[2].c_str())));
