@@ -112,7 +112,7 @@ void GameInstance::handleNetworkBonuses(
                         damagePlayer(
                             currentPlayer.getComponent<ecs::PlayerComponent>()
                                 ->getPlayerID(),
-                            (-50));
+                            (health->getHealth() - 100));
                     }
                     auto &bonusSound =
                         refAssetManager.getAsset<sf::SoundBuffer>(
