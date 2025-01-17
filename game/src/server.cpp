@@ -113,6 +113,18 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
+    for (auto &e : refEntityManager.getCurrentLevel()
+             .findEntitiesByComponent<ecs::BonusComponent>()) {
+        if (!e.get().getComponent<ecs::PlayerComponent>()) {
+            auto bon = e.get().getComponent<ecs::BonusComponent>();
+            auto pos = e.get().getComponent<ecs::PositionComponent>();
+            std::stringstream sss;
+            sss << BN_SPAWN << " " << bon->getBonusID() << " " << pos->getX()
+                << " " << pos->getY() << " " << bon->getWave() << PACKET_END;
+            refNetworkManager.sendToOne(
+                clientID, System::Network::ISocket::Type::TCP, sss.str());
+        }
+    }
     if (_musicName != "") {
         std::stringstream ss;
         ss << M_MUSIC << " " << _musicName << " " << PACKET_END;
