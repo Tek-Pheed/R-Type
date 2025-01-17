@@ -23,11 +23,9 @@
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
-#include "Entity.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
 #include "GameAssets.hpp"
-#include "GameEvents.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
 #include "LevelConfig.hpp"
@@ -111,7 +109,7 @@ void GameInstance::handleNetworkMechs(
                     auto &newWaveInComingSound =
                         this->refAssetManager.getAsset<sf::SoundBuffer>(
                             Asset::NEWWAVEINCOMING);
-                    _factory.buildSoundEffect(
+                    factory.buildSoundEffect(
                         newWaveInComingSound, "newWaveInComingSound", 100.0f);
                 }
                 if (RType::GameInstance::DEBUG_LOGS)
@@ -199,7 +197,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create basic "
                     "enemy from level config");
-            _factory.buildEnemy(getNewId(),
+            factory.buildEnemy(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[4].c_str()), wave,
@@ -212,7 +210,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                     THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
                                          "shooter "
                                          "enemy from level config");
-            _factory.buildEnemyShooter(getNewId(),
+            factory.buildEnemyShooter(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[4].c_str()), wave,
@@ -224,7 +222,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create boss "
                     "from level config");
-            _factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
+            factory.buildBoss(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[2].c_str()), wave);
         }
@@ -267,7 +265,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create bonus "
                     "from level config");
-            _factory.buildBonus(getNewId(),
+            factory.buildBonus(getNewId(),
                 (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 static_cast<ecs::Bonus>(std::atoi(value[2].c_str())));
@@ -280,7 +278,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -346,17 +344,16 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 1.0f) {
-                for (auto entID :
-                    refEntityManager.getCurrentLevel()
-                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
                     if (enemy && (enemy->getType() == 1)) {
-                        _factory.buildBulletFromEnemy(enemy->getEnemyID());
+                        factory.buildBulletFromEnemy(enemy->getEnemyID());
                     }
                     if (enemy && enemy->getType() == 2) {
-                        _factory.buildBulletFromBoss(enemy->getEnemyID());
+                        factory.buildBulletFromBoss(enemy->getEnemyID());
                     }
                 }
                 time = 0.0f;
@@ -390,9 +387,8 @@ void GameInstance::gamePostTick(
                 }
             }
         }
-        for (auto &entity :
-            refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
+        for (auto &entity : refEntityManager.getCurrentLevel()
+                 .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
             auto mus =
                 entity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
             if (mus->getMusicType().getStatus() != sf::Music::Playing)
@@ -529,7 +525,8 @@ GameInstance::GameInstance(Engine::Core &engineRef)
       refAssetManager(engineRef.getFeature<Engine::Feature::AssetManager>()),
       refNetworkManager(
           engineRef.getFeature<Engine::Feature::NetworkingManager>()),
-      _gameConfig(Config(getConfigPath())), _factory(Factory(*this))
+      gameConfig(Config(getConfigPath())), factory(Factory(*this)),
+      levels(Levels(*this))
 {
 }
 
@@ -537,11 +534,6 @@ GameInstance::~GameInstance()
 {
     refNetworkManager.stopNetworking();
     refGameEngine.stop();
-}
-
-bool GameInstance::getServerMode()
-{
-    return _isServer;
 }
 
 bool GameInstance::isServer() const
@@ -573,3 +565,9 @@ void GameInstance::setGameMode(size_t mode)
 {
     _gamemode = mode;
 }
+
+size_t GameInstance::getMaxPlayers() const
+{
+    return _maxPlayers;
+}
+

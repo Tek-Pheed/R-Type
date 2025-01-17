@@ -71,7 +71,7 @@ void GameInstance::handleNetworkBonuses(
                 if (!isServer()) {
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
-                    _factory.buildBonus(id,
+                    factory.buildBonus(id,
                         (float) std::atof(tokens[1].c_str()),
                         (float) std::atof(tokens[2].c_str()),
                         ecs::Bonus::NONE);
@@ -114,7 +114,7 @@ void GameInstance::handleNetworkBonuses(
                             (-50));
                     }
                     auto &bonusSound = refAssetManager.getAsset<sf::SoundBuffer>(Asset::BONUS_GET);
-                    _factory.buildSoundEffect(bonusSound, "bonusSound", 100.0f);
+                    factory.buildSoundEffect(bonusSound, "bonusSound", 100.0f);
                     currentPlayerBonus->setBonus(
                         static_cast<ecs::Bonus>(std::atoi(tokens[2].c_str())));
                     std::cout << "set bonus " << currentPlayerBonus->getBonus()

@@ -27,6 +27,7 @@
 #include "Entity.hpp"
 #include "Factory.hpp"
 #include "GameSystems.hpp"
+#include "Levels.hpp"
 #include <unordered_map>
 
 namespace RType
@@ -36,8 +37,6 @@ namespace RType
         static constexpr bool DEBUG_LOGS = false;
 
         static constexpr const char *USER_CONFIG_FILE = "config.cfg";
-        static constexpr const char *LEVEL_CONFIG_PATH =
-            "./assets/levels/level1.txt";
         static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
         static constexpr uint16_t SERVER_REFRESH_RATE = 60U;
         static constexpr uint16_t DEFAULT_UDP_PORT = 8082;
@@ -62,8 +61,6 @@ namespace RType
         size_t WinScaleX = 1;
         size_t WinScaleY = 1;
 
-        bool getServerMode();
-
         void setupClient(const std::string &ip = DEFAULT_IP,
             uint16_t tcpPort = DEFAULT_TCP_PORT,
             uint16_t udpPort = DEFAULT_UDP_PORT);
@@ -81,14 +78,7 @@ namespace RType
         // Texture Utilities
         void loadAssets();
 
-        ecs::Entity &buildBackground();
-        ecs::Entity &buildButton(std::string text, int buttonNb);
-        ecs::Entity &buildInput(std::string str, int buttonID);
-        void levelMainMenu();
         void createPersistentLevel();
-        void levelSettingsMenu();
-        void levelContinueMenu();
-        void levelLobbyMenu();
         void handleConfigButtons(sf::Keyboard::Key pressedKey, int actionType);
         void handleAutoFireButton(
             std::string newAutoFireValue, ecs::Entity &entity);
@@ -121,9 +111,9 @@ namespace RType
 
         std::vector<ecs::Entity> &getEntities();
 
-        std::string _playerName;
+        std::string playerName;
 
-        int _nbTxtFiles;
+        int nbTxtFiles;
 
         // Enemies
         ecs::Entity &getEnemyById(size_t enemyID);
@@ -184,25 +174,24 @@ namespace RType
         Engine::Feature::AssetManager &refAssetManager;
         Engine::Feature::NetworkingManager &refNetworkManager;
 
-        Config _gameConfig;
+        Config gameConfig;
 
-        bool _isSettingsUpButtonClicked = false;
-        bool _isSettingsRightButtonClicked = false;
-        bool _isSettingsLeftButtonClicked = false;
-        bool _isSettingsDownButtonClicked = false;
+        bool isSettingsUpButtonClicked = false;
+        bool isSettingsRightButtonClicked = false;
+        bool isSettingsLeftButtonClicked = false;
+        bool isSettingsDownButtonClicked = false;
 
-        bool _isSettingsNicknameButtonClicked = false;
-        std::vector<sf::Keyboard::Key> _nicknameKeys;
-        ecs::Entity *_nicknameInputEntity = nullptr;
+        bool isSettingsNicknameButtonClicked = false;
+        std::vector<sf::Keyboard::Key> nicknameKeys;
 
         // MENU
-        std::vector<ecs::Entity> _buttonList;
-        size_t _lastButtonIdClicked;
+        std::vector<ecs::Entity> buttonList;
+        size_t lastButtonIdClicked;
 
-        std::vector<ecs::Entity> _inputList;
-        size_t _lastInputIdClicked;
+        std::vector<ecs::Entity> inputList;
+        size_t lastInputIdClicked;
 
-        sf::Sound _currentMusic;
+        sf::Sound currentMusic;
 
         // Ticks
         uint64_t getTicks() const;
@@ -212,8 +201,11 @@ namespace RType
         size_t getDifficulty() const;
         size_t getGameMode() const;
         void setGameMode(size_t mode);
+        size_t getMaxPlayers() const;
 
-        Factory _factory;
+
+        Factory factory;
+        Levels levels;
 
       private:
         size_t _maxPlayers = DEFAULT_MAX_PLAYERS;

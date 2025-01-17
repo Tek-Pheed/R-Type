@@ -41,7 +41,7 @@ namespace RType
             ecs::RenderComponent::ObjectType::BUTTON));
         button.addComponent(std::make_shared<ecs::ClickableComponent>(type));
 
-        _game._inputList.push_back(button);
+        _game.inputList.push_back(button);
 
         return button;
     }

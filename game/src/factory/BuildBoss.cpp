@@ -125,7 +125,7 @@ void GameInstance::handleNetworkBosses(
                 if (!isServer()) {
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
-                    _factory.buildBoss(id,
+                    factory.buildBoss(id,
                         (float) std::atof(tokens[1].c_str()),
                         (float) std::atof(tokens[2].c_str()),
                         (float) std::atof(tokens[3].c_str()),

@@ -209,7 +209,7 @@ std::vector<std::string> GameInstance::getTxtFiles(const std::string &path)
 
 void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
 {
-    std::vector<std::string> levelFiles = getTxtFiles("./assets/levels");
+    std::vector<std::string> levelFiles = getTxtFiles("assets/levels");
 
     if (levelFiles.empty()) {
         throw ErrorClass(THROW_ERROR_LOCATION "No level founds !");
