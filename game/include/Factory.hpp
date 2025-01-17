@@ -8,7 +8,8 @@
 #ifndef R_TYPE_FACTORY_HPP
 #define R_TYPE_FACTORY_HPP
 
-#include <SFML/Graphics.hpp>
+#include "SFML/Audio/SoundBuffer.hpp"
+#include "SFML/Graphics.hpp"
 #include "Entity.hpp"
 #include "components/ClickableComponent.hpp"
 

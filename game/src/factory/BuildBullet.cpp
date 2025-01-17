@@ -10,6 +10,7 @@
 #include <sstream>
 #include "Components.hpp"
 #include "Factory.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
@@ -55,7 +56,7 @@ void Factory::buildBulletFromPlayer(size_t playerID)
 
     std::stringstream ss;
     ss << P_SHOOT << " " << playerID << PACKET_END;
-    if (_game.isServer()) {
+    if constexpr (server) {
         _game.refNetworkManager.sendToOthers(
             playerID, System::Network::ISocket::Type::UDP, ss.str());
     } else {
@@ -113,7 +114,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
 
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << enemyID << PACKET_END;
-    if (_game.isServer()) {
+    if constexpr (server) {
         _game.refNetworkManager.sendToAll(
             System::Network::ISocket::Type::UDP, ss.str());
     } else {
@@ -176,7 +177,7 @@ void Factory::buildBulletFromBoss(size_t bossId, float velx, float vely)
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << bossId << " " << velx
        << " " << vely << " " << PACKET_END;
-    if (_game.isServer()) {
+    if constexpr (server) {
         _game.refNetworkManager.sendToAll(
             System::Network::ISocket::Type::UDP, ss.str());
     } else {

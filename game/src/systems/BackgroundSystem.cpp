@@ -25,7 +25,7 @@ void BackgroundSystem::initSystem(GameInstance &gameRef)
 void BackgroundSystem::update(
     std::vector<ecs::Entity> &entities, float deltaTime)
 {
-    if (_game->isServer())
+    if constexpr (server)
         return;
     for (auto &entity : entities) {
         auto bgComp = entity.getComponent<ecs::BackgroundComponent>();

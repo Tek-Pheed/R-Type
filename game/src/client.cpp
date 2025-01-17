@@ -228,7 +228,6 @@ void RType::GameInstance::clientHandleDisconnected(
 void RType::GameInstance::setupClient(
     const std::string &ip, uint16_t tcpPort, uint16_t udpPort)
 {
-    _isServer = false;
     _ip = ip;
     _tcpPort = tcpPort;
     _udpPort = udpPort;

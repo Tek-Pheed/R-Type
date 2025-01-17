@@ -31,9 +31,9 @@ static int printClientHelp()
 }
 
 static int prepareGame(int argc, const char *argv[],
-    RType::GameInstance &gameInstance, bool server)
+    RType::GameInstance &gameInstance)
 {
-    if (server) {
+    if constexpr (server) {
         if (argc == 1) {
             gameInstance.setupServer();
         } else {
@@ -74,11 +74,8 @@ int main(int argc, const char *argv[])
     RType::GameInstance gameInstance(gameEngine);
     try {
         int result = 0;
-#if defined(RTYPE_SERVER)
-        result = prepareGame(argc, argv, gameInstance, true);
-#else
-        result = prepareGame(argc, argv, gameInstance, false);
-#endif
+        result = prepareGame(argc, argv, gameInstance);
+
         if (result != 0)
             return (result);
         gameEngine.mainLoop();

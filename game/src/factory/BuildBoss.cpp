@@ -41,7 +41,7 @@ ecs::Entity &RType::Factory::buildBoss(
     boss.addComponent(std::make_shared<ecs::VelocityComponent>(0.0f, 0.0f));
     boss.addComponent(std::make_shared<ecs::HitboxComponent>(0.3f, 0.7f));
     boss.getComponent<ecs::EnemyComponent>()->setWave(wave);
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::BOSS_TEXTURE);
         sf::Sprite sprite;
@@ -88,7 +88,7 @@ ecs::Entity &GameInstance::getBossById(size_t bossID)
 
 void GameInstance::sendBossPosition(size_t bossID)
 {
-    if (isServer()) {
+    if constexpr (server) {
         std::unique_lock lock(_gameLock);
         auto &ene = getBossById(bossID);
         auto position = ene.getComponent<ecs::PositionComponent>();
@@ -108,7 +108,7 @@ void GameInstance::deleteBoss(size_t bossID)
         std::cout << "Deleting boss" << std::endl;
     auto &ene = getBossById(bossID);
     refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
-    if (isServer()) {
+    if constexpr (server) {
         std::stringstream ss;
         ss << E_DEAD << " " << bossID << " " << PACKET_END;
         refNetworkManager.sendToAll(
@@ -122,7 +122,7 @@ void GameInstance::handleNetworkBosses(
     switch (code) {
         case Protocol::E_SPAWN: {
             if (tokens.size() >= 6) {
-                if (!isServer()) {
+                if constexpr (!server) {
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
                     factory.buildBoss(id,
@@ -136,7 +136,7 @@ void GameInstance::handleNetworkBosses(
         }
         case Protocol::E_POS: {
             if (tokens.size() >= 4) {
-                if (!isServer()) {
+                if constexpr (!server) {
                     uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
                     if (_lastNetTick <= tick) {
                         _lastNetTick = tick;
@@ -151,7 +151,7 @@ void GameInstance::handleNetworkBosses(
             break;
         }
         case Protocol::E_DEAD: {
-            if (_isServer)
+            if constexpr (server)
                 return;
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());

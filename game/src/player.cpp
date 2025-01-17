@@ -38,7 +38,7 @@ void GameInstance::handleLobby(
     switch (code) {
         case Protocol::L_STARTGAME: {
             _gameStarted = true;
-            if (_isServer) {
+            if constexpr (server) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::stringstream sss;
                 sss << L_STARTGAME << " " << id << PACKET_END;
@@ -80,7 +80,7 @@ void GameInstance::handleLobby(
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
                 std::cout << "Max players set to : " << _maxPlayers
                           << std::endl;
-                if (!_isServer)
+                if constexpr (!server)
                     for (auto &entity : enti) {
                         auto text =
                             entity.get()
@@ -93,7 +93,7 @@ void GameInstance::handleLobby(
                             text->setStr(ss.str());
                         }
                     }
-                if (_isServer) {
+                if constexpr (server) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     sss << L_SETMAXPLAYRS << " " << id << " " << _maxPlayers
@@ -109,7 +109,7 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _difficulty = (size_t) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
-                if (!_isServer)
+                if constexpr (!server)
                     for (auto &entity : enti) {
                         auto text =
                             entity.get()
@@ -125,7 +125,7 @@ void GameInstance::handleLobby(
                             text->setStr(ss.str());
                         }
                     }
-                if (_isServer) {
+                if constexpr (server) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     sss << L_SETDIFFICULTY << " " << id << " " << _difficulty
@@ -140,7 +140,7 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _bonus = (bool) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
-                if (!_isServer)
+                if constexpr (!server)
                     for (auto &entity : enti) {
                         auto text =
                             entity.get()
@@ -153,7 +153,7 @@ void GameInstance::handleLobby(
                             text->setStr(ss.str());
                         }
                     }
-                if (_isServer) {
+                if constexpr (server) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     sss << L_SETBONUS << " " << id << " " << _bonus << " "
@@ -168,7 +168,7 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _level = (size_t) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
-                if (!_isServer)
+                if constexpr (!server)
                     for (auto &entity : enti) {
                         auto text =
                             entity.get()
@@ -181,7 +181,7 @@ void GameInstance::handleLobby(
                             text->setStr(ss.str());
                         }
                     }
-                if (_isServer) {
+                if constexpr (server) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     sss << L_SETLEVEL << " " << id << " " << _level << " "
@@ -196,7 +196,7 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _gamemode = (size_t) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
-                if (!_isServer)
+                if constexpr (!server)
                     for (auto &entity : enti) {
                         auto text =
                             entity.get()
@@ -210,7 +210,7 @@ void GameInstance::handleLobby(
                             text->setStr(ss.str());
                         }
                     }
-                if (_isServer) {
+                if constexpr (server) {
                     std::stringstream sss;
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     sss << L_GAMEMODE << " " << id << " " << _gamemode << " "
@@ -223,7 +223,7 @@ void GameInstance::handleLobby(
         }
         case Protocol::L_SENDLEVELS: {
             if (tokens.size() >= 2) {
-                if (!_isServer) {
+                if constexpr (!server) {
                     this->nbTxtFiles = std::atoi(tokens[0].c_str());
                 }
             }
@@ -239,7 +239,7 @@ void GameInstance::handleNetworkPlayers(
             if (tokens.size() >= 4) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
                 std::shared_ptr<ecs::PositionComponent> pos;
-                if (isServer()) {
+                if constexpr (server) {
                     auto &pl = factory.buildPlayer(true, id, tokens[3]);
                     pos = pl.getComponent<ecs::PositionComponent>();
                 } else {
@@ -255,7 +255,7 @@ void GameInstance::handleNetworkPlayers(
             if (tokens.size() >= 4) {
                 uint64_t tick = (uint64_t) atoi(tokens[0].c_str());
                 size_t id = (size_t) atoi(tokens[1].c_str());
-                if (!isServer()) {
+                if constexpr (!server) {
                     if (tick < _lastNetTick) {
                         return;
                     } else {
@@ -272,7 +272,7 @@ void GameInstance::handleNetworkPlayers(
                 auto pos = player.getComponent<ecs::PositionComponent>();
                 pos->setX((float) std::atof(tokens[2].c_str()));
                 pos->setY((float) std::atof(tokens[3].c_str()));
-                if (isServer()) {
+                if constexpr (server) {
                     std::stringstream ss;
                     ss << P_POS << " " << _ticks << " "
                        << player.getComponent<ecs::PlayerComponent>()
@@ -287,7 +287,7 @@ void GameInstance::handleNetworkPlayers(
             break;
         }
         case Protocol::P_DEAD: {
-            if (!_isServer && hasLocalPlayer()
+            if (!server && hasLocalPlayer()
                 && getLocalPlayer()
                         .getComponent<ecs::PlayerComponent>()
                         ->getPlayerID()
@@ -303,7 +303,7 @@ void GameInstance::handleNetworkPlayers(
                     (float) getWindow().getSize().y / 2 - 50, title,
                     sf::Color::Red, 100);
             }
-            if (_isServer)
+            if constexpr (server)
                 return;
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
@@ -324,7 +324,7 @@ void GameInstance::handleNetworkPlayers(
             if (tokens.size() >= 3) {
                 uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
                 size_t id = (size_t) atoi(tokens[1].c_str());
-                if (!_isServer) {
+                if constexpr (!server) {
                     if (tick < _lastNetTick) {
                         return;
                     } else {
@@ -454,7 +454,7 @@ void GameInstance::deletePlayer(size_t playerID)
     if (isServer() || _isConnectedToServer) {
         auto players = getAllPlayers();
         auto &pl = getPlayerById(playerID);
-        if (!isServer()) {
+        if constexpr (!server) {
             factory.buildExplosionPlayer(
                 pl.getComponent<ecs::PositionComponent>()->getX(),
                 pl.getComponent<ecs::PositionComponent>()->getY());
@@ -465,7 +465,7 @@ void GameInstance::deletePlayer(size_t playerID)
         refEntityManager.getCurrentLevel().markEntityForDeletion(pl.getID());
         std::stringstream ss;
         ss << P_DEAD << " " << playerID << " " << PACKET_END;
-        if (isServer()) {
+        if constexpr (server) {
             refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, ss.str());
         }
@@ -481,7 +481,7 @@ void GameInstance::damagePlayer(size_t playerID, int damage)
         auto health = pl.getComponent<ecs::HealthComponent>();
         if (health) {
             health->setHealth(health->getHealth() - damage);
-            if (isServer()) {
+            if constexpr (server) {
                 std::stringstream ss;
                 ss << P_DMG << " " << _ticks << " " << playerID << " "
                    << health->getHealth() << PACKET_END;
@@ -500,7 +500,7 @@ void GameInstance::sendPlayerPosition(size_t playerID)
         std::stringstream ss;
         ss << P_POS << " " << _ticks << " " << playerID << " "
            << position->getX() << " " << position->getY() << PACKET_END;
-        if (isServer()) {
+        if constexpr (server) {
             refNetworkManager.sendToOthers(
                 playerID, System::Network::ISocket::Type::UDP, ss.str());
         } else {

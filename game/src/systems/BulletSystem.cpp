@@ -36,7 +36,7 @@ void BulletSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
             continue;
         position->setX(position->getX() + velocity->getVx() * deltaTime);
         position->setY(position->getY() + velocity->getVy() * deltaTime);
-        if (_game->isServer()) {
+        if constexpr (server) {
             if (position->getX() >= (float) bulletMaxTravel
                 || position->getX() < 0.0f
                 || position->getY() >= (float) bulletMaxTravel

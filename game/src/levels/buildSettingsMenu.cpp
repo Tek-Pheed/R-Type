@@ -19,7 +19,7 @@ void Levels::buildSettingsMenu()
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(_game);
     _game.refEntityManager.switchLevel("settingsMenu");
 
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         auto &title = _game.refEntityManager.getCurrentLevel().createEntity();
 
         sf::Text text;

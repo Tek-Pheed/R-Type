@@ -13,7 +13,7 @@ using namespace RType;
 
 void Levels::buildLobby()
 {
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         std::string title = "GAME CONFIG";
 
         auto &text =

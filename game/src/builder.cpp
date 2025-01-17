@@ -9,7 +9,7 @@
     #define NOMINMAX
 #endif
 
-#include <SFML/Window.hpp>
+#include "SFML/Window.hpp"
 #include <iostream>
 #include <map>
 #include <memory>
@@ -57,7 +57,7 @@ void RType::GameInstance::createPersistentLevel()
 {
     auto &level = refEntityManager.getPersistentLevel();
 
-    if (!isServer())
+    if constexpr (!server)
         factory.buildBackground();
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(*this);
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(*this);
@@ -137,7 +137,7 @@ void RType::GameInstance::handleInputButtons(
 void RType::GameInstance::handleConfigButtons(
     sf::Keyboard::Key pressedKey, int actionType)
 {
-    if (!isServer()) {
+    if constexpr (!server) {
         std::string pressedKeyString = getKeyString(pressedKey);
         std::string newValue = "sf::Keyboard::" + pressedKeyString;
 

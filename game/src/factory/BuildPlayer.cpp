@@ -9,6 +9,7 @@
 #include <sstream>
 #include "Components.hpp"
 #include "Factory.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "components/AIComponent.hpp"
@@ -37,7 +38,7 @@ namespace RType
         std::string n = DEFAULT_PLAYER_NAME;
         if (!name.empty())
             n = name;
-        if (!_game.isServer()) {
+        if constexpr (!server) {
             auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
                 Asset::PLAYER_TEXTURE);
             auto &font =
@@ -79,7 +80,7 @@ namespace RType
                 std::stringstream sss;
                 sss << P_CONN << " " << id << " " << pos->getX() << " "
                     << pos->getY() << " " << n << " " << PACKET_END;
-                if (!_game.isServer()) {
+                if constexpr (!server) {
                     _game.refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::TCP, sss.str());
                 } else {
@@ -102,7 +103,7 @@ namespace RType
             std::make_shared<ecs::PositionComponent>(0.1f, 0.1f));
         player.addComponent(
             std::make_shared<ecs::VelocityComponent>(velocity.x, velocity.y));
-        if (!_game.isServer()) {
+        if constexpr (!server) {
             auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
                 Asset::PLAYER_TEXTURE);
             sf::Sprite sprite;

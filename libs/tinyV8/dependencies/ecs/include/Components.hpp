@@ -7,7 +7,6 @@
 #ifndef R_TYPE_COMPONENT_HPP
 #define R_TYPE_COMPONENT_HPP
 
-#include <SFML/Audio.hpp>
 #include <string>
 
 namespace ecs

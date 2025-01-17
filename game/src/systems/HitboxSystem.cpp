@@ -125,7 +125,7 @@ void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
                     enemyHitB->getWidth(), enemyHitB->getHeight(),
                     bulletPos->getX(), bulletPos->getY(),
                     bulletHitB->getWidth(), bulletHitB->getHeight())) {
-                if (_game->isServer()) {
+                if constexpr (server) {
                     health->setHealth(health->getHealth() - 100);
                 }
                 _game->refEntityManager.getCurrentLevel()
@@ -164,7 +164,7 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
                     playerHitb->getWidth(), playerHitb->getHeight(),
                     bulletPos->getX(), bulletPos->getY(),
                     bulletHitB->getWidth(), bulletHitB->getHeight())) {
-                if (_game->isServer()) {
+                if constexpr (server) {
                     if (bulletComp->getType() == 0)
                         _game->damagePlayer(player->getPlayerID(), DMG);
                     if (bulletComp->getType() == 1)
@@ -251,7 +251,7 @@ void HitboxSystem::PlayerPvPMode(ecs::Entity &bullet, float deltaTime)
                     bulletHitbox->getWidth(), bulletHitbox->getHeight(),
                     position2->getX(), position2->getY(),
                     playerHitb2->getWidth(), playerHitb2->getHeight())) {
-                if (_game->isServer()) {
+                if constexpr (server) {
                     _game->damagePlayer(player2->getPlayerID(), DMG);
                 }
                 _game->refEntityManager.getCurrentLevel()
