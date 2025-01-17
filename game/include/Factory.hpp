@@ -51,7 +51,7 @@ namespace RType
         ecs::Entity &buildExplosionEnemy(float posX, float posY);
         ecs::Entity &buildExplosionPlayer(float posX, float posY);
         ecs::Entity &buildBonus(
-            size_t id, float posX, float posY, ecs::Bonus bonus);
+            size_t id, float posX, float posY, int type, int wave = 0);
         ecs::Entity &buildInput(const std::string &str, int buttonID);
 
       private:

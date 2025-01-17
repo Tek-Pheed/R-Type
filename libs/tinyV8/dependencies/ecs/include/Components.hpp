@@ -382,11 +382,13 @@ namespace ecs
 
     class BonusComponent : public Component {
       public:
-        explicit BonusComponent(const Bonus &bonus);
-        BonusComponent(size_t bonusID, const Bonus &bonus);
+        explicit BonusComponent(const Bonus &bonus, int wave = 0);
+        BonusComponent(size_t bonusID, const Bonus &bonus, int wave = 0);
 
         Bonus getBonus();
         void setBonus(const Bonus &bonus);
+
+        int getWave(void) const;
 
         void setBonusID(size_t bonusID);
         size_t getBonusID();
@@ -394,6 +396,7 @@ namespace ecs
       private:
         size_t _bonusID;
         Bonus _bonus;
+        int _wave;
     };
 
     class HitboxComponent : public Component {
