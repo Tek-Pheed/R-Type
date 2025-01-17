@@ -170,8 +170,9 @@ namespace Engine
                 }
                 levels.emplace(levelName,
                     std::move(Level<GameClass>(_engineRef, levelName)));
-                std::cout << "ENGINE: Created new level: " << levelName
-                          << std::endl;
+                if (_engineRef.verboseLogs)
+                    std::cout << "ENGINE: Created new level: " << levelName
+                              << std::endl;
                 return (levels.at(levelName));
             }
 
@@ -188,15 +189,17 @@ namespace Engine
                 const std::string cur = _currentLevel;
 
                 if (!levels.contains(levelName)) {
-                    std::cout << "ENGINE: Can't delete level" << levelName
-                              << std::endl;
+                    if (_engineRef.verboseLogs)
+                        std::cout << "ENGINE: Can't delete level" << levelName
+                                  << std::endl;
                     return (false);
                 }
                 levels.erase(levelName);
                 if (levelName == cur)
                     _currentLevel = "";
-                std::cout << "ENGINE: Deleted level: " << levelName
-                          << std::endl;
+                if (_engineRef.verboseLogs)
+                    std::cout << "ENGINE: Deleted level: " << levelName
+                              << std::endl;
                 return (true);
             }
 
@@ -289,9 +292,11 @@ namespace Engine
                     throw std::range_error(THROW_ERROR_LOCATION
                         "Cannot switch to an empty level!");
                 if (levelName == _currentLevel) {
-                    std::cout << "ENGINE: Note: Attempt to switch to already "
-                                 "current level: "
-                              << levelName << std::endl;
+                    if (_engineRef.verboseLogs)
+                        std::cout
+                            << "ENGINE: Note: Attempt to switch to already "
+                               "current level: "
+                            << levelName << std::endl;
                     return (getCurrentLevel());
                 }
                 if (!levels.contains(levelName)) {
@@ -310,8 +315,9 @@ namespace Engine
                 }
                 auto &l = getCurrentLevel();
                 l.startLevel();
-                std::cout << "ENGINE: Switched to level: " << levelName
-                          << std::endl;
+                if (_engineRef.verboseLogs)
+                    std::cout << "ENGINE: Switched to level: " << levelName
+                              << std::endl;
                 return (l);
             }
 

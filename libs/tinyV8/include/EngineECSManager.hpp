@@ -326,7 +326,7 @@ namespace Engine
             {
                 (void) deltaTimeSec;
                 for (size_t id : _markedForDelete) {
-                    if (!destroyEntityById(id))
+                    if (!destroyEntityById(id) && _engineRef.verboseLogs)
                         std::cout << "ENGINE: Trying to delete non existant "
                                      "entity with id: "
                                   << id << std::endl;

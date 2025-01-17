@@ -135,8 +135,8 @@ namespace Engine
         class NetworkingManager : public AEngineFeature {
             static size_t constexpr DEFAULT_TCP_PORT = 8081;
             static size_t constexpr DEFAULT_UDP_PORT = 8082;
-            static size_t constexpr UDP_PACKET_MAX_SIZE = 1400U;
-            static size_t constexpr UDP_BUFFER_MAX_QUEUED_PACKETS = 128;
+            static size_t constexpr PACKET_MAX_SIZE = 1400U;
+            static size_t constexpr BUFFER_MAX_QUEUED_PACKETS = 128;
 
           public:
             struct NetClient {
