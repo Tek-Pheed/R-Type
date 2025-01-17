@@ -41,8 +41,11 @@ namespace RType
 {
     class GameInstance {
       public:
+#ifdef NDEBUG
         static constexpr bool DEBUG_LOGS = false;
-
+#else
+        static constexpr bool DEBUG_LOGS = true;
+#endif
         static constexpr const char *USER_CONFIG_FILE = "config.cfg";
         static constexpr uint16_t CLIENT_REFRESH_RATE = 60U;
         static constexpr uint16_t SERVER_REFRESH_RATE = 60U;

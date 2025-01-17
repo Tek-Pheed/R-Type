@@ -150,6 +150,8 @@ namespace Engine
         Core();
         ~Core();
 
+        bool verboseLogs = true;
+
         /**
          * @brief Sets the running value to true
 

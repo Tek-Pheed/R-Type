@@ -32,11 +32,14 @@ More information about required system libraries (for SFML): https://www.sfml-de
 
 **On Fedora/RedHat based distributions:**
 
-_You have to install Criterion manually, since there is no package available. [This helper script worked for us](https://gist.github.com/Thibb1/065786184253d8e553efe7122ee82e82)_
 
 ```
 dnf install freetype-devel libglvnd-opengl libXrandr-devel libXcursor-devel xrandr freetype glew libjpeg-turbo libsndfile openal-soft libvorbis-devel flac-devel libX11-devel libGL-devel systemd-devel openal-soft-devel
 ```
+>[!NOTE]
+>
+>_On Fedora you will have to install Criterion manually, since there is no package available. [This helper script worked for us](https://gist.github.com/Thibb1/065786184253d8e553efe7122ee82e82)_
+
 
 **On Debian/Ubuntu based distributions:**
 
@@ -89,6 +92,10 @@ We provide a script, `tools/distribute-linux.sh`, that automates the build proce
 - **A Server AppImage:** This is a self-contained Linux executable for the game server, similar to the client AppImage.
 
 By distributing these AppImages, you can share the project with your friends on almost any Linux distribution that supports AppImages.
+
+>[!NOTE]
+>
+>The libfuse2 package is required to build appimages.
 
 ## Windows
 
