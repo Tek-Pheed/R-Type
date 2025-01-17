@@ -9,10 +9,6 @@
 
 namespace ecs
 {
-    BonusComponent::BonusComponent(const ecs::Bonus &bonus)
-    {
-        this->_bonus = bonus;
-    }
 
     BonusComponent::BonusComponent(size_t bonusID, const ecs::Bonus &bonus)
     {

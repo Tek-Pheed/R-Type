@@ -18,7 +18,7 @@ namespace ecs
 
     class PositionComponent : public Component {
       public:
-        PositionComponent(float x = 0, float y = 0);
+        explicit PositionComponent(float x = 0, float y = 0);
 
         float getX();
         float getY();
@@ -38,7 +38,7 @@ namespace ecs
 
     class PlayerComponent : public Component {
       public:
-        PlayerComponent(size_t playerID);
+        explicit PlayerComponent(size_t playerID);
 
         size_t getPlayerID() const;
         void setPlayerID(size_t playerID);
@@ -148,7 +148,7 @@ namespace ecs
 
     template <typename musicType> class MusicComponent : public Component {
       public:
-        explicit MusicComponent(musicType &music, std::string str)
+        explicit MusicComponent(musicType &music, const std::string &str)
             : _music(music), _str(str)
         {
         }
@@ -158,7 +158,7 @@ namespace ecs
             return this->_music;
         }
 
-        void setMusicType(musicType &music)
+        void setMusicType(const musicType &music)
         {
             _music = music;
         }
@@ -170,8 +170,8 @@ namespace ecs
 
     template <typename spriteType> class SpriteComponent : public Component {
       public:
-        SpriteComponent(spriteType &sprite, int offsetX = 0, int offsetY = 0,
-            int maxX = 0, float delay = 0.0f, int startX = 0,
+        explicit SpriteComponent(spriteType &sprite, int offsetX = 0,
+            int offsetY = 0, int maxX = 0, float delay = 0.0f, int startX = 0,
             bool once = false)
             : _sprite(sprite), _sizeX(offsetX), _sizeY(offsetY), _maxX(maxX),
               _delay(delay), _startX(startX), _once(once)
@@ -179,7 +179,7 @@ namespace ecs
             _elapsedTime = 0.0f;
         }
 
-        void setSprite(spriteType &sprite)
+        void setSprite(const spriteType &sprite)
         {
             this->_sprite = sprite;
         }
@@ -381,8 +381,7 @@ namespace ecs
 
     class BonusComponent : public Component {
       public:
-        explicit BonusComponent(const Bonus &bonus);
-        BonusComponent(size_t bonusID, const Bonus &bonus);
+        explicit BonusComponent(size_t bonusID, const Bonus &bonus);
 
         Bonus getBonus();
         void setBonus(const Bonus &bonus);

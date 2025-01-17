@@ -65,7 +65,7 @@ namespace RType
             player.addComponent(
                 std::make_shared<ecs::TextComponent<sf::Text>>(text, n));
             player.addComponent(
-                std::make_shared<ecs::BonusComponent>(ecs::Bonus::NONE));
+                std::make_shared<ecs::BonusComponent>(id, ecs::Bonus::NONE));
         } else {
             player.addComponent(
                 std::make_shared<ecs::TextComponent<std::string>>(n, name));
