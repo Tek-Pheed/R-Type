@@ -22,6 +22,6 @@ or define.
 | Rectangle component | Defines an entity as a Rectangle                                      |
 | Text component      | Defines an entity as a text                                           |
 | Name component      | Defines an entity name                                                |
-| Bonus component     | Defines an entity as a bonus (0 = RapidFire, 1 = Speed and 2 = Health |
+| Bonus component     | Defines an entity as a bonus (0 = RapidFire, 1 = Speed and 2 = Health) |
 | Hitbox component    | Add a hitbox to an entity                                             |
 | Clickable component | Define type of button                                                 |
