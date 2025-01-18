@@ -18,6 +18,7 @@
 #include "EngineNetworking.hpp"
 #include "Game.hpp"
 
+[[maybe_unused]]
 static int printServerHelp()
 {
     std::cout << "USAGE: ./server [PORT TCP] [PORT UDP]" << std::endl;

@@ -8,7 +8,7 @@
 #include "Game.hpp"
 #include "GameAssets.hpp"
 #include "Levels.hpp"
-
+[[maybe_unused]]
 static float randrange(float max, float min)
 {
     return (min
@@ -102,6 +102,5 @@ void Levels::buildMainMenu()
                     - (float) 75 * -2),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black, "EXIT",
             40, sf::Color::Black, ecs::ClickableType::EXIT);
-
     }
 }

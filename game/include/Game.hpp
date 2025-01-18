@@ -185,7 +185,7 @@ namespace RType
         void handleNetworkBonuses(
             int code, const std::vector<std::string> &tokens);
         ecs::Entity &getBonusById(size_t bonusID);
-        void applyBonus(ecs::Entity &bonus, size_t playerID);
+        void applyBonus(ecs::Entity &bonus, size_t playerID, int bonusType);
 
         Engine::Core &refGameEngine;
         Engine::Feature::LevelManager<GameInstance> &refEntityManager;

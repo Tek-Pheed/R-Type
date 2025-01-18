@@ -80,7 +80,8 @@ ecs::Entity &GameInstance::getBonusById(size_t bonusID)
         THROW_ERROR_LOCATION "Bonus not found id=" + std::to_string(bonusID));
 }
 
-void GameInstance::applyBonus(ecs::Entity &bonus, size_t playerID)
+void GameInstance::applyBonus(
+    ecs::Entity &bonus, size_t playerID, int bonusType)
 {
     auto bonComp = bonus.getComponent<ecs::BonusComponent>();
     if (!bonComp)
@@ -96,15 +97,16 @@ void GameInstance::applyBonus(ecs::Entity &bonus, size_t playerID)
                   << " get by player " << playerComp->getPlayerID()
                   << std::endl;
 
-    refEntityManager.getCurrentLevel().markEntityForDeletion(bonusIDE);
     auto currentPlayerBonus = player.getComponent<ecs::BonusComponent>();
     auto health = player.getComponent<ecs::HealthComponent>();
     if (!currentPlayerBonus || !health)
         return;
-    if (bonComp->getBonus() == 2)
+    if (bonusType == 2)
         damagePlayer(
             player.getComponent<ecs::PlayerComponent>()->getPlayerID(), (-50));
-    currentPlayerBonus->setBonus(bonComp->getBonus());
+    currentPlayerBonus->setBonus(static_cast<ecs::Bonus>(bonusType));
+    std::cout << "I got a bonus : " << bonusType << std::endl;
+    refEntityManager.getCurrentLevel().markEntityForDeletion(bonusIDE);
     if constexpr (!server) {
         auto &bonusSound =
             refAssetManager.getAsset<sf::SoundBuffer>(Asset::BONUS_GET);
@@ -112,8 +114,7 @@ void GameInstance::applyBonus(ecs::Entity &bonus, size_t playerID)
     } else {
         std::stringstream sss;
         sss << BN_GET << " " << playerComp->getPlayerID() << " "
-            << bonComp->getBonusID() << " " << bonComp->getBonus() << " "
-            << PACKET_END;
+            << bonComp->getBonusID() << " " << bonusType << " " << PACKET_END;
         refNetworkManager.sendToAll(
             System::Network::ISocket::Type::TCP, sss.str());
     }
@@ -140,8 +141,9 @@ void GameInstance::handleNetworkBonuses(
             if (tokens.size() >= 3) {
                 size_t bonusID = (size_t) std::atoi(tokens[1].c_str());
                 size_t playerID = (size_t) std::atoi(tokens[0].c_str());
+                int bonusType = (int) std::atoi(tokens[2].c_str());
                 auto bon = getBonusById(bonusID);
-                applyBonus(bon, playerID);
+                applyBonus(bon, playerID, bonusType);
             }
             break;
         }
