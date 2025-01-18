@@ -35,6 +35,8 @@ namespace RType
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
         player.addComponent(
             std::make_shared<ecs::HitboxComponent>(0.075f, 0.06f));
+        player.addComponent(
+            std::make_shared<ecs::BonusComponent>(id, ecs::Bonus::NONE));
         std::string n = DEFAULT_PLAYER_NAME;
         if (!name.empty())
             n = name;
@@ -64,8 +66,6 @@ namespace RType
             text.setString(n);
             player.addComponent(
                 std::make_shared<ecs::TextComponent<sf::Text>>(text, n));
-            player.addComponent(
-                std::make_shared<ecs::BonusComponent>(id, ecs::Bonus::NONE));
         } else {
             player.addComponent(
                 std::make_shared<ecs::TextComponent<std::string>>(n, name));

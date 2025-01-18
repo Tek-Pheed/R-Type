@@ -57,9 +57,8 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
     static float damageCooldown = 0.0f;
     damageCooldown -= deltaTime;
 
-    for (size_t id :
-        _game->refEntityManager.getCurrentLevel()
-            .findEntitiesIdByComponent<ecs::PositionComponent>()) {
+    for (size_t id : _game->refEntityManager.getCurrentLevel()
+             .findEntitiesIdByComponent<ecs::PositionComponent>()) {
         try {
             auto &enti =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
@@ -109,7 +108,7 @@ void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
         return;
 
     for (size_t id : _game->refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+             .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
         try {
             auto &enti =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
@@ -150,7 +149,7 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
         return;
 
     for (size_t id : _game->refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::PlayerComponent>()) {
+             .findEntitiesIdByComponent<ecs::PlayerComponent>()) {
         try {
             auto &enti =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
@@ -193,7 +192,7 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
         return;
 
     for (size_t id : _game->refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::PlayerComponent>()) {
+             .findEntitiesIdByComponent<ecs::PlayerComponent>()) {
         try {
             auto &enti =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
@@ -208,14 +207,7 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
                     playerHitB->getWidth(), playerHitB->getHeight(),
                     bonusPos->getX(), bonusPos->getY(), bonusHitB->getWidth(),
                     bonusHitB->getHeight())) {
-                std::stringstream sss;
-                sss << BN_GET << " " << player->getPlayerID() << " "
-                    << bonusComp->getBonusID() << " " << bonusComp->getBonus()
-                    << " " << PACKET_END;
-                _game->refNetworkManager.sendToAll(
-                    System::Network::ISocket::Type::TCP, sss.str());
-                _game->refEntityManager.getCurrentLevel()
-                    .markEntityForDeletion(bonus.getID());
+                _game->applyBonus(bonus, player->getPlayerID());
             }
         } catch (const std::exception &e) {
             if constexpr (RType::GameInstance::DEBUG_LOGS)
@@ -237,7 +229,7 @@ void HitboxSystem::PlayerPvPMode(ecs::Entity &bullet, float deltaTime)
         return;
 
     for (size_t id : _game->refEntityManager.getCurrentLevel()
-                         .findEntitiesIdByComponent<ecs::PlayerComponent>()) {
+             .findEntitiesIdByComponent<ecs::PlayerComponent>()) {
         if (id == bullet.getID())
             continue;
         try {
@@ -272,9 +264,8 @@ void HitboxSystem::PlayerPvPMode(ecs::Entity &bullet, float deltaTime)
 void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
 {
     (void) entities;
-    for (size_t id :
-        _game->refEntityManager.getCurrentLevel()
-            .findEntitiesIdByComponent<ecs::PositionComponent>()) {
+    for (size_t id : _game->refEntityManager.getCurrentLevel()
+             .findEntitiesIdByComponent<ecs::PositionComponent>()) {
         try {
             auto &entity =
                 _game->refEntityManager.getCurrentLevel().getEntityById(id);
