@@ -210,6 +210,9 @@ void GameInstance::handleLobby(
                                << (_gamemode ? "PVP" : "WAVE");
                             text->setStr(ss.str());
                         }
+                        if (_gamemode == 1) {
+                            loadPvPLevel();
+                        }
                     }
                 if constexpr (server) {
                     std::stringstream sss;
