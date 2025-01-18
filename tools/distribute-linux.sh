@@ -55,7 +55,7 @@ cat > R-Type-Server.desktop << 'EOF'
 Type=Application
 Name=R-Type-Server
 Comment=The server of the R-Type project.
-Icon=server
+Icon=ftype
 Categories=Game
 EOF
 
@@ -64,7 +64,7 @@ find $SCRIPTPATH/../release/ -type f \( -name "*.so" -o -name "*.so.*" \) -exec 
 find $SCRIPTPATH/../release/ -type l \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} $SCRIPTPATH/../release/packages/server/appdir \;
 mkdir -p $SCRIPTPATH/../release/packages/server/appdir/assets/
 cp -R $SCRIPTPATH/../release/assets/levels $SCRIPTPATH/../release/packages/server/appdir/assets/
-cp $SCRIPTPATH/../release/assets/icon/server.png $SCRIPTPATH/../release/packages/server/appdir/server.png
+cp $SCRIPTPATH/../release/assets/icon/ftype.png $SCRIPTPATH/../release/packages/server/appdir/ftype.png
 cd ..
 
 $SCRIPTPATH/appimageTool/appimagetool-x86_64.AppImage appdir
@@ -96,7 +96,7 @@ cat > R-Type-Client.desktop << 'EOF'
 Type=Application
 Name=R-Type-Client
 Comment=The client of the R-Type project.
-Icon=client
+Icon=ftype
 Categories=Game
 EOF
 
@@ -104,7 +104,7 @@ cp $SCRIPTPATH/../release/client ./client
 find $SCRIPTPATH/../release/ -type f \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} $SCRIPTPATH/../release/packages/client/appdir \;
 find $SCRIPTPATH/../release/ -type l \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} $SCRIPTPATH/../release/packages/client/appdir \;
 cp -R $SCRIPTPATH/../release/assets/ ./assets
-cp $SCRIPTPATH/../release/assets/icon/client.png $SCRIPTPATH/../release/packages/client/appdir/client.png
+cp $SCRIPTPATH/../release/assets/icon/ftype.png $SCRIPTPATH/../release/packages/client/appdir/ftype.png
 cd ..
 
 $SCRIPTPATH/appimageTool/appimagetool-x86_64.AppImage appdir

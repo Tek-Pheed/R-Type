@@ -33,7 +33,7 @@ void GameInstance::handleLobby(
     int code, const std::vector<std::string> &tokens)
 {
     EventManager eventManager(*this);
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Handling lobby: " << code << std::endl;
     switch (code) {
         case Protocol::L_STARTGAME: {
@@ -78,7 +78,7 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _maxPlayers = (size_t) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
-                if (RType::GameInstance::DEBUG_LOGS)
+                if constexpr (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Max players set to : " << _maxPlayers
                               << std::endl;
                 if constexpr (!server)

@@ -22,7 +22,7 @@ namespace RType
         const float Width = 0.075f * (float) _game.WinScaleX;
         const float Height = 0.06f * (float) _game.WinScaleY;
 
-        if (RType::GameInstance::DEBUG_LOGS)
+        if constexpr (RType::GameInstance::DEBUG_LOGS)
             std::cout << "Adding new player to the game" << std::endl;
         auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));

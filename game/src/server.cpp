@@ -33,7 +33,7 @@ void GameInstance::serverEventNewConn(
 {
     (void) core;
     size_t newID = std::any_cast<size_t>(arg);
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Server wakeup on event: " << event << std::endl;
     std::stringstream ss;
     ss << C_INIT_UDP << " " << newID << PACKET_END;
@@ -46,7 +46,7 @@ void GameInstance::serverEventClosedConn(
 {
     (void) core;
     ssize_t id = std::any_cast<ssize_t>(arg);
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Server wakeup on event: " << event << std::endl;
     std::stringstream ss;
     if (id >= 0) {
@@ -66,7 +66,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
 {
     std::unique_lock lock(_gameLock);
 
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Sending game state to new player: " << clientID
                   << std::endl;
     for (auto &p : getAllPlayers()) {
@@ -84,7 +84,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
                 nm->getText();
         }
         if (!pl || !pos) {
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "serverSendGameState: Failed to get player"
                           << std::endl;
             continue;
@@ -102,7 +102,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
         auto hl = e.get().getComponent<ecs::HealthComponent>();
         if (!ec || !pos) {
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "serverSendGameState: Failed to get enemy"
                           << std::endl;
             continue;
@@ -196,7 +196,7 @@ void RType::GameInstance::serverHanlderValidateConnection(
                 serverSendGameState((size_t) netClientID);
             }
         } else {
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "serverHanlderValidateConnection: Could not read "
                              "client ID"
                           << std::endl;

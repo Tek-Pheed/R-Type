@@ -207,13 +207,9 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
                     playerHitB->getWidth(), playerHitB->getHeight(),
                     bonusPos->getX(), bonusPos->getY(), bonusHitB->getWidth(),
                     bonusHitB->getHeight())) {
-                //_game->applyBonus(bonus, player->getPlayerID());
-                std::stringstream sss;
-                sss << BN_GET << " " << player->getPlayerID() << " "
-                    << bonusComp->getBonusID() << " " << bonusComp->getBonus()
-                    << " " << PACKET_END;
-                _game->refNetworkManager.sendToAll(
-                    System::Network::ISocket::Type::TCP, sss.str());
+                if (bonusComp->getWave() == _game->currentWave)
+                    _game->applyBonus(
+                        bonus, player->getPlayerID(), bonusComp->getBonus());
             }
         } catch (const std::exception &e) {
             if constexpr (RType::GameInstance::DEBUG_LOGS)

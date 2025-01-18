@@ -52,7 +52,7 @@ void RType::GameInstance::clientHandlerConnection(
                     refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::UDP, ss.str());
                 } else {
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Could not read client ID" << std::endl;
                 }
             }
@@ -63,13 +63,13 @@ void RType::GameInstance::clientHandlerConnection(
                 if (tokens[0].starts_with("OK") && _netClientID >= 0) {
                     // We can create the player here, or wait and create it
                     // later
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Build player with id:" << _netClientID
                                   << std::endl;
                     factory.buildPlayer(
                         true, (size_t) _netClientID, playerName);
                 } else {
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "The connection failed." << std::endl;
                 }
             }

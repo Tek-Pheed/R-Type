@@ -92,9 +92,9 @@ void GameInstance::applyBonus(
     auto playerComp = player.getComponent<ecs::PlayerComponent>();
     if (!playerComp)
         return;
-    if (RType::GameInstance::DEBUG_LOGS)
-        std::cout << "Bonus " << bonusID << " " << bonComp->getBonus()
-                  << " get by player " << playerComp->getPlayerID()
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Bonus " << bonusID << " with type " << bonComp->getBonus()
+                  << " applied to player " << playerComp->getPlayerID()
                   << std::endl;
 
     auto currentPlayerBonus = player.getComponent<ecs::BonusComponent>();
@@ -105,7 +105,6 @@ void GameInstance::applyBonus(
         damagePlayer(
             player.getComponent<ecs::PlayerComponent>()->getPlayerID(), (-50));
     currentPlayerBonus->setBonus(static_cast<ecs::Bonus>(bonusType));
-    std::cout << "I got a bonus : " << bonusType << std::endl;
     refEntityManager.getCurrentLevel().markEntityForDeletion(bonusIDE);
     if constexpr (!server) {
         auto &bonusSound =
@@ -142,7 +141,7 @@ void GameInstance::handleNetworkBonuses(
                 size_t bonusID = (size_t) std::atoi(tokens[1].c_str());
                 size_t playerID = (size_t) std::atoi(tokens[0].c_str());
                 int bonusType = (int) std::atoi(tokens[2].c_str());
-                auto bon = getBonusById(bonusID);
+                auto &bon = getBonusById(bonusID);
                 applyBonus(bon, playerID, bonusType);
             }
             break;
