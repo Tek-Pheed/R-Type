@@ -216,10 +216,11 @@ namespace Engine
                     try {
                         cli.second.tcpSocket.closeSocket();
                     } catch (const std::exception &e) {
-                        std::cout << CATCH_ERROR_LOCATION
-                            "Can't close client socket, it might "
-                            "already be closed"
-                                  << std::endl;
+                        if (_engineRef.verboseLogs)
+                            std::cout << CATCH_ERROR_LOCATION
+                                "Can't close client socket, it might "
+                                "already be closed"
+                                      << std::endl;
                     }
                 }
                 _clients.clear();

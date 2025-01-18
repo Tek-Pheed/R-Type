@@ -6,7 +6,7 @@ echo "Generating build files..."
 cmake -B build . -DCMAKE_BUILD_TYPE=Release
 cd build
 echo "Building R-Type..."
-cmake --build . -j $env:NUMBER_OF_PROCESSORS
+cmake --build . --config Release -j $env:NUMBER_OF_PROCESSORS
 
 $sourceDir = "dependencies/SFML/"
 $destDir = "../release/"

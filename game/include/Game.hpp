@@ -17,8 +17,6 @@ constexpr const bool server = true;
 constexpr const bool server = false;
 #endif
 
-#include "SFML/Graphics.hpp"
-#include "SFML/Audio.hpp"
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -35,6 +33,8 @@ constexpr const bool server = false;
 #include "Factory.hpp"
 #include "GameSystems.hpp"
 #include "Levels.hpp"
+#include "SFML/Audio.hpp"
+#include "SFML/Graphics.hpp"
 #include <unordered_map>
 
 namespace RType
@@ -173,15 +173,19 @@ namespace RType
         void serverEventPackets(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
 
+        // Events
         void gamePreTick(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         void gameTick(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         void gamePostTick(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
+
         // Bonus
         void handleNetworkBonuses(
             int code, const std::vector<std::string> &tokens);
+        ecs::Entity &getBonusById(size_t bonusID);
+        void applyBonus(ecs::Entity &bonus, size_t playerID, int bonusType);
 
         Engine::Core &refGameEngine;
         Engine::Feature::LevelManager<GameInstance> &refEntityManager;

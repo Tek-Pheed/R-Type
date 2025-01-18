@@ -114,7 +114,7 @@ void GameInstance::handleNetworkMechs(
                     factory.buildSoundEffect(
                         newWaveInComingSound, "newWaveInComingSound", 100.0f);
                 }
-                if (RType::GameInstance::DEBUG_LOGS)
+                if constexpr (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Changing wave: " << currentWave << std::endl;
             }
             break;
@@ -234,7 +234,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                                          "music from level config");
             std::stringstream ss;
             _musicName = value[0];
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "Set music: " << _musicName << std::endl;
             ss << M_MUSIC << " " << value[0] << " " << PACKET_END;
             refNetworkManager.sendToAll(
@@ -246,7 +246,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                     THROW_ERROR_LOCATION "loadLevelContent: Failed to create "
                                          "background from level config");
             std::stringstream ss;
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "Set background: " << _bgName << std::endl;
             _bgName = value[0];
             ss << M_BG << " " << value[0] << " " << PACKET_END;
@@ -258,7 +258,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to set wave");
             wave = std::atoi(value[0].c_str());
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "Set wave to: " << wave << std::endl;
         }
         if (key == BUILD_BONUS && _bonus) {
@@ -266,6 +266,9 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create bonus "
                     "from level config");
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << "Building bonus with type : "
+                          << std::atoi(value[2].c_str()) << std::endl;
             factory.buildBonus(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 static_cast<ecs::Bonus>(std::atoi(value[2].c_str())), wave);
@@ -278,7 +281,7 @@ const std::vector<const Asset::AssetStore *> getAllAsset()
     std::vector<const Asset::AssetStore *> vect;
 
     for (size_t i = 0; i < sizeof(Asset::assets) / sizeof(Asset::assets[0]);
-         i++) {
+        i++) {
         vect.emplace_back(&Asset::assets[i]);
     }
     return (vect);
@@ -345,9 +348,8 @@ void GameInstance::gameTick(
             static float time = 0.0f;
             time += deltaTime_sec;
             if (time >= 1.0f) {
-                for (auto entID :
-                    refEntityManager.getCurrentLevel()
-                        .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
+                for (auto entID : refEntityManager.getCurrentLevel()
+                         .findEntitiesIdByComponent<ecs::EnemyComponent>()) {
                     auto enemy = refEntityManager.getCurrentLevel()
                                      .getEntityById(entID)
                                      .getComponent<ecs::EnemyComponent>();
@@ -391,9 +393,8 @@ void GameInstance::gamePostTick(
                 }
             }
         }
-        for (auto &entity :
-            refEntityManager.getCurrentLevel()
-                .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
+        for (auto &entity : refEntityManager.getCurrentLevel()
+                 .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()) {
             auto mus =
                 entity.get().getComponent<ecs::MusicComponent<sf::Sound>>();
             if (mus->getMusicType().getStatus() != sf::Music::Playing)
@@ -419,7 +420,7 @@ void GameInstance::gamePostTick(
             if (next) {
                 if (entVect.size() == 0 && !ended) {
                     if (_level < getTxtFiles("assets/levels").size()) {
-                        if (RType::GameInstance::DEBUG_LOGS)
+                        if constexpr (RType::GameInstance::DEBUG_LOGS)
                             std::cout << "Next level" << std::endl;
                         _level++;
                         std::string levelFileName = "assets/levels/level"
@@ -441,7 +442,7 @@ void GameInstance::gamePostTick(
                 }
                 std::stringstream ss;
                 currentWave += 1;
-                if (RType::GameInstance::DEBUG_LOGS)
+                if constexpr (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Changing wave: " << currentWave << std::endl;
                 ss << M_WAVE << " " << currentWave << PACKET_END;
                 refNetworkManager.sendToAll(
@@ -487,14 +488,14 @@ int RType::GameInstance::manageBuffers()
             int code_int = isCodeValid(code);
             std::vector<std::string> tokens;
             if (code_int == -1) {
-                if (RType::GameInstance::DEBUG_LOGS)
+                if constexpr (RType::GameInstance::DEBUG_LOGS)
                     std::cout << "Invalid packet: " << buffer << std::endl;
                 return -1;
             }
             std::string str = buffer.substr(4, buffer.size() - 4);
             std::istringstream ss(str);
             std::string token;
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "Managing Buffer: " << buff << std::endl;
             while (std::getline(ss, token, ' ')) {
                 tokens.push_back(token);
@@ -519,8 +520,9 @@ int RType::GameInstance::manageBuffers()
             }
             ss.clear();
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION "Failed to handle packet: "
-                      << buff << " : " << e.what() << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION "Failed to handle packet: "
+                          << buff << " : " << e.what() << std::endl;
             continue;
         }
     }

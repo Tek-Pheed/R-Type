@@ -174,8 +174,8 @@ Removed a terrain, if its has been destroyed or went off the screen.
 
 # Bonus Management (150)
 
-- Spawn bonus - 151 -> TCP
-- Get bonus - 152 -> TCP
+- Spawn bonus (bonusID, posX, posY, wave) - 151 -> TCP
+- Get bonus (playerID, bonusID, bonusType) - 152 -> TCP
 
 # Game Management (240)
 

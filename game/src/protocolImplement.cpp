@@ -49,7 +49,6 @@ PacketHandler::~PacketHandler()
 {
 }
 
-// This will need to be more robust
 std::vector<std::string> PacketHandler::splitPackets(
     const System::Network::byteArray &bytes, size_t &resultIndexEnd)
 {
@@ -65,7 +64,7 @@ std::vector<std::string> PacketHandler::splitPackets(
                 std::string packet =
                     deserializeString(in, getKey(), buffer.size());
                 if (!packet.empty()) {
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Deserialized: " << packet << std::endl;
                     out.push_back(packet);
                     start = buffer.size();
@@ -114,7 +113,7 @@ void PacketHandler::serializeString(
     const std::string &str, std::ostream &out, char key)
 {
     size_t size = str.size();
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Serializing: " << str << std::endl;
     out.write(reinterpret_cast<const char *>(&size), sizeof(size));
 

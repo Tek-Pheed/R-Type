@@ -30,7 +30,7 @@ ecs::Entity &RType::Factory::buildBoss(
     const float Width = 0.3f * (float) _game.WinScaleX;
     const float Height = 0.7f * (float) _game.WinScaleY;
 
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new boss to the game" << std::endl;
     auto &boss = _game.refEntityManager.getCurrentLevel().createEntity();
     boss.addComponent(std::make_shared<ecs::EnemyComponent>(id, 2));
@@ -104,7 +104,7 @@ void GameInstance::sendBossPosition(size_t bossID)
 void GameInstance::deleteBoss(size_t bossID)
 {
     std::unique_lock lock(_gameLock);
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Deleting boss" << std::endl;
     auto &ene = getBossById(bossID);
     refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
