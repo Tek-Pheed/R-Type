@@ -349,8 +349,9 @@ void GameInstance::handleNetworkPlayers(
                         refEntityManager.getCurrentLevel().getEntityById(
                             static_cast<size_t>(getHealthId()));
                     } catch (const std::exception &e) {
-                        std::cout << CATCH_ERROR_LOCATION << e.what()
-                                  << std::endl;
+                        if constexpr (RType::GameInstance::DEBUG_LOGS)
+                            std::cout << CATCH_ERROR_LOCATION << e.what()
+                                      << std::endl;
                         return;
                     }
                     auto healthEnt =

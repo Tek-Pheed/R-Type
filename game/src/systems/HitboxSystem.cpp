@@ -93,7 +93,8 @@ void HitboxSystem::EnemyCollision(ecs::Entity &enemy, float deltaTime)
                 }
             }
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }
@@ -132,7 +133,8 @@ void HitboxSystem::PlayerBulletCollision(ecs::Entity &bullet)
                     .markEntityForDeletion(bullet.getID());
             }
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }
@@ -174,7 +176,8 @@ void HitboxSystem::EnemyBulletCollision(ecs::Entity &bullet)
                     .markEntityForDeletion(bullet.getID());
             }
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }
@@ -215,7 +218,8 @@ void HitboxSystem::BonusCollision(ecs::Entity &bonus)
                     .markEntityForDeletion(bonus.getID());
             }
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }
@@ -259,7 +263,8 @@ void HitboxSystem::PlayerPvPMode(ecs::Entity &bullet, float deltaTime)
             }
 
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }
@@ -307,7 +312,8 @@ void HitboxSystem::update(std::vector<ecs::Entity> &entities, float deltaTime)
                 && hitbox && bullet->getIsFromPlayer() == true)
                 PlayerPvPMode(entity, deltaTime);
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         }
     }
 }

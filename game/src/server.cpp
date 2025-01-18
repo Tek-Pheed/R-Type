@@ -54,8 +54,10 @@ void GameInstance::serverEventClosedConn(
             deletePlayer((size_t) id);
             refNetworkManager.disconnectClient((size_t) id);
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION "Could not delete player: " << id
-                      << ", maybe it failed to connect." << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION "Could not delete player: "
+                          << id << ", maybe it failed to connect."
+                          << std::endl;
         }
     }
 }
@@ -94,7 +96,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
     for (auto &e : refEntityManager.getCurrentLevel()
-             .findEntitiesByComponent<ecs::EnemyComponent>()) {
+                       .findEntitiesByComponent<ecs::EnemyComponent>()) {
         auto pos = e.get().getComponent<ecs::PositionComponent>();
         auto vel = e.get().getComponent<ecs::VelocityComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
@@ -114,7 +116,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
     for (auto &e : refEntityManager.getCurrentLevel()
-             .findEntitiesByComponent<ecs::BonusComponent>()) {
+                       .findEntitiesByComponent<ecs::BonusComponent>()) {
         if (!e.get().getComponent<ecs::PlayerComponent>()) {
             auto bon = e.get().getComponent<ecs::BonusComponent>();
             auto pos = e.get().getComponent<ecs::PositionComponent>();

@@ -31,7 +31,8 @@ void setNewHealth(GameInstance &game, ecs::Entity &player)
         game.refEntityManager.getCurrentLevel().getEntityById(
             static_cast<size_t>(game.getHealthId()));
     } catch (const std::exception &e) {
-        std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
+        if constexpr (RType::GameInstance::DEBUG_LOGS)
+            std::cout << CATCH_ERROR_LOCATION << e.what() << std::endl;
         return;
     }
     auto &healthEnt = game.refEntityManager.getCurrentLevel().getEntityById(

@@ -26,9 +26,10 @@ void NetworkingManager::runConnectThread()
         try {
             System::Network::select(&readfds, nullptr, nullptr, tv);
         } catch (const std::exception &s) {
-            std::cout << CATCH_ERROR_LOCATION
-                "ENGINE: [Accept Thread] An error occured in the server: "
-                      << s.what() << std::endl;
+            if (_engineRef.verboseLogs)
+                std::cout << CATCH_ERROR_LOCATION
+                    "ENGINE: [Accept Thread] An error occured in the server: "
+                          << s.what() << std::endl;
         }
         if (readfds.size() == 0)
             continue;
@@ -180,9 +181,10 @@ void NetworkingManager::runWriteThread()
                 }
             }
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION
-                "ENGINE: [Write Thread] failed with exception: "
-                      << e.what() << ", tying again..." << std::endl;
+            if (_engineRef.verboseLogs)
+                std::cout << CATCH_ERROR_LOCATION
+                    "ENGINE: [Write Thread] failed with exception: "
+                          << e.what() << ", tying again..." << std::endl;
             shouldWait = false;
         }
     }
@@ -378,9 +380,10 @@ void NetworkingManager::runReadThread()
                 }
             }
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION
-                "ENGINE: [Read Thread] failed with exception: "
-                      << e.what() << ", trying again..." << std::endl;
+            if (_engineRef.verboseLogs)
+                std::cout << CATCH_ERROR_LOCATION
+                    "ENGINE: [Read Thread] failed with exception: "
+                          << e.what() << ", trying again..." << std::endl;
         }
     }
     std::cout << "ENGINE: [Read Thread] Terminating." << std::endl;

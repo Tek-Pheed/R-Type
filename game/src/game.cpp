@@ -302,9 +302,10 @@ void GameInstance::loadAssets()
                 &sf::SoundBuffer::loadFromFile);
         }
     } catch (const std::exception &e) {
-        std::cout << CATCH_ERROR_LOCATION
-            "Failed to an load asset with error: "
-                  << e.what() << std::endl;
+        if constexpr (RType::GameInstance::DEBUG_LOGS)
+            std::cout << CATCH_ERROR_LOCATION
+                "Failed to an load asset with error: "
+                      << e.what() << std::endl;
     }
 }
 
@@ -361,8 +362,10 @@ void GameInstance::gameTick(
             }
         }
     } catch (const std::exception &e) {
-        std::cout << CATCH_ERROR_LOCATION "An error occured while playing: "
-                  << e.what() << std::endl;
+        if constexpr (RType::GameInstance::DEBUG_LOGS)
+            std::cout << CATCH_ERROR_LOCATION
+                "An error occured while playing: "
+                      << e.what() << std::endl;
     }
 }
 

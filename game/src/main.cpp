@@ -30,8 +30,8 @@ static int printClientHelp()
     return (84);
 }
 
-static int prepareGame(int argc, const char *argv[],
-    RType::GameInstance &gameInstance)
+static int prepareGame(
+    int argc, const char *argv[], RType::GameInstance &gameInstance)
 {
     if constexpr (server) {
         if (argc == 1) {
@@ -81,11 +81,12 @@ int main(int argc, const char *argv[])
             return (result);
         gameEngine.mainLoop();
     } catch (const std::exception &e) {
-        std::cout << CATCH_ERROR_LOCATION
-            "We are sorry, but an unhandled exception occured during "
-            "runtime: "
-                  << std::endl
-                  << e.what() << std::endl;
+        if constexpr (RType::GameInstance::DEBUG_LOGS)
+            std::cout << CATCH_ERROR_LOCATION
+                "We are sorry, but an unhandled exception occured during "
+                "runtime: "
+                      << std::endl
+                      << e.what() << std::endl;
         return (84);
     }
     return (0);
