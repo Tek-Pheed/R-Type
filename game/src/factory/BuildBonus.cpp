@@ -82,9 +82,10 @@ void GameInstance::handleNetworkBonuses(
         }
         case Protocol::BN_GET: {
             if (tokens.size() >= 3) {
-                std::cout << "Bonus " << tokens[1].c_str() << " "
-                          << tokens[2].c_str() << " get by "
-                          << tokens[0].c_str() << std::endl;
+                if (RType::GameInstance::DEBUG_LOGS)
+                    std::cout << "Bonus " << tokens[1].c_str() << " "
+                              << tokens[2].c_str() << " get by "
+                              << tokens[0].c_str() << std::endl;
                 auto bonuses =
                     refEntityManager.getCurrentLevel()
                         .findEntitiesByComponent<ecs::BonusComponent>();
@@ -120,8 +121,10 @@ void GameInstance::handleNetworkBonuses(
                     factory.buildSoundEffect(bonusSound, "bonusSound", 100.0f);
                     currentPlayerBonus->setBonus(
                         static_cast<ecs::Bonus>(std::atoi(tokens[2].c_str())));
-                    std::cout << "set bonus " << currentPlayerBonus->getBonus()
-                              << std::endl;
+                    if (RType::GameInstance::DEBUG_LOGS)
+                        std::cout << "set bonus "
+                                  << currentPlayerBonus->getBonus()
+                                  << std::endl;
                 }
             }
             break;

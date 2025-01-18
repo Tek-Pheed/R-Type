@@ -78,8 +78,9 @@ void GameInstance::handleLobby(
             if (tokens.size() >= 2) {
                 _maxPlayers = (size_t) atoi(tokens[1].c_str());
                 auto enti = refEntityManager.getCurrentLevel().getEntities();
-                std::cout << "Max players set to : " << _maxPlayers
-                          << std::endl;
+                if (RType::GameInstance::DEBUG_LOGS)
+                    std::cout << "Max players set to : " << _maxPlayers
+                              << std::endl;
                 if constexpr (!server)
                     for (auto &entity : enti) {
                         auto text =
@@ -294,8 +295,7 @@ void GameInstance::handleNetworkPlayers(
                     == (size_t) atoi(tokens[0].c_str())) {
                 auto &youLoseSound = refAssetManager.getAsset<sf::SoundBuffer>(
                     Asset::YOU_LOSE_SOUND);
-                factory.buildSoundEffect(
-                    youLoseSound, "youLoseSound", 100.0f);
+                factory.buildSoundEffect(youLoseSound, "youLoseSound", 100.0f);
                 std::string title = "YOU ARE DEAD";
                 auto textWidth = title.size() * 20;
                 factory.buildText(0,
@@ -433,7 +433,7 @@ size_t GameInstance::getHostClient()
 std::vector<std::reference_wrapper<ecs::Entity>> GameInstance::getAllPlayers()
 {
     return (refEntityManager.getCurrentLevel()
-            .findEntitiesByComponent<ecs::PlayerComponent>());
+                .findEntitiesByComponent<ecs::PlayerComponent>());
 }
 
 ecs::Entity &GameInstance::getPlayerById(size_t id)
