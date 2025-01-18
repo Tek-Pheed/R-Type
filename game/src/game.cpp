@@ -520,8 +520,9 @@ int RType::GameInstance::manageBuffers()
             }
             ss.clear();
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION "Failed to handle packet: "
-                      << buff << " : " << e.what() << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION "Failed to handle packet: "
+                          << buff << " : " << e.what() << std::endl;
             continue;
         }
     }

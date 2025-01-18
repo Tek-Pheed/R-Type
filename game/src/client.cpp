@@ -166,7 +166,7 @@ void RType::GameInstance::connectToGame()
         _playerEntityID = -1;
         _isConnectedToServer = true;
 
-    } catch (const std::exception &e) {
+    } catch (const System::Network::NetworkException &e) {
         std::cout << CATCH_ERROR_LOCATION
                   << "Failed to connect to server: IP=" << _ip
                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
