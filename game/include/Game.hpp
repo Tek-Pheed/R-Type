@@ -11,7 +11,14 @@
     #define NOMINMAX
 #endif
 
-#include <SFML/Graphics.hpp>
+#if defined(RTYPE_SERVER)
+constexpr const bool server = true;
+#else
+constexpr const bool server = false;
+#endif
+
+#include "SFML/Graphics.hpp"
+#include "SFML/Audio.hpp"
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -57,6 +64,10 @@ namespace RType
 
         static constexpr float MUSIC_VOLUME = 18.0f;
         static constexpr float BULLET_VOLUME = 5.0f;
+        static constexpr bool isServer()
+        {
+            return (server);
+        };
 
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
@@ -166,8 +177,6 @@ namespace RType
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
         void gamePostTick(
             Engine::Events::EventType event, Engine::Core &core, std::any arg);
-        bool isServer() const;
-
         // Bonus
         void handleNetworkBonuses(
             int code, const std::vector<std::string> &tokens);
@@ -218,7 +227,6 @@ namespace RType
         size_t _gamemode = 0;
         int _playerEntityID = -1;
         ssize_t _netClientID = -1;
-        bool _isServer;
         bool _isConnectedToServer = false;
         bool _gameStarted = false;
         uint16_t _udpPort = DEFAULT_UDP_PORT;
@@ -238,4 +246,5 @@ namespace RType
         int _healthId = -1;
         sf::Clock _bonusClock;
     };
+
 }; // namespace RType

@@ -26,7 +26,7 @@ void Levels::buildMainMenu()
     level.createSubsystem<GameSystems::PositionSystem>().initSystem(_game);
     _game.refEntityManager.switchLevel("mainMenu");
 
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         auto songEntity =
             _game.refEntityManager.getPersistentLevel()
                 .findEntitiesByComponent<ecs::MusicComponent<sf::Sound>>()[0];

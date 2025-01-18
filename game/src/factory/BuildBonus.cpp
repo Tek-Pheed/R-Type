@@ -34,7 +34,7 @@ ecs::Entity &Factory::buildBonus(
         std::make_shared<ecs::VelocityComponent>(velocity, 0.0f));
     bonusE.addComponent(std::make_shared<ecs::HitboxComponent>(Width, Height));
 
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::BONUS_TEXTURE);
 
@@ -69,7 +69,7 @@ void GameInstance::handleNetworkBonuses(
     switch (code) {
         case Protocol::BN_SPAWN: {
             if (tokens.size() >= 3) {
-                if (!isServer()) {
+                if constexpr (!server) {
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
                     factory.buildBonus(id,

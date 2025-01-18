@@ -49,7 +49,7 @@ void PositionSystem::update(
                         != positionComponent->getY())) {
                 _game->sendPlayerPosition(player->getPlayerID());
             }
-            if (!this->_game->isServer()) {
+            if constexpr (!server) {
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 

@@ -11,6 +11,7 @@ namespace ecs
 {
     BonusComponent::BonusComponent(const ecs::Bonus &bonus, int wave)
     {
+        _bonusID = 0;
         this->_bonus = bonus;
         _wave = wave;
     }

@@ -68,9 +68,11 @@ sf::Sound &GameInstance::getMusicPlayer()
 void GameInstance::handleNetworkMechs(
     int code, const std::vector<std::string> &tokens)
 {
+    if constexpr (server)
+        return;
     switch (code) {
         case Protocol::M_MUSIC: {
-            if (tokens.size() >= 1 && !isServer()) {
+            if (tokens.size() >= 1) {
                 auto &ref =
                     refAssetManager.loadAsset("assets/sounds/" + tokens[0],
                         tokens[0], &sf::SoundBuffer::loadFromFile);
@@ -84,7 +86,7 @@ void GameInstance::handleNetworkMechs(
             break;
         }
         case Protocol::M_BG: {
-            if (tokens.size() >= 1 && !isServer()) {
+            if (tokens.size() >= 1) {
                 auto &ref =
                     refAssetManager.loadAsset("assets/background/" + tokens[0],
                         tokens[0], &sf::Texture::loadFromFile, sf::IntRect());
@@ -103,7 +105,7 @@ void GameInstance::handleNetworkMechs(
             break;
         }
         case Protocol::M_WAVE: {
-            if (tokens.size() >= 1 && !isServer()) {
+            if (tokens.size() >= 1) {
                 currentWave = std::atoi(tokens[0].c_str());
                 if (currentWave > 1) {
                     auto &newWaveInComingSound =
@@ -126,7 +128,7 @@ void GameInstance::loadPvPLevel()
     std::unique_lock lock(_gameLock);
     std::stringstream ss;
 
-    if (isServer()) {
+    if constexpr (server) {
         // Change background
         ss << M_BG << " " << "clouds.jpg" << " " << PACKET_END;
         refNetworkManager.sendToAll(System::Network::ISocket::TCP, ss.str());
@@ -145,7 +147,7 @@ void GameInstance::loadPvPLevel()
         }
     }
 
-    if (!isServer()) {
+    if constexpr (!server) {
         for (auto &entity : getAllPlayers()) {
             auto &player = entity.get();
             auto playerComp = player.getComponent<ecs::PlayerComponent>();
@@ -197,8 +199,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create basic "
                     "enemy from level config");
-            factory.buildEnemy(getNewId(),
-                (float) std::atof(value[0].c_str()),
+            factory.buildEnemy(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 (float) std::atof(value[4].c_str()), wave,
                 (float) std::atof(value[2].c_str()),
@@ -265,8 +266,7 @@ void GameInstance::loadLevelContent(const std::string &filename)
                 throw ErrorClass(THROW_ERROR_LOCATION
                     "loadLevelContent: Failed to create bonus "
                     "from level config");
-            factory.buildBonus(getNewId(),
-                (float) std::atof(value[0].c_str()),
+            factory.buildBonus(getNewId(), (float) std::atof(value[0].c_str()),
                 (float) std::atof(value[1].c_str()),
                 static_cast<ecs::Bonus>(std::atoi(value[2].c_str())), wave);
         }
@@ -316,7 +316,7 @@ void GameInstance::gamePreTick(
     (void) arg;
     std::unique_lock lock(_gameLock);
 
-    if (!isServer()) {
+    if constexpr (!server) {
         getWindow().clear();
     }
 }
@@ -332,7 +332,7 @@ void GameInstance::gameTick(
     _ticks++;
     try {
         manageBuffers();
-        if (!_isServer) {
+        if constexpr (!server) {
             playEvent();
             for (auto &pl : getAllPlayers()) {
                 playerAnimations(pl.get());
@@ -375,7 +375,7 @@ void GameInstance::gamePostTick(
 
     std::unique_lock lock(_gameLock);
 
-    if (!isServer()) {
+    if constexpr (!server) {
         for (auto &entity : refEntityManager.getCurrentLevel().getEntities()) {
             auto player = entity.get().getComponent<ecs::PlayerComponent>();
             auto pText =
@@ -396,49 +396,51 @@ void GameInstance::gamePostTick(
                     entity.get().getID());
         }
         getWindow().display();
-    } else if (_gamemode != 1) {
-        bool next = true;
-        auto entVect = refEntityManager.getCurrentLevel()
-                           .findEntitiesByComponent<ecs::EnemyComponent>();
-        if (ended || !_gameStarted) {
-            return;
-        }
-        for (auto &ent : entVect) {
-            if (ent.get().getComponent<ecs::EnemyComponent>()->getWave()
-                <= currentWave) {
-                next = false;
-                break;
+    } else {
+        if (_gamemode != 1) {
+            bool next = true;
+            auto entVect = refEntityManager.getCurrentLevel()
+                               .findEntitiesByComponent<ecs::EnemyComponent>();
+            if (ended || !_gameStarted) {
+                return;
             }
-        }
-        if (next) {
-            if (entVect.size() == 0 && !ended) {
-                if (_level < getTxtFiles("assets/levels").size()) {
-                    std::cout << "Next level" << std::endl;
-                    _level++;
-                    std::string levelFileName = "assets/levels/level"
-                        + std::to_string(_level) + ".txt";
-                    loadLevelContent(levelFileName);
-                    currentWave = -1;
-                } else {
-                    ended = true;
-                    std::cout << "Congrats ! You played all levels :)"
-                              << std::endl;
-                    std::cout << "Congrats ! You played all levels :)"
-                              << std::endl;
-                    std::cout << "Congrats ! You played all levels :)"
-                              << std::endl;
-                    std::cout << "Congrats ! You played all levels :)"
-                              << std::endl;
-                    refGameEngine.stop();
+            for (auto &ent : entVect) {
+                if (ent.get().getComponent<ecs::EnemyComponent>()->getWave()
+                    <= currentWave) {
+                    next = false;
+                    break;
                 }
             }
-            std::stringstream ss;
-            currentWave += 1;
-            if (RType::GameInstance::DEBUG_LOGS)
-                std::cout << "Changing wave: " << currentWave << std::endl;
-            ss << M_WAVE << " " << currentWave << PACKET_END;
-            refNetworkManager.sendToAll(
-                System::Network::ISocket::TCP, ss.str());
+            if (next) {
+                if (entVect.size() == 0 && !ended) {
+                    if (_level < getTxtFiles("assets/levels").size()) {
+                        std::cout << "Next level" << std::endl;
+                        _level++;
+                        std::string levelFileName = "assets/levels/level"
+                            + std::to_string(_level) + ".txt";
+                        loadLevelContent(levelFileName);
+                        currentWave = -1;
+                    } else {
+                        ended = true;
+                        std::cout << "Congrats ! You played all levels :)"
+                                  << std::endl;
+                        std::cout << "Congrats ! You played all levels :)"
+                                  << std::endl;
+                        std::cout << "Congrats ! You played all levels :)"
+                                  << std::endl;
+                        std::cout << "Congrats ! You played all levels :)"
+                                  << std::endl;
+                        refGameEngine.stop();
+                    }
+                }
+                std::stringstream ss;
+                currentWave += 1;
+                if (RType::GameInstance::DEBUG_LOGS)
+                    std::cout << "Changing wave: " << currentWave << std::endl;
+                ss << M_WAVE << " " << currentWave << PACKET_END;
+                refNetworkManager.sendToAll(
+                    System::Network::ISocket::TCP, ss.str());
+            }
         }
     }
 }
@@ -474,12 +476,11 @@ int RType::GameInstance::manageBuffers()
             switch (code_int) {
                 case 0: handleNetworkPlayers(code, tokens); break;
                 case 1: handleNetworkEnemies(code, tokens); break;
-                // case 2: handle_terrain(code, tokens); break;
                 case 3: handleNetworkMechs(code, tokens); break;
                 case 4: handleNetworkBonuses(code, tokens); break;
                 case 24: handleLobby(code, tokens); break;
                 case 9:
-                    if (isServer()) {
+                    if constexpr (server) {
                         serverHanlderValidateConnection(code, tokens);
                     } else {
                         clientHandlerConnection(code, tokens);
@@ -536,11 +537,6 @@ GameInstance::~GameInstance()
     refGameEngine.stop();
 }
 
-bool GameInstance::isServer() const
-{
-    return (_isServer);
-}
-
 std::vector<ecs::Entity> &RType::GameInstance::getEntities()
 {
     return (refEntityManager.getCurrentLevel().getEntitiesVect());
@@ -570,4 +566,3 @@ size_t GameInstance::getMaxPlayers() const
 {
     return _maxPlayers;
 }
-

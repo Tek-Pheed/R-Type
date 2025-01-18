@@ -5,7 +5,7 @@
 ** MouseClicked.cpp
 */
 
-#include <SFML/Graphics.hpp>
+#include "SFML/Graphics.hpp"
 #include <cstdlib>
 #include <filesystem>
 #include <sstream>
@@ -21,6 +21,8 @@ using namespace RType;
 
 void EventManager::handleStartButton(bool isHost)
 {
+    if constexpr (server)
+        return;
     size_t id = _game.getLocalPlayer()
                     .getComponent<ecs::PlayerComponent>()
                     ->getPlayerID();
@@ -36,6 +38,8 @@ void EventManager::handleStartButton(bool isHost)
 
 void EventManager::handleDifficultyButton(ecs::Entity &entity, bool isHost)
 {
+    if constexpr (server)
+        return;
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
     size_t id = _game.getLocalPlayer()
                     .getComponent<ecs::PlayerComponent>()
@@ -73,6 +77,8 @@ void EventManager::handleDifficultyButton(ecs::Entity &entity, bool isHost)
 
 void EventManager::handleBonusButton(ecs::Entity &entity, bool isHost)
 {
+    if constexpr (server)
+        return;
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
     size_t id = _game.getLocalPlayer()
                     .getComponent<ecs::PlayerComponent>()
@@ -104,6 +110,8 @@ void EventManager::handleBonusButton(ecs::Entity &entity, bool isHost)
 
 void EventManager::handleLevelButton(ecs::Entity &entity, bool isHost)
 {
+    if constexpr (server)
+        return;
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
     size_t id = _game.getLocalPlayer()
                     .getComponent<ecs::PlayerComponent>()
@@ -139,6 +147,8 @@ void EventManager::handleLevelButton(ecs::Entity &entity, bool isHost)
 
 void EventManager::handleNumberOfPlayerButton(ecs::Entity &entity, bool isHost)
 {
+    if constexpr (server)
+        return;
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
     size_t id = _game.getLocalPlayer()
                     .getComponent<ecs::PlayerComponent>()
@@ -175,6 +185,8 @@ void EventManager::handleNumberOfPlayerButton(ecs::Entity &entity, bool isHost)
 
 void EventManager::handleGamemodeButton(ecs::Entity &entity, bool isHost)
 {
+    if constexpr (server)
+        return;
     auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
     size_t id = _game.getLocalPlayer()
                     .getComponent<ecs::PlayerComponent>()
@@ -209,6 +221,8 @@ void EventManager::handleGamemodeButton(ecs::Entity &entity, bool isHost)
 
 void EventManager::mouseClicked()
 {
+    if constexpr (server)
+        return;
     sf::Vector2f mousePos = _game.getWindow().mapPixelToCoords(
         sf::Mouse::getPosition(_game.getWindow()));
     bool currentAutoFireValue = _game.gameConfig.getAutoFireConfig();

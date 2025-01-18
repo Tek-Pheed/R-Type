@@ -72,7 +72,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         auto pl = p.get().getComponent<ecs::PlayerComponent>();
         std::string n = DEFAULT_PLAYER_NAME;
 
-        if (_isServer) {
+        if constexpr (server) {
             auto nm = p.get().getComponent<ecs::TextComponent<std::string>>();
             if (nm)
                 n = nm->getText();
@@ -227,7 +227,6 @@ void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
         throw ErrorClass(THROW_ERROR_LOCATION "No level founds !");
     }
 
-    _isServer = true;
     _tcpPort = tcpPort;
     _udpPort = udpPort;
     refNetworkManager.setupServer<PacketHandler>(_tcpPort, _udpPort);
