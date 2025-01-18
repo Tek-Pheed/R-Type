@@ -20,6 +20,8 @@ using namespace RType;
 
 void Levels::buildMainMenu()
 {
+    _game.resetGame();
+    _game.refEntityManager.deleteAllLevel();
     auto &level = _game.refEntityManager.createNewLevel("mainMenu");
 
     level.createSubsystem<GameSystems::RenderSystem>().initSystem(_game);
@@ -100,5 +102,6 @@ void Levels::buildMainMenu()
                     - (float) 75 * -2),
             sf::Vector2f(700, 50), sf::Color::White, sf::Color::Black, "EXIT",
             40, sf::Color::Black, ecs::ClickableType::EXIT);
+
     }
 }

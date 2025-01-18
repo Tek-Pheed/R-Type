@@ -119,11 +119,12 @@ void GameInstance::deleteEnemy(size_t enemyID)
     if (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Deleting enemy: " << enemyID << std::endl;
     auto &ene = getEnemyById(enemyID);
+    size_t eneid = ene.getID();
     if constexpr (!server)
         factory.buildExplosionEnemy(
             ene.getComponent<ecs::PositionComponent>()->getX(),
             ene.getComponent<ecs::PositionComponent>()->getY());
-    refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
+    refEntityManager.getCurrentLevel().markEntityForDeletion(eneid);
     if constexpr (server) {
         std::stringstream ss;
         ss << E_DEAD << " " << enemyID << " " << PACKET_END;
