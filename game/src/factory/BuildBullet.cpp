@@ -10,6 +10,7 @@
 #include <sstream>
 #include "Components.hpp"
 #include "Factory.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "GameSystems.hpp"
@@ -50,12 +51,12 @@ void Factory::buildBulletFromPlayer(size_t playerID)
         std::make_shared<ecs::HitboxComponent>(0.042f, 0.022f));
     if (_game.getGameMode() == 1 && player.getComponent<ecs::PlayerComponent>()
         && player.getComponent<ecs::PlayerComponent>()->getTeam() == 1)
-        x = positionComp->getX() - 0.1f;
+        x = positionComp->getX() - 0.05f;
     bullet.addComponent(std::make_shared<ecs::PositionComponent>(x, y));
 
     std::stringstream ss;
     ss << P_SHOOT << " " << playerID << PACKET_END;
-    if (_game.isServer()) {
+    if constexpr (server) {
         _game.refNetworkManager.sendToOthers(
             playerID, System::Network::ISocket::Type::UDP, ss.str());
     } else {
@@ -113,7 +114,7 @@ void Factory::buildBulletFromEnemy(size_t enemyID)
 
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << enemyID << PACKET_END;
-    if (_game.isServer()) {
+    if constexpr (server) {
         _game.refNetworkManager.sendToAll(
             System::Network::ISocket::Type::UDP, ss.str());
     } else {
@@ -176,7 +177,7 @@ void Factory::buildBulletFromBoss(size_t bossId, float velx, float vely)
     std::stringstream ss;
     ss << E_SHOOT << " " << _game.getTicks() << " " << bossId << " " << velx
        << " " << vely << " " << PACKET_END;
-    if (_game.isServer()) {
+    if constexpr (server) {
         _game.refNetworkManager.sendToAll(
             System::Network::ISocket::Type::UDP, ss.str());
     } else {

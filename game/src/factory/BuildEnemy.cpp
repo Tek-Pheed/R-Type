@@ -31,7 +31,7 @@ ecs::Entity &RType::Factory::buildEnemy(size_t id, float posX, float posY,
     const float Width = 0.05f * (float) _game.WinScaleX;
     const float Height = Width;
 
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new enemy (" << id << ") to the game at pos "
                   << posX << " " << posY << std::endl;
     auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
@@ -46,7 +46,7 @@ ecs::Entity &RType::Factory::buildEnemy(size_t id, float posX, float posY,
     enemy.getComponent<ecs::EnemyComponent>()->setWave(wave);
     enemy.getComponent<ecs::VelocityComponent>()->setVx(velocityX);
     enemy.getComponent<ecs::VelocityComponent>()->setVy(velocityY);
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::ENEMY_TEXTURE);
 
@@ -93,7 +93,7 @@ ecs::Entity &GameInstance::getEnemyById(size_t enemyID)
 
 void GameInstance::sendEnemyPosition(size_t enemyID)
 {
-    if (isServer()) {
+    if constexpr (server) {
         std::unique_lock lock(_gameLock);
         auto &ene = getEnemyById(enemyID);
         auto position = ene.getComponent<ecs::PositionComponent>();
@@ -116,15 +116,16 @@ void GameInstance::sendEnemyPosition(size_t enemyID)
 void GameInstance::deleteEnemy(size_t enemyID)
 {
     std::unique_lock lock(_gameLock);
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Deleting enemy: " << enemyID << std::endl;
     auto &ene = getEnemyById(enemyID);
-    if (!isServer())
-        _factory.buildExplosionEnemy(
+    size_t eneid = ene.getID();
+    if constexpr (!server)
+        factory.buildExplosionEnemy(
             ene.getComponent<ecs::PositionComponent>()->getX(),
             ene.getComponent<ecs::PositionComponent>()->getY());
-    refEntityManager.getCurrentLevel().markEntityForDeletion(ene.getID());
-    if (isServer()) {
+    refEntityManager.getCurrentLevel().markEntityForDeletion(eneid);
+    if constexpr (server) {
         std::stringstream ss;
         ss << E_DEAD << " " << enemyID << " " << PACKET_END;
         refNetworkManager.sendToAll(
@@ -138,15 +139,15 @@ void GameInstance::handleNetworkEnemies(
     switch (code) {
         case Protocol::E_SPAWN: {
             if (tokens.size() >= 6) {
-                if (!isServer()) {
+                if constexpr (!server) {
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     size_t type = (size_t) atoi(tokens[1].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Spawning enemy " << id << " with type "
                                   << type << std::endl;
                     if (type == 0 && tokens.size() >= 8)
-                        _factory.buildEnemy(id,
+                        factory.buildEnemy(id,
                             (float) std::atof(tokens[2].c_str()),
                             (float) std::atof(tokens[3].c_str()),
                             (float) std::atof(tokens[4].c_str()),
@@ -154,7 +155,7 @@ void GameInstance::handleNetworkEnemies(
                             (float) std::atof(tokens[6].c_str()),
                             (float) std::atof(tokens[7].c_str()));
                     if (type == 1 && tokens.size() >= 8)
-                        _factory.buildEnemyShooter(id,
+                        factory.buildEnemyShooter(id,
                             (float) std::atof(tokens[2].c_str()),
                             (float) std::atof(tokens[3].c_str()),
                             (float) std::atof(tokens[4].c_str()),
@@ -162,7 +163,7 @@ void GameInstance::handleNetworkEnemies(
                             (float) std::atof(tokens[6].c_str()),
                             (float) std::atof(tokens[7].c_str()));
                     if (type == 2)
-                        _factory.buildBoss(id,
+                        factory.buildBoss(id,
                             (float) std::atof(tokens[2].c_str()),
                             (float) std::atof(tokens[3].c_str()),
                             (float) std::atof(tokens[4].c_str()),
@@ -173,7 +174,7 @@ void GameInstance::handleNetworkEnemies(
         }
         case Protocol::E_POS: {
             if (tokens.size() >= 4) {
-                if (!isServer()) {
+                if constexpr (!server) {
                     uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
                     if (_lastNetTick <= tick) {
                         _lastNetTick = tick;
@@ -189,7 +190,7 @@ void GameInstance::handleNetworkEnemies(
         }
         case Protocol::E_DEAD: {
             std::unique_lock lock(_gameLock);
-            if (_isServer)
+            if constexpr (server)
                 return;
             if (tokens.size() >= 1) {
                 size_t id = (size_t) atoi(tokens[0].c_str());
@@ -198,12 +199,12 @@ void GameInstance::handleNetworkEnemies(
             break;
         }
         case Protocol::E_SHOOT: {
-            if (_isServer)
+            if constexpr (server)
                 return;
             if (tokens.size() >= 2) {
                 uint64_t tick = (uint64_t) atoll(tokens[0].c_str());
                 if (_lastNetTick <= tick) {
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Enemy shoot" << std::endl;
                     _lastNetTick = tick;
                     size_t id = (size_t) atoi(tokens[1].c_str());
@@ -212,11 +213,11 @@ void GameInstance::handleNetworkEnemies(
                     size_t type =
                         mob.getComponent<ecs::EnemyComponent>()->getType();
                     if (type == 1)
-                        _factory.buildBulletFromEnemy(id);
+                        factory.buildBulletFromEnemy(id);
                     else if (type == 2) {
                         float velx = (float) std::atof(tokens[2].c_str());
                         float vely = (float) std::atof(tokens[3].c_str());
-                        _factory.buildBulletFromBoss(id, velx, vely);
+                        factory.buildBulletFromBoss(id, velx, vely);
                     }
                 }
             }
@@ -231,7 +232,7 @@ ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     const float Width = 0.05f * (float) _game.WinScaleX;
     const float Height = 0.120f * (float) _game.WinScaleY;
 
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Adding new enemy (" << id << ") to the game at pos "
                   << posX << " " << posY << std::endl;
     auto &enemy = _game.refEntityManager.getCurrentLevel().createEntity();
@@ -244,7 +245,7 @@ ecs::Entity &RType::Factory::buildEnemyShooter(size_t id, float posX,
     enemy.getComponent<ecs::EnemyComponent>()->setWave(wave);
     enemy.getComponent<ecs::VelocityComponent>()->setVx(velocityX);
     enemy.getComponent<ecs::VelocityComponent>()->setVy(velocityY);
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
             Asset::SHOOTERENEMY_TEXTURE);
 

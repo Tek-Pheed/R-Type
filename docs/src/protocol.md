@@ -174,8 +174,8 @@ Removed a terrain, if its has been destroyed or went off the screen.
 
 # Bonus Management (150)
 
-- Spawn bonus - 151 -> TCP
-- Get bonus - 152 -> TCP
+- Spawn bonus (bonusID, posX, posY, wave) - 151 -> TCP
+- Get bonus (playerID, bonusID, bonusType) - 152 -> TCP
 
 # Game Management (240)
 
@@ -197,6 +197,5 @@ Set the level config map
 - Set game mode (id, mode) - 246 <-> TCP
 Set the game mode, 0 for wave, 1 for pvp
 
-
-
-# TODO: add bonus on/off
+- Send levels (id, mode) - 247 <-> TCP
+Send number of levels available in assets/levels

@@ -9,6 +9,7 @@
 #include <sstream>
 #include "Components.hpp"
 #include "Factory.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 #include "components/AIComponent.hpp"
@@ -21,7 +22,7 @@ namespace RType
         const float Width = 0.075f * (float) _game.WinScaleX;
         const float Height = 0.06f * (float) _game.WinScaleY;
 
-        if (RType::GameInstance::DEBUG_LOGS)
+        if constexpr (RType::GameInstance::DEBUG_LOGS)
             std::cout << "Adding new player to the game" << std::endl;
         auto &player = _game.refEntityManager.getCurrentLevel().createEntity();
         player.addComponent(std::make_shared<ecs::PlayerComponent>(id));
@@ -34,10 +35,12 @@ namespace RType
         player.addComponent(std::make_shared<ecs::VelocityComponent>(0, 0));
         player.addComponent(
             std::make_shared<ecs::HitboxComponent>(0.075f, 0.06f));
+        player.addComponent(
+            std::make_shared<ecs::BonusComponent>(id, ecs::Bonus::NONE));
         std::string n = DEFAULT_PLAYER_NAME;
         if (!name.empty())
             n = name;
-        if (!_game.isServer()) {
+        if constexpr (!server) {
             auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
                 Asset::PLAYER_TEXTURE);
             auto &font =
@@ -63,8 +66,6 @@ namespace RType
             text.setString(n);
             player.addComponent(
                 std::make_shared<ecs::TextComponent<sf::Text>>(text, n));
-            player.addComponent(
-                std::make_shared<ecs::BonusComponent>(ecs::Bonus::NONE));
         } else {
             player.addComponent(
                 std::make_shared<ecs::TextComponent<std::string>>(n, name));
@@ -79,7 +80,7 @@ namespace RType
                 std::stringstream sss;
                 sss << P_CONN << " " << id << " " << pos->getX() << " "
                     << pos->getY() << " " << n << " " << PACKET_END;
-                if (!_game.isServer()) {
+                if constexpr (!server) {
                     _game.refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::TCP, sss.str());
                 } else {
@@ -102,7 +103,7 @@ namespace RType
             std::make_shared<ecs::PositionComponent>(0.1f, 0.1f));
         player.addComponent(
             std::make_shared<ecs::VelocityComponent>(velocity.x, velocity.y));
-        if (!_game.isServer()) {
+        if constexpr (!server) {
             auto &texture = _game.refAssetManager.getAsset<sf::Texture>(
                 Asset::PLAYER_TEXTURE);
             sf::Sprite sprite;

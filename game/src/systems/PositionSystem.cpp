@@ -29,8 +29,10 @@ void PositionSystem::update(
         auto positionComponent = entity.getComponent<ecs::PositionComponent>();
         auto velocityComponent = entity.getComponent<ecs::VelocityComponent>();
         auto bullet = entity.getComponent<ecs::BulletComponent>();
+        auto player = entity.getComponent<ecs::PlayerComponent>();
+        auto bonus = entity.getComponent<ecs::BonusComponent>();
         auto enemy = entity.getComponent<ecs::EnemyComponent>();
-        if (enemy && enemy->getWave() != _game->currentWave)
+        if ((enemy && enemy->getWave() != _game->currentWave )|| (!player && bonus && bonus->getWave() != _game->currentWave))
             continue;
         if (positionComponent && velocityComponent && !bullet) {
             float newX = static_cast<float>(positionComponent->getX())
@@ -40,7 +42,6 @@ void PositionSystem::update(
             positionComponent->setX(newX);
             positionComponent->setY(newY);
 
-            auto player = entity.getComponent<ecs::PlayerComponent>();
             auto ai = entity.getComponent<ecs::AIComponent>();
             if (player
                 && (positionComponent->getOldX() != positionComponent->getX()
@@ -48,7 +49,7 @@ void PositionSystem::update(
                         != positionComponent->getY())) {
                 _game->sendPlayerPosition(player->getPlayerID());
             }
-            if (!this->_game->isServer()) {
+            if constexpr (!server) {
                 auto sprite =
                     entity.getComponent<ecs::SpriteComponent<sf::Sprite>>();
 

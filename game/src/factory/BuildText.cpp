@@ -15,16 +15,17 @@
 #include "Components.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
+#include "Game.hpp"
 #include "GameAssets.hpp"
 #include "GameProtocol.hpp"
 
 using namespace RType;
 
-ecs::Entity &RType::Factory::buildText(
-    size_t id, float posX, float posY, std::string &content, sf::Color color, unsigned int characterSize)
+ecs::Entity &RType::Factory::buildText(size_t id, float posX, float posY,
+    std::string &content, sf::Color color, unsigned int characterSize)
 {
     auto &text = _game.refEntityManager.getCurrentLevel().createEntity();
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         text.addComponent(
             std::make_shared<ecs::PositionComponent>(posX, posY));
         text.setID(id);

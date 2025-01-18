@@ -9,15 +9,18 @@
 
 namespace ecs
 {
-    BonusComponent::BonusComponent(const ecs::Bonus &bonus)
+    BonusComponent::BonusComponent(const ecs::Bonus &bonus, int wave)
     {
+        _bonusID = 0;
         this->_bonus = bonus;
+        _wave = wave;
     }
 
-    BonusComponent::BonusComponent(size_t bonusID, const ecs::Bonus &bonus)
+    BonusComponent::BonusComponent(size_t bonusID, const ecs::Bonus &bonus, int wave)
     {
         this->_bonusID = bonusID;
         this->_bonus = bonus;
+        _wave = wave;
     }
 
     Bonus BonusComponent::getBonus()
@@ -33,6 +36,11 @@ namespace ecs
     void BonusComponent::setBonusID(size_t bonusID)
     {
         this->_bonusID = bonusID;
+    }
+
+    int BonusComponent::getWave(void) const
+    {
+        return (_wave);
     }
 
     size_t BonusComponent::getBonusID()

@@ -6,7 +6,7 @@
 # BOSS(posX, posY, Health): Create a Boss
 # MUSIC(filename)
 # BACKGROUND(filename)
-# BONUS(posX, posY, type[0-2])
+# BONUS(posX, posY, type[(0 = RapidFire, 1 = Speed and 2 = Health)])
 
 MUSIC(evangelion.ogg)
 BACKGROUND(nexus.png)

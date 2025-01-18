@@ -20,19 +20,19 @@ target_link_libraries(client tinyV8)
 
 add_executable(server ${SRC} ${APP})
 target_include_directories(server PRIVATE include)
+target_link_libraries(server sfml-system sfml-window sfml-graphics sfml-audio)
 target_link_libraries(server tinyV8)
-target_link_libraries(client sfml-system sfml-window sfml-graphics sfml-audio)
 
 set_target_properties(client PROPERTIES
-INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
-BUILD_WITH_INSTALL_RPATH TRUE
-CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    BUILD_WITH_INSTALL_RPATH TRUE
+    CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
 set_target_properties(server PROPERTIES
-INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
-BUILD_WITH_INSTALL_RPATH TRUE
-CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    INSTALL_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    BUILD_WITH_INSTALL_RPATH TRUE
+    CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
 include_directories(../libs/system/include)

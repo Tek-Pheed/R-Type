@@ -52,7 +52,7 @@ void RType::GameInstance::clientHandlerConnection(
                     refNetworkManager.sendToAll(
                         System::Network::ISocket::Type::UDP, ss.str());
                 } else {
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Could not read client ID" << std::endl;
                 }
             }
@@ -63,13 +63,13 @@ void RType::GameInstance::clientHandlerConnection(
                 if (tokens[0].starts_with("OK") && _netClientID >= 0) {
                     // We can create the player here, or wait and create it
                     // later
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "Build player with id:" << _netClientID
                                   << std::endl;
-                    _factory.buildPlayer(
-                        true, (size_t) _netClientID, _playerName);
+                    factory.buildPlayer(
+                        true, (size_t) _netClientID, playerName);
                 } else {
-                    if (RType::GameInstance::DEBUG_LOGS)
+                    if constexpr (RType::GameInstance::DEBUG_LOGS)
                         std::cout << "The connection failed." << std::endl;
                 }
             }
@@ -100,18 +100,18 @@ void RType::GameInstance::connectToGame()
     try {
         size_t count = 0;
 
-        for (auto &entity : _inputList) {
+        for (auto &entity : inputList) {
             count++;
             auto text = entity.getComponent<ecs::TextComponent<sf::Text>>();
 
             if (!text)
                 continue;
 
-            if (text->getStr().empty() || text->getStr() == "IP ADRESS")
+            if (text->getStr().empty() || text->getStr() == "IP ADDRESS")
                 continue;
 
             switch (count) {
-                case 1: _playerName = text->getStr(); break;
+                case 1: playerName = text->getStr(); break;
                 case 2: _ip = text->getStr(); break;
                 case 3:
                     _tcpPort = (uint16_t) std::atoi(text->getStr().c_str());
@@ -152,8 +152,8 @@ void RType::GameInstance::connectToGame()
         level.createSubsystem<GameSystems::HealthSystem>().initSystem(*this);
         refEntityManager.switchLevel("mainLevel", false);
 
-        int nbTxtFiles = countTxtFiles("./assets/levels");
-        this->_nbTxtFiles = nbTxtFiles;
+        int TempnbTxtFiles = countTxtFiles("assets/levels");
+        this->nbTxtFiles = TempnbTxtFiles;
         std::stringstream ss;
 
         ss << L_SENDLEVELS << " " << nbTxtFiles << PACKET_END;
@@ -161,12 +161,12 @@ void RType::GameInstance::connectToGame()
         refNetworkManager.sendToAll(
             System::Network::ISocket::Type::TCP, ss.str());
 
-        levelLobbyMenu();
+        levels.buildLobby();
 
         _playerEntityID = -1;
         _isConnectedToServer = true;
 
-    } catch (const std::exception &e) {
+    } catch (const System::Network::NetworkException &e) {
         std::cout << CATCH_ERROR_LOCATION
                   << "Failed to connect to server: IP=" << _ip
                   << " TCP=" << _tcpPort << " UDP=" << _udpPort
@@ -196,9 +196,10 @@ void RType::GameInstance::launchGame()
                     .getComponent<ecs::HealthComponent>()
                     ->getHealth());
         setHealthId(static_cast<int>(getNewId()));
-        _factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text, sf::Color::White, 48);
+        factory.buildText(static_cast<size_t>(getHealthId()), 0, 0, text,
+            sf::Color::White, 48);
     } catch (const std::exception &e) {
-        levelMainMenu();
+        levels.buildMainMenu();
     }
 }
 
@@ -221,20 +222,19 @@ void RType::GameInstance::clientHandleDisconnected(
                  "connection was unstable."
               << std::endl;
     refEntityManager.deleteAllLevel();
-    levelMainMenu();
+    levels.buildMainMenu();
 }
 
 void RType::GameInstance::setupClient(
     const std::string &ip, uint16_t tcpPort, uint16_t udpPort)
 {
-    _isServer = false;
     _ip = ip;
     _tcpPort = tcpPort;
     _udpPort = udpPort;
     refGameEngine.setTickRate(CLIENT_REFRESH_RATE);
     _window = std::make_unique<sf::RenderWindow>();
 
-    auto res = _gameConfig.getKeyFromConfig("RESOLUTION");
+    auto res = gameConfig.getKeyFromConfig("RESOLUTION");
     std::stringstream resStream(res);
     std::string resX;
     std::string resY;
@@ -269,7 +269,7 @@ void RType::GameInstance::setupClient(
         &RType::GameInstance::clientHandleDisconnected, *this);
     loadAssets();
     createPersistentLevel();
-    levelMainMenu();
+    levels.buildMainMenu();
 }
 
 sf::RenderWindow &GameInstance::getWindow()
@@ -284,7 +284,7 @@ void GameInstance::playEvent()
     std::stringstream ss;
     EventManager event_manager(*this);
 
-    bool autoFireEnabled = _gameConfig.getAutoFireConfig();
+    bool autoFireEnabled = gameConfig.getAutoFireConfig();
 
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -305,7 +305,7 @@ void GameInstance::playEvent()
                                     ? 0.10f
                                     : 0.25f)) {
                         if (_netClientID >= 0) {
-                            _factory.buildBulletFromPlayer(
+                            factory.buildBulletFromPlayer(
                                 (size_t) _netClientID);
                             this->_fireClock.restart();
                         }
@@ -340,7 +340,7 @@ void GameInstance::playEvent()
                 >= (bonus->getBonus() == ecs::Bonus::RAPIDFIRE ? 0.10f
                                                                : 0.25f)) {
             if (_netClientID >= 0) {
-                _factory.buildBulletFromPlayer((size_t) _netClientID);
+                factory.buildBulletFromPlayer((size_t) _netClientID);
                 this->_fireClock.restart();
             }
         }

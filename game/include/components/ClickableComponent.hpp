@@ -34,7 +34,7 @@ namespace ecs
 
     class ClickableComponent : public Component {
       public:
-        ClickableComponent(ClickableType type);
+        explicit ClickableComponent(ClickableType type);
 
         ClickableType getClickableType();
         void setClickableType(ClickableType type);

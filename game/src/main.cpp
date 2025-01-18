@@ -12,14 +12,15 @@
 #include <cstdint>
 #include <exception>
 #include <iostream>
+#include <stdexcept>
 #include "Engine.hpp"
 #include "EngineAssetManager.hpp"
 #include "EngineLevelManager.hpp"
 #include "EngineNetworking.hpp"
 #include "Game.hpp"
-#include "GameEvents.hpp"
-#include "GameSystems.hpp"
+#include "system_network.hpp"
 
+[[maybe_unused]]
 static int printServerHelp()
 {
     std::cout << "USAGE: ./server [PORT TCP] [PORT UDP]" << std::endl;
@@ -32,20 +33,27 @@ static int printClientHelp()
     return (84);
 }
 
-static int prepareGame(int argc, const char *argv[],
-    RType::GameInstance &gameInstance, bool server)
+static int prepareGame(
+    int argc, const char *argv[], RType::GameInstance &gameInstance)
 {
-    if (server) {
-        if (argc == 1) {
-            gameInstance.setupServer();
-        } else {
-            if (argc != 3)
-                return (printServerHelp());
-            if (!atoi(argv[1]) || !atoi(argv[2]))
-                return (printClientHelp());
-            uint16_t portTCP = (uint16_t) atoi(argv[1]);
-            uint16_t portUDP = (uint16_t) atoi(argv[2]);
-            gameInstance.setupServer(portTCP, portUDP);
+    if constexpr (server) {
+        try {
+            if (argc == 1) {
+                gameInstance.setupServer();
+            } else {
+                if (argc != 3)
+                    return (printServerHelp());
+                if (!atoi(argv[1]) || !atoi(argv[2]))
+                    return (printClientHelp());
+                uint16_t portTCP = (uint16_t) atoi(argv[1]);
+                uint16_t portUDP = (uint16_t) atoi(argv[2]);
+                gameInstance.setupServer(portTCP, portUDP);
+            }
+        } catch (const System::Network::NetworkException &e) {
+            std::cout << CATCH_ERROR_LOCATION
+                "Network error while trying to setup server: "
+                      << e.what() << std::endl;
+            return (84);
         }
         std::cout << "R-Type running as server" << std::endl;
     } else {
@@ -68,6 +76,7 @@ static int prepareGame(int argc, const char *argv[],
 int main(int argc, const char *argv[])
 {
     Engine::Core gameEngine;
+    gameEngine.verboseLogs = RType::GameInstance::DEBUG_LOGS;
     gameEngine
         .loadFeature<Engine::Feature::LevelManager<RType::GameInstance>>();
     gameEngine.loadFeature<Engine::Feature::AssetManager>();
@@ -76,19 +85,18 @@ int main(int argc, const char *argv[])
     RType::GameInstance gameInstance(gameEngine);
     try {
         int result = 0;
-#if defined(RTYPE_SERVER)
-        result = prepareGame(argc, argv, gameInstance, true);
-#else
-        result = prepareGame(argc, argv, gameInstance, false);
-#endif
-        if (result != 0)
+        result = prepareGame(argc, argv, gameInstance);
+        if (result != 0) {
+            std::cout << "Failed to launch R-Type" << std::endl;
             return (result);
+        }
         gameEngine.mainLoop();
-    } catch (const std::exception &e) {
-        std::cout << CATCH_ERROR_LOCATION "We are sorry, but an unhandled exception occured during "
-                     "runtime: "
-                  << std::endl
-                  << e.what() << std::endl;
+    } catch (const std::runtime_error &e) {
+        if constexpr (RType::GameInstance::DEBUG_LOGS)
+            std::cout << CATCH_ERROR_LOCATION
+                "An exception occured during runtime: "
+                      << std::endl
+                      << e.what() << std::endl;
         return (84);
     }
     return (0);

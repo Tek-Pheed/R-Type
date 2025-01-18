@@ -24,14 +24,13 @@ void EventManager::keyPressed(sf::Event &event)
     sf::Keyboard::Key keyPressed = sf::Keyboard::Unknown;
     const size_t maxInputLenght = 16;
 
-    std::string moveUpKeyString =
-        _game._gameConfig.getKeyFromConfig("MOVE_UP");
+    std::string moveUpKeyString = _game.gameConfig.getKeyFromConfig("MOVE_UP");
     std::string moveRightKeyString =
-        _game._gameConfig.getKeyFromConfig("MOVE_RIGHT");
+        _game.gameConfig.getKeyFromConfig("MOVE_RIGHT");
     std::string moveLeftKeyString =
-        _game._gameConfig.getKeyFromConfig("MOVE_LEFT");
+        _game.gameConfig.getKeyFromConfig("MOVE_LEFT");
     std::string moveDownKeyString =
-        _game._gameConfig.getKeyFromConfig("MOVE_DOWN");
+        _game.gameConfig.getKeyFromConfig("MOVE_DOWN");
 
     sf::Keyboard::Key moveUpKey = utils.getKeyFromString(moveUpKeyString);
     sf::Keyboard::Key moveRightKey =
@@ -39,32 +38,32 @@ void EventManager::keyPressed(sf::Event &event)
     sf::Keyboard::Key moveLeftKey = utils.getKeyFromString(moveLeftKeyString);
     sf::Keyboard::Key moveDownKey = utils.getKeyFromString(moveDownKeyString);
 
-    if (_game._isSettingsUpButtonClicked) {
+    if (_game.isSettingsUpButtonClicked) {
         keyPressed = event.key.code;
         _game.handleConfigButtons(keyPressed, 0);
-        _game._isSettingsUpButtonClicked = false;
-    } else if (_game._isSettingsRightButtonClicked) {
+        _game.isSettingsUpButtonClicked = false;
+    } else if (_game.isSettingsRightButtonClicked) {
         keyPressed = event.key.code;
         _game.handleConfigButtons(keyPressed, -1);
-        _game._isSettingsRightButtonClicked = false;
-    } else if (_game._isSettingsLeftButtonClicked) {
+        _game.isSettingsRightButtonClicked = false;
+    } else if (_game.isSettingsLeftButtonClicked) {
         keyPressed = event.key.code;
         _game.handleConfigButtons(keyPressed, -2);
-        _game._isSettingsLeftButtonClicked = false;
-    } else if (_game._isSettingsDownButtonClicked) {
+        _game.isSettingsLeftButtonClicked = false;
+    } else if (_game.isSettingsDownButtonClicked) {
         keyPressed = event.key.code;
         _game.handleConfigButtons(keyPressed, -3);
-        _game._isSettingsDownButtonClicked = false;
-    } else if (_game._isSettingsNicknameButtonClicked) {
+        _game.isSettingsDownButtonClicked = false;
+    } else if (_game.isSettingsNicknameButtonClicked) {
         keyPressed = event.key.code;
         if (keyPressed == sf::Keyboard::Enter) {
-            _game.handleInputButtons(_game._nicknameKeys);
-            _game._nicknameKeys.clear();
-            _game._isSettingsNicknameButtonClicked = false;
+            _game.handleInputButtons(_game.nicknameKeys);
+            _game.nicknameKeys.clear();
+            _game.isSettingsNicknameButtonClicked = false;
         } else if (keyPressed == sf::Keyboard::Backspace
-            && !_game._nicknameKeys.empty()) {
-            _game._nicknameKeys.pop_back();
-            _game.handleInputButtons(_game._nicknameKeys);
+            && !_game.nicknameKeys.empty()) {
+            _game.nicknameKeys.pop_back();
+            _game.handleInputButtons(_game.nicknameKeys);
         } else if ((keyPressed >= sf::Keyboard::A
                        && keyPressed <= sf::Keyboard::Z)
             || (keyPressed >= sf::Keyboard::Num0
@@ -72,9 +71,9 @@ void EventManager::keyPressed(sf::Event &event)
             || (keyPressed >= sf::Keyboard::Numpad0
                 && keyPressed <= sf::Keyboard::Numpad9)
             || keyPressed == sf::Keyboard::Period) {
-            if (_game._nicknameKeys.size() < maxInputLenght) {
-                _game._nicknameKeys.push_back(keyPressed);
-                _game.handleInputButtons(_game._nicknameKeys);
+            if (_game.nicknameKeys.size() < maxInputLenght) {
+                _game.nicknameKeys.push_back(keyPressed);
+                _game.handleInputButtons(_game.nicknameKeys);
             }
         }
     }
@@ -89,25 +88,25 @@ void EventManager::keyPressed(sf::Event &event)
 
         if (event.key.code == moveUpKey) {
             if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                velocity->setVy(-0.30f);
+                velocity->setVy(-0.4f);
             } else {
                 velocity->setVy(-0.30f);
             }
         } else if (event.key.code == moveDownKey) {
             if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                velocity->setVy(0.30f);
+                velocity->setVy(0.4f);
             } else {
                 velocity->setVy(0.30f);
             }
         } else if (event.key.code == moveRightKey) {
             if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                velocity->setVx(0.16f);
+                velocity->setVx(0.24f);
             } else {
                 velocity->setVx(0.16f);
             }
         } else if (event.key.code == moveLeftKey) {
             if (bonus->getBonus() == ecs::Bonus::SPEED) {
-                velocity->setVx(-0.16f);
+                velocity->setVx(-0.24f);
             } else {
                 velocity->setVx(-0.16f);
             }

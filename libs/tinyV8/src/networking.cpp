@@ -175,9 +175,10 @@ NetworkingManager::NetClient &NetworkingManager::addClient(
     std::unique_lock lock(_globalMutex);
     _clientCounter++;
     _clients[_clientCounter] = client;
-    std::cout << "ENGINE: Created a new client ("
-              << std::to_string(_clientCounter) << ") on the server."
-              << std::endl;
+    if (_engineRef.verboseLogs)
+        std::cout << "ENGINE: Created a new client ("
+                  << std::to_string(_clientCounter) << ") on the server."
+                  << std::endl;
     AEngineFeature::_engineRef.triggerEvent(
         Events::EVENT_OnServerNewClient, _clientCounter);
     return (_clients[_clientCounter]);
@@ -202,8 +203,9 @@ void NetworkingManager::removeClient(size_t id)
     std::unique_lock lock(_globalMutex);
 
     _clients.at(id).isDisconnected = true;
-    std::cout << "ENGINE: Removed a client (" << id << ") from the server."
-              << std::endl;
+    if (_engineRef.verboseLogs)
+        std::cout << "ENGINE: Removed a client (" << id << ") from the server."
+                  << std::endl;
 }
 
 void NetworkingManager::disconnectClient(size_t id)
@@ -213,8 +215,9 @@ void NetworkingManager::disconnectClient(size_t id)
     _clients.at(id).isDisconnected = true;
     _globalMutex.unlock();
     _writeCondition.notify_all();
-    std::cout << "ENGINE: Force disconnection of a client (" << id
-              << ") from the server." << std::endl;
+    if (_engineRef.verboseLogs)
+        std::cout << "ENGINE: Force disconnection of a client (" << id
+                  << ") from the server." << std::endl;
 }
 
 ssize_t NetworkingManager::identifyClient(

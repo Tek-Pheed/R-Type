@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include "Components.hpp"
+#include "Entity.hpp"
 #include "ErrorClass.hpp"
 #include "Factory.hpp"
 #include "Game.hpp"
@@ -20,20 +21,21 @@
 using namespace RType;
 
 ecs::Entity &Factory::buildBonus(
-    size_t id, float posX, float posY, ecs::Bonus bonus)
+    size_t id, float posX, float posY, int type, int wave)
 {
     constexpr auto velocity = -0.08f;
     const float Width = 0.04f * (float) _game.WinScaleX;
     const float Height = Width;
 
     auto &bonusE = _game.refEntityManager.getCurrentLevel().createEntity();
-    bonusE.addComponent(std::make_shared<ecs::BonusComponent>(id, bonus));
+    bonusE.addComponent(std::make_shared<ecs::BonusComponent>(
+        id, static_cast<ecs::Bonus>(type), wave));
     bonusE.addComponent(std::make_shared<ecs::PositionComponent>(posX, posY));
     bonusE.addComponent(
         std::make_shared<ecs::VelocityComponent>(velocity, 0.0f));
     bonusE.addComponent(std::make_shared<ecs::HitboxComponent>(Width, Height));
 
-    if (!_game.isServer()) {
+    if constexpr (!server) {
         auto &texture =
             _game.refAssetManager.getAsset<sf::Texture>(Asset::BONUS_TEXTURE);
 
@@ -54,12 +56,67 @@ ecs::Entity &Factory::buildBonus(
         if (pos) {
             std::stringstream sss;
             sss << BN_SPAWN << " " << id << " " << pos->getX() << " "
-                << pos->getY() << PACKET_END;
+                << pos->getY() << " " << wave << PACKET_END;
+
             _game.refNetworkManager.sendToAll(
                 System::Network::ISocket::Type::TCP, sss.str());
         }
     }
     return bonusE;
+}
+
+ecs::Entity &GameInstance::getBonusById(size_t bonusID)
+{
+    auto bonuses = refEntityManager.getCurrentLevel()
+                       .findEntitiesByComponent<ecs::BonusComponent>();
+
+    for (auto &pl : bonuses) {
+        if (pl.get().getComponent<ecs::BonusComponent>()->getBonusID()
+            == bonusID) {
+            return (pl);
+        }
+    }
+    throw ErrorClass(
+        THROW_ERROR_LOCATION "Bonus not found id=" + std::to_string(bonusID));
+}
+
+void GameInstance::applyBonus(
+    ecs::Entity &bonus, size_t playerID, int bonusType)
+{
+    auto bonComp = bonus.getComponent<ecs::BonusComponent>();
+    if (!bonComp)
+        return;
+    size_t bonusID = bonus.getComponent<ecs::BonusComponent>()->getBonusID();
+    size_t bonusIDE = bonus.getID();
+    auto &player = getPlayerById(playerID);
+    auto playerComp = player.getComponent<ecs::PlayerComponent>();
+    if (!playerComp)
+        return;
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
+        std::cout << "Bonus " << bonusID << " with type " << bonComp->getBonus()
+                  << " applied to player " << playerComp->getPlayerID()
+                  << std::endl;
+
+    auto currentPlayerBonus = player.getComponent<ecs::BonusComponent>();
+    auto health = player.getComponent<ecs::HealthComponent>();
+    if (!currentPlayerBonus || !health)
+        return;
+    if (bonusType == 2)
+        damagePlayer(
+            player.getComponent<ecs::PlayerComponent>()->getPlayerID(), (-50));
+    currentPlayerBonus->setBonus(static_cast<ecs::Bonus>(bonusType));
+    refEntityManager.getCurrentLevel().markEntityForDeletion(bonusIDE);
+    if constexpr (!server) {
+        auto &bonusSound =
+            refAssetManager.getAsset<sf::SoundBuffer>(Asset::BONUS_GET);
+        factory.buildSoundEffect(bonusSound, "bonusSound", 100.0f);
+    } else {
+        std::stringstream sss;
+        sss << BN_GET << " " << playerComp->getPlayerID() << " "
+            << bonComp->getBonusID() << " " << bonusType << " " << PACKET_END;
+        refNetworkManager.sendToAll(
+            System::Network::ISocket::Type::TCP, sss.str());
+    }
 }
 
 void GameInstance::handleNetworkBonuses(
@@ -68,58 +125,24 @@ void GameInstance::handleNetworkBonuses(
     switch (code) {
         case Protocol::BN_SPAWN: {
             if (tokens.size() >= 3) {
-                if (!isServer()) {
+                if constexpr (!server) {
                     size_t id = (size_t) atoi(tokens[0].c_str());
                     std::shared_ptr<ecs::PositionComponent> pos;
-                    _factory.buildBonus(id,
+                    factory.buildBonus(id,
                         (float) std::atof(tokens[1].c_str()),
-                        (float) std::atof(tokens[2].c_str()),
-                        ecs::Bonus::NONE);
+                        (float) std::atof(tokens[2].c_str()), ecs::Bonus::NONE,
+                        std::atoi(tokens[3].c_str()));
                 }
             }
             break;
         }
         case Protocol::BN_GET: {
             if (tokens.size() >= 3) {
-                std::cout << "Bonus " << tokens[1].c_str() << " "
-                          << tokens[2].c_str() << " get by "
-                          << tokens[0].c_str() << std::endl;
-                auto bonuses =
-                    refEntityManager.getCurrentLevel()
-                        .findEntitiesByComponent<ecs::BonusComponent>();
-                size_t bonusID = (size_t) std::atof(tokens[1].c_str());
-                size_t bonusIDE = 0;
-                for (auto &pl : bonuses) {
-                    if (pl.get()
-                            .getComponent<ecs::BonusComponent>()
-                            ->getBonusID()
-                        == bonusID) {
-                        bonusIDE = pl.get().getID();
-                    }
-                }
-                refEntityManager.getCurrentLevel().markEntityForDeletion(
-                    bonusIDE);
-                auto &currentPlayer = getLocalPlayer();
-                if (currentPlayer.getComponent<ecs::PlayerComponent>()
-                        ->getPlayerID()
-                    == (size_t) std::atoi(tokens[0].c_str())) {
-                    auto currentPlayerBonus =
-                        currentPlayer.getComponent<ecs::BonusComponent>();
-                    if (std::atoi(tokens[2].c_str()) == 3) {
-                        auto health =
-                            currentPlayer.getComponent<ecs::HealthComponent>();
-                        damagePlayer(
-                            currentPlayer.getComponent<ecs::PlayerComponent>()
-                                ->getPlayerID(),
-                            (health->getHealth() - 100));
-                    }
-                    auto &bonusSound = refAssetManager.getAsset<sf::SoundBuffer>(Asset::BONUS_GET);
-                    _factory.buildSoundEffect(bonusSound, "bonusSound", 100.0f);
-                    currentPlayerBonus->setBonus(
-                        static_cast<ecs::Bonus>(std::atoi(tokens[2].c_str())));
-                    std::cout << "set bonus " << currentPlayerBonus->getBonus()
-                              << std::endl;
-                }
+                size_t bonusID = (size_t) std::atoi(tokens[1].c_str());
+                size_t playerID = (size_t) std::atoi(tokens[0].c_str());
+                int bonusType = (int) std::atoi(tokens[2].c_str());
+                auto &bon = getBonusById(bonusID);
+                applyBonus(bon, playerID, bonusType);
             }
             break;
         }

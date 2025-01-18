@@ -14,13 +14,13 @@ void EventManager::keyReleased(sf::Event &event)
     Utils utils;
 
     std::string moveUpKeyString =
-        _game._gameConfig.getKeyFromConfig("MOVE_UP");
+        _game.gameConfig.getKeyFromConfig("MOVE_UP");
     std::string moveRightKeyString =
-        _game._gameConfig.getKeyFromConfig("MOVE_RIGHT");
+        _game.gameConfig.getKeyFromConfig("MOVE_RIGHT");
     std::string moveLeftKeyString =
-        _game._gameConfig.getKeyFromConfig("MOVE_LEFT");
+        _game.gameConfig.getKeyFromConfig("MOVE_LEFT");
     std::string moveDownKeyString =
-        _game._gameConfig.getKeyFromConfig("MOVE_DOWN");
+        _game.gameConfig.getKeyFromConfig("MOVE_DOWN");
 
     sf::Keyboard::Key moveUpKey = utils.getKeyFromString(moveUpKeyString);
     sf::Keyboard::Key moveRightKey =

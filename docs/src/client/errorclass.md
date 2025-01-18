@@ -12,19 +12,3 @@ with specific error messages.
   message to initialize the error.
 - `ErrorClass(const char *message)`: Constructor that accepts a C-style string
   message to initialize the error.
-
-### Example Usage
-
-```cpp
-#include "ErrorClass.hpp"
-
-int main() {
-    try {
-        throw ErrorClass("Custom error occurred");
-
-    } catch (const ErrorClass &e) {
-        std::cout << "Error: " << e.what() << std::endl;
-    }
-
-    return 0;
-}

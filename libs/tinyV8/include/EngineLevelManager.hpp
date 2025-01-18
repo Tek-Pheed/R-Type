@@ -163,16 +163,17 @@ namespace Engine
              */
             Level<GameClass> &createNewLevel(const std::string &levelName)
             {
-                if (_levels.contains(levelName)) {
+                if (levels.contains(levelName)) {
                     throw std::range_error(THROW_ERROR_LOCATION
                         "A level with the same name already exists ! ["
                         + levelName + "]");
                 }
-                _levels.emplace(levelName,
+                levels.emplace(levelName,
                     std::move(Level<GameClass>(_engineRef, levelName)));
-                std::cout << "ENGINE: Created new level: " << levelName
-                          << std::endl;
-                return (_levels.at(levelName));
+                if (_engineRef.verboseLogs)
+                    std::cout << "ENGINE: Created new level: " << levelName
+                              << std::endl;
+                return (levels.at(levelName));
             }
 
             /**
@@ -187,16 +188,18 @@ namespace Engine
             {
                 const std::string cur = _currentLevel;
 
-                if (!_levels.contains(levelName)) {
-                    std::cout << "ENGINE: Can't delete level" << levelName
-                              << std::endl;
+                if (!levels.contains(levelName)) {
+                    if (_engineRef.verboseLogs)
+                        std::cout << "ENGINE: Can't delete level" << levelName
+                                  << std::endl;
                     return (false);
                 }
-                _levels.erase(levelName);
+                levels.erase(levelName);
                 if (levelName == cur)
                     _currentLevel = "";
-                std::cout << "ENGINE: Deleted level: " << levelName
-                          << std::endl;
+                if (_engineRef.verboseLogs)
+                    std::cout << "ENGINE: Deleted level: " << levelName
+                              << std::endl;
                 return (true);
             }
 
@@ -212,7 +215,7 @@ namespace Engine
             {
                 _currentLevel = "";
 
-                _levels.clear();
+                levels.clear();
                 return (true);
             }
 
@@ -241,12 +244,12 @@ namespace Engine
              */
             Level<GameClass> &getSpecificLevel(const std::string &levelName)
             {
-                if (!_levels.contains(levelName)) {
+                if (!levels.contains(levelName)) {
                     throw std::range_error(THROW_ERROR_LOCATION
                         "No level was loaded, or the level "
                         "does not exists anymore!");
                 }
-                return (_levels.at(levelName));
+                return (levels.at(levelName));
             }
 
             /**
@@ -258,12 +261,12 @@ namespace Engine
              */
             Level<GameClass> &getCurrentLevel(void)
             {
-                if (_currentLevel == "" || !_levels.contains(_currentLevel)) {
+                if (_currentLevel == "" || !levels.contains(_currentLevel)) {
                     throw std::range_error(THROW_ERROR_LOCATION
                         "No level was loaded, or the level "
                         "does not exists anymore!");
                 }
-                return (_levels.at(_currentLevel));
+                return (levels.at(_currentLevel));
             }
 
             /**
@@ -289,12 +292,14 @@ namespace Engine
                     throw std::range_error(THROW_ERROR_LOCATION
                         "Cannot switch to an empty level!");
                 if (levelName == _currentLevel) {
-                    std::cout << "ENGINE: Note: Attempt to switch to already "
-                                 "current level: "
-                              << levelName << std::endl;
+                    if (_engineRef.verboseLogs)
+                        std::cout
+                            << "ENGINE: Note: Attempt to switch to already "
+                               "current level: "
+                            << levelName << std::endl;
                     return (getCurrentLevel());
                 }
-                if (!_levels.contains(levelName)) {
+                if (!levels.contains(levelName)) {
                     throw std::range_error(THROW_ERROR_LOCATION
                         "No level was loaded, or the level "
                         "does not exists anymore!");
@@ -303,22 +308,23 @@ namespace Engine
                     Events::EVENT_OnLevelSwitch, std::string(levelName));
                 _currentLevel = levelName;
                 if (prev != "") {
-                    _levels.at(prev).stopLevel();
+                    levels.at(prev).stopLevel();
                     if (destroyPrevious == true) {
                         deleteLevel(prev);
                     }
                 }
                 auto &l = getCurrentLevel();
                 l.startLevel();
-                std::cout << "ENGINE: Switched to level: " << levelName
-                          << std::endl;
+                if (_engineRef.verboseLogs)
+                    std::cout << "ENGINE: Switched to level: " << levelName
+                              << std::endl;
                 return (l);
             }
 
           protected:
             ECSManager<GameClass> _persistentLevel;
             std::string _currentLevel;
-            std::unordered_map<std::string, Level<GameClass>> _levels;
+            std::unordered_map<std::string, Level<GameClass>> levels;
 
             void engineOnTick(float deltaTimeSec) override
             {

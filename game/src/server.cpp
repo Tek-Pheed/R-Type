@@ -33,7 +33,7 @@ void GameInstance::serverEventNewConn(
 {
     (void) core;
     size_t newID = std::any_cast<size_t>(arg);
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Server wakeup on event: " << event << std::endl;
     std::stringstream ss;
     ss << C_INIT_UDP << " " << newID << PACKET_END;
@@ -46,7 +46,7 @@ void GameInstance::serverEventClosedConn(
 {
     (void) core;
     ssize_t id = std::any_cast<ssize_t>(arg);
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Server wakeup on event: " << event << std::endl;
     std::stringstream ss;
     if (id >= 0) {
@@ -54,8 +54,10 @@ void GameInstance::serverEventClosedConn(
             deletePlayer((size_t) id);
             refNetworkManager.disconnectClient((size_t) id);
         } catch (const std::exception &e) {
-            std::cout << CATCH_ERROR_LOCATION "Could not delete player: " << id
-                      << ", maybe it failed to connect." << std::endl;
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
+                std::cout << CATCH_ERROR_LOCATION "Could not delete player: "
+                          << id << ", maybe it failed to connect."
+                          << std::endl;
         }
     }
 }
@@ -64,7 +66,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
 {
     std::unique_lock lock(_gameLock);
 
-    if (RType::GameInstance::DEBUG_LOGS)
+    if constexpr (RType::GameInstance::DEBUG_LOGS)
         std::cout << "Sending game state to new player: " << clientID
                   << std::endl;
     for (auto &p : getAllPlayers()) {
@@ -72,7 +74,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
         auto pl = p.get().getComponent<ecs::PlayerComponent>();
         std::string n = DEFAULT_PLAYER_NAME;
 
-        if (_isServer) {
+        if constexpr (server) {
             auto nm = p.get().getComponent<ecs::TextComponent<std::string>>();
             if (nm)
                 n = nm->getText();
@@ -82,7 +84,7 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
                 nm->getText();
         }
         if (!pl || !pos) {
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "serverSendGameState: Failed to get player"
                           << std::endl;
             continue;
@@ -94,13 +96,13 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
             clientID, System::Network::ISocket::Type::TCP, sss.str());
     }
     for (auto &e : refEntityManager.getCurrentLevel()
-             .findEntitiesByComponent<ecs::EnemyComponent>()) {
+                       .findEntitiesByComponent<ecs::EnemyComponent>()) {
         auto pos = e.get().getComponent<ecs::PositionComponent>();
         auto vel = e.get().getComponent<ecs::VelocityComponent>();
         auto ec = e.get().getComponent<ecs::EnemyComponent>();
         auto hl = e.get().getComponent<ecs::HealthComponent>();
         if (!ec || !pos) {
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "serverSendGameState: Failed to get enemy"
                           << std::endl;
             continue;
@@ -112,6 +114,18 @@ void RType::GameInstance::serverSendGameState(size_t clientID)
             << " " << vel->getVy() << PACKET_END;
         refNetworkManager.sendToOne(
             clientID, System::Network::ISocket::Type::TCP, sss.str());
+    }
+    for (auto &e : refEntityManager.getCurrentLevel()
+                       .findEntitiesByComponent<ecs::BonusComponent>()) {
+        if (!e.get().getComponent<ecs::PlayerComponent>()) {
+            auto bon = e.get().getComponent<ecs::BonusComponent>();
+            auto pos = e.get().getComponent<ecs::PositionComponent>();
+            std::stringstream sss;
+            sss << BN_SPAWN << " " << bon->getBonusID() << " " << pos->getX()
+                << " " << pos->getY() << " " << bon->getWave() << PACKET_END;
+            refNetworkManager.sendToOne(
+                clientID, System::Network::ISocket::Type::TCP, sss.str());
+        }
     }
     if (_musicName != "") {
         std::stringstream ss;
@@ -182,7 +196,7 @@ void RType::GameInstance::serverHanlderValidateConnection(
                 serverSendGameState((size_t) netClientID);
             }
         } else {
-            if (RType::GameInstance::DEBUG_LOGS)
+            if constexpr (RType::GameInstance::DEBUG_LOGS)
                 std::cout << "serverHanlderValidateConnection: Could not read "
                              "client ID"
                           << std::endl;
@@ -209,13 +223,12 @@ std::vector<std::string> GameInstance::getTxtFiles(const std::string &path)
 
 void GameInstance::setupServer(uint16_t tcpPort, uint16_t udpPort)
 {
-    std::vector<std::string> levelFiles = getTxtFiles("./assets/levels");
+    std::vector<std::string> levelFiles = getTxtFiles("assets/levels");
 
     if (levelFiles.empty()) {
         throw ErrorClass(THROW_ERROR_LOCATION "No level founds !");
     }
 
-    _isServer = true;
     _tcpPort = tcpPort;
     _udpPort = udpPort;
     refNetworkManager.setupServer<PacketHandler>(_tcpPort, _udpPort);
