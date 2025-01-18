@@ -72,6 +72,8 @@ namespace RType
         GameInstance(Engine::Core &engineRef);
         ~GameInstance();
 
+        void resetGame();
+
         size_t WinScaleX = 1;
         size_t WinScaleY = 1;
 

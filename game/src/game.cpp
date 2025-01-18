@@ -451,6 +451,26 @@ void GameInstance::gamePostTick(
     }
 }
 
+void RType::GameInstance::resetGame()
+{
+    _maxPlayers = DEFAULT_MAX_PLAYERS;
+    _difficulty = DEFAULT_DIFFICULTY;
+    _bonus = true;
+    _level = 1;
+    _gamemode = 0;
+    _playerEntityID = -1;
+    _netClientID = -1;
+    _isConnectedToServer = false;
+    _gameStarted = false;
+    _udpPort = DEFAULT_UDP_PORT;
+    _tcpPort = DEFAULT_TCP_PORT;
+    _ip = DEFAULT_IP;
+    _ticks = 0U;
+    _lastNetTick = 0U;
+    _clientGameMasterId = -1;
+    _healthId = -1;
+}
+
 int RType::GameInstance::manageBuffers()
 {
     if (!isServer() && !_isConnectedToServer)
