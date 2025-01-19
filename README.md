@@ -46,10 +46,7 @@ The project is developed using the following libraries:
 
 ## 3. How to Launch
 
-### Manual/Native build
-[Check out this page on our documentation](https://r-type.leafs-studio.com/building.html)
-
-### Build and launch R-Type with docker
+### Build and launch R-Type
 
 This projet works with Dockerfile.
 
@@ -87,10 +84,25 @@ or you can go [here](https://r-type.leafs-studio.com) to see it !
 
 Benchmarks have been made in order to choose the best way to realise this
 project, one for the languages and one for the graphical libraries.
-You can find the [Benchmarks](https://r-type.leafs-studio.com/benchmarks.html)
-here.
+You can find the [Benchmarks](./benchmarks.md) here.
 
-## 5. Authors
+## 5. Accessibility Compliance
+
+The game has been developed and verified using the [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) to ensure it adheres to color accessibility standards. 
+
+### Compliance Details:
+- **Normal Text**: 
+  - WCAG AA: Pass
+  - WCAG AAA: Pass
+- **Large Text**: 
+  - WCAG AA: Pass
+  - WCAG AAA: Pass
+- **Graphical Objects and User Interface Components**: 
+  - WCAG AA: Pass
+
+This ensures the game respects color norms and is accessible to individuals with color vision deficiencies, such as daltonism.
+
+## 6. Authors
 
 The project was developed by the following team members:
 
@@ -99,4 +111,3 @@ The project was developed by the following team members:
 - **[Scandella Raphaël]**
 - **[AUGAIT Arnaud]**
 - **[NASSET Samy]**
-
