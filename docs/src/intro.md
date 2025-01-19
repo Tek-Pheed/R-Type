@@ -86,7 +86,23 @@ Benchmarks have been made in order to choose the best way to realise this
 project, one for the languages and one for the graphical libraries.
 You can find the [Benchmarks](./benchmarks.md) here.
 
-## 5. Authors
+## 5. Accessibility Compliance
+
+The game has been developed and verified using the [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) to ensure it adheres to color accessibility standards. 
+
+### Compliance Details:
+- **Normal Text**: 
+  - WCAG AA: Pass
+  - WCAG AAA: Pass
+- **Large Text**: 
+  - WCAG AA: Pass
+  - WCAG AAA: Pass
+- **Graphical Objects and User Interface Components**: 
+  - WCAG AA: Pass
+
+This ensures the game respects color norms and is accessible to individuals with color vision deficiencies, such as daltonism.
+
+## 6. Authors
 
 The project was developed by the following team members:
 
