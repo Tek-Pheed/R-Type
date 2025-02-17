@@ -18,7 +18,7 @@
 
 - **Rust** : Plus simple que le C++ pour la gestion de la mémoire, grâce à son système d'emprunt et de propriété.
 
-- Go** : Moins complexe que C++ ou Rust mais offre moins de fonctionnalités pour la gestion fine des ressources.
+- **Go** : Moins complexe que C++ ou Rust mais offre moins de fonctionnalités pour la gestion fine des ressources.
 
 - **Python** : Le plus facile à utiliser mais ne convient pas pour les parties critiques du jeu où les performances sont primordiales.
 
@@ -40,7 +40,7 @@
 
 - **Go** : Principalement utilisé pour les réseaux et les applications dorsales, avec un écosystème solide dans ce domaine mais une utilisation limitée dans le développement de jeux.
 
-- Python** : Il dispose d'un énorme écosystème pour les scripts, le prototypage et les outils d'automatisation, mais son utilisation est très limitée pour le développement de jeux en temps réel.
+- **Python** : Il dispose d'un énorme écosystème pour les scripts, le prototypage et les outils d'automatisation, mais son utilisation est très limitée pour le développement de jeux en temps réel.
 
 ### Conclusion : Pourquoi C++ est le meilleur choix pour notre projet R-Type ?
 
